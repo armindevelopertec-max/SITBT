@@ -29,28 +29,28 @@ export class Personal {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'person_id' })
   person_id: number;
 
   @ManyToOne(() => Persona)
   @JoinColumn({ name: 'person_id' })
   persona: Persona;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'profesion' })
   profession: string;
 
-  @Column({ type: 'enum', enum: StaffPosition })
+  @Column({ type: 'varchar', length: 50, name: 'cargo' })
   position: StaffPosition;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', name: 'fecha_contrato' })
   hire_date: Date;
 
-  @Column({ type: 'enum', enum: StaffStatus, default: StaffStatus.ACTIVO })
+  @Column({ type: 'varchar', length: 20, name: 'estado' })
   status: StaffStatus;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 }

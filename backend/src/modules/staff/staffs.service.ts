@@ -25,7 +25,7 @@ export class StaffsService {
   ): Promise<{ data: Personal[]; total: number; page: number; limit: number }> {
     const query = this.staffRepository
       .createQueryBuilder('staff')
-      .leftJoinAndSelect('staff.person', 'person');
+      .leftJoinAndSelect('staff.persona', 'persona');
 
     if (status) {
       query.andWhere('staff.status = :status', { status });
@@ -47,7 +47,7 @@ export class StaffsService {
   async findOne(id: number): Promise<Personal> {
     const staff = await this.staffRepository.findOne({
       where: { id },
-      relations: ['person'],
+      relations: ['persona'],
     });
     if (!staff) {
       throw new NotFoundException(`Staff with ID ${id} not found`);
@@ -69,7 +69,7 @@ export class StaffsService {
   async findByPosition(position: StaffPosition): Promise<Personal[]> {
     return this.staffRepository.find({
       where: { position, status: StaffStatus.ACTIVO },
-      relations: ['person'],
+      relations: ['persona'],
       order: { hire_date: 'ASC' },
     });
   }
@@ -77,7 +77,7 @@ export class StaffsService {
   async findActive(): Promise<Personal[]> {
     return this.staffRepository.find({
       where: { status: StaffStatus.ACTIVO },
-      relations: ['person'],
+      relations: ['persona'],
       order: { hire_date: 'ASC' },
     });
   }

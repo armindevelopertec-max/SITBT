@@ -22,6 +22,7 @@ import { ConvalidationsModule } from './modules/convalidations/convalidations.mo
 import { AuditModule } from './modules/audit/audit.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { InstitutionSettingsModule } from './modules/institution-settings/institution-settings.module';
+import { GestionesModule } from './modules/gestiones/gestiones.module';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { InstitutionSettingsModule } from './modules/institution-settings/instit
         password: configService.get('DB_PASSWORD', 'sitbt_password'),
         database: configService.get('DB_DATABASE', 'sitbt_db'),
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false,
         logging: configService.get('DB_LOGGING', 'false') === 'true',
       }),
       inject: [ConfigService],
@@ -65,6 +66,7 @@ import { InstitutionSettingsModule } from './modules/institution-settings/instit
     AuditModule,
     StorageModule,
     InstitutionSettingsModule,
+    GestionesModule,
   ],
 })
 export class AppModule {}

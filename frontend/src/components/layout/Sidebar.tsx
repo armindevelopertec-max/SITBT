@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth-store';
 import { useInstitutionSettings } from '@/hooks/useInstitutionSettings';
-import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, ClipboardList, Award, CreditCard, FileText, RefreshCw, BarChart3, Shield, User, BookMarked, CalendarCheck, Settings, Building2 } from 'lucide-react';
+import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, ClipboardList, Award, CreditCard, FileText, RefreshCw, BarChart3, Shield, User, BookMarked, CalendarCheck, Settings, Building2, Calendar } from 'lucide-react';
 import { Role } from '@/types';
 
 interface MenuItem {
@@ -35,12 +35,6 @@ const menuSections: MenuSection[] = [
         href: '/panel',
         icon: <Home className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente', 'estudiante', 'apoyo'],
-      },
-      {
-        title: 'Personas',
-        href: '/personas',
-        icon: <Users className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico', 'rector'],
       },
       {
         title: 'Estudiantes',
@@ -134,6 +128,12 @@ const menuSections: MenuSection[] = [
         title: 'Institución',
         href: '/configuracion/institucion',
         icon: <Building2 className="w-5 h-5" />,
+        roles: ['administrador'],
+      },
+      {
+        title: 'Gestiones',
+        href: '/configuracion/gestiones',
+        icon: <Calendar className="w-5 h-5" />,
         roles: ['administrador'],
       },
     ],

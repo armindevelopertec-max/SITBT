@@ -25,9 +25,9 @@ export class StudentsService {
   ): Promise<{ data: Estudiante[]; total: number; page: number; limit: number }> {
     const query = this.studentRepository
       .createQueryBuilder('student')
-      .leftJoinAndSelect('student.person', 'person')
-      .leftJoinAndSelect('student.career', 'career')
-      .leftJoinAndSelect('student.study_plan', 'study_plan');
+      .leftJoinAndSelect('student.persona', 'persona')
+      .leftJoinAndSelect('student.carrera', 'carrera')
+      .leftJoinAndSelect('student.plan_estudio', 'plan_estudio');
 
     if (status) {
       query.andWhere('student.status = :status', { status });
@@ -49,7 +49,7 @@ export class StudentsService {
   async findOne(id: number): Promise<Estudiante> {
     const student = await this.studentRepository.findOne({
       where: { id },
-      relations: ['person', 'career', 'study_plan'],
+      relations: ['persona', 'carrera', 'plan_estudio'],
     });
     if (!student) {
       throw new NotFoundException(`Student with ID ${id} not found`);
@@ -60,7 +60,7 @@ export class StudentsService {
   async findByInscriptionCode(code: string): Promise<Estudiante> {
     const student = await this.studentRepository.findOne({
       where: { inscription_code: code },
-      relations: ['person', 'career', 'study_plan'],
+      relations: ['persona', 'carrera', 'plan_estudio'],
     });
     if (!student) {
       throw new NotFoundException(`Student with inscription code ${code} not found`);
@@ -82,7 +82,7 @@ export class StudentsService {
   async findByCareer(careerId: number, gestion?: string): Promise<Estudiante[]> {
     const query = this.studentRepository
       .createQueryBuilder('student')
-      .leftJoinAndSelect('student.person', 'person')
+      .leftJoinAndSelect('student.persona', 'persona')
       .where('student.career_id = :careerId', { careerId });
 
     if (gestion) {
@@ -95,7 +95,7 @@ export class StudentsService {
   async findActive(): Promise<Estudiante[]> {
     return this.studentRepository.find({
       where: { status: StudentStatus.ACTIVO },
-      relations: ['person', 'career'],
+      relations: ['persona', 'carrera'],
       order: { inscription_code: 'ASC' },
     });
   }

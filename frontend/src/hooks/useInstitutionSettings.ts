@@ -13,6 +13,7 @@ export interface InstitutionSettings {
   website: string | null;
   ciudad: string | null;
   pais: string;
+  descripcion: string | null;
 }
 
 export function useInstitutionSettings() {
@@ -41,6 +42,7 @@ export function useInstitutionSettings() {
         website: null,
         ciudad: null,
         pais: 'Bolivia',
+        descripcion: null,
       });
     } finally {
       setLoading(false);

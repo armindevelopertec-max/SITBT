@@ -10,54 +10,63 @@ export type Role =
 export interface User {
   id: number;
   username: string;
-  email: string;
+  email?: string;
   role: Role;
-  personId?: number;
-  isActive: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  person_id?: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Person {
   id: number;
   ci: string;
-  nombre: string;
-  primerApellido: string;
-  segundoApellido?: string;
-  fechaNacimiento: string;
-  genero: 'M' | 'F';
-  telefono?: string;
-  direccion?: string;
+  ci_issued?: string;
+  names: string;
+  lastname_paternal: string;
+  lastname_maternal: string;
+  birthdate: string;
+  birthplace?: string;
+  gender: 'M' | 'F';
+  marital_status?: string;
+  nationality?: string;
+  dual_nationality?: string;
+  passport_number?: string;
+  blood_type?: string;
+  disability?: string;
+  military_book_number?: string;
+  mother_tongue?: string;
+  phone?: string;
   email?: string;
-  foto?: string;
-  estadoCivil?: string;
-  nacionalidad?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  address?: string;
+  photo_url?: string;
+  status?: 'activo' | 'inactivo';
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Student {
   id: number;
-  personId: number;
-  codigoEstudiante: string;
-  fechaIngreso: string;
-  estado: 'activo' | 'inactivo' | 'egresado' | 'suspendido';
-  person?: Person;
-  createdAt?: string;
-  updatedAt?: string;
+  person_id: number;
+  student_code: string;
+  admission_date: string;
+  status: 'activo' | 'inactivo' | 'egresado' | 'suspendido';
+  persona?: Person;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Staff {
   id: number;
-  personId: number;
-  cargo: string;
-  departamento?: string;
-  fechaContratacion: string;
-  tipoContrato: 'planta' | 'contrato' | 'honorarios';
-  estado: 'activo' | 'inactivo';
+  person_id: number;
+  rol: string;
+  department?: string;
+  hire_date: string;
+  contract_type: 'planta' | 'contrato' | 'honorarios';
+  status: 'activo' | 'inactivo';
   person?: Person;
-  createdAt?: string;
-  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Career {
@@ -170,6 +179,8 @@ export interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   setUser: (user: User) => void;
@@ -186,4 +197,29 @@ export interface MenuItem {
 export interface BreadcrumbItem {
   label: string;
   href?: string;
+}
+
+export interface Periodo {
+  id: number;
+  gestion_id: number;
+  number: string;
+  name?: string;
+  start_date: string;
+  end_date: string;
+  status: 'abierta' | 'cerrada' | 'pendiente';
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Gestion {
+  id: number;
+  year: string;
+  period_type: 'semestral';
+  status: 'abierta' | 'cerrada' | 'pendiente';
+  is_current: boolean;
+  notes?: string;
+  periodos?: Periodo[];
+  created_at?: string;
+  updated_at?: string;
 }

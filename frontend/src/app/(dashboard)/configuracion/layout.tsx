@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Building2, Shield, Settings as SettingsIcon } from 'lucide-react';
+import { Building2, Shield, Settings as SettingsIcon, Calendar } from 'lucide-react';
 
 interface ConfiguracionLayoutProps {
   children: ReactNode;
@@ -16,6 +16,12 @@ const configuracionLinks = [
     href: '/configuracion/institucion',
     icon: Building2,
     description: 'Datos generales, contacto y logo',
+  },
+  {
+    title: 'Gestiones',
+    href: '/configuracion/gestiones',
+    icon: Calendar,
+    description: 'Períodos académicos y estados',
   },
 ];
 

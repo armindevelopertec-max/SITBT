@@ -10,6 +10,11 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isAuthenticated: false,
       isLoading: false,
+      _hasHydrated: false,
+
+      setHasHydrated: (state: boolean) => {
+        set({ _hasHydrated: state });
+      },
 
       login: async (username: string, password: string) => {
         set({ isLoading: true });
@@ -25,8 +30,8 @@ export const useAuthStore = create<AuthState>()(
             username: user.username,
             email: user.person?.email || '',
             role: firstRole,
-            personId: user.person_id,
-            isActive: true,
+            person_id: user.person_id,
+            is_active: true,
           };
 
           set({
@@ -56,6 +61,9 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

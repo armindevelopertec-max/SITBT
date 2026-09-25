@@ -16,7 +16,7 @@ export default function DashboardLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, _hasHydrated } = useAuthStore();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -32,8 +32,17 @@ export default function DashboardLayout({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  useEffect(() => {
+    if (_hasHydrated && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [_hasHydrated, isAuthenticated, router]);
+
+  if (!_hasHydrated) {
+    return null;
+  }
+
   if (!isAuthenticated) {
-    router.push('/login');
     return null;
   }
 
