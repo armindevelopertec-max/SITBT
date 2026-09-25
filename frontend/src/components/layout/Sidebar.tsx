@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -19,6 +18,13 @@ interface MenuItem {
 interface MenuSection {
   title?: string;
   items: MenuItem[];
+}
+
+interface SidebarProps {
+  isCollapsed: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
+  onCollapse?: () => void;
 }
 
 const menuSections: MenuSection[] = [
@@ -134,8 +140,7 @@ const menuSections: MenuSection[] = [
   },
 ];
 
-export default function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+export default function Sidebar({ isCollapsed, isOpen = true, onClose, onCollapse }: SidebarProps) {
   const pathname = usePathname();
   const { user } = useAuthStore();
   const { settings } = useInstitutionSettings();
@@ -151,7 +156,8 @@ export default function Sidebar() {
     <aside
       className={cn(
         'fixed left-0 top-0 z-40 h-screen bg-white border-r border-gray-200 transition-all duration-300',
-        isCollapsed ? 'w-16' : 'w-64'
+        isCollapsed ? 'w-16' : 'w-64',
+        !isOpen ? '-translate-x-full lg:translate-x-0' : 'translate-x-0'
       )}
     >
       <div className="flex flex-col h-full">
@@ -196,14 +202,20 @@ export default function Sidebar() {
             )
           )}
           <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            onClick={onCollapse}
+            className="hidden lg:block p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
             {isCollapsed ? (
               <Menu className="w-5 h-5 text-gray-600" />
             ) : (
               <X className="w-5 h-5 text-gray-600" />
             )}
+          </button>
+          <button
+            onClick={onClose}
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-600" />
           </button>
         </div>
 
