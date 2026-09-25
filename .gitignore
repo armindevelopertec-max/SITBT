@@ -1,0 +1,41 @@
+# Dependencies
+backend/node_modules/
+frontend/node_modules/
+
+# Build outputs
+backend/dist/
+frontend/.next/
+frontend/out/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Docker volumes (data)
+postgres_data/
+redis_data/
+minio_data/
+minio_config/
+
+# MinIO data
+sitbt-files/
+
+# Temporary files
+*.tmp
+*.temp
