@@ -10,6 +10,7 @@ import {
 import { Estudiante } from './estudiante.entity';
 import { Materia } from './materia.entity';
 import { Grupo } from './grupo.entity';
+import { MateriaPlan } from './materia-plan.entity';
 
 export enum EnrollmentStatus {
   CURSANDO = 'cursando',
@@ -36,6 +37,13 @@ export class Inscripcion {
   @ManyToOne(() => Materia)
   @JoinColumn({ name: 'subject_id' })
   materia: Materia;
+
+  @Column({ nullable: true })
+  plan_subject_id: number | null;
+
+  @ManyToOne(() => MateriaPlan, { nullable: true })
+  @JoinColumn({ name: 'plan_subject_id' })
+  materiaPlan: MateriaPlan;
 
   @Column()
   group_id: number;

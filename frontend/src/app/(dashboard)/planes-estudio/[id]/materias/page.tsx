@@ -408,12 +408,12 @@ export default function PlanMateriasPage() {
                       <TableBody>
                         {materiasSemestre.map(mp => (
                           <TableRow key={mp.id}>
-                            <TableCell className="font-medium">{mp.materia?.code}</TableCell>
-                            <TableCell>{mp.materia?.name}</TableCell>
+                            <TableCell className="font-medium">{mp.code || mp['materia.code']}</TableCell>
+                            <TableCell>{mp['materia.name']}</TableCell>
                             <TableCell className="text-center">{mp.weekly_hours}</TableCell>
                             <TableCell>
-                              {mp.prerequisite ? (
-                                <Badge variant="secondary">{mp.prerequisite.code}</Badge>
+                              {mp.prerequisite_id ? (
+                                <Badge variant="secondary">{mp.prerequisite_plan_code || mp['prerequisite.code']}</Badge>
                               ) : (
                                 <span className="text-gray-400 text-sm">-</span>
                               )}
