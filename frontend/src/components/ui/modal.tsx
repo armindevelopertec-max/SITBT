@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 import { Button } from './button';
 
 interface ModalProps {
-  isOpen: boolean;
+  open: boolean;
   onClose: () => void;
   title?: string;
   description?: string;
@@ -16,7 +16,7 @@ interface ModalProps {
 }
 
 export function Modal({
-  isOpen,
+  open,
   onClose,
   title,
   description,
@@ -24,7 +24,7 @@ export function Modal({
   size = 'md',
   showCloseButton = true,
 }: ModalProps) {
-  if (!isOpen) return null;
+  if (!open) return null;
 
   const sizes = {
     sm: 'max-w-md',
@@ -78,38 +78,38 @@ export function Modal({
 }
 
 interface ConfirmModalProps {
-  isOpen: boolean;
+  open: boolean;
   onClose: () => void;
   onConfirm: () => void;
   title: string;
-  description: string;
+  message: string;
   confirmText?: string;
   cancelText?: string;
   variant?: 'default' | 'destructive';
-  isLoading?: boolean;
+  loading?: boolean;
 }
 
 export function ConfirmModal({
-  isOpen,
+  open,
   onClose,
   onConfirm,
   title,
-  description,
+  message,
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
   variant = 'default',
-  isLoading = false,
+  loading = false,
 }: ConfirmModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} description={description} size="sm">
+    <Modal open={open} onClose={onClose} title={title} description={message} size="sm">
       <div className="flex justify-end gap-3 mt-6">
-        <Button variant="outline" onClick={onClose} disabled={isLoading}>
+        <Button variant="outline" onClick={onClose} disabled={loading}>
           {cancelText}
         </Button>
         <Button
           variant={variant === 'destructive' ? 'destructive' : 'primary'}
           onClick={onConfirm}
-          isLoading={isLoading}
+          isLoading={loading}
         >
           {confirmText}
         </Button>

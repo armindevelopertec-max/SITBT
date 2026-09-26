@@ -129,13 +129,14 @@ export default function GestionesPage() {
     setConfirmModalOpen(true);
   };
 
-  const handleSetCurrent = async (gestion: Gestion) => {
-    try {
-      await api.post(`/gestiones/${gestion.id}/set-current`);
-      fetchGestiones();
-    } catch (error) {
-      console.error('Error setting current gestion:', error);
-    }
+  const handleSetCurrent = (gestion: Gestion) => {
+    setConfirmAction({
+      type: 'setCurrent',
+      id: gestion.id,
+      title: 'Marcar como Actual',
+      message: `¿Estás seguro de marcar la gestión ${gestion.year} como actual?`,
+    });
+    setConfirmModalOpen(true);
   };
 
   const handleDelete = async () => {
@@ -185,6 +186,9 @@ export default function GestionesPage() {
           break;
         case 'closeGestion':
           await api.post(`/gestiones/${confirmAction.id}/close`);
+          break;
+        case 'setCurrent':
+          await api.post(`/gestiones/${confirmAction.id}/set-current`);
           break;
         case 'openPeriodo':
           await api.post(`/gestiones/periodos/${confirmAction.id}/open`);

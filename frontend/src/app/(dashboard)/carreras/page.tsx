@@ -1,28 +1,92 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Select } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ConfirmModal } from '@/components/ui/modal';
+import { api } from '@/lib/api';
+import { Search, Plus, Edit2, Trash2, Loader2 } from 'lucide-react';
 
-const careersData = [
-  { id: 1, codigo: 'ING-SIS', nombre: 'Ingeniería de Sistemas', duracion: 10, modalidad: 'presencial', estado: 'activo' },
-  { id: 2, codigo: 'CONT', nombre: 'Contabilidad', duracion: 8, modalidad: 'presencial', estado: 'activo' },
-  { id: 3, codigo: 'ADMIN', nombre: 'Administración de Empresas', duracion: 8, modalidad: 'semipresencial', estado: 'activo' },
-  { id: 4, codigo: 'DER', nombre: 'Derecho', duracion: 10, modalidad: 'presencial', estado: 'inactivo' },
-];
+interface Carrera {
+  id: number;
+  code: string;
+  name: string;
+  title: string;
+  area: string | null;
+  description: string | null;
+  load_hours: number;
+  status: 'activo' | 'inactivo';
+  created_at: string;
+  updated_at: string;
+}
 
-export default function CareersPage() {
+export default function CarrerasPage() {
+  const router = useRouter();
+  const [carreras, setCarreras] = useState<Carrera[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingCarrera, setDeletingCarrera] = useState<Carrera | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetchCarreras();
+  }, []);
+
+  const fetchCarreras = async () => {
+    try {
+      const response = await api.get('/carreras/active');
+      setCarreras(response.data || []);
+    } catch (error) {
+      console.error('Error fetching carreras:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deletingCarrera) return;
+
+    setSaving(true);
+    try {
+      await api.delete(`/carreras/${deletingCarrera.id}`);
+      setDeleteModalOpen(false);
+      setDeletingCarrera(null);
+      fetchCarreras();
+    } catch (error) {
+      console.error('Error deleting carrera:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const filteredCarreras = carreras.filter(c =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (c.area && c.area.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Carreras' }]} />
+      <Breadcrumb items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Carreras' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Carreras</h1>
-        <Button>
+        <Button onClick={() => router.push('/carreras/nuevo')}>
           <Plus className="w-4 h-4 mr-2" />
           Nueva Carrera
         </Button>
@@ -34,7 +98,12 @@ export default function CareersPage() {
             <CardTitle>Lista de Carreras</CardTitle>
             <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input placeholder="Buscar carrera..." className="pl-10" />
+              <Input
+                placeholder="Buscar por nombre, código o área..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
           </div>
         </CardHeader>
@@ -44,42 +113,53 @@ export default function CareersPage() {
               <TableRow>
                 <TableHead>Código</TableHead>
                 <TableHead>Nombre</TableHead>
-                <TableHead>Duración (semestres)</TableHead>
-                <TableHead>Modalidad</TableHead>
-                <TableHead>Estado</TableHead>
+                <TableHead>Título</TableHead>
+                <TableHead>Área</TableHead>
                 <TableHead>Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {careersData.map((career) => (
-                <TableRow key={career.id}>
-                  <TableCell className="font-medium">{career.codigo}</TableCell>
-                  <TableCell>{career.nombre}</TableCell>
-                  <TableCell>{career.duracion}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="capitalize">{career.modalidad}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={career.estado === 'activo' ? 'exito' : 'error'} className="capitalize">
-                      {career.estado}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon">
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </Button>
-                    </div>
+              {filteredCarreras.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                    No se encontraron carreras
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                filteredCarreras.map((carrera) => (
+                  <TableRow key={carrera.id}>
+                    <TableCell className="font-medium">{carrera.code}</TableCell>
+                    <TableCell>{carrera.name}</TableCell>
+                    <TableCell>{carrera.title}</TableCell>
+                    <TableCell>{carrera.area || '-'}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="icon" onClick={() => router.push(`/carreras/${carrera.id}`)}>
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => { setDeletingCarrera(carrera); setDeleteModalOpen(true); }}>
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      <ConfirmModal
+        open={deleteModalOpen}
+        onClose={() => { setDeleteModalOpen(false); setDeletingCarrera(null); }}
+        onConfirm={handleDelete}
+        title="Eliminar Carrera"
+        message={`¿Estás seguro de eliminar la carrera "${deletingCarrera?.name}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        confirmVariant="danger"
+        loading={saving}
+      />
     </div>
   );
 }

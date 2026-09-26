@@ -29,8 +29,8 @@ export class SubjectsController {
   }
 
   @Get()
-  findAll(@Query('page') page = 1, @Query('limit') limit = 20, @Query('area') area?: string) {
-    return this.subjectsService.findAll(+page, +limit, area);
+  findAll(@Query('page') page = 1, @Query('limit') limit = 20) {
+    return this.subjectsService.findAll(+page, +limit);
   }
 
   @Get('all')
@@ -41,11 +41,6 @@ export class SubjectsController {
   @Get('search')
   search(@Query('q') query: string) {
     return this.subjectsService.search(query);
-  }
-
-  @Get('area/:area')
-  findByArea(@Param('area') area: string) {
-    return this.subjectsService.findByArea(area);
   }
 
   @Get('code/:code')

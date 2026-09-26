@@ -56,7 +56,7 @@ export class StudyPlansController {
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.studyPlansService.findOne(id);
+    return this.studyPlansService.findOneWithMaterias(id);
   }
 
   @Patch(':id')
@@ -67,5 +67,35 @@ export class StudyPlansController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.studyPlansService.remove(id);
+  }
+
+  @Post(':id/materias')
+  addMateria(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { subject_id: number; semester: number; weekly_hours: number; prerequisite_id?: number },
+  ) {
+    return this.studyPlansService.addMateria(id, body.subject_id, body.semester, body.weekly_hours, body.prerequisite_id);
+  }
+
+  @Delete(':id/materias/:materiaPlanId')
+  removeMateria(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('materiaPlanId', ParseIntPipe) materiaPlanId: number,
+  ) {
+    return this.studyPlansService.removeMateria(materiaPlanId);
+  }
+
+  @Patch(':id/materias/:materiaPlanId')
+  updateMateria(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('materiaPlanId', ParseIntPipe) materiaPlanId: number,
+    @Body() body: { semester: number; weekly_hours: number; prerequisite_id?: number },
+  ) {
+    return this.studyPlansService.updateMateria(materiaPlanId, body.semester, body.weekly_hours, body.prerequisite_id);
+  }
+
+  @Get(':id/materias')
+  getMaterias(@Param('id', ParseIntPipe) id: number) {
+    return this.studyPlansService.getMaterias(id);
   }
 }

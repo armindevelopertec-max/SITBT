@@ -11,14 +11,11 @@ export class Materia {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 20, unique: true })
+  @Column({ type: 'varchar', length: 20 })
   code: string;
 
   @Column({ type: 'varchar', length: 150 })
   name: string;
-
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  area: string;
 
   @CreateDateColumn()
   created_at: Date;

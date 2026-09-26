@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { api } from '@/lib/api';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Star } from 'lucide-react';
 
 interface Career {
   id: number;
@@ -23,6 +23,22 @@ interface StudyPlan {
   rm_number: string;
 }
 
+interface Gestion {
+  id: number;
+  year: string;
+  period_type: string;
+  status: string;
+  is_current: boolean;
+  periodos?: { id: number; number: string; name: string; status: string }[];
+}
+
+interface Periodo {
+  id: number;
+  number: string;
+  name: string;
+  status: string;
+}
+
 export default function NewStudentPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -30,6 +46,7 @@ export default function NewStudentPage() {
   const [loadingPlans, setLoadingPlans] = useState(false);
   const [careers, setCareers] = useState<Career[]>([]);
   const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
+  const [periodos, setPeriodos] = useState<{ gestion: Gestion; periodo: Periodo }[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [personData, setPersonData] = useState({
@@ -62,6 +79,7 @@ export default function NewStudentPage() {
 
   useEffect(() => {
     fetchCareers();
+    fetchGestiones();
   }, []);
 
   useEffect(() => {
@@ -92,6 +110,29 @@ export default function NewStudentPage() {
       console.error('Error fetching study plans:', error);
     } finally {
       setLoadingPlans(false);
+    }
+  };
+
+  const fetchGestiones = async () => {
+    try {
+      const response = await api.get('/gestiones');
+      const allGestiones: Gestion[] = response.data.data || [];
+      const allPeriodos: { gestion: Gestion; periodo: Periodo }[] = [];
+
+      allGestiones.forEach((gestion) => {
+        if (gestion.periodos && gestion.periodos.length > 0) {
+          gestion.periodos.forEach((periodo: any) => {
+            allPeriodos.push({ gestion, periodo });
+          });
+        }
+      });
+
+      setPeriodos(allPeriodos.sort((a, b) => {
+        if (a.gestion.year !== b.gestion.year) return b.gestion.year.localeCompare(a.gestion.year);
+        return a.periodo.number.localeCompare(b.periodo.number);
+      }));
+    } catch (error) {
+      console.error('Error fetching gestiones:', error);
     }
   };
 
@@ -324,12 +365,16 @@ export default function NewStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Select
                   label="Gestión de Ingreso *"
                   value={studentData.admission_gestion}
                   onChange={(e) => setStudentData({ ...studentData, admission_gestion: e.target.value })}
                   error={errors.admission_gestion}
-                  placeholder="2024"
+                  options={periodos.map(p => ({
+                    value: `${p.gestion.year}-${p.periodo.number}`,
+                    label: `${p.periodo.number}/${p.gestion.year}${p.periodo.status === 'abierta' ? ' ★' : ''}`,
+                  }))}
+                  placeholder="Seleccionar período..."
                 />
               </div>
               <div>

@@ -32,4 +32,11 @@ export class MateriaPlan {
 
   @Column({ type: 'int' })
   weekly_hours: number;
+
+  @Column({ nullable: true, type: 'int' })
+  prerequisite_id: number | null;
+
+  @ManyToOne(() => Materia, { nullable: true, eager: false })
+  @JoinColumn({ name: 'prerequisite_id' })
+  prerequisite: Materia;
 }

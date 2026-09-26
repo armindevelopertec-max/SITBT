@@ -26,15 +26,9 @@ export class SubjectsService {
   async findAll(
     page = 1,
     limit = 20,
-    area?: string,
   ): Promise<{ data: Materia[]; total: number; page: number; limit: number }> {
-    const query = this.subjectRepository.createQueryBuilder('subject');
-
-    if (area) {
-      query.where('subject.area = :area', { area });
-    }
-
-    const [data, total] = await query
+    const [data, total] = await this.subjectRepository
+      .createQueryBuilder('subject')
       .orderBy('subject.name', 'ASC')
       .skip((page - 1) * limit)
       .take(limit)
@@ -74,13 +68,6 @@ export class SubjectsService {
   async remove(id: number): Promise<void> {
     const subject = await this.findOne(id);
     await this.subjectRepository.remove(subject);
-  }
-
-  async findByArea(area: string): Promise<Materia[]> {
-    return this.subjectRepository.find({
-      where: { area },
-      order: { name: 'ASC' },
-    });
   }
 
   async search(query: string): Promise<Materia[]> {

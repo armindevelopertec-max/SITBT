@@ -136,6 +136,12 @@ const menuSections: MenuSection[] = [
         icon: <Calendar className="w-5 h-5" />,
         roles: ['administrador'],
       },
+      {
+        title: 'Planes de Estudio',
+        href: '/planes-estudio',
+        icon: <BookOpen className="w-5 h-5" />,
+        roles: ['administrador'],
+      },
     ],
   },
 ];
