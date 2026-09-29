@@ -93,7 +93,7 @@ export default function NewStudentPage() {
   const fetchCareers = async () => {
     try {
       const response = await api.get('/carreras/active');
-      setCareers(response.data.data || []);
+      setCareers(response.data || []);
     } catch (error) {
       console.error('Error fetching careers:', error);
     } finally {
@@ -105,7 +105,7 @@ export default function NewStudentPage() {
     setLoadingPlans(true);
     try {
       const response = await api.get(`/planes-estudio/current/${careerId}`);
-      setStudyPlans(response.data.data || []);
+      setStudyPlans(response.data || []);
     } catch (error) {
       console.error('Error fetching study plans:', error);
     } finally {
@@ -116,7 +116,7 @@ export default function NewStudentPage() {
   const fetchGestiones = async () => {
     try {
       const response = await api.get('/gestiones');
-      const allGestiones: Gestion[] = response.data.data || [];
+      const allGestiones: Gestion[] = response.data || [];
       const allPeriodos: { gestion: Gestion; periodo: Periodo }[] = [];
 
       allGestiones.forEach((gestion) => {
