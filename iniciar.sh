@@ -6,24 +6,60 @@ echo "=== SITBT - Iniciando Sistema ==="
 
 cd "$(dirname "$0")"
 
-echo "[1/5] Iniciando servicios Docker (PostgreSQL, Redis, MinIO)..."
+echo "[1/6] Iniciando servicios Docker (PostgreSQL, Redis, MinIO)..."
 docker compose up -d
 
-echo "[2/5] Esperando a que los servicios estén disponibles..."
+echo "[2/6] Esperando a que los servicios estén disponibles..."
 sleep 5
 
-echo "[3/5] Instalando dependencias del backend..."
+echo "[3/6] Instalando dependencias del backend..."
 cd backend
 npm install
 
-echo "[4/5] Ejecutando seed (usuario admin)..."
-npm run seed
+echo "[4/6] Verificando base de datos..."
 
-echo "[5/5] Iniciando backend y frontend..."
+# Verificar si ya existe el usuario admin
+ADMIN_EXISTS=$(PGPASSWORD=sitbt_password psql -h localhost -p 5434 -U sitbt -d sitbt_db -t -c "SELECT COUNT(*) FROM users WHERE username = 'admin';" 2>/dev/null || echo "0")
+ADMIN_EXISTS=$(echo $ADMIN_EXISTS | tr -d ' ')
+
+if [ "$ADMIN_EXISTS" -eq "0" ]; then
+  echo "  - Ejecutando seed (creando usuario admin)..."
+  npm run seed
+else
+  echo "  - Usuario admin ya existe, omitiendo seed"
+fi
+
+# Verificar si hay estudiantes/personal sin usuario
+STUDENTS_WITHOUT_USER=$(PGPASSWORD=sitbt_password psql -h localhost -p 5434 -U sitbt -d sitbt_db -t -c "
+  SELECT COUNT(*) FROM students s
+  LEFT JOIN users u ON s.person_id = u.person_id
+  WHERE u.id IS NULL;
+" 2>/dev/null || echo "0")
+STUDENTS_WITHOUT_USER=$(echo $STUDENTS_WITHOUT_USER | tr -d ' ')
+
+STAFF_WITHOUT_USER=$(PGPASSWORD=sitbt_password psql -h localhost -p 5434 -U sitbt -d sitbt_db -t -c "
+  SELECT COUNT(*) FROM staff s
+  LEFT JOIN users u ON s.person_id = u.person_id
+  WHERE u.id IS NULL;
+" 2>/dev/null || echo "0")
+STAFF_WITHOUT_USER=$(echo $STAFF_WITHOUT_USER | tr -d ' ')
+
+TOTAL_WITHOUT_USER=$((STUDENTS_WITHOUT_USER + STAFF_WITHOUT_USER))
+
+if [ "$TOTAL_WITHOUT_USER" -gt "0" ]; then
+  echo "  - Encontrados $STUDENTS_WITHOUT_USER estudiantes y $STAFF_WITHOUT_USER personal sin usuario"
+  echo "  - Ejecutando generación de usuarios..."
+  npm run generate-users
+else
+  echo "  - Todos los estudiantes y personal ya tienen usuario"
+fi
+
+echo "[5/6] Iniciando backend..."
 npm run start:dev &
 BACKEND_PID=$!
 cd ..
 
+echo "[6/6] Iniciando frontend..."
 cd frontend
 npm run dev &
 FRONTEND_PID=$!

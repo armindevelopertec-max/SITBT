@@ -16,13 +16,27 @@ export class UsersService {
     private userRoleRepository: Repository<UsuarioRol>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<Usuario> {
+  async create(createUserDto: CreateUserDto & { role_code?: string }): Promise<Usuario> {
     const passwordHash = await bcrypt.hash(createUserDto.password, 10);
     const user = this.userRepository.create({
       ...createUserDto,
       password_hash: passwordHash,
     });
-    return this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+
+    if (createUserDto.role_code) {
+      const roleRepository = this.userRoleRepository.manager.getRepository('Rol');
+      const role = await roleRepository.findOne({ where: { code: createUserDto.role_code } });
+      if (role) {
+        const userRole = this.userRoleRepository.create({
+          user_id: savedUser.id,
+          role_id: role.id,
+        });
+        await this.userRoleRepository.save(userRole);
+      }
+    }
+
+    return this.findOne(savedUser.id);
   }
 
   async findAll(
@@ -32,7 +46,9 @@ export class UsersService {
   ): Promise<{ data: Usuario[]; total: number; page: number; limit: number }> {
     const query = this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.persona', 'persona');
+      .leftJoinAndSelect('user.persona', 'persona')
+      .leftJoinAndSelect('user.usuarioRoles', 'usuarioRol')
+      .leftJoinAndSelect('usuarioRol.rol', 'rol');
 
     if (status) {
       query.andWhere('user.status = :status', { status });
@@ -44,29 +60,40 @@ export class UsersService {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    const usersWithRoles = data.map(user => ({
+      ...user,
+      roles: user.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
+    }));
+
+    return { data: usersWithRoles, total, page, limit };
   }
 
-  async findOne(id: number): Promise<Usuario> {
+  async findOne(id: number): Promise<any> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['persona'],
+      relations: ['persona', 'usuarioRoles', 'usuarioRoles.rol'],
     });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    return user;
+    return {
+      ...user,
+      roles: user.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
+    };
   }
 
-  async findByUsername(username: string): Promise<Usuario> {
+  async findByUsername(username: string): Promise<any> {
     const user = await this.userRepository.findOne({
       where: { username },
-      relations: ['persona'],
+      relations: ['persona', 'usuarioRoles', 'usuarioRoles.rol'],
     });
     if (!user) {
       throw new NotFoundException(`User with username ${username} not found`);
     }
-    return user;
+    return {
+      ...user,
+      roles: user.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
+    };
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<Usuario> {
@@ -125,11 +152,15 @@ export class UsersService {
     });
   }
 
-  async findActive(): Promise<Usuario[]> {
-    return this.userRepository.find({
+  async findActive(): Promise<any[]> {
+    const users = await this.userRepository.find({
       where: { status: UserStatus.ACTIVO },
-      relations: ['persona'],
+      relations: ['persona', 'usuarioRoles', 'usuarioRoles.rol'],
       order: { username: 'ASC' },
     });
+    return users.map(user => ({
+      ...user,
+      roles: user.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
+    }));
   }
 }

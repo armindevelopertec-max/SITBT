@@ -5,9 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
 import { Persona } from './persona.entity';
+import { UsuarioRol } from './usuario-rol.entity';
 
 export enum UserStatus {
   ACTIVO = 'activo',
@@ -38,6 +40,9 @@ export class Usuario {
 
   @Column({ type: 'timestamp', nullable: true })
   last_login: Date;
+
+  @OneToMany(() => UsuarioRol, (usuarioRol) => usuarioRol.usuario)
+  usuarioRoles: UsuarioRol[];
 
   @CreateDateColumn()
   created_at: Date;

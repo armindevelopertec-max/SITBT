@@ -1,20 +1,76 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { Estudiante, StudentStatus } from '../../entities/estudiante.entity';
+import { Persona } from '../../entities/persona.entity';
+import { Usuario } from '../../entities/usuario.entity';
+import { UsuarioRol } from '../../entities/usuario-rol.entity';
+import { Rol } from '../../entities/rol.entity';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+
+export interface CreatedStudentWithUser {
+  student: Estudiante;
+  user: {
+    username: string;
+    password: string;
+  };
+}
 
 @Injectable()
 export class StudentsService {
   constructor(
     @InjectRepository(Estudiante)
     private studentRepository: Repository<Estudiante>,
+    @InjectRepository(Persona)
+    private personaRepository: Repository<Persona>,
+    @InjectRepository(Usuario)
+    private usuarioRepository: Repository<Usuario>,
+    @InjectRepository(UsuarioRol)
+    private usuarioRolRepository: Repository<UsuarioRol>,
+    @InjectRepository(Rol)
+    private rolRepository: Repository<Rol>,
   ) {}
 
-  async create(createStudentDto: CreateStudentDto): Promise<Estudiante> {
+  async create(createStudentDto: CreateStudentDto): Promise<CreatedStudentWithUser> {
     const student = this.studentRepository.create(createStudentDto);
-    return this.studentRepository.save(student);
+    const savedStudent = await this.studentRepository.save(student);
+
+    const persona = await this.personaRepository.findOne({ where: { id: createStudentDto.person_id } });
+    if (!persona) {
+      throw new NotFoundException('Persona no encontrada');
+    }
+    const currentYear = new Date().getFullYear().toString();
+
+    const username = `est_${savedStudent.inscription_code.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const password = `${persona.ci}-${currentYear}`;
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const usuario = this.usuarioRepository.create({
+      person_id: savedStudent.person_id,
+      username,
+      password_hash: passwordHash,
+      status: 'activo' as any,
+    });
+    const savedUsuario = await this.usuarioRepository.save(usuario);
+
+    const rolEstudiante = await this.rolRepository.findOne({ where: { code: 'estudiante' } });
+    if (rolEstudiante) {
+      const usuarioRol = this.usuarioRolRepository.create({
+        user_id: savedUsuario.id,
+        role_id: rolEstudiante.id,
+      });
+      await this.usuarioRolRepository.save(usuarioRol);
+    }
+
+    return {
+      student: savedStudent,
+      user: {
+        username,
+        password,
+      },
+    };
   }
 
   async findAll(

@@ -1,20 +1,89 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { Personal, StaffStatus, StaffPosition } from '../../entities/personal.entity';
+import { Persona } from '../../entities/persona.entity';
+import { Usuario } from '../../entities/usuario.entity';
+import { UsuarioRol } from '../../entities/usuario-rol.entity';
+import { Rol } from '../../entities/rol.entity';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
+
+export interface CreatedStaffWithUser {
+  staff: Personal;
+  user: {
+    username: string;
+    password: string;
+  };
+}
 
 @Injectable()
 export class StaffsService {
   constructor(
     @InjectRepository(Personal)
     private staffRepository: Repository<Personal>,
+    @InjectRepository(Persona)
+    private personaRepository: Repository<Persona>,
+    @InjectRepository(Usuario)
+    private usuarioRepository: Repository<Usuario>,
+    @InjectRepository(UsuarioRol)
+    private usuarioRolRepository: Repository<UsuarioRol>,
+    @InjectRepository(Rol)
+    private rolRepository: Repository<Rol>,
   ) {}
 
-  async create(createStaffDto: CreateStaffDto): Promise<Personal> {
+  async create(createStaffDto: CreateStaffDto): Promise<CreatedStaffWithUser> {
     const staff = this.staffRepository.create(createStaffDto);
-    return this.staffRepository.save(staff);
+    const savedStaff = await this.staffRepository.save(staff);
+
+    const persona = await this.personaRepository.findOne({ where: { id: createStaffDto.person_id } });
+    if (!persona) {
+      throw new NotFoundException('Persona no encontrada');
+    }
+    const currentYear = new Date().getFullYear().toString();
+
+    const username = `doc_${persona.ci.replace(/[^a-zA-Z0-9]/g, '')}`;
+    const password = `${persona.ci}-${currentYear}`;
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const usuario = this.usuarioRepository.create({
+      person_id: savedStaff.person_id,
+      username,
+      password_hash: passwordHash,
+      status: 'activo' as any,
+    });
+    const savedUsuario = await this.usuarioRepository.save(usuario);
+
+    const roleCode = this.mapPositionToRole(savedStaff.position);
+    const rol = await this.rolRepository.findOne({ where: { code: roleCode } });
+    if (rol) {
+      const usuarioRol = this.usuarioRolRepository.create({
+        user_id: savedUsuario.id,
+        role_id: rol.id,
+      });
+      await this.usuarioRolRepository.save(usuarioRol);
+    }
+
+    return {
+      staff: savedStaff,
+      user: {
+        username,
+        password,
+      },
+    };
+  }
+
+  private mapPositionToRole(position: StaffPosition): string {
+    const positionRoleMap: Record<StaffPosition, string> = {
+      [StaffPosition.DOCENTE]: 'docente',
+      [StaffPosition.SECRETARIA]: 'secretaria',
+      [StaffPosition.DIRECTOR_ACADEMICO]: 'director_academico',
+      [StaffPosition.RECTOR]: 'rector',
+      [StaffPosition.APOYO]: 'apoyo',
+      [StaffPosition.BIBLIOTECARIO]: 'apoyo',
+    };
+    return positionRoleMap[position] || 'apoyo';
   }
 
   async findAll(

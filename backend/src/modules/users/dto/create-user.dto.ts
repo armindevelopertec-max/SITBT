@@ -5,6 +5,7 @@ import {
   IsEnum,
   MaxLength,
   MinLength,
+  IsNotEmpty,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserStatus } from '../../../entities/usuario.entity';
@@ -30,4 +31,9 @@ export class CreateUserDto {
   @IsEnum(UserStatus)
   @IsOptional()
   status?: UserStatus;
+
+  @ApiPropertyOptional({ example: 'estudiante', description: 'Codigo del rol a asignar' })
+  @IsString()
+  @IsOptional()
+  role_code?: string;
 }

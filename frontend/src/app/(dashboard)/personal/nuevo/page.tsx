@@ -7,13 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { Modal } from '@/components/ui/modal';
 import { api } from '@/lib/api';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, User, Key } from 'lucide-react';
 
 export default function NewStaffPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [credentialsModal, setCredentialsModal] = useState<{ username: string; password: string } | null>(null);
 
   const [personData, setPersonData] = useState({
     ci: '',
@@ -78,9 +80,13 @@ export default function NewStaffPage() {
         status: 'activo',
       };
 
-      await api.post('/personal', staffPayload);
+      const response = await api.post('/personal', staffPayload);
 
-      router.push('/personal');
+      if (response.data.user) {
+        setCredentialsModal(response.data.user);
+      } else {
+        router.push('/personal');
+      }
     } catch (error: any) {
       console.error('Error creating staff:', error);
       if (error.response?.data?.message) {
@@ -310,6 +316,46 @@ export default function NewStaffPage() {
           </Button>
         </div>
       </form>
+
+      {credentialsModal && (
+        <Modal open={!!credentialsModal} onClose={() => {
+          setCredentialsModal(null);
+          router.push('/personal');
+        }} title="Usuario Creado" size="md">
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              El personal ha sido registrado exitosamente. A continuación encontrará las credenciales de acceso al sistema:
+            </p>
+            <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+              <div className="flex items-center gap-3">
+                <User className="w-5 h-5 text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-500">Nombre de usuario</p>
+                  <p className="font-mono font-medium">{credentialsModal.username}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Key className="w-5 h-5 text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-500">Contraseña temporal</p>
+                  <p className="font-mono font-medium">{credentialsModal.password}</p>
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-amber-600">
+              ⚠️ Se recomienda que el usuario cambie su contraseña después de iniciar sesión.
+            </p>
+            <div className="flex justify-end">
+              <Button onClick={() => {
+                setCredentialsModal(null);
+                router.push('/personal');
+              }}>
+                Entendido
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

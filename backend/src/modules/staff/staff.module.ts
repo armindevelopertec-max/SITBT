@@ -4,9 +4,12 @@ import { Personal } from '../../entities/personal.entity';
 import { StaffsService } from './staffs.service';
 import { StaffsController } from './staffs.controller';
 import { Persona } from '../../entities/persona.entity';
+import { Usuario } from '../../entities/usuario.entity';
+import { UsuarioRol } from '../../entities/usuario-rol.entity';
+import { Rol } from '../../entities/rol.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Personal, Persona])],
+  imports: [TypeOrmModule.forFeature([Personal, Persona, Usuario, UsuarioRol, Rol])],
   controllers: [StaffsController],
   providers: [StaffsService],
   exports: [StaffsService],
