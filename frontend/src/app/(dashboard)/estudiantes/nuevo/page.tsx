@@ -115,7 +115,7 @@ export default function NewStudentPage() {
 
   const fetchGestiones = async () => {
     try {
-      const response = await api.get('/gestiones');
+      const response = await api.get('/gestiones/active');
       const allGestiones: Gestion[] = response.data || [];
       const allPeriodos: { gestion: Gestion; periodo: Periodo }[] = [];
 
