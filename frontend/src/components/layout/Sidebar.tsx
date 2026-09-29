@@ -79,7 +79,7 @@ const menuSections: MenuSection[] = [
         roles: ['administrador', 'secretaria', 'director_academico', 'docente'],
       },
       {
-        title: 'Pagos',
+        title: 'Pagos *',
         href: '/pagos',
         icon: <CreditCard className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'rector'],

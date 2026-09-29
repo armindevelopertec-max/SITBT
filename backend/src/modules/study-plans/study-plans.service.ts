@@ -99,10 +99,11 @@ export class StudyPlansService {
     });
   }
 
-  async findCurrentByCareer(careerId: number): Promise<PlanEstudio | null> {
-    return this.studyPlanRepository.findOne({
+  async findCurrentByCareer(careerId: number): Promise<PlanEstudio[]> {
+    return this.studyPlanRepository.find({
       where: { career_id: careerId, status: StudyPlanStatus.VIGENTE },
       relations: ['carrera'],
+      order: { rm_date: 'DESC' },
     });
   }
 
