@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Estudiante } from './estudiante.entity';
 import { Usuario } from './usuario.entity';
+import { Gestion } from './gestion.entity';
 
 export enum CredentialStatus {
   EMITIDA = 'emitida',
@@ -30,6 +31,13 @@ export class Credencial {
 
   @Column({ type: 'varchar', length: 10 })
   gestion: string;
+
+  @Column({ name: 'gestion_id', nullable: true })
+  gestion_id: number;
+
+  @ManyToOne(() => Gestion)
+  @JoinColumn({ name: 'gestion_id' })
+  gestionEntity: Gestion;
 
   @Column({ type: 'integer' })
   semester: number;

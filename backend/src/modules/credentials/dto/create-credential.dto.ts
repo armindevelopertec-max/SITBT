@@ -22,6 +22,11 @@ export class CreateCredentialDto {
   @MaxLength(10)
   gestion: string;
 
+  @ApiPropertyOptional()
+  @IsInt()
+  @IsOptional()
+  gestion_id?: number;
+
   @ApiProperty({ example: 1 })
   @IsInt()
   @Min(1)

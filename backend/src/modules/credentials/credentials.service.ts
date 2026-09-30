@@ -41,6 +41,7 @@ export class CredentialsService {
       .leftJoinAndSelect('credential.estudiante', 'student')
       .leftJoinAndSelect('student.persona', 'person')
       .leftJoinAndSelect('student.carrera', 'career')
+      .leftJoinAndSelect('credential.gestionEntity', 'gestion')
       .leftJoinAndSelect('credential.emisor', 'issuer');
 
     if (gestion) {
@@ -67,7 +68,7 @@ export class CredentialsService {
   async findOne(id: number): Promise<Credencial> {
     const credential = await this.credentialRepository.findOne({
       where: { id },
-      relations: ['estudiante', 'estudiante.persona', 'estudiante.carrera', 'emisor'],
+      relations: ['estudiante', 'estudiante.persona', 'estudiante.carrera', 'gestionEntity', 'emisor'],
     });
     if (!credential) {
       throw new NotFoundException(`Credential with ID ${id} not found`);

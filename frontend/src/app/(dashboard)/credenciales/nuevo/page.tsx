@@ -27,11 +27,21 @@ interface Student {
 interface FormData {
   student_id: number | null;
   gestion: string;
+  gestion_id: number | null;
   semester: number | null;
   issued_date: string;
   valid_until: string;
   photo_url: string;
   notes: string;
+}
+
+interface Gestion {
+  id: number;
+  year: string;
+  period_type: string;
+  status: string;
+  is_current: boolean;
+  periodos?: { id: number; number: string; name: string }[];
 }
 
 export default function NewCredentialPage() {
@@ -45,6 +55,7 @@ export default function NewCredentialPage() {
   const [formData, setFormData] = useState<FormData>({
     student_id: null,
     gestion: new Date().getFullYear().toString(),
+    gestion_id: null,
     semester: null,
     issued_date: new Date().toISOString().split('T')[0],
     valid_until: `${new Date().getFullYear()}-12-31`,
@@ -52,10 +63,13 @@ export default function NewCredentialPage() {
     notes: '',
   });
 
+  const [gestiones, setGestiones] = useState<Gestion[]>([]);
+
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
   useEffect(() => {
     fetchStudents();
+    fetchGestiones();
   }, []);
 
   const fetchStudents = async () => {
@@ -67,6 +81,20 @@ export default function NewCredentialPage() {
       console.error('Error fetching students:', error);
     } finally {
       setLoadingStudents(false);
+    }
+  };
+
+  const fetchGestiones = async () => {
+    try {
+      const response = await api.get('/gestiones');
+      const data = response.data.data || response.data || [];
+      setGestiones(data);
+      const current = data.find((g: Gestion) => g.is_current);
+      if (current) {
+        setFormData(prev => ({ ...prev, gestion: current.year, gestion_id: current.id }));
+      }
+    } catch (error) {
+      console.error('Error fetching gestiones:', error);
     }
   };
 
@@ -113,6 +141,7 @@ export default function NewCredentialPage() {
       const payload = {
         student_id: formData.student_id,
         gestion: formData.gestion,
+        gestion_id: formData.gestion_id,
         semester: formData.semester,
         issued_date: formData.issued_date,
         valid_until: formData.valid_until,
@@ -235,14 +264,29 @@ export default function NewCredentialPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <Input
-                  label="Gestión *"
-                  value={formData.gestion}
-                  onChange={(e) => setFormData({ ...formData, gestion: e.target.value })}
-                  error={errors.gestion}
-                  placeholder="2026"
-                />
+<div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Gestión *
+                </label>
+<select
+                  className={`w-full h-10 px-3 border rounded-lg text-sm ${errors.gestion ? 'border-red-500' : ''}`}
+                  value={formData.gestion ? `${formData.gestion}-${formData.semester}` : ''}
+                  onChange={(e) => {
+                    const [year, sem] = e.target.value.split('-');
+                    const semester = parseInt(sem) || null;
+                    setFormData(prev => ({ ...prev, gestion: year, semester }));
+                  }}
+                >
+                  <option value="">Seleccionar...</option>
+                  {gestiones.flatMap((g) =>
+                    (g.periodos || []).map((p: any) => (
+                      <option key={`${g.id}-${p.number}`} value={`${g.year}-${p.number === 'I' ? 1 : 2}`}>
+                        {p.number}/{g.year}
+                      </option>
+                    ))
+                  )}
+                </select>
+                {errors.gestion && <p className="text-sm text-red-600 mt-1">{errors.gestion}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">

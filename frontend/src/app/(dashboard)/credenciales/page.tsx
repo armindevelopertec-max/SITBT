@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ConfirmModal } from '@/components/ui/modal';
 import { api } from '@/lib/api';
-import { Search, Plus, Printer, X, Loader2 } from 'lucide-react';
+import { Search, Plus, Printer, X, Loader2, Trash2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
 type CredentialStatus = 'emitida' | 'anulada' | 'reemplazada';
@@ -17,6 +17,13 @@ interface Credencial {
   id: number;
   student_id: number;
   gestion: string;
+  gestion_id?: number;
+  gestionEntity?: {
+    id: number;
+    year: string;
+    period_type: string;
+    status: string;
+  };
   semester: number;
   issued_date: string;
   valid_until: string;
@@ -211,13 +218,13 @@ function CredentialPreview({ credential, institution }: { credential: Credencial
                 <Row label="Nombres" value={firstName} />
                 <Row label="Carrera" value={careerName} />
                 <Row label="Nivel" value={`${credential.semester}° Semestre`} />
-                <Row label="Gestión" value={credential.gestion} />
+                <Row label="Gestión" value={`${credential.semester === 1 ? 'I' : 'II'}/${credential.gestion}`} />
               </div>
               <PhotoBox url={credential.photo_url} />
             </div>
             <div style={{ position: 'absolute', top: 31, right: 6, transform: 'translateY(-50%)', zIndex: 2, background: GOLD, color: NAVY, borderRadius: 6, padding: '4px 10px', textAlign: 'center' }}>
               <div style={{ fontSize: 6.5, fontWeight: 700, letterSpacing: 0.5 }}>GESTIÓN</div>
-              <div style={{ fontSize: 10.5, fontWeight: 800 }}>{credential.gestion}</div>
+              <div style={{ fontSize: 10.5, fontWeight: 800 }}>{credential.semester === 1 ? 'I' : 'II'}/{credential.gestion}</div>
             </div>
           </div>
         </div>
@@ -239,7 +246,7 @@ function CredentialPreview({ credential, institution }: { credential: Credencial
                 <Row label="Nombres" value={firstName} small />
                 <Row label="C.I." value={person?.ci || '—'} small />
                 <Row label="Nivel" value={`${credential.semester}° Semestre`} small />
-                <Row label="Gestión" value={credential.gestion} small />
+                <Row label="Gestión" value={`${credential.semester === 1 ? 'I' : 'II'}/${credential.gestion}`} small />
                 <Row label="Válida hasta" value={formatDate(credential.valid_until)} small />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0, justifyContent: 'center' }}>
@@ -266,6 +273,7 @@ export default function CredentialsPage() {
   const [statusFilter, setStatusFilter] = useState<'ALL' | CredentialStatus>('ALL');
   const [gestionFilter, setGestionFilter] = useState<string>('ALL');
   const [cancelModal, setCancelModal] = useState<Credencial | null>(null);
+  const [deleteModal, setDeleteModal] = useState<Credencial | null>(null);
   const [saving, setSaving] = useState(false);
   const [institution, setInstitution] = useState<Institution | undefined>(undefined);
 
@@ -323,6 +331,23 @@ export default function CredentialsPage() {
       }
     } catch (error) {
       console.error('Error cancelling credential:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteModal) return;
+    setSaving(true);
+    try {
+      await api.delete(`/credenciales/${deleteModal.id}`);
+      setDeleteModal(null);
+      fetchCredentials();
+      if (selected?.id === deleteModal.id) {
+        setSelected(null);
+      }
+    } catch (error) {
+      console.error('Error deleting credential:', error);
     } finally {
       setSaving(false);
     }
@@ -417,6 +442,10 @@ export default function CredentialsPage() {
                     Anular
                   </Button>
                 )}
+                <Button size="sm" variant="outline" className="text-red-600" onClick={() => setDeleteModal(selected)}>
+                  <Trash2 className="w-3 h-3 mr-1" />
+                  Eliminar
+                </Button>
               </div>
               <div className="mt-4 pt-4 border-t grid grid-cols-4 gap-3 text-xs">
                 <div>
@@ -456,6 +485,17 @@ export default function CredentialsPage() {
         title="Anular Credencial"
         message={`¿Anular la credencial de "${cancelModal?.estudiante?.persona?.names} ${cancelModal?.estudiante?.persona?.lastname_paternal}" Semestre ${cancelModal?.semester}?`}
         confirmText="Anular"
+        variant="destructive"
+        loading={saving}
+      />
+
+      <ConfirmModal
+        open={!!deleteModal}
+        onClose={() => setDeleteModal(null)}
+        onConfirm={handleDelete}
+        title="Eliminar Credencial"
+        message={`¿Eliminar permanentemente la credencial de "${deleteModal?.estudiante?.persona?.names} ${deleteModal?.estudiante?.persona?.lastname_paternal}"?`}
+        confirmText="Eliminar"
         variant="destructive"
         loading={saving}
       />

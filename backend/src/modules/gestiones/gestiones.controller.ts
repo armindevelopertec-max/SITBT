@@ -20,12 +20,12 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Gestiones')
 @Controller('gestiones')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class GestionesController {
   constructor(private readonly gestionesService: GestionesService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   create(@Body() createGestionDto: CreateGestionDto) {
     return this.gestionesService.create(createGestionDto);
   }
@@ -60,6 +60,8 @@ export class GestionesController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateGestionDto: UpdateGestionDto,
@@ -68,26 +70,36 @@ export class GestionesController {
   }
 
   @Post(':id/open')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   open(@Param('id', ParseIntPipe) id: number) {
     return this.gestionesService.open(id);
   }
 
   @Post(':id/close')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   close(@Param('id', ParseIntPipe) id: number) {
     return this.gestionesService.close(id);
   }
 
   @Post(':id/set-current')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   setCurrent(@Param('id', ParseIntPipe) id: number) {
     return this.gestionesService.setCurrent(id);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.gestionesService.remove(id);
   }
 
   @Post(':gestionId/periodos')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   createPeriodo(
     @Param('gestionId', ParseIntPipe) gestionId: number,
     @Body() createPeriodoDto: CreatePeriodoDto,
@@ -96,6 +108,8 @@ export class GestionesController {
   }
 
   @Patch('periodos/:periodoId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   updatePeriodo(
     @Param('periodoId', ParseIntPipe) periodoId: number,
     @Body() updatePeriodoDto: UpdatePeriodoDto,
@@ -104,16 +118,22 @@ export class GestionesController {
   }
 
   @Delete('periodos/:periodoId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   deletePeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
     return this.gestionesService.deletePeriodo(periodoId);
   }
 
   @Post('periodos/:periodoId/open')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   openPeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
     return this.gestionesService.openPeriodo(periodoId);
   }
 
   @Post('periodos/:periodoId/close')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   closePeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
     return this.gestionesService.closePeriodo(periodoId);
   }
