@@ -31,8 +31,8 @@ export class Credencial {
   @Column({ type: 'varchar', length: 10 })
   gestion: string;
 
-  @Column({ type: 'varchar', length: 30, unique: true })
-  code: string;
+  @Column({ type: 'integer' })
+  semester: number;
 
   @Column({ type: 'date', name: 'issued_date' })
   issued_date: Date;

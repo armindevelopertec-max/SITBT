@@ -9,8 +9,10 @@ import {
   Query,
   UseGuards,
   ParseIntPipe,
+  Req,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Request } from 'express';
 import { CredentialsService } from './credentials.service';
 import { CreateCredentialDto } from './dto/create-credential.dto';
 import { UpdateCredentialDto } from './dto/update-credential.dto';
@@ -25,7 +27,9 @@ export class CredentialsController {
   constructor(private readonly service: CredentialsService) {}
 
   @Post()
-  create(@Body() createDto: CreateCredentialDto) {
+  create(@Body() createDto: CreateCredentialDto, @Req() req: Request) {
+    const user = req.user as { id: number };
+    createDto.issued_by = user.id;
     return this.service.create(createDto);
   }
 
@@ -34,9 +38,10 @@ export class CredentialsController {
     @Query('page') page = 1,
     @Query('limit') limit = 20,
     @Query('gestion') gestion?: string,
+    @Query('semester') semester?: string,
     @Query('status') status?: CredentialStatus,
   ) {
-    return this.service.findAll(+page, +limit, gestion, status);
+    return this.service.findAll(+page, +limit, gestion, semester ? +semester : undefined, status);
   }
 
   @Get('student/:studentId')
@@ -44,14 +49,17 @@ export class CredentialsController {
     return this.service.findByStudent(studentId);
   }
 
+  @Get('student/:studentId/gestion/:gestion')
+  findByStudentAndGestion(
+    @Param('studentId', ParseIntPipe) studentId: number,
+    @Param('gestion') gestion: string,
+  ) {
+    return this.service.findByStudentAndGestion(studentId, gestion);
+  }
+
   @Get('student/:studentId/active')
   findActiveByStudent(@Param('studentId', ParseIntPipe) studentId: number) {
     return this.service.findActiveByStudent(studentId);
-  }
-
-  @Get('code/:code')
-  findByCode(@Param('code') code: string) {
-    return this.service.findByCode(code);
   }
 
   @Get(':id')

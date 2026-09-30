@@ -6,6 +6,8 @@ import {
   IsDateString,
   IsBoolean,
   MaxLength,
+  Min,
+  Max,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CredentialStatus } from '../../../entities/credencial.entity';
@@ -20,10 +22,11 @@ export class CreateCredentialDto {
   @MaxLength(10)
   gestion: string;
 
-  @ApiProperty({ example: 'CRED-2024-0001' })
-  @IsString()
-  @MaxLength(30)
-  code: string;
+  @ApiProperty({ example: 1 })
+  @IsInt()
+  @Min(1)
+  @Max(6)
+  semester: number;
 
   @ApiProperty({ example: '2024-02-01' })
   @IsDateString()
@@ -44,9 +47,10 @@ export class CreateCredentialDto {
   @IsOptional()
   status?: CredentialStatus;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsInt()
-  issued_by: number;
+  @IsOptional()
+  issued_by?: number;
 
   @ApiPropertyOptional()
   @IsBoolean()
