@@ -92,6 +92,30 @@ export default function NewStudentPage() {
     }
   }, [studentData.career_id]);
 
+  const generateInscriptionCode = () => {
+    if (!personData.lastname_paternal || !personData.lastname_maternal || !personData.names || !studentData.career_id || !studentData.admission_gestion || !personData.ci) {
+      return;
+    }
+
+    const lastnamePaternal = personData.lastname_paternal.trim().toUpperCase();
+    const lastnameMaternal = personData.lastname_maternal.trim().toUpperCase();
+    const names = personData.names.trim().split(' ')[0].toUpperCase();
+    const career = careers.find(c => c.id.toString() === studentData.career_id);
+    const careerCode = career ? career.name.substring(0, 2).toUpperCase() : '';
+
+    const gestionParts = studentData.admission_gestion.split('/');
+    const yearLast2 = gestionParts[gestionParts.length - 1].slice(-2);
+
+    const ciLast2 = personData.ci.slice(-2);
+
+    const code = `${lastnamePaternal[0]}${lastnameMaternal[0]}${names[0]}-${careerCode}${yearLast2}${ciLast2}`;
+    setStudentData(prev => ({ ...prev, inscription_code: code }));
+  };
+
+  useEffect(() => {
+    generateInscriptionCode();
+  }, [personData.lastname_paternal, personData.lastname_maternal, personData.names, studentData.career_id, studentData.admission_gestion, personData.ci]);
+
   const fetchCareers = async () => {
     try {
       const response = await api.get('/carreras/active');
@@ -365,9 +389,10 @@ export default function NewStudentPage() {
                 <Input
                   label="Código de Inscripción *"
                   value={studentData.inscription_code}
-                  onChange={(e) => setStudentData({ ...studentData, inscription_code: e.target.value })}
                   error={errors.inscription_code}
-                  placeholder="INS-2024-0001"
+                  placeholder="Se genera automáticamente"
+                  readOnly
+                  className="bg-gray-50"
                 />
               </div>
               <div>

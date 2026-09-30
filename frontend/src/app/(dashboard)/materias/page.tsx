@@ -3,22 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ConfirmModal } from '@/components/ui/modal';
 import { api } from '@/lib/api';
-import { Search, Plus, Edit2, Trash2, Loader2, ArrowLeft } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, Loader2 } from 'lucide-react';
 
 interface Materia {
   id: number;
   code: string;
   name: string;
-  area: string | null;
-  created_at: string;
-  updated_at: string;
 }
 
 export default function MateriasPage() {
@@ -47,10 +42,8 @@ export default function MateriasPage() {
 
   const handleDelete = async () => {
     if (!deletingMateria) return;
-
     setSaving(true);
     try {
-      console.log('Deleting materia with id:', deletingMateria.id);
       await api.delete(`/materias/${deletingMateria.id}`);
       setDeleteModalOpen(false);
       setDeletingMateria(null);
@@ -77,79 +70,63 @@ export default function MateriasPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Breadcrumb items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Materias' }]} />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gestión de Materias</h1>
-        <Button onClick={() => router.push('/materias/nuevo')}>
-          <Plus className="w-4 h-4 mr-2" />
-          Nueva Materia
+        <h1 className="text-xl font-bold text-gray-900">Materias</h1>
+        <Button size="sm" onClick={() => router.push('/materias/nuevo')}>
+          <Plus className="w-3 h-3 mr-1" />
+          Nueva
         </Button>
       </div>
 
-      <Card variant="bordered">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Lista de Materias</CardTitle>
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="Buscar por nombre o código..."
-                className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+      <div className="relative">
+        <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400" />
+        <Input
+          placeholder="Buscar..."
+          className="pl-7 h-8 text-sm"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {filteredMaterias.length === 0 ? (
+        <p className="text-center text-sm text-gray-500 py-8">
+          {searchQuery ? 'Sin resultados' : 'Sin materias registradas'}
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+          {filteredMaterias.map((materia) => (
+            <div
+              key={materia.id}
+              className="flex items-center justify-between p-2 border rounded hover:bg-gray-50 group"
+            >
+              <div className="flex-1 mr-2">
+                <p className="text-[10px] text-primary-600 font-medium">{materia.code}</p>
+                <p className="text-sm font-medium break-words">{materia.name}</p>
+              </div>
+              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => router.push(`/materias/${materia.id}`)}>
+                  <Edit2 className="w-3 h-3" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setDeletingMateria(materia); setDeleteModalOpen(true); }}>
+                  <Trash2 className="w-3 h-3 text-red-500" />
+                </Button>
+              </div>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Código</TableHead>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredMaterias.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-center py-8 text-gray-500">
-                    No se encontraron materias
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredMaterias.map((materia) => (
-                  <TableRow key={materia.id}>
-                    <TableCell className="font-medium">{materia.code}</TableCell>
-                    <TableCell>{materia.name}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => router.push(`/materias/${materia.id}`)}>
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => { console.log('Click delete', materia); setDeletingMateria(materia); setDeleteModalOpen(true); }}>
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+          ))}
+        </div>
+      )}
 
       <ConfirmModal
         open={deleteModalOpen}
         onClose={() => { setDeleteModalOpen(false); setDeletingMateria(null); }}
         onConfirm={handleDelete}
         title="Eliminar Materia"
-        message={`¿Estás seguro de eliminar la materia "${deletingMateria?.name}"? Esta acción no se puede deshacer.`}
+        message={`¿Eliminar "${deletingMateria?.name}"?`}
         confirmText="Eliminar"
-        confirmVariant="danger"
+        variant="destructive"
         loading={saving}
       />
     </div>

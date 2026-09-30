@@ -157,7 +157,7 @@ export default function CarrerasPage() {
         title="Eliminar Carrera"
         message={`¿Estás seguro de eliminar la carrera "${deletingCarrera?.name}"? Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
-        confirmVariant="danger"
+        variant="destructive"
         loading={saving}
       />
     </div>

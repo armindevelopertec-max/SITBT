@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -34,6 +34,20 @@ export class StudentsService {
   ) {}
 
   async create(createStudentDto: CreateStudentDto): Promise<CreatedStudentWithUser> {
+    const existingStudent = await this.studentRepository.findOne({
+      where: { person_id: createStudentDto.person_id },
+    });
+    if (existingStudent) {
+      throw new ConflictException('Esta persona ya tiene un estudiante asociado');
+    }
+
+    const existingCode = await this.studentRepository.findOne({
+      where: { inscription_code: createStudentDto.inscription_code },
+    });
+    if (existingCode) {
+      throw new ConflictException('El código de inscripción ya existe');
+    }
+
     const student = this.studentRepository.create(createStudentDto);
     const savedStudent = await this.studentRepository.save(student);
 
@@ -132,7 +146,21 @@ export class StudentsService {
 
   async remove(id: number): Promise<void> {
     const student = await this.findOne(id);
+
+    const usuario = await this.usuarioRepository.findOne({
+      where: { person_id: student.person_id },
+    });
+    if (usuario) {
+      await this.usuarioRepository.remove(usuario);
+    }
+
+    const personaId = student.person_id;
     await this.studentRepository.remove(student);
+
+    const persona = await this.personaRepository.findOne({ where: { id: personaId } });
+    if (persona) {
+      await this.personaRepository.remove(persona);
+    }
   }
 
   async findByCareer(careerId: number, gestion?: string): Promise<Estudiante[]> {

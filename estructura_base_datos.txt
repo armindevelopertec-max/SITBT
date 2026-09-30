@@ -1,0 +1,514 @@
+================================================================================
+                    ESTRUCTURA DE BASE DE DATOS - SITBT
+================================================================================
+
+Las tablas se relacionan a traves de la entidad PERSONA que es la base central.
+
+================================================================================
+TABLA: persons (Personas)
+================================================================================
+Campo                | Tipo          | Descripcion
+---------------------|---------------|------------------------------------------
+id                   | serial        | PK
+ci                   | varchar(20)   | Cedula de Identidad (unico)
+ci_issued            | varchar(5)    | Extension CI (LP, CB, SC, etc.)
+names                | varchar(100)  | Nombres
+lastname_paternal    | varchar(50)   | Apellido paterno
+lastname_maternal    | varchar(50)   | Apellido materno
+birthdate            | date          | Fecha de nacimiento
+birthplace           | varchar(100)  | Lugar de nacimiento
+gender               | enum(M,F)     | Genero
+marital_status       | enum          | Estado civil
+nationality          | varchar(50)   | Nacionalidad (default: Boliviana)
+dual_nationality     | varchar(50)   | Doble nacionalidad
+passport_number      | varchar(30)   | Numero de pasaporte
+blood_type           | enum          | Tipo de sangre (A+, A-, B+, etc.)
+disability           | varchar(100)  | Discapacidad
+military_book_number | varchar(30)   | Libreta militar
+mother_tongue        | varchar(50)   | Lengua materna
+phone                | varchar(20)   | Telefono
+email                | varchar(100)  | Correo electronico
+address              | varchar(200)  | Direccion
+photo_url            | varchar(255)  | URL de foto
+status               | enum          | Estado (activo, inactivo)
+created_at           | timestamp     | Fecha creacion
+updated_at           | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - 1:1 con users (un usuario pertenece a una persona)
+  - 1:N con students (una persona puede ser estudiante)
+  - 1:N con staff (una persona puede ser personal)
+
+================================================================================
+TABLA: users (Usuarios)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+person_id    | int           | FK -> persons.id (unico)
+username     | varchar(50)   | Nombre de usuario (unico)
+password_hash| varchar(255)  | Contrasenia hasheada
+status       | enum          | Estado (activo, inactivo, bloqueado)
+last_login   | timestamp     | Ultimo inicio de sesion
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - N:1 con persons
+  - 1:N con user_roles
+
+================================================================================
+TABLA: roles (Roles)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+code         | varchar(30)   | Codigo (unico): administrador, secretaria,
+                    |               docente, estudiante, rector, apoyo
+name         | varchar(50)   | Nombre visible
+description  | text          | Descripcion
+status       | enum          | Estado (activo, inactivo)
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+================================================================================
+TABLA: user_roles (Roles de Usuario)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+user_id      | int           | FK -> users.id
+role_id      | int           | FK -> roles.id
+assigned_at  | timestamp     | Fecha asignacion
+
+================================================================================
+TABLA: students (Estudiantes)
+================================================================================
+Campo                | Tipo          | Descripcion
+---------------------|---------------|------------------------------------------
+id                   | serial        | PK
+person_id            | int           | FK -> persons.id
+inscription_code     | varchar(30)   | Codigo de inscripcion (unico)
+admission_gestion    | varchar(10)   | Gestion de ingreso (ej: 2026)
+admission_date       | date          | Fecha de ingreso
+career_id            | int           | FK -> careers.id
+study_plan_id        | int           | FK -> study_plans.id
+folder_number        | varchar(20)   | Numero de folder
+form01_code          | varchar(30)   | Codigo Formulario 01
+bachelor_title_number| varchar(50)   | Numero de titulo de bachiller
+bachelor_title_date  | date          | Fecha de titulo de bachiller
+status               | enum          | Estado (activo, egresado, titulado,
+                    |               | congelado, baja)
+created_at           | timestamp     | Fecha creacion
+updated_at           | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - N:1 con persons
+  - N:1 con careers
+  - N:1 con study_plans
+  - 1:N con enrollments
+  - 1:N con payments
+  - 1:N con certificates
+  - 1:N con credentials
+  - 1:N con student_guardians
+
+================================================================================
+TABLA: staff (Personal)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+person_id    | int           | FK -> persons.id
+profesion    | varchar(100)  | Profesion
+cargo        | varchar(50)   | Cargo (docente, secretaria, rector, etc.)
+fecha_contrato | date        | Fecha de contrato
+estado       | enum          | Estado (activo, inactivo, licencia)
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+Cargos disponibles:
+  - docente
+  - secretaria
+  - director_academico
+  - rector
+  - apoyo
+  - bibliotecario
+
+Relaciones:
+  - N:1 con persons
+  - 1:N con teaching_assignments
+  - 1:N con grades
+
+================================================================================
+TABLA: careers (Carreras)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+code         | varchar(10)   | Codigo (unico)
+name         | varchar(100)  | Nombre
+area         | varchar(100)  | Area
+title        | varchar(150)  | Titulo que otorga
+description  | text          | Descripcion
+load_hours   | int           | Horas de carga (default: 3600)
+status       | enum          | Estado (activo, inactivo)
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+================================================================================
+TABLA: study_plans (Planes de Estudio)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+career_id    | int           | FK -> careers.id
+rm_number    | varchar(50)   | Numero RM (Resolucion Ministerial)
+rm_date      | date          | Fecha de RM
+status       | enum          | Estado (vigente, historico)
+notes        | text          | Notas
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - N:1 con careers
+  - 1:N con plan_subjects
+  - 1:N con groups
+
+================================================================================
+TABLA: subjects (Materias)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+code         | varchar(20)   | Codigo
+name         | varchar(150)  | Nombre
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+================================================================================
+TABLA: plan_subjects (Materias del Plan)
+================================================================================
+Campo            | Tipo          | Descripcion
+-----------------|---------------|------------------------------------------
+id               | serial        | PK
+study_plan_id    | int           | FK -> study_plans.id
+subject_id       | int           | FK -> subjects.id
+semester         | int           | Semestre
+weekly_hours     | int           | Horas semanales
+prerequisite_id  | int           | FK -> subjects.id (prerrequisito, nullable)
+
+Relaciones:
+  - N:1 con study_plans
+  - N:1 con subjects
+  - N:1 con subjects (prerrequisito)
+
+================================================================================
+TABLA: groups (Grupos)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+career_id    | int           | FK -> careers.id
+study_plan_id| int           | FK -> study_plans.id
+semester     | int           | Semestre
+shift_id     | int           | FK -> shifts.id
+parallel     | varchar(5)    | Paralelo (A, B, C, etc.)
+gestion      | varchar(10)   | Gestion (ej: 2026)
+capacity     | int           | Capacidad (default: 30)
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - N:1 con careers
+  - N:1 con study_plans
+  - N:1 con shifts
+  - 1:N con enrollments
+  - 1:N con teaching_assignments
+
+================================================================================
+TABLA: shifts (Turnos)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+code         | varchar(10)   | Codigo (unico)
+name         | varchar(20)   | Nombre (Matutino, Vespertino, etc.)
+start_time   | time          | Hora de inicio
+end_time     | time          | Hora de fin
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+================================================================================
+TABLA: enrollments (Inscripciones)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+student_id   | int           | FK -> students.id
+subject_id   | int           | FK -> subjects.id
+plan_subject_id | int (null)  | FK -> plan_subjects.id
+group_id     | int           | FK -> groups.id
+gestion      | varchar(10)   | Gestion
+semester     | int           | Semestre
+status       | enum          | Estado (cursando, aprobado, reprobado,
+                |               | convalidada)
+final_grade  | int           | Nota final
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - N:1 con students
+  - N:1 con subjects
+  - N:1 con plan_subjects
+  - N:1 con groups
+  - 1:N con grades
+
+================================================================================
+TABLA: grades (Calificaciones)
+================================================================================
+Campo                | Tipo          | Descripcion
+---------------------|---------------|------------------------------------------
+id                   | serial        | PK
+enrollment_id        | int           | FK -> enrollments.id
+partial_1            | int           | Nota parcial 1
+partial_2            | int           | Nota parcial 2
+final_average        | int           | Promedio final
+observation          | varchar(30)   | Observacion
+status_regular       | enum          | Estado regular (aprobado, reprobado,
+                      |               | no_presento)
+second_turn_eligible | boolean       | Elegible para segundo turno
+second_turn_score    | int           | Nota segundo turno
+second_turn_applied  | boolean       | Segundo turno aplicado
+status_2t            | enum          | Estado 2do turno
+definitive_grade     | int           | Nota definitiva
+status_definitivo    | enum          | Estado definitivo
+registered_by        | int           | FK -> staff.id (docente)
+registered_at        | timestamp     | Fecha registro
+updated_at           | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - N:1 con enrollments
+  - N:1 con staff (docente)
+
+================================================================================
+TABLA: teaching_assignments (Asignacion Docente)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+teacher_id   | int           | FK -> staff.id
+subject_id   | int           | FK -> subjects.id
+group_id     | int           | FK -> groups.id
+gestion      | varchar(10)   | Gestion
+status       | enum          | Estado (activo, finalizado)
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - N:1 con staff
+  - N:1 con subjects
+  - N:1 con groups
+
+================================================================================
+TABLA: payments (Pagos)
+================================================================================
+Campo          | Tipo          | Descripcion
+----------------|---------------|------------------------------------------
+id             | serial        | PK
+student_id     | int           | FK -> students.id
+concept_id     | int           | FK -> payment_concepts.id
+gestion        | varchar(10)   | Gestion
+amount         | decimal(10,2) | Monto
+payment_date   | timestamp     | Fecha de pago
+payment_method | enum          | Metodo (efectivo, transferencia, qr)
+receipt_number | varchar(30)   | Numero de recibo
+received_by    | int           | FK -> users.id
+status         | enum          | Estado (pagado, anulado, pendiente)
+notes          | text          | Notas
+created_at     | timestamp     | Fecha creacion
+updated_at     | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - N:1 con students
+  - N:1 con payment_concepts
+  - N:1 con users
+
+================================================================================
+TABLA: payment_concepts (Conceptos de Pago)
+================================================================================
+Campo          | Tipo          | Descripcion
+----------------|---------------|------------------------------------------
+id             | serial        | PK
+code           | varchar(20)   | Codigo (unico)
+name           | varchar(100)  | Nombre
+type           | enum          | Tipo (unico, semestral)
+default_amount | decimal(10,2) | Monto por defecto
+description    | text          | Descripcion
+status         | enum          | Estado (activo, inactivo)
+created_at     | timestamp     | Fecha creacion
+updated_at     | timestamp     | Fecha actualizacion
+
+================================================================================
+TABLA: certificates (Certificados)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+student_id   | int           | FK -> students.id
+type         | varchar(50)   | Tipo (certificado_inscripcion, etc.)
+date         | date          | Fecha emision
+code        | varchar(30)   | Codigo (unico)
+issued_by    | int           | FK -> users.id
+created_at   | timestamp     | Fecha creacion
+
+Relaciones:
+  - N:1 con students
+  - N:1 con users
+
+================================================================================
+TABLA: credentials (Credenciales Estudiantiles)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+student_id   | int           | FK -> students.id
+gestion      | varchar(10)   | Gestion
+code         | varchar(30)   | Codigo (unico)
+issued_date  | date          | Fecha emision
+valid_until  | date          | Valido hasta
+photo_url    | varchar(255)   | URL de foto
+status       | enum          | Estado (emitida, anulada, reemplazada)
+issued_by    | int           | FK -> users.id
+printed      | boolean       | Si fue impresa
+notes        | text          | Notas
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - N:1 con students
+  - N:1 con users
+
+================================================================================
+TABLA: student_guardians (Apoderados)
+================================================================================
+Campo                    | Tipo          | Descripcion
+-------------------------|---------------|------------------------------------------
+id                       | serial        | PK
+student_id               | int           | FK -> students.id
+father_names             | varchar(100)  | Nombres del padre
+father_lastname_paternal | varchar(50)   | Apellido paterno padre
+father_lastname_maternal | varchar(50)   | Apellido materno padre
+father_ci                | varchar(20)   | CI padre
+father_ci_issued         | varchar(5)    | Extension CI padre
+father_phone             | varchar(20)   | Telefono padre
+father_address           | varchar(200)  | Direccion padre
+mother_names             | varchar(100)  | Nombres de la madre
+mother_lastname_paternal | varchar(50)   | Apellido materno madre
+mother_lastname_maternal | varchar(50)   | Apellido materno madre
+mother_ci                | varchar(20)   | CI madre
+mother_ci_issued         | varchar(5)    | Extension CI madre
+mother_phone             | varchar(20)   | Telefono madre
+mother_address           | varchar(200)  | Direccion madre
+created_at               | timestamp     | Fecha creacion
+updated_at               | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - N:1 con students
+
+================================================================================
+TABLA: gestiones (Gestiones Academicas)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+year         | varchar(10)   | Anio (unico)
+period_type  | enum          | Tipo (semestral)
+status       | enum          | Estado (abierta, cerrada, pendiente)
+is_current   | boolean       | Si es la gestion actual
+notes        | text          | Notas
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - 1:N con periodos
+
+================================================================================
+TABLA: periodos (Periodos Academicos)
+================================================================================
+Campo        | Tipo          | Descripcion
+--------------|---------------|------------------------------------------
+id           | serial        | PK
+gestion_id   | int           | FK -> gestiones.id
+number       | varchar(10)   | Numero (1, 2, etc.)
+name         | varchar(50)   | Nombre (1er Semestre, etc.)
+start_date   | date          | Fecha inicio
+end_date     | date          | Fecha fin
+status       | enum          | Estado (abierta, cerrada, pendiente)
+notes        | text          | Notas
+created_at   | timestamp     | Fecha creacion
+updated_at   | timestamp     | Fecha actualizacion
+
+Relaciones:
+  - N:1 con gestiones
+
+================================================================================
+TABLA: institution_settings (Configuracion Institucional)
+================================================================================
+Campo          | Tipo          | Descripcion
+----------------|---------------|------------------------------------------
+id             | serial        | PK
+nombre         | varchar(255)  | Nombre completo
+nombre_corto   | varchar(100)  | Nombre corto
+lema           | varchar(255)  | Lema institucional
+logo_url       | varchar(255)  | URL del logo
+direccion      | varchar(255)  | Direccion
+telefono       | varchar(50)   | Telefono
+departamento   | varchar(100)  | Departamento
+email          | varchar(100)  | Email
+ciudad         | varchar(100)  | Ciudad
+pais           | varchar(100)  | Pais
+descripcion    | text          | Descripcion
+
+================================================================================
+RESUMEN DE RELACIONES
+================================================================================
+
+PERSONA (central)
+  |
+  +--1:1-- users
+  +--1:N-- students
+  +--1:N-- staff
+
+USERS
+  +--1:N-- user_roles --N:1-- roles
+  +--1:N-- payments
+
+STUDENTS
+  +--1:N-- enrollments --N:1-- subjects
+  +--1:N-- enrollments --N:1-- groups
+  +--1:N-- payments
+  +--1:N-- certificates
+  +--1:N-- credentials
+  +--1:N-- student_guardians
+
+STAFF
+  +--1:N-- teaching_assignments --N:1-- subjects
+  +--1:N-- teaching_assignments --N:1-- groups
+  +--1:N-- grades --N:1-- enrollments
+
+CAREERS
+  +--1:N-- study_plans
+  +--1:N-- groups
+
+STUDY_PLANS
+  +--1:N-- plan_subjects --N:1-- subjects
+  +--1:N-- groups
+
+GROUPS
+  +--1:N-- enrollments
+  +--1:N-- teaching_assignments
+
+GESTIONES
+  +--1:N-- periodos
+
+================================================================================

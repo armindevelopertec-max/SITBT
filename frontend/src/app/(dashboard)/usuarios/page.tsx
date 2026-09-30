@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Modal, ConfirmModal } from '@/components/ui/modal';
 import { useUsers, UserResponse } from '@/hooks/useUsers';
+import { Role } from '@/types';
 import { Plus, Search, Edit2, Trash2, Shield, Key, X, Loader2 } from 'lucide-react';
 
 const rolColors: Record<string, 'default' | 'primary' | 'secondary' | 'exito' | 'advertencia' | 'error'> = {
@@ -66,7 +67,7 @@ export default function UsersPage() {
   const handleCreate = async () => {
     try {
       setFormLoading(true);
-      await createUser(formData);
+      await createUser({ ...formData, role_code: formData.role_code as Role });
       setCreateModal(false);
       setFormData({ username: '', password: '', person_id: 1, role_code: 'estudiante' });
     } catch (err) {
@@ -289,7 +290,7 @@ export default function UsersPage() {
       <Modal open={resetPasswordModal.open} onClose={() => setResetPasswordModal({ open: false, user: null })} title="Restablecer Contraseña" size="sm">
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            Ingrese la nueva contraseña para el usuario "{resetPasswordModal.user?.username}":
+            Ingrese la nueva contraseña para el usuario &quot;{resetPasswordModal.user?.username}&quot;:
           </p>
           <div>
             <label className="block text-sm font-medium mb-1">Nueva contraseña</label>

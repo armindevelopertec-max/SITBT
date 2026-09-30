@@ -214,7 +214,7 @@ export default function PlanesEstudioPage() {
         title="Eliminar Plan de Estudio"
         message={`¿Estás seguro de eliminar el plan "${deletingPlan?.rm_number}"? Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
-        confirmVariant="danger"
+        variant="destructive"
         loading={saving}
       />
     </div>

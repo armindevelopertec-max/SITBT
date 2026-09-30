@@ -111,7 +111,8 @@ export class UsersService {
 
   async remove(id: number): Promise<void> {
     const user = await this.findOne(id);
-    await this.userRepository.remove(user);
+    user.status = UserStatus.INACTIVO;
+    await this.userRepository.save(user);
   }
 
   async changePassword(id: number, newPassword: string): Promise<void> {

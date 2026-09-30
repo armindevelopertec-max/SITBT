@@ -132,7 +132,21 @@ export class StaffsService {
 
   async remove(id: number): Promise<void> {
     const staff = await this.findOne(id);
+
+    const usuario = await this.usuarioRepository.findOne({
+      where: { person_id: staff.person_id },
+    });
+    if (usuario) {
+      await this.usuarioRepository.remove(usuario);
+    }
+
+    const personaId = staff.person_id;
     await this.staffRepository.remove(staff);
+
+    const persona = await this.personaRepository.findOne({ where: { id: personaId } });
+    if (persona) {
+      await this.personaRepository.remove(persona);
+    }
   }
 
   async findByPosition(position: StaffPosition): Promise<Personal[]> {

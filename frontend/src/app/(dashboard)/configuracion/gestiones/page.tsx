@@ -367,7 +367,7 @@ export default function GestionesPage() {
       </div>
 
       <Modal
-        isOpen={modalOpen}
+        open={modalOpen}
         onClose={handleCloseModal}
         title={editingGestion ? 'Editar Gestión' : 'Nueva Gestión'}
         size="md"
@@ -440,31 +440,31 @@ export default function GestionesPage() {
       </Modal>
 
       <ConfirmModal
-        isOpen={deleteModalOpen}
+        open={deleteModalOpen}
         onClose={() => {
           setDeleteModalOpen(false);
           setDeletingGestion(null);
         }}
         onConfirm={handleDelete}
         title="Eliminar Gestión"
-        description={`¿Estás seguro de eliminar la gestión ${deletingGestion?.year}? Se eliminarán también todos sus períodos. Esta acción no se puede deshacer.`}
+        message={`¿Estás seguro de eliminar la gestión ${deletingGestion?.year}? Se eliminarán también todos sus períodos. Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
         variant="destructive"
-        isLoading={saving}
+        loading={saving}
       />
 
       <ConfirmModal
-        isOpen={confirmModalOpen}
+        open={confirmModalOpen}
         onClose={() => {
           setConfirmModalOpen(false);
           setConfirmAction(null);
         }}
         onConfirm={handleConfirm}
         title={confirmAction?.title || ''}
-        description={confirmAction?.message || ''}
+        message={confirmAction?.message || ''}
         confirmText="Confirmar"
         variant="default"
-        isLoading={saving}
+        loading={saving}
       />
     </div>
   );

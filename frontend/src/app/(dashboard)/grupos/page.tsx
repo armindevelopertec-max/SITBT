@@ -212,7 +212,7 @@ export default function GruposPage() {
         title="Eliminar Grupo"
         message={`¿Estás seguro de eliminar el grupo "${deletingGrupo?.parallel}" de ${deletingGrupo?.gestion}? Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
-        confirmVariant="danger"
+        variant="destructive"
         loading={saving}
       />
     </div>

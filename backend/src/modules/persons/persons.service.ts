@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Persona, PersonStatus } from '../../entities/persona.entity';
@@ -13,6 +13,13 @@ export class PersonsService {
   ) {}
 
   async create(createPersonDto: CreatePersonDto): Promise<Persona> {
+    const existingCi = await this.personRepository.findOne({
+      where: { ci: createPersonDto.ci },
+    });
+    if (existingCi) {
+      throw new ConflictException('Ya existe una persona con este CI');
+    }
+
     const person = this.personRepository.create(createPersonDto);
     return this.personRepository.save(person);
   }

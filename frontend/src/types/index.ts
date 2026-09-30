@@ -48,7 +48,7 @@ export interface Person {
 export interface Student {
   id: number;
   person_id: number;
-  student_code: string;
+  inscription_code: string;
   admission_date: string;
   status: 'activo' | 'inactivo' | 'egresado' | 'suspendido';
   persona?: Person;
@@ -59,12 +59,11 @@ export interface Student {
 export interface Staff {
   id: number;
   person_id: number;
-  rol: string;
-  department?: string;
+  profession?: string;
+  position: string;
   hire_date: string;
-  contract_type: 'planta' | 'contrato' | 'honorarios';
-  status: 'activo' | 'inactivo';
-  person?: Person;
+  status: 'activo' | 'inactivo' | 'licencia';
+  persona?: Person;
   created_at?: string;
   updated_at?: string;
 }

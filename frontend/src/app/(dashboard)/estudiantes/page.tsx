@@ -6,7 +6,6 @@ import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Modal, ConfirmModal } from '@/components/ui/modal';
@@ -14,26 +13,15 @@ import { Plus, Search, Edit2, Trash2, Loader2, User, Eye, Key } from 'lucide-rea
 import { api } from '@/lib/api';
 import { Student } from '@/types';
 
-const STATUS_OPTIONS = [
-  { value: 'activo', label: 'Activo' },
-  { value: 'inactivo', label: 'Inactivo' },
-  { value: 'egresado', label: 'Egresado' },
-  { value: 'suspendido', label: 'Suspendido' },
-  { value: 'congelado', label: 'Congelado' },
-];
-
 export default function StudentsPage() {
   const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [editModal, setEditModal] = useState<Student | null>(null);
   const [deleteModal, setDeleteModal] = useState<Student | null>(null);
   const [credentialsModal, setCredentialsModal] = useState<{ username: string; password: string; nombre: string; studentId: number; personId: number } | null>(null);
   const [resetLoading, setResetLoading] = useState(false);
-
-  const [editData, setEditData] = useState({ status: '' });
   const [formLoading, setFormLoading] = useState(false);
 
   useEffect(() => {
@@ -71,25 +59,6 @@ export default function StudentsPage() {
     return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>;
   };
 
-  const openEditModal = (student: Student) => {
-    setEditData({ status: student.status });
-    setEditModal(student);
-  };
-
-  const handleEdit = async () => {
-    if (!editModal) return;
-    setFormLoading(true);
-    try {
-      await api.patch(`/estudiantes/${editModal.id}`, { status: editData.status });
-      setEditModal(null);
-      fetchStudents();
-    } catch (error) {
-      console.error('Error updating student:', error);
-    } finally {
-      setFormLoading(false);
-    }
-  };
-
   const handleDelete = async () => {
     if (!deleteModal) return;
     setFormLoading(true);
@@ -111,7 +80,7 @@ export default function StudentsPage() {
       const persona = student.persona;
       const nombre = persona ? `${persona.names} ${persona.lastname_paternal}` : 'Estudiante';
 
-      if (users && users.length > 0) {
+      if (users && users.length > 0 && persona) {
         const user = users[0];
         const newPassword = `${persona.ci}-${new Date().getFullYear()}`;
         setCredentialsModal({ username: user.username, password: newPassword, nombre, studentId: student.id, personId: student.person_id });
@@ -197,7 +166,7 @@ export default function StudentsPage() {
                   <TableCell>
                     {student.persona?.names} {student.persona?.lastname_paternal} {student.persona?.lastname_maternal}
                   </TableCell>
-                  <TableCell>{student.student_code}</TableCell>
+                  <TableCell>{student.inscription_code}</TableCell>
                   <TableCell>{new Date(student.admission_date).toLocaleDateString('es-BO')}</TableCell>
                   <TableCell>{getStatusBadge(student.status)}</TableCell>
                   <TableCell>
@@ -205,7 +174,7 @@ export default function StudentsPage() {
                       <Button variant="ghost" size="icon" title="Ver credenciales" onClick={() => viewCredentials(student)}>
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" title="Editar" onClick={() => openEditModal(student)}>
+                      <Button variant="ghost" size="icon" title="Editar" onClick={() => router.push(`/estudiantes/editar/${student.id}`)}>
                         <Edit2 className="w-4 h-4" />
                       </Button>
                       <Button variant="ghost" size="icon" title="Eliminar" onClick={() => setDeleteModal(student)}>
@@ -226,35 +195,6 @@ export default function StudentsPage() {
           </Table>
         </CardContent>
       </Card>
-
-      <Modal open={!!editModal} onClose={() => setEditModal(null)} title="Editar Estudiante" size="md">
-        <div className="space-y-4">
-          {editModal && (
-            <>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-sm text-gray-500">Estudiante</p>
-                <p className="font-medium">
-                  {editModal.persona?.names} {editModal.persona?.lastname_paternal} {editModal.persona?.lastname_maternal}
-                </p>
-                <p className="text-sm text-gray-500">{editModal.persona?.ci}</p>
-              </div>
-              <div>
-                <Select
-                  label="Estado"
-                  value={editData.status}
-                  onChange={(e) => setEditData({ status: e.target.value })}
-                  options={STATUS_OPTIONS}
-                  placeholder="Seleccionar estado..."
-                />
-              </div>
-              <div className="flex justify-end gap-3 pt-4">
-                <Button variant="outline" onClick={() => setEditModal(null)}>Cancelar</Button>
-                <Button onClick={handleEdit} isLoading={formLoading}>Guardar Cambios</Button>
-              </div>
-            </>
-          )}
-        </div>
-      </Modal>
 
       <ConfirmModal
         open={!!deleteModal}

@@ -1,0 +1,134 @@
+================================================================================
+                    DESCRIPCION DE MODULOS DEL NAVBAR - SITBT
+================================================================================
+
+El sistema cuenta con un menu lateral (sidebar) organizado en 3 secciones
+principales. El acceso a cada modulo depende del rol del usuario autenticado.
+
+--------------------------------------------------------------------------------
+SECCION: PRINCIPAL
+--------------------------------------------------------------------------------
+
+PANEL PRINCIPAL (/)
+  - Ruta: /panel
+  - Descripcion: Dashboard con estadisticas generales del sistema, actividad
+    reciente y calendario academico. Es la pagina de inicio tras autenticarse.
+  - Roles: Todos los usuarios
+
+ESTUDIANTES
+  - Ruta: /estudiantes
+  - Descripcion: Gestion completa de estudiantes incluyendo registro de nuevos
+    alumnos, actualizacion de datos, eliminacion y busqueda de estudiantes.
+  - Roles: administrador, secretaria, director_academico, rector, docente
+
+PERSONAL
+  - Ruta: /personal
+  - Descripcion: Gestion del personal docente y administrativo de la institucion.
+    Permite dar de alta, modificar y consultar informacion del personal.
+  - Roles: administrador, secretaria, director_academico, rector
+
+CARRERAS
+  - Ruta: /carreras
+  - Descripcion: Gestion de las carreras u ofertas academicas disponibles en
+    la institucion. Cada carrera tiene sus propios requisitos y plan de estudios.
+  - Roles: administrador, secretaria, director_academico, rector
+
+MATERIAS
+  - Ruta: /materias
+  - Descripcion: Gestion de materias organizadas por carrera. Permite crear,
+    editar y eliminar materias que forman parte de los planes de estudio.
+  - Roles: administrador, secretaria, director_academico, rector, docente
+
+GRUPOS
+  - Ruta: /grupos
+  - Descripcion: Gestion de grupos y paralelos para organizar a los estudiantes
+    por curso y turno (matutino, vespertino, nocturno).
+  - Roles: administrador, secretaria, director_academico, rector, docente
+
+INSCRIPCIONES
+  - Ruta: /inscripciones
+  - Descripcion: Proceso de inscripcion de estudiantes a carreras y grupos.
+    Controla el flujo de nuevos alumnos hacia el sistema.
+  - Roles: administrador, secretaria, director_academico
+
+CALIFICACIONES
+  - Ruta: /calificaciones
+  - Descripcion: Registro y gestion de notas y calificaciones de los estudiantes.
+    Los docentes pueden ingresar las notas de sus materias.
+  - Roles: administrador, secretaria, director_academico, docente
+
+PAGOS
+  - Ruta: /pagos
+  - Descripcion: Gestion de pagos y transacciones financieras relacionadas
+    con matriculas, mensualidades y otros conceptos.
+  - Roles: administrador, secretaria, rector
+
+CERTIFICADOS
+  - Ruta: /certificados
+  - Descripcion: Emision de certificados academicos como certificados de
+    estudio, titulos y constancias varias.
+  - Roles: administrador, secretaria, director_academico
+
+CONVALIDACIONES
+  - Ruta: /convalidaciones
+  - Descripcion: Proceso de convalidacion de materias cursadas en otras
+    instituciones. Permite reconocer materias aprobadas previamente.
+  - Roles: administrador, secretaria, director_academico
+
+REPORTES
+  - Ruta: /reportes
+  - Descripcion: Generacion de reportes y estadisticas del sistema. Incluye
+    reportes de rendimiento academico, asistencia, pagos, etc.
+  - Roles: administrador, director_academico, rector
+
+--------------------------------------------------------------------------------
+SECCION: ADMINISTRACION
+--------------------------------------------------------------------------------
+
+USUARIOS
+  - Ruta: /usuarios
+  - Descripcion: Gestion completa de usuarios del sistema. Permite crear,
+    editar, eliminar cuentas y asignar roles a los usuarios.
+  - Roles: administrador
+
+CREDENCIALES
+  - Ruta: /credenciales
+  - Descripcion: Gestion de credenciales y documentacion del personal y
+    estudiantes. Control de documentos oficiales.
+  - Roles: administrador, secretaria
+
+--------------------------------------------------------------------------------
+SECCION: CONFIGURACION
+--------------------------------------------------------------------------------
+
+INSTITUCION
+  - Ruta: /configuracion/institucion
+  - Descripcion: Configuracion de datos generales de la institucion como
+    nombre, logo, lema, direccion y demas informacion institucional.
+  - Roles: administrador
+
+GESTIONES
+  - Ruta: /configuracion/gestiones
+  - Descripcion: Gestion de gestiones academicas (ciclos escolares). Permite
+    definir cual es la gestion escolar activa y crear nuevas gestiones.
+  - Roles: administrador
+
+PLANES DE ESTUDIO
+  - Ruta: /planes-estudio
+  - Descripcion: Gestion de planes de estudio por carrera. Define la estructura
+    curricular, prerrequisitos y carga horaria de cada carrera.
+  - Roles: administrador
+
+================================================================================
+ROLES DEL SISTEMA
+================================================================================
+
+administrador      - Acceso total al sistema
+secretaria         - Acceso a operaciones administrativas
+director_academico - Gestion academica
+rector             - Nivel ejecutivo/autoridades
+docente            - Profesores (limitado a calificaciones, grupos, etc.)
+estudiante         - Solo acceso a panel (vista limitada)
+apoyo              - Personal de apoyo
+
+================================================================================

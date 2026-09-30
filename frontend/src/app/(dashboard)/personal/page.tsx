@@ -6,19 +6,12 @@ import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Modal, ConfirmModal } from '@/components/ui/modal';
 import { Plus, Search, Edit2, Trash2, Loader2, User, Eye, Key } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Staff } from '@/types';
-
-const STATUS_OPTIONS = [
-  { value: 'activo', label: 'Activo' },
-  { value: 'inactivo', label: 'Inactivo' },
-  { value: 'licencia', label: 'Licencia' },
-];
 
 const POSITION_OPTIONS = [
   { value: 'docente', label: 'Docente' },
@@ -35,11 +28,9 @@ export default function StaffPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [editModal, setEditModal] = useState<Staff | null>(null);
   const [deleteModal, setDeleteModal] = useState<Staff | null>(null);
   const [credentialsModal, setCredentialsModal] = useState<{ username: string; password: string; nombre: string; staffId: number; personId: number } | null>(null);
 
-  const [editData, setEditData] = useState({ status: '', position: '' });
   const [formLoading, setFormLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
 
@@ -88,28 +79,6 @@ export default function StaffPage() {
     return <Badge variant={variants[position] || 'secondary'}>{position.replace('_', ' ')}</Badge>;
   };
 
-  const openEditModal = (s: Staff) => {
-    setEditData({ status: s.status, position: s.position });
-    setEditModal(s);
-  };
-
-  const handleEdit = async () => {
-    if (!editModal) return;
-    setFormLoading(true);
-    try {
-      await api.patch(`/personal/${editModal.id}`, {
-        status: editData.status,
-        position: editData.position,
-      });
-      setEditModal(null);
-      fetchStaff();
-    } catch (error) {
-      console.error('Error updating staff:', error);
-    } finally {
-      setFormLoading(false);
-    }
-  };
-
   const handleDelete = async () => {
     if (!deleteModal) return;
     setFormLoading(true);
@@ -131,7 +100,7 @@ export default function StaffPage() {
       const persona = s.persona;
       const nombre = persona ? `${persona.names} ${persona.lastname_paternal}` : 'Personal';
 
-      if (users && users.length > 0) {
+      if (users && users.length > 0 && persona) {
         const user = users[0];
         const newPassword = `${persona.ci}-${new Date().getFullYear()}`;
         setCredentialsModal({ username: user.username, password: newPassword, nombre, staffId: s.id, personId: s.person_id });
@@ -225,7 +194,7 @@ export default function StaffPage() {
                       <Button variant="ghost" size="icon" title="Ver credenciales" onClick={() => viewCredentials(s)}>
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" title="Editar" onClick={() => openEditModal(s)}>
+                      <Button variant="ghost" size="icon" title="Editar" onClick={() => router.push(`/personal/editar/${s.id}`)}>
                         <Edit2 className="w-4 h-4" />
                       </Button>
                       <Button variant="ghost" size="icon" title="Eliminar" onClick={() => setDeleteModal(s)}>
@@ -246,44 +215,6 @@ export default function StaffPage() {
           </Table>
         </CardContent>
       </Card>
-
-      <Modal open={!!editModal} onClose={() => setEditModal(null)} title="Editar Personal" size="md">
-        <div className="space-y-4">
-          {editModal && (
-            <>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-sm text-gray-500">Personal</p>
-                <p className="font-medium">
-                  {editModal.persona?.names} {editModal.persona?.lastname_paternal} {editModal.persona?.lastname_maternal}
-                </p>
-                <p className="text-sm text-gray-500">{editModal.persona?.ci}</p>
-              </div>
-              <div>
-                <Select
-                  label="Cargo"
-                  value={editData.position}
-                  onChange={(e) => setEditData({ ...editData, position: e.target.value })}
-                  options={POSITION_OPTIONS}
-                  placeholder="Seleccionar cargo..."
-                />
-              </div>
-              <div>
-                <Select
-                  label="Estado"
-                  value={editData.status}
-                  onChange={(e) => setEditData({ ...editData, status: e.target.value })}
-                  options={STATUS_OPTIONS}
-                  placeholder="Seleccionar estado..."
-                />
-              </div>
-              <div className="flex justify-end gap-3 pt-4">
-                <Button variant="outline" onClick={() => setEditModal(null)}>Cancelar</Button>
-                <Button onClick={handleEdit} isLoading={formLoading}>Guardar Cambios</Button>
-              </div>
-            </>
-          )}
-        </div>
-      </Modal>
 
       <ConfirmModal
         open={!!deleteModal}
