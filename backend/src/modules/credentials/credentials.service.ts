@@ -40,6 +40,7 @@ export class CredentialsService {
       .createQueryBuilder('credential')
       .leftJoinAndSelect('credential.estudiante', 'student')
       .leftJoinAndSelect('student.persona', 'person')
+      .leftJoinAndSelect('student.carrera', 'career')
       .leftJoinAndSelect('credential.emisor', 'issuer');
 
     if (gestion) {
