@@ -39,4 +39,12 @@ api.interceptors.response.use(
   }
 );
 
+// Public API (no auth required)
+export const publicApi = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 export default api;

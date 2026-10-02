@@ -9,15 +9,31 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Modal, ConfirmModal } from '@/components/ui/modal';
-import { Plus, Search, Edit2, Trash2, Loader2, User, Eye, Key } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Loader2, User, Eye, Key, Filter } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Student } from '@/types';
+import { Select } from '@/components/ui/select';
+
+const statusLabels: Record<string, { label: string; color: string }> = {
+  pre_registro: { label: 'Pre-registro', color: 'bg-purple-100 text-purple-800' },
+  verificado: { label: 'Verificado', color: 'bg-blue-100 text-blue-800' },
+  matriculado: { label: 'Matriculado', color: 'bg-green-100 text-green-800' },
+  egresado: { label: 'Egresado', color: 'bg-gray-100 text-gray-800' },
+  retirado: { label: 'Retirado', color: 'bg-red-100 text-red-800' },
+};
+
+const originLabels: Record<string, string> = {
+  web: 'Web',
+  secretaria: 'Secretaría',
+};
 
 export default function StudentsPage() {
   const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [estadoFilter, setEstadoFilter] = useState<string>('');
+  const [origenFilter, setOrigenFilter] = useState<string>('');
 
   const [deleteModal, setDeleteModal] = useState<Student | null>(null);
   const [credentialsModal, setCredentialsModal] = useState<{ username: string; password: string; nombre: string; studentId: number; personId: number } | null>(null);
@@ -45,18 +61,15 @@ export default function StudentsPage() {
     const fullName = `${persona.names} ${persona.lastname_paternal} ${persona.lastname_maternal}`.toLowerCase();
     const ci = persona.ci.toLowerCase();
     const search = searchTerm.toLowerCase();
-    return fullName.includes(search) || ci.includes(search);
+    const matchesSearch = fullName.includes(search) || ci.includes(search);
+    const matchesEstado = !estadoFilter || student.estado_matricula === estadoFilter;
+    const matchesOrigen = !origenFilter || student.origen === origenFilter;
+    return matchesSearch && matchesEstado && matchesOrigen;
   });
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'exito' | 'error' | 'advertencia' | 'secondary'> = {
-      activo: 'exito',
-      inactivo: 'error',
-      egresado: 'advertencia',
-      suspendido: 'error',
-      congelado: 'advertencia',
-    };
-    return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>;
+    const config = statusLabels[status] || { label: status, color: 'bg-gray-100 text-gray-800' };
+    return <Badge className={config.color}>{config.label}</Badge>;
   };
 
   const handleDelete = async () => {
@@ -132,16 +145,43 @@ export default function StudentsPage() {
 
       <Card variant="bordered">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Lista de Estudiantes ({students.length})</CardTitle>
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="Buscar por nombre o CI..."
-                className="pl-10"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <CardTitle>Lista de Estudiantes ({filteredStudents.length})</CardTitle>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex gap-2">
+                <Select
+                  value={estadoFilter}
+                  onChange={(e) => setEstadoFilter(e.target.value)}
+                  options={[
+                    { value: '', label: 'Todos' },
+                    { value: 'pre_registro', label: 'Pre-registro' },
+                    { value: 'verificado', label: 'Verificado' },
+                    { value: 'matriculado', label: 'Matriculado' },
+                    { value: 'egresado', label: 'Egresado' },
+                    { value: 'retirado', label: 'Retirado' },
+                  ]}
+                  placeholder="Estado"
+                />
+                <Select
+                  value={origenFilter}
+                  onChange={(e) => setOrigenFilter(e.target.value)}
+                  options={[
+                    { value: '', label: 'Todos' },
+                    { value: 'web', label: 'Web' },
+                    { value: 'secretaria', label: 'Secretaría' },
+                  ]}
+                  placeholder="Origen"
+                />
+              </div>
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Buscar por nombre o CI..."
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -152,8 +192,9 @@ export default function StudentsPage() {
                 <TableHead>CI</TableHead>
                 <TableHead>Nombre Completo</TableHead>
                 <TableHead>Código</TableHead>
+                <TableHead>Origen</TableHead>
+                <TableHead>Estado Matrícula</TableHead>
                 <TableHead>Fecha Ingreso</TableHead>
-                <TableHead>Estado</TableHead>
                 <TableHead>Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -167,8 +208,11 @@ export default function StudentsPage() {
                     {student.persona?.names} {student.persona?.lastname_paternal} {student.persona?.lastname_maternal}
                   </TableCell>
                   <TableCell>{student.inscription_code}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{originLabels[student.origen || 'secretaria'] || '-'}</Badge>
+                  </TableCell>
+                  <TableCell>{getStatusBadge(student.estado_matricula || 'matriculado')}</TableCell>
                   <TableCell>{new Date(student.admission_date).toLocaleDateString('es-BO')}</TableCell>
-                  <TableCell>{getStatusBadge(student.status)}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Button variant="ghost" size="icon" title="Ver credenciales" onClick={() => viewCredentials(student)}>
@@ -186,8 +230,8 @@ export default function StudentsPage() {
               ))}
               {filteredStudents.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                    {searchTerm ? 'No se encontraron estudiantes' : 'No hay estudiantes registrados'}
+                  <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                    {searchTerm || estadoFilter || origenFilter ? 'No se encontraron estudiantes' : 'No hay estudiantes registrados'}
                   </TableCell>
                 </TableRow>
               )}

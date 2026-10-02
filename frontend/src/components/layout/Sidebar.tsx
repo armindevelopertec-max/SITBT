@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth-store';
 import { useInstitutionSettings } from '@/hooks/useInstitutionSettings';
-import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, ClipboardList, Award, CreditCard, FileText, RefreshCw, BarChart3, Shield, User, BookMarked, CalendarCheck, Settings, Building2, Calendar } from 'lucide-react';
+import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, ClipboardList, Award, CreditCard, FileText, RefreshCw, BarChart3, Shield, User, BookMarked, CalendarCheck, Settings, Building2, Calendar, ClipboardCheck, FileBadge } from 'lucide-react';
 import { Role } from '@/types';
 
 interface MenuItem {
@@ -35,6 +35,12 @@ const menuSections: MenuSection[] = [
         href: '/panel',
         icon: <Home className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente', 'estudiante', 'apoyo'],
+      },
+      {
+        title: 'Admisión',
+        href: '/admision',
+        icon: <ClipboardCheck className="w-5 h-5" />,
+        roles: ['administrador', 'secretaria'],
       },
       {
         title: 'Estudiantes',
@@ -117,6 +123,12 @@ const menuSections: MenuSection[] = [
         title: 'Credenciales',
         href: '/credenciales',
         icon: <FileText className="w-5 h-5" />,
+        roles: ['administrador', 'secretaria'],
+      },
+      {
+        title: 'Documentos',
+        href: '/documentos',
+        icon: <FileBadge className="w-5 h-5" />,
         roles: ['administrador', 'secretaria'],
       },
     ],

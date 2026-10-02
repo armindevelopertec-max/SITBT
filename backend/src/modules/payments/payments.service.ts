@@ -13,7 +13,10 @@ export class PaymentsService {
   ) {}
 
   async create(createDto: CreatePaymentDto): Promise<Pago> {
-    const payment = this.paymentRepository.create(createDto);
+    const payment = this.paymentRepository.create({
+      ...createDto,
+      payment_date: new Date(createDto.payment_date),
+    } as Partial<Pago>);
     return this.paymentRepository.save(payment);
   }
 

@@ -17,6 +17,18 @@ export enum CredentialStatus {
   REEMPLAZADA = 'reemplazada',
 }
 
+export enum CredentialEmissionType {
+  PRIMERA = 'primera',
+  RENOVACION = 'renovacion',
+  REIMPRESION = 'reimpresion',
+}
+
+export enum CredentialDeliveryStatus {
+  GENERADO = 'generado',
+  IMPRESO = 'impreso',
+  ENTREGADO = 'entregado',
+}
+
 @Entity('credentials')
 export class Credencial {
   @PrimaryGeneratedColumn()
@@ -63,6 +75,24 @@ export class Credencial {
 
   @Column({ type: 'boolean', default: false })
   printed: boolean;
+
+  @Column({ type: 'enum', enum: CredentialEmissionType, default: CredentialEmissionType.PRIMERA })
+  tipo_emision: CredentialEmissionType;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  vigencia_hasta: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  qr_verificacion: string;
+
+  @Column({ type: 'enum', enum: CredentialDeliveryStatus, default: CredentialDeliveryStatus.GENERADO })
+  estado_entrega: CredentialDeliveryStatus;
+
+  @Column({ nullable: true })
+  entregado_a: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  fecha_entrega: Date;
 
   @Column({ type: 'text', nullable: true })
   notes: string;

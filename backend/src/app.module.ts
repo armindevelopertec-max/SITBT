@@ -23,6 +23,10 @@ import { AuditModule } from './modules/audit/audit.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { InstitutionSettingsModule } from './modules/institution-settings/institution-settings.module';
 import { GestionesModule } from './modules/gestiones/gestiones.module';
+import { AdmissionModule } from './modules/admission/admission.module';
+import { ConsentModule } from './modules/consent/consent.module';
+import { DocumentsModule } from './modules/documents/documents.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -67,6 +71,10 @@ import { GestionesModule } from './modules/gestiones/gestiones.module';
     StorageModule,
     InstitutionSettingsModule,
     GestionesModule,
+    AdmissionModule,
+    ConsentModule,
+    DocumentsModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}

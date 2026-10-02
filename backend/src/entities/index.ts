@@ -28,3 +28,6 @@ export * from './registro-auditoria.entity';
 export * from './apoderado.entity';
 export * from './referencia.entity';
 export * from './documento-estudiante.entity';
+export { AdmissionRequest, AdmissionStatus, AdmissionOrigin } from './admission-request.entity';
+export { ConsentRecord, ConsentType } from './consent-record.entity';
+export { EmittedDocument, DocumentType, DocumentStatus } from './emitted-document.entity';

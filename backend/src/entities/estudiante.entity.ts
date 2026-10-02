@@ -20,6 +20,19 @@ export enum StudentStatus {
   BAJA = 'baja',
 }
 
+export enum StudentMatriculaStatus {
+  PRE_REGISTRO = 'pre_registro',
+  VERIFICADO = 'verificado',
+  MATRICULADO = 'matriculado',
+  EGRESADO = 'egresado',
+  RETIRADO = 'retirado',
+}
+
+export enum StudentOrigin {
+  WEB = 'web',
+  SECRETARIA = 'secretaria',
+}
+
 @Entity('students')
 export class Estudiante {
   @PrimaryGeneratedColumn()
@@ -69,6 +82,24 @@ export class Estudiante {
 
   @Column({ type: 'enum', enum: StudentStatus, default: StudentStatus.ACTIVO })
   status: StudentStatus;
+
+  @Column({ type: 'enum', enum: StudentMatriculaStatus, default: StudentMatriculaStatus.MATRICULADO })
+  estado_matricula: StudentMatriculaStatus;
+
+  @Column({ type: 'enum', enum: StudentOrigin, default: StudentOrigin.SECRETARIA })
+  origen: StudentOrigin;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  admission_request_id: string;
+
+  @Column({ nullable: true })
+  verificado_por: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  fecha_verificacion: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  fecha_pre_registro: Date;
 
   @CreateDateColumn()
   created_at: Date;

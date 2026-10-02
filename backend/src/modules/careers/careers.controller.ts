@@ -19,12 +19,12 @@ import { CareerStatus } from '../../entities/carrera.entity';
 
 @ApiTags('Carreras')
 @Controller('carreras')
-@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class CareersController {
   constructor(private readonly careersService: CareersService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   create(@Body() createCareerDto: CreateCareerDto) {
     return this.careersService.create(createCareerDto);
   }
@@ -55,11 +55,13 @@ export class CareersController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   update(@Param('id', ParseIntPipe) id: number, @Body() updateCareerDto: UpdateCareerDto) {
     return this.careersService.update(id, updateCareerDto);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.careersService.remove(id);
   }
