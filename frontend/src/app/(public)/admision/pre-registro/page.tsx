@@ -54,9 +54,11 @@ function PreRegistroForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    const upperFields = ['names', 'lastname_paternal', 'lastname_maternal', 'ci', 'address', 'birthplace_other', 'nationality_other', 'nombreTutor', 'ciTutor'];
+    const isUpper = upperFields.includes(name);
     setForm((prev) => ({
       ...prev,
-      [name]: name === 'carrera_id' ? (value ? parseInt(value) : undefined) : value,
+      [name]: name === 'carrera_id' ? (value ? parseInt(value) : undefined) : (isUpper ? value.toUpperCase() : value),
     }));
   };
 

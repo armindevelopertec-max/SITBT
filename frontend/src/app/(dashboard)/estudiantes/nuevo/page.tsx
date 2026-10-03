@@ -80,6 +80,8 @@ export default function NewStudentPage() {
     bachelor_title_date: '',
   });
 
+  const toUpper = (value: string) => value.toUpperCase();
+
   useEffect(() => {
     fetchCareers();
     fetchGestiones();
@@ -258,7 +260,7 @@ export default function NewStudentPage() {
                 <Input
                   label="Cédula de Identidad *"
                   value={personData.ci}
-                  onChange={(e) => setPersonData({ ...personData, ci: e.target.value })}
+                  onChange={(e) => setPersonData({ ...personData, ci: toUpper(e.target.value) })}
                   error={errors.ci}
                   placeholder="12345678"
                 />
@@ -267,7 +269,7 @@ export default function NewStudentPage() {
                 <Input
                   label="Nombres *"
                   value={personData.names}
-                  onChange={(e) => setPersonData({ ...personData, names: e.target.value })}
+                  onChange={(e) => setPersonData({ ...personData, names: toUpper(e.target.value) })}
                   error={errors.names}
                   placeholder="Juan Carlos"
                 />
@@ -276,7 +278,7 @@ export default function NewStudentPage() {
                 <Input
                   label="Apellido Paterno *"
                   value={personData.lastname_paternal}
-                  onChange={(e) => setPersonData({ ...personData, lastname_paternal: e.target.value })}
+                  onChange={(e) => setPersonData({ ...personData, lastname_paternal: toUpper(e.target.value) })}
                   error={errors.lastname_paternal}
                   placeholder="Perez"
                 />
@@ -285,7 +287,7 @@ export default function NewStudentPage() {
                 <Input
                   label="Apellido Materno"
                   value={personData.lastname_maternal}
-                  onChange={(e) => setPersonData({ ...personData, lastname_maternal: e.target.value })}
+                  onChange={(e) => setPersonData({ ...personData, lastname_maternal: toUpper(e.target.value) })}
                   error={errors.lastname_maternal}
                   placeholder="Gomez"
                 />
@@ -327,7 +329,7 @@ export default function NewStudentPage() {
                   <Input
                     label="Especificar lugar de nacimiento"
                     value={personData.birthplace_other || ''}
-                    onChange={(e) => setPersonData({ ...personData, birthplace_other: e.target.value })}
+                    onChange={(e) => setPersonData({ ...personData, birthplace_other: toUpper(e.target.value) })}
                     placeholder="Ingrese el lugar de nacimiento"
                   />
                 </div>
@@ -413,7 +415,7 @@ export default function NewStudentPage() {
                   <Input
                     label="Especificar nacionalidad"
                     value={personData.nationality_other || ''}
-                    onChange={(e) => setPersonData({ ...personData, nationality_other: e.target.value })}
+                    onChange={(e) => setPersonData({ ...personData, nationality_other: toUpper(e.target.value) })}
                     placeholder="Ingrese su nacionalidad"
                   />
                 </div>
@@ -439,7 +441,7 @@ export default function NewStudentPage() {
                 <Input
                   label="Dirección"
                   value={personData.address}
-                  onChange={(e) => setPersonData({ ...personData, address: e.target.value })}
+                  onChange={(e) => setPersonData({ ...personData, address: toUpper(e.target.value) })}
                   placeholder="Av. 16 de Julio, La Paz"
                 />
               </div>
