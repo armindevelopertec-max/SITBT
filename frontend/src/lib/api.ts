@@ -1,10 +1,18 @@
 import axios from 'axios';
 import { useAuthStore } from '@/store/auth-store';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
+
+const getBaseUrl = () => {
+  if (API_URL) {
+    return API_URL;
+  }
+  return `${API_BASE}/api`;
+};
 
 export const api = axios.create({
-  baseURL: API_URL,
+  baseURL: `${getBaseUrl()}`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -39,9 +47,8 @@ api.interceptors.response.use(
   }
 );
 
-// Public API (no auth required)
 export const publicApi = axios.create({
-  baseURL: API_URL,
+  baseURL: `${getBaseUrl()}`,
   headers: {
     'Content-Type': 'application/json',
   },

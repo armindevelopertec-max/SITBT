@@ -202,7 +202,7 @@ export default function StudentsPage() {
               {filteredStudents.map((student) => (
                 <TableRow key={student.id}>
                   <TableCell className="font-medium">
-                    {student.persona?.ci} {student.persona?.ci_issued && `- ${student.persona.ci_issued}`}
+                    {student.persona?.ci}
                   </TableCell>
                   <TableCell>
                     {student.persona?.names} {student.persona?.lastname_paternal} {student.persona?.lastname_maternal}

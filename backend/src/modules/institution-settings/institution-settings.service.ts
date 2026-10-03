@@ -46,11 +46,18 @@ export class InstitutionSettingsService {
 
   async getPublicSettings(): Promise<Partial<InstitutionSettings>> {
     const settings = await this.findOne();
+    let logoUrl = settings.logo_url;
+    if (logoUrl && logoUrl.startsWith('http')) {
+      const match = logoUrl.match(/\/sitbt-files\/(.+)$/);
+      if (match) {
+        logoUrl = `/storage/files/${match[1]}`;
+      }
+    }
     return {
       nombre: settings.nombre,
       nombre_corto: settings.nombre_corto,
       lema: settings.lema,
-      logo_url: settings.logo_url,
+      logo_url: logoUrl,
       direccion: settings.direccion,
       telefono: settings.telefono,
       departamento: settings.departamento,

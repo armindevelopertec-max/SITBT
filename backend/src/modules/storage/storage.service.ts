@@ -58,7 +58,7 @@ export class StorageService {
         { 'Content-Type': file.mimetype },
       );
 
-      const url = await this.getFileUrl(filename);
+      const url = `/storage/files/${filename}`;
 
       return {
         filename,
@@ -88,7 +88,7 @@ export class StorageService {
         { 'Content-Type': mimetype },
       );
 
-      const url = await this.getFileUrl(fullPath);
+      const url = `/storage/files/${fullPath}`;
 
       return {
         filename: fullPath,
@@ -164,6 +164,32 @@ export class StorageService {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  async getFileStream(filename: string): Promise<{ stream: NodeJS.ReadableStream; size: number; mimetype: string }> {
+    try {
+      const stat = await this.minioClient.statObject(this.bucket, filename);
+      const stream = await this.minioClient.getObject(this.bucket, filename);
+      return {
+        stream,
+        size: stat.size,
+        mimetype: stat.metaData?.['content-type'] || 'application/octet-stream',
+      };
+    } catch (error: any) {
+      throw new InternalServerErrorException(`Failed to get file stream: ${error.message}`);
+    }
+  }
+
+  async getFileMetadata(filename: string): Promise<{ size: number; mimetype: string }> {
+    try {
+      const stat = await this.minioClient.statObject(this.bucket, filename);
+      return {
+        size: stat.size,
+        mimetype: stat.metaData?.['content-type'] || 'application/octet-stream',
+      };
+    } catch (error: any) {
+      throw new InternalServerErrorException(`Failed to get file metadata: ${error.message}`);
     }
   }
 }

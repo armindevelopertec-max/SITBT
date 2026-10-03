@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Query,
@@ -11,9 +10,12 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Res,
+  StreamableFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Response } from 'express';
 import { StorageService, UploadedFile as UploadedFileType } from './storage.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -40,6 +42,20 @@ export class StorageController {
   async getFile(@Param('filename') filename: string) {
     const file = await this.service.getFile(filename);
     return { buffer: file.toString('base64') };
+  }
+
+  @Get('files/:filename')
+  async getFileStream(
+    @Param('filename') filename: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { stream, size, mimetype } = await this.service.getFileStream(filename);
+    res.set({
+      'Content-Type': mimetype,
+      'Content-Length': size,
+      'Content-Disposition': `inline; filename="${filename}"`,
+    });
+    return new StreamableFile(stream as any);
   }
 
   @Get(':filename/url')

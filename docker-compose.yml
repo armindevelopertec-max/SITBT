@@ -11,6 +11,8 @@ services:
       - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sitbt_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U sitbt -d sitbt_db"]
       interval: 10s
@@ -24,6 +26,8 @@ services:
       - "6380:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - sitbt_network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -41,13 +45,77 @@ services:
       - "9011:9001"
     volumes:
       - minio_data:/data
-      - minio_config:/root/.mc
+    networks:
+      - sitbt_network
     command: server /data --console-address ":9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sitbt_backend
+    environment:
+      PORT: 4000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: sitbt
+      DB_PASSWORD: sitbt_password
+      DB_DATABASE: sitbt_db
+      DB_LOGGING: "true"
+      JWT_SECRET: sitbt_jwt_secret_key_2024_boliviana_tecnologia
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      MINIO_BUCKET: sitbt-files
+      FRONTEND_URL: http://localhost
+    networks:
+      - sitbt_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sitbt_frontend
+    environment:
+      BACKEND_URL: http://backend:4000
+      NEXT_PUBLIC_API_BASE: ""
+    networks:
+      - sitbt_network
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    container_name: sitbt_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - sitbt_network
+    depends_on:
+      - frontend
+      - backend
+
+networks:
+  sitbt_network:
+    driver: bridge
 
 volumes:
   postgres_data:

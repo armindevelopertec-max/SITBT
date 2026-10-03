@@ -219,7 +219,7 @@ export default function AdmisionPage() {
   };
 
   const filteredAdmissions = admissions.filter((admission) => {
-    const fullName = `${admission.nombre} ${admission.apellidoPaterno || ''} ${admission.apellidoMaterno || ''}`.toLowerCase();
+    const fullName = `${admission.names} ${admission.lastname_paternal || ''} ${admission.lastname_maternal || ''}`.toLowerCase();
     const ci = admission.ci.toLowerCase();
     const search = searchTerm.toLowerCase();
     const matchesSearch = fullName.includes(search) || ci.includes(search);
@@ -657,7 +657,7 @@ export default function AdmisionPage() {
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            ¿Está seguro de verificar el pre-registro de <strong>{verificarModal?.nombre} {verificarModal?.apellidoPaterno}</strong>?
+            ¿Está seguro de verificar el pre-registro de <strong>{verificarModal?.names} {verificarModal?.lastname_paternal}</strong>?
           </p>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones (opcional)</label>

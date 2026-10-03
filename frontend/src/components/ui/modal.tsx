@@ -82,11 +82,12 @@ interface ConfirmModalProps {
   onClose: () => void;
   onConfirm: () => void;
   title: string;
-  message: string;
+  message?: string;
   confirmText?: string;
   cancelText?: string;
   variant?: 'default' | 'destructive';
   loading?: boolean;
+  children?: React.ReactNode;
 }
 
 export function ConfirmModal({
@@ -99,9 +100,11 @@ export function ConfirmModal({
   cancelText = 'Cancelar',
   variant = 'default',
   loading = false,
+  children,
 }: ConfirmModalProps) {
   return (
     <Modal open={open} onClose={onClose} title={title} description={message} size="sm">
+      {children}
       <div className="flex justify-end gap-3 mt-6">
         <Button variant="outline" onClick={onClose} disabled={loading}>
           {cancelText}

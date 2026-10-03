@@ -13,7 +13,9 @@ interface ImageUploadProps {
   className?: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
+const getUploadUrl = () => API_URL ? `${API_URL}/storage/upload` : `${API_BASE}/api/storage/upload`;
 
 export function ImageUpload({
   label,
@@ -60,7 +62,7 @@ export function ImageUpload({
         }
       }
 
-      const response = await fetch(`${API_URL}/storage/upload?folder=logos`, {
+      const response = await fetch(`${getUploadUrl()}?folder=logos`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${tokenValue}`,

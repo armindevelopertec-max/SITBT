@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { publicApi } from '@/lib/api';
 
 interface InstitutionSettings {
   nombre: string;
@@ -35,9 +36,8 @@ export function InstitutionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const fetchInstitution = async () => {
       try {
-        const response = await fetch('http://localhost:4000/institution-settings/public');
-        const data = await response.json();
-        setInstitution(data);
+        const response = await publicApi.get('/institution-settings/public');
+        setInstitution(response.data);
       } catch (error) {
         console.error('Error fetching institution:', error);
       } finally {

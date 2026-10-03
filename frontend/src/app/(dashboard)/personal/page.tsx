@@ -181,7 +181,7 @@ export default function StaffPage() {
               {filteredStaff.map((s) => (
                 <TableRow key={s.id}>
                   <TableCell className="font-medium">
-                    {s.persona?.ci} {s.persona?.ci_issued && `- ${s.persona.ci_issued}`}
+                    {s.persona?.ci}
                   </TableCell>
                   <TableCell>
                     {s.persona?.names} {s.persona?.lastname_paternal} {s.persona?.lastname_maternal}
