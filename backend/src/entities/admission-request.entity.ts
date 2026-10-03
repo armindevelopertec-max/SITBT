@@ -33,13 +33,13 @@ export class AdmissionRequest {
   id: string;
 
   @Column({ type: 'varchar', length: 100 })
-  nombre: string;
+  names: string;
 
   @Column({ name: 'apellido_paterno', type: 'varchar', length: 100, nullable: true })
-  apellidoPaterno: string;
+  lastname_paternal: string;
 
   @Column({ name: 'apellido_materno', type: 'varchar', length: 100, nullable: true })
-  apellidoMaterno: string;
+  lastname_maternal: string;
 
   @Column({ type: 'varchar', length: 20 })
   ci: string;
@@ -48,16 +48,28 @@ export class AdmissionRequest {
   ci_issued: string;
 
   @Column({ name: 'fecha_nacimiento', type: 'date' })
-  fechaNacimiento: Date;
+  birthdate: Date;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  birthplace: string;
+
+  @Column({ type: 'enum', enum: Gender, nullable: true })
+  gender: string;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  marital_status: string;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  nationality: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
-  telefono: string;
+  phone: string;
 
   @Column({ type: 'varchar', length: 100 })
   email: string;
 
   @Column({ type: 'varchar', length: 200, nullable: true })
-  direccion: string;
+  address: string;
 
   @Column({ name: 'nombre_tutor', type: 'varchar', length: 100, nullable: true })
   nombreTutor: string;
@@ -67,9 +79,6 @@ export class AdmissionRequest {
 
   @Column({ name: 'telefono_tutor', type: 'varchar', length: 20, nullable: true })
   telefonoTutor: string;
-
-  @Column({ type: 'enum', enum: Gender, nullable: true })
-  genero: string;
 
   @Column({ nullable: true })
   carrera_id: number;

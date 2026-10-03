@@ -5,17 +5,17 @@ import { AdmissionOrigin } from '../../../entities/admission-request.entity';
 export class CreateAdmissionDto {
   @ApiProperty()
   @IsString()
-  nombre: string;
+  names: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  apellidoPaterno?: string;
+  lastname_paternal?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  apellidoMaterno?: string;
+  lastname_maternal?: string;
 
   @ApiProperty()
   @IsString()
@@ -28,12 +28,32 @@ export class CreateAdmissionDto {
 
   @ApiProperty()
   @IsDateString()
-  fechaNacimiento: string;
+  birthdate: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  telefono?: string;
+  birthplace?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  gender?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  marital_status?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  nationality?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  phone?: string;
 
   @ApiProperty()
   @IsEmail()
@@ -42,7 +62,7 @@ export class CreateAdmissionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  direccion?: string;
+  address?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -58,11 +78,6 @@ export class CreateAdmissionDto {
   @IsOptional()
   @IsString()
   telefonoTutor?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  genero?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

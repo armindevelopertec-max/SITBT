@@ -31,7 +31,7 @@ export class AdmissionService {
   async create(createDto: CreateAdmissionDto): Promise<AdmissionRequest> {
     const request = this.admissionRepository.create({
       ...createDto,
-      fechaNacimiento: new Date(createDto.fechaNacimiento),
+      birthdate: new Date(createDto.birthdate),
     } as Partial<AdmissionRequest>);
     return this.admissionRepository.save(request);
   }
@@ -125,14 +125,17 @@ export class AdmissionService {
       persona = this.personaRepository.create({
         ci: request.ci,
         ci_issued: request.ci_issued,
-        names: request.nombre,
-        lastname_paternal: request.apellidoPaterno || request.nombre.split(' ')[0] || request.nombre,
-        lastname_maternal: request.apellidoMaterno || request.nombre.split(' ').slice(1).join(' ') || '',
-        birthdate: new Date(request.fechaNacimiento),
-        gender: request.genero as Gender,
-        phone: request.telefono,
+        names: request.names,
+        lastname_paternal: request.lastname_paternal || request.names.split(' ')[0] || request.names,
+        lastname_maternal: request.lastname_maternal || request.names.split(' ').slice(1).join(' ') || '',
+        birthdate: new Date(request.birthdate),
+        birthplace: request.birthplace,
+        gender: request.gender as Gender,
+        marital_status: request.marital_status as any,
+        nationality: request.nationality,
+        phone: request.phone,
         email: request.email,
-        address: request.direccion,
+        address: request.address,
       });
       persona = (await this.personaRepository.save(persona)) as Persona;
     }
@@ -193,9 +196,9 @@ export class AdmissionService {
     const yearSuffix = gestion.slice(-2);
 
     const initials = (
-      (request.apellidoPaterno?.[0] || '') +
-      (request.apellidoMaterno?.[0] || '') +
-      (request.nombre?.[0] || '')
+      (request.lastname_paternal?.[0] || '') +
+      (request.lastname_maternal?.[0] || '') +
+      (request.names?.[0] || '')
     ).toUpperCase();
 
     const careerCode = carrera.name.substring(0, 2).toUpperCase();

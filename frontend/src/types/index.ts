@@ -263,19 +263,22 @@ export interface AdmissionRequest {
 }
 
 export interface CreateAdmissionDto {
-  nombre: string;
-  apellidoPaterno?: string;
-  apellidoMaterno?: string;
+  names: string;
+  lastname_paternal?: string;
+  lastname_maternal?: string;
   ci: string;
   ci_issued?: string;
-  fechaNacimiento: string;
-  telefono?: string;
+  birthdate: string;
+  birthplace?: string;
+  gender?: 'M' | 'F';
+  marital_status?: string;
+  nationality?: string;
+  phone?: string;
   email: string;
-  direccion?: string;
+  address?: string;
   nombreTutor?: string;
   ciTutor?: string;
   telefonoTutor?: string;
-  genero?: 'M' | 'F';
   carrera_id?: number;
   origen?: AdmissionOrigin;
 }
