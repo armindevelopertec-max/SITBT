@@ -61,7 +61,7 @@ export default function ContactoPage() {
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-100 mb-4">Contáctanos</h1>
-            <p className="text-xl text-gray-400">Estamos aquí para ayudarte</p>
+            <p className="text-xl text-primary-400">Estamos aquí para ayudarte</p>
           </div>
         </div>
       </section>

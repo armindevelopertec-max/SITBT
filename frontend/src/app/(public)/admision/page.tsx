@@ -59,59 +59,72 @@ export default function AdmisionPage() {
           <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80" alt="" className="w-full h-full object-cover" />
         </div>
         <div className="relative z-10 h-full flex items-center">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-100 mb-4">Admisión 2026</h1>
-            <p className="text-xl text-primary-400 max-w-2xl mx-auto">
+            <p className="text-xl text-primary-400">
               Convierte tu vocación en tu profesión
             </p>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-dark-900 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-dark-700 border border-dark-600 rounded-2xl p-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-100 mb-4">¿Listo para empezar?</h2>
-            <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-              Completa tu pre-registro en línea y da el primer paso hacia tu carrera técnica
+      {/* Process */}
+      <section className="bg-dark-900 py-24 border-y border-dark-600">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-1.5 bg-primary-500/10 text-primary-400 text-sm font-medium rounded-full mb-4">
+              Proceso paso a paso
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-100 mb-4">
+              Proceso de <span className="text-primary-400">Admisión</span>
+            </h2>
+            <p className="text-gray-400 text-lg max-w-xl mx-auto">
+              Sigue estos pasos para completar tu inscripción
             </p>
-            <Link href="/admision/pre-registro" className="inline-flex items-center gap-2 px-8 py-4 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all">
+          </div>
+
+          <div className="relative">
+            <div className="absolute top-16 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-emerald-500 via-purple-500 to-orange-500 hidden md:block" />
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              {processSteps.map((step, index) => {
+                const colors = [
+                  { bg: 'from-blue-500 to-cyan-500', text: 'text-blue-400', bgLight: 'bg-blue-500/10', border: 'border-blue-500/50', shadow: 'shadow-blue-500/50', cardBg: 'bg-blue-500/5' },
+                  { bg: 'from-emerald-500 to-teal-500', text: 'text-emerald-400', bgLight: 'bg-emerald-500/10', border: 'border-emerald-500/50', shadow: 'shadow-emerald-500/50', cardBg: 'bg-emerald-500/5' },
+                  { bg: 'from-purple-500 to-pink-500', text: 'text-purple-400', bgLight: 'bg-purple-500/10', border: 'border-purple-500/50', shadow: 'shadow-purple-500/50', cardBg: 'bg-purple-500/5' },
+                  { bg: 'from-orange-500 to-amber-500', text: 'text-orange-400', bgLight: 'bg-orange-500/10', border: 'border-orange-500/50', shadow: 'shadow-orange-500/50', cardBg: 'bg-orange-500/5' },
+                ];
+                const c = colors[index];
+                return (
+                  <div key={index} className="relative text-center group">
+                    <div className="relative z-10 flex flex-col items-center">
+                      <div className={`w-20 h-20 bg-gradient-to-br ${c.bg} rounded-full flex items-center justify-center shadow-2xl ${c.shadow} group-hover:scale-110 transition-all duration-500 mb-6 ring-8 ring-dark-800`}>
+                        <span className="text-dark-900 font-bold text-3xl">{step.step}</span>
+                      </div>
+                      <div className={`w-full ${c.cardBg} border ${c.border} rounded-2xl p-6 backdrop-blur-sm group-hover:-translate-y-2 transition-all duration-300`}>
+                        <div className={`w-14 h-14 ${c.bgLight} ${c.text} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                          {step.icon}
+                        </div>
+                        <h4 className="text-xl font-bold text-gray-100 mb-2">{step.title}</h4>
+                        <p className="text-gray-400 text-sm">{step.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="text-center mt-16">
+            <Link href="/admision/pre-registro" className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-dark-900 font-bold rounded-xl hover:shadow-xl hover:shadow-primary-500/40 transition-all duration-300 hover:-translate-y-1">
               Realizar pre-registro <ArrowRightIcon className="w-5 h-5" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Process */}
-      <section className="bg-dark-900 py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-100 mb-4">Proceso de Admisión</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              Sigue estos pasos para completar tu inscripción
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-6">
-            {processSteps.map((step, index) => (
-              <div key={index} className="relative bg-dark-700 border border-dark-600 rounded-xl p-6">
-                <div className="absolute -top-4 left-6 w-8 h-8 bg-primary-500 text-dark-900 rounded-full flex items-center justify-center font-bold">
-                  {step.step}
-                </div>
-                <div className="w-12 h-12 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mb-4 mt-2">
-                  {step.icon}
-                </div>
-                <h4 className="text-lg font-bold text-gray-100 mb-2">{step.title}</h4>
-                <p className="text-gray-400 text-sm">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Requirements & Costs */}
-      <section className="bg-dark-800 py-24 border-y border-dark-600">
+      <section className="bg-dark-700 py-24 border-y border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12">
             <div>
@@ -148,49 +161,8 @@ export default function AdmisionPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section>  
 
-      {/* Info */}
-      <section className="bg-dark-900 py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-dark-700 border border-dark-600 rounded-xl p-8 text-center">
-              <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Phone className="w-7 h-7" />
-              </div>
-              <h4 className="text-lg font-bold text-gray-100 mb-2">Teléfono</h4>
-              <p className="text-gray-400">{institution?.telefono || '7525247'}</p>
-            </div>
-            <div className="bg-dark-700 border border-dark-600 rounded-xl p-8 text-center">
-              <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-7 h-7" />
-              </div>
-              <h4 className="text-lg font-bold text-gray-100 mb-2">Email</h4>
-              <p className="text-gray-400">{institution?.email || 'ITBT@edu.bo'}</p>
-            </div>
-            <div className="bg-dark-700 border border-dark-600 rounded-xl p-8 text-center">
-              <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-7 h-7" />
-              </div>
-              <h4 className="text-lg font-bold text-gray-100 mb-2">Ubicación</h4>
-              <p className="text-gray-400">{institution?.direccion || 'Av. de los Heroes'}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="bg-dark-700 py-16 border-t border-dark-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-100 mb-4">No esperes más</h2>
-          <p className="text-xl text-gray-400 mb-8">
-            Las vacantes son limitadas para el período 2026
-          </p>
-          <Link href="/admision/pre-registro" className="inline-flex items-center gap-2 px-8 py-4 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all">
-            Pre-registrarme ahora <ArrowRightIcon className="w-5 h-5" />
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }

@@ -194,13 +194,13 @@ export default function CareersPage() {
     <div className="bg-dark-900">
       {/* Hero */}
       <section className="relative h-80 overflow-hidden bg-dark-900">
-        <div className="absolute inset-0 opacity-50">
+        <div className="absolute inset-0 opacity-30">
           <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80" alt="" className="w-full h-full object-cover" />
         </div>
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-100 mb-4">Nuestras Carreras</h1>
-            <p className="text-xl text-gray-300">
+            <p className="text-xl text-primary-400">
               Programas técnicos superiores autorizados por el Ministerio de Educación
             </p>
           </div>
