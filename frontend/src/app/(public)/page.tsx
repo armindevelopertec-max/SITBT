@@ -17,7 +17,7 @@ const heroImages = [
     subtitle: 'Practica con tecnología de vanguardia'
   },
   {
-    url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80',
+    url: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80',
     title: 'Tu Futuro Comienza Aquí',
     subtitle: 'Únete a miles de profesionales exitosos'
   }
@@ -399,7 +399,7 @@ export default function HomePage() {
             </div>
             <div className="rounded-2xl overflow-hidden h-80 lg:h-auto">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d191.6287699653574!2d-68.1987555!3d-16.5046514!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTbCsDMwJzE2LjUiUyA2OMKwMTEnNTQuMiJX!5e0!3m2!1ses!2sbo!4v1699900000000!5m2!1ses!2sbo"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1893.8396095475862!2d-68.1708826691198!3d-16.504407754821006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x915edff3f214c707%3A0x53da8aae1940d8d!2sInstiuto%20Boliviana%20de%20Tecnolog%C3%ADa!5e0!3m2!1ses-419!2sbo!4v1791038047614!5m2!1ses-419!2sbo"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}

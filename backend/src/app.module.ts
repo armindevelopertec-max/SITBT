@@ -46,6 +46,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
         autoLoadEntities: true,
         synchronize: false,
         logging: configService.get('DB_LOGGING', 'false') === 'true',
+        timezone: 'America/La_Paz',
       }),
       inject: [ConfigService],
     }),

@@ -38,7 +38,7 @@ const menuSections: MenuSection[] = [
       },
       {
         title: 'Admisión',
-        href: '/admision',
+        href: '/panel/admision',
         icon: <ClipboardCheck className="w-5 h-5" />,
         roles: ['administrador', 'secretaria'],
       },

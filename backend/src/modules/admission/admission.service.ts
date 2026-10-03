@@ -11,6 +11,9 @@ import { UpdateAdmissionDto } from './dto/update-admission.dto';
 import { Persona, Gender } from '../../entities/persona.entity';
 import { Estudiante, StudentMatriculaStatus, StudentOrigin } from '../../entities/estudiante.entity';
 import { Inscripcion } from '../../entities/inscripcion.entity';
+import { PlanEstudio } from '../../entities/plan-estudio.entity';
+import { Carrera } from '../../entities/carrera.entity';
+import { InstitutionSettings } from '../../entities/institution-settings.entity';
 
 @Injectable()
 export class AdmissionService {
@@ -134,7 +137,16 @@ export class AdmissionService {
       persona = (await this.personaRepository.save(persona)) as Persona;
     }
 
-    const inscriptionCode = `INS-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const studyPlan = await this.estudianteRepository.manager.findOne(
+      PlanEstudio,
+      { where: { career_id: request.carrera_id, status: 'vigente' as any } }
+    );
+
+    if (!studyPlan) {
+      throw new BadRequestException('No existe un plan de estudio vigente para la carrera seleccionada');
+    }
+
+    const inscriptionCode = await this.generateInscriptionCode(request);
 
     const estudianteData: DeepPartial<Estudiante> = {
       person_id: persona.id,
@@ -145,7 +157,7 @@ export class AdmissionService {
       inscription_code: inscriptionCode,
       form01_code: undefined,
       career_id: request.carrera_id,
-      study_plan_id: 1,
+      study_plan_id: studyPlan.id,
       admission_date: new Date(),
       status: 'activo' as any,
       estado_matricula: StudentMatriculaStatus.MATRICULADO,
@@ -165,6 +177,32 @@ export class AdmissionService {
     await this.admissionRepository.save(request);
 
     return { student: savedStudent, persona };
+  }
+
+  private async generateInscriptionCode(request: AdmissionRequest): Promise<string> {
+    const carrera = await this.estudianteRepository.manager.findOne(
+      require('../../entities/carrera.entity'),
+      { where: { id: request.carrera_id } }
+    ) as Carrera | null;
+
+    if (!carrera) {
+      throw new BadRequestException('Carrera no encontrada');
+    }
+
+    const gestion = new Date().getFullYear().toString();
+    const yearSuffix = gestion.slice(-2);
+
+    const initials = (
+      (request.apellidoPaterno?.[0] || '') +
+      (request.apellidoMaterno?.[0] || '') +
+      (request.nombre?.[0] || '')
+    ).toUpperCase();
+
+    const careerCode = carrera.name.substring(0, 2).toUpperCase();
+
+    const ciLast2 = request.ci.slice(-2);
+
+    return `${initials}-${careerCode}${yearSuffix}${ciLast2}`;
   }
 
   async remove(id: string): Promise<void> {

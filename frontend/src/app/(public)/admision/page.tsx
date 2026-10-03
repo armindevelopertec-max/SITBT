@@ -46,11 +46,7 @@ const costs = [
   { amount: 'Bs. 400', concept: 'Matrícula semestral' },
 ];
 
-const achievements = [
-  { number: '+500', label: 'Egresados' },
-  { number: '+95%', label: 'Tasa de empleabilidad' },
-  { number: '2', label: 'R.M. activas' },
-];
+
 
 export default function AdmisionPage() {
   const { institution } = useInstitution();
@@ -60,7 +56,7 @@ export default function AdmisionPage() {
       {/* Hero */}
       <section className="relative h-80 overflow-hidden bg-dark-800">
         <div className="absolute inset-0 opacity-30">
-          <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80" alt="" className="w-full h-full object-cover" />
+          <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80" alt="" className="w-full h-full object-cover" />
         </div>
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
@@ -83,20 +79,6 @@ export default function AdmisionPage() {
             <Link href="/admision/pre-registro" className="inline-flex items-center gap-2 px-8 py-4 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all">
               Realizar pre-registro <ArrowRightIcon className="w-5 h-5" />
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Achievements */}
-      <section className="bg-dark-800 py-16 border-y border-dark-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-3 gap-8 text-center">
-            {achievements.map((item, index) => (
-              <div key={index}>
-                <div className="text-4xl font-bold text-primary-400 mb-2">{item.number}</div>
-                <div className="text-gray-400">{item.label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </section>

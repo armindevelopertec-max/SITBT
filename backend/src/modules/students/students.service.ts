@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -7,6 +7,9 @@ import { Persona } from '../../entities/persona.entity';
 import { Usuario } from '../../entities/usuario.entity';
 import { UsuarioRol } from '../../entities/usuario-rol.entity';
 import { Rol } from '../../entities/rol.entity';
+import { Carrera } from '../../entities/carrera.entity';
+import { InstitutionSettings } from '../../entities/institution-settings.entity';
+import { PlanEstudio } from '../../entities/plan-estudio.entity';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 
@@ -41,20 +44,30 @@ export class StudentsService {
       throw new ConflictException('Esta persona ya tiene un estudiante asociado');
     }
 
-    const existingCode = await this.studentRepository.findOne({
-      where: { inscription_code: createStudentDto.inscription_code },
-    });
-    if (existingCode) {
-      throw new ConflictException('El código de inscripción ya existe');
-    }
-
-    const student = this.studentRepository.create(createStudentDto);
-    const savedStudent = await this.studentRepository.save(student);
-
     const persona = await this.personaRepository.findOne({ where: { id: createStudentDto.person_id } });
     if (!persona) {
       throw new NotFoundException('Persona no encontrada');
     }
+
+    let inscriptionCode = createStudentDto.inscription_code;
+    if (!inscriptionCode) {
+      inscriptionCode = await this.generateInscriptionCode(
+        persona,
+        createStudentDto.career_id
+      );
+    } else {
+      const existingCode = await this.studentRepository.findOne({
+        where: { inscription_code: inscriptionCode },
+      });
+      if (existingCode) {
+        throw new ConflictException('El código de inscripción ya existe');
+      }
+    }
+
+    const studentData = { ...createStudentDto, inscription_code: inscriptionCode };
+    const student = this.studentRepository.create(studentData);
+    const savedStudent = await this.studentRepository.save(student);
+
     const currentYear = new Date().getFullYear().toString();
 
     const username = `est_${savedStudent.inscription_code.replace(/[^a-zA-Z0-9]/g, '_')}`;
@@ -220,5 +233,31 @@ export class StudentsService {
     });
 
     return result;
+  }
+
+  private async generateInscriptionCode(persona: Persona, careerId: number): Promise<string> {
+    const carrera = await this.studentRepository.manager.findOne(
+      require('../../entities/carrera.entity'),
+      { where: { id: careerId } }
+    ) as Carrera | null;
+
+    if (!carrera) {
+      throw new BadRequestException('Carrera no encontrada');
+    }
+
+    const gestion = new Date().getFullYear().toString();
+    const yearSuffix = gestion.slice(-2);
+
+    const initials = (
+      (persona.lastname_paternal?.[0] || '') +
+      (persona.lastname_maternal?.[0] || '') +
+      (persona.names?.[0] || '')
+    ).toUpperCase();
+
+    const careerCode = carrera.name.substring(0, 2).toUpperCase();
+
+    const ciLast2 = persona.ci.slice(-2);
+
+    return `${initials}-${careerCode}${yearSuffix}${ciLast2}`;
   }
 }

@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useAuthStore } from '@/store/auth-store';
-import { GraduationCap, AlertCircle, Lock, User } from 'lucide-react';
+import { AlertCircle, Lock, User } from 'lucide-react';
 
 export default function AccederPage() {
   const [error, setError] = useState<string | null>(null);
@@ -37,21 +36,6 @@ export default function AccederPage() {
 
   return (
     <div className="min-h-screen bg-dark-900 flex flex-col">
-      <header className="bg-dark-800 border-b border-dark-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <GraduationCap className="w-10 h-10 text-primary-400" />
-            <div className="flex flex-col">
-              <span className="text-lg font-bold text-gray-100 leading-tight">ITBT</span>
-              <span className="text-xs text-primary-400 tracking-wider">TÉCNICO SUPERIOR</span>
-            </div>
-          </Link>
-          <Link href="/" className="text-gray-400 hover:text-primary-400 text-sm">
-            ← Volver al inicio
-          </Link>
-        </div>
-      </header>
-
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">

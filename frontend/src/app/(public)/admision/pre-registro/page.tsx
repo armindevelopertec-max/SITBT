@@ -333,7 +333,16 @@ function PreRegistroForm() {
             </div>
           </div>
 
-          {/* Datos del Tutor */}
+          {/* Datos del Tutor - Solo para menores de 18 años */}
+          {form.fechaNacimiento && (() => {
+            const hoy = new Date();
+            const nacimiento = new Date(form.fechaNacimiento);
+            const edad = hoy.getFullYear() - nacimiento.getFullYear();
+            const mesDiff = hoy.getMonth() - nacimiento.getMonth();
+            const diaDiff = hoy.getDate() - nacimiento.getDate();
+            const edadReal = edad - (mesDiff < 0 || (mesDiff === 0 && diaDiff < 0) ? 1 : 0);
+            return edadReal < 18;
+          })() && (
           <div className="bg-dark-700 rounded-2xl p-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-primary-500/20 text-primary-400 rounded-lg flex items-center justify-center">
@@ -384,6 +393,7 @@ function PreRegistroForm() {
               </div>
             </div>
           </div>
+          )}
 
           {/* Privacy */}
           <div className="bg-dark-700/50 rounded-xl p-6">

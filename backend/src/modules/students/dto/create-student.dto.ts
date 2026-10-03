@@ -36,10 +36,11 @@ export class CreateStudentDto {
   @MaxLength(30)
   folder_number?: string;
 
-  @ApiProperty({ example: 'INS-2024-0001' })
+  @ApiPropertyOptional({ example: 'INS-2024-0001' })
   @IsString()
+  @IsOptional()
   @MaxLength(30)
-  inscription_code: string;
+  inscription_code?: string;
 
   @ApiPropertyOptional()
   @IsString()

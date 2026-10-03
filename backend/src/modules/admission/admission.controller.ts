@@ -8,6 +8,7 @@ import {
   Query,
   UseGuards,
   HttpCode,
+  Delete,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AdmissionService } from './admission.service';
@@ -80,7 +81,7 @@ export class AdmissionController {
     return this.service.convertToStudent(id, admissionGestion);
   }
 
-  @Post(':id')
+  @Delete(':id')
   remove(@Param('id') id: string) {
     return this.service.remove(id);
   }
