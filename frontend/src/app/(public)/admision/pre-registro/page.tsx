@@ -249,30 +249,53 @@ function PreRegistroForm() {
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Lugar de nacimiento
                 </label>
-                <input
-                  type="text"
+                <select
                   name="birthplace"
                   value={form.birthplace || ''}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                  placeholder="La Paz"
-                />
+                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                >
+                  <option value="">Seleccionar</option>
+                  <option value="La Paz">La Paz</option>
+                  <option value="Cochabamba">Cochabamba</option>
+                  <option value="Santa Cruz">Santa Cruz</option>
+                  <option value="Oruro">Oruro</option>
+                  <option value="Potosí">Potosí</option>
+                  <option value="Tarija">Tarija</option>
+                  <option value="Chuquisaca">Chuquisaca</option>
+                  <option value="Beni">Beni</option>
+                  <option value="Pando">Pando</option>
+                </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Género *
                 </label>
-                <select
-                  name="gender"
-                  value={form.gender || ''}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                >
-                  <option value="">Seleccionar</option>
-                  <option value="M">Masculino</option>
-                  <option value="F">Femenino</option>
-                </select>
+                <div className="flex gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="M"
+                      checked={form.gender === 'M'}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-primary-500 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-300">Masculino</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="F"
+                      checked={form.gender === 'F'}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-primary-500 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-300">Femenino</span>
+                  </label>
+                </div>
               </div>
 
               <div>

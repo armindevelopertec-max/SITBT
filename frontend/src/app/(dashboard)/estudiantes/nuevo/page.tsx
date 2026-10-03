@@ -264,11 +264,22 @@ export default function NewStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Select
                   label="Extensión CI"
                   value={personData.ci_issued}
                   onChange={(e) => setPersonData({ ...personData, ci_issued: e.target.value })}
-                  placeholder="Opcional "
+                  options={[
+                    { value: '', label: 'Seleccionar' },
+                    { value: 'LP', label: 'La Paz' },
+                    { value: 'CB', label: 'Cochabamba' },
+                    { value: 'SC', label: 'Santa Cruz' },
+                    { value: 'OR', label: 'Oruro' },
+                    { value: 'PT', label: 'Potosí' },
+                    { value: 'TJ', label: 'Tarija' },
+                    { value: 'CH', label: 'Chuquisaca' },
+                    { value: 'BE', label: 'Beni' },
+                    { value: 'PD', label: 'Pando' },
+                  ]}
                 />
               </div>
               <div>
@@ -308,25 +319,51 @@ export default function NewStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Select
                   label="Lugar de Nacimiento"
                   value={personData.birthplace}
                   onChange={(e) => setPersonData({ ...personData, birthplace: e.target.value })}
-                  placeholder="La Paz"
+                  options={[
+                    { value: '', label: 'Seleccionar' },
+                    { value: 'La Paz', label: 'La Paz' },
+                    { value: 'Cochabamba', label: 'Cochabamba' },
+                    { value: 'Santa Cruz', label: 'Santa Cruz' },
+                    { value: 'Oruro', label: 'Oruro' },
+                    { value: 'Potosí', label: 'Potosí' },
+                    { value: 'Tarija', label: 'Tarija' },
+                    { value: 'Chuquisaca', label: 'Chuquisaca' },
+                    { value: 'Beni', label: 'Beni' },
+                    { value: 'Pando', label: 'Pando' },
+                  ]}
                 />
               </div>
               <div>
-                <Select
-                  label="Género *"
-                  value={personData.gender}
-                  onChange={(e) => setPersonData({ ...personData, gender: e.target.value })}
-                  error={errors.gender}
-                  options={[
-                    { value: 'M', label: 'Masculino' },
-                    { value: 'F', label: 'Femenino' },
-                  ]}
-                  placeholder="Seleccionar..."
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Género *</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="M"
+                      checked={personData.gender === 'M'}
+                      onChange={(e) => setPersonData({ ...personData, gender: e.target.value })}
+                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-700">Masculino</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="F"
+                      checked={personData.gender === 'F'}
+                      onChange={(e) => setPersonData({ ...personData, gender: e.target.value })}
+                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-700">Femenino</span>
+                  </label>
+                </div>
+                {errors.gender && <p className="text-xs text-red-500 mt-1">{errors.gender}</p>}
               </div>
               <div>
                 <Select
@@ -343,11 +380,21 @@ export default function NewStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Select
                   label="Nacionalidad"
                   value={personData.nationality}
                   onChange={(e) => setPersonData({ ...personData, nationality: e.target.value })}
-                  placeholder="Boliviana"
+                  options={[
+                    { value: 'Boliviana', label: 'Boliviana' },
+                    { value: 'Argentina', label: 'Argentina' },
+                    { value: 'Peruana', label: 'Peruana' },
+                    { value: 'Chilena', label: 'Chilena' },
+                    { value: 'Brasileña', label: 'Brasileña' },
+                    { value: 'Colombiana', label: 'Colombiana' },
+                    { value: 'Venezolana', label: 'Venezolana' },
+                    { value: 'Española', label: 'Española' },
+                    { value: 'Otra', label: 'Otra' },
+                  ]}
                 />
               </div>
               <div>
