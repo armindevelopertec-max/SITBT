@@ -58,6 +58,7 @@ export default function NewStudentPage() {
     lastname_maternal: '',
     birthdate: '',
     birthplace: '',
+    birthplace_other: '',
     gender: '',
     marital_status: '',
     nationality: 'Boliviana',
@@ -302,7 +303,10 @@ export default function NewStudentPage() {
                 <Select
                   label="Lugar de Nacimiento"
                   value={personData.birthplace}
-                  onChange={(e) => setPersonData({ ...personData, birthplace: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setPersonData({ ...personData, birthplace: value });
+                  }}
                   options={[
                     { value: '', label: 'Seleccionar' },
                     { value: 'La Paz', label: 'La Paz' },
@@ -314,9 +318,20 @@ export default function NewStudentPage() {
                     { value: 'Chuquisaca', label: 'Chuquisaca' },
                     { value: 'Beni', label: 'Beni' },
                     { value: 'Pando', label: 'Pando' },
+                    { value: 'Otra', label: 'Otra' },
                   ]}
                 />
               </div>
+              {personData.birthplace === 'Otra' && (
+                <div>
+                  <Input
+                    label="Especificar lugar de nacimiento"
+                    value={personData.birthplace_other || ''}
+                    onChange={(e) => setPersonData({ ...personData, birthplace_other: e.target.value })}
+                    placeholder="Ingrese el lugar de nacimiento"
+                  />
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Género *</label>
                 <div className="flex gap-4">

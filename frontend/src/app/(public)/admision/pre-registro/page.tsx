@@ -24,6 +24,7 @@ function PreRegistroForm() {
     ci: '',
     birthdate: '',
     birthplace: '',
+    birthplace_other: '',
     gender: undefined,
     marital_status: undefined,
     nationality: 'Boliviana',
@@ -241,8 +242,21 @@ function PreRegistroForm() {
                   <option value="Chuquisaca">Chuquisaca</option>
                   <option value="Beni">Beni</option>
                   <option value="Pando">Pando</option>
+                  <option value="Otra">Otra</option>
                 </select>
               </div>
+              {form.birthplace === 'Otra' && (
+                <div>
+                  <input
+                    type="text"
+                    name="birthplace_other"
+                    value={form.birthplace_other || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                    placeholder="Especificar lugar de nacimiento"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">

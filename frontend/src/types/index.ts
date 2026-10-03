@@ -269,6 +269,7 @@ export interface CreateAdmissionDto {
   nationality_other?: string;
   birthdate: string;
   birthplace?: string;
+  birthplace_other?: string;
   gender?: 'M' | 'F';
   marital_status?: string;
   phone?: string;
