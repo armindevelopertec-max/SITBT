@@ -26,19 +26,22 @@ const originLabels: Record<string, string> = {
 
 interface AdmissionRequest {
   id: string;
-  nombre: string;
-  apellidoPaterno: string;
-  apellidoMaterno: string;
+  names: string;
+  lastname_paternal: string;
+  lastname_maternal: string;
   ci: string;
   ci_issued: string;
-  fechaNacimiento: string;
-  telefono: string;
+  birthdate: string;
+  phone: string;
   email: string;
-  direccion: string;
+  address: string;
   nombreTutor: string;
   ciTutor: string;
   telefonoTutor: string;
-  genero: string;
+  gender: string;
+  birthplace: string;
+  marital_status: string;
+  nationality: string;
   carrera_id: number;
   carrera: { id: number; name: string } | null;
   estado: string;
@@ -50,9 +53,27 @@ interface AdmissionRequest {
   created_at: string;
 }
 
-interface DetalleModalData {
-  request: AdmissionRequest;
-  showConvert: boolean;
+interface Career {
+  id: number;
+  name: string;
+  code: string;
+}
+
+interface StudyPlan {
+  id: number;
+  career_id: number;
+  rm_number: string;
+}
+
+interface ConvertFormData {
+  admission_gestion: string;
+  admission_date: string;
+  career_id: number;
+  study_plan_id: number;
+  folder_number: string;
+  form01_code: string;
+  bachelor_title_number: string;
+  bachelor_title_date: string;
 }
 
 export default function AdmisionPage() {
@@ -69,11 +90,26 @@ export default function AdmisionPage() {
   const [deleteModal, setDeleteModal] = useState<AdmissionRequest | null>(null);
 
   const [observaciones, setObservaciones] = useState('');
-  const [gestion, setGestion] = useState(new Date().getFullYear().toString());
   const [formLoading, setFormLoading] = useState(false);
+
+  const [careers, setCareers] = useState<Career[]>([]);
+  const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
+  const [gestiones, setGestiones] = useState<string[]>([]);
+  const [convertForm, setConvertForm] = useState<ConvertFormData>({
+    admission_gestion: new Date().getFullYear().toString(),
+    admission_date: new Date().toISOString().split('T')[0],
+    career_id: 0,
+    study_plan_id: 0,
+    folder_number: '',
+    form01_code: '',
+    bachelor_title_number: '',
+    bachelor_title_date: '',
+  });
 
   useEffect(() => {
     fetchAdmissions();
+    fetchCareers();
+    fetchGestiones();
   }, []);
 
   const fetchAdmissions = async () => {
@@ -84,6 +120,106 @@ export default function AdmisionPage() {
       console.error('Error fetching admissions:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCareers = async () => {
+    try {
+      const response = await api.get('/carreras/active');
+      setCareers(response.data || []);
+    } catch (error) {
+      console.error('Error fetching careers:', error);
+    }
+  };
+
+  const fetchGestiones = async () => {
+    try {
+      const response = await api.get('/gestiones');
+      const data = response.data;
+      if (Array.isArray(data)) {
+        setGestiones(data.map((g: any) => g.year || g.gestion || g));
+      } else if (data.data) {
+        setGestiones(data.data.map((g: any) => g.year || g.gestion || g));
+      }
+    } catch (error) {
+      console.error('Error fetching gestiones:', error);
+      setGestiones([new Date().getFullYear().toString()]);
+    }
+  };
+
+  const fetchStudyPlans = async (careerId: number) => {
+    try {
+      const response = await api.get(`/planes-estudio/current/${careerId}`);
+      setStudyPlans(response.data || []);
+    } catch (error) {
+      console.error('Error fetching study plans:', error);
+      setStudyPlans([]);
+    }
+  };
+
+  const handleOpenConvert = (request: AdmissionRequest) => {
+    setConvertirModal(request);
+    setConvertForm({
+      admission_gestion: new Date().getFullYear().toString(),
+      admission_date: new Date().toISOString().split('T')[0],
+      career_id: request.carrera_id || 0,
+      study_plan_id: 0,
+      folder_number: '',
+      form01_code: '',
+      bachelor_title_number: '',
+      bachelor_title_date: '',
+    });
+    if (request.carrera_id) {
+      fetchStudyPlans(request.carrera_id);
+    }
+  };
+
+  const handleConvert = async () => {
+    if (!convertirModal) return;
+    setFormLoading(true);
+    try {
+      const personaPayload = {
+        ci: convertirModal.ci,
+        ci_issued: convertirModal.ci_issued,
+        names: convertirModal.names,
+        lastname_paternal: convertirModal.lastname_paternal,
+        lastname_maternal: convertirModal.lastname_maternal,
+        birthdate: convertirModal.birthdate,
+        birthplace: convertirModal.birthplace,
+        gender: convertirModal.gender,
+        marital_status: convertirModal.marital_status,
+        nationality: convertirModal.nationality,
+        phone: convertirModal.phone,
+        email: convertirModal.email,
+        address: convertirModal.address,
+      };
+      const personResponse = await api.post('/personas', personaPayload);
+      const personId = personResponse.data.id;
+
+      const studentPayload = {
+        person_id: personId,
+        admission_gestion: convertForm.admission_gestion,
+        admission_date: convertForm.admission_date,
+        career_id: convertForm.career_id,
+        study_plan_id: convertForm.study_plan_id,
+        folder_number: convertForm.folder_number || undefined,
+        form01_code: convertForm.form01_code || undefined,
+        bachelor_title_number: convertForm.bachelor_title_number || undefined,
+        bachelor_title_date: convertForm.bachelor_title_date || undefined,
+      };
+
+      await api.post('/estudiantes', studentPayload);
+
+      const updatedRequest = { ...convertirModal, estado: 'convertido' };
+      await api.patch(`/admission/${convertirModal.id}`, { estado: 'convertido' });
+
+      setConvertirModal(null);
+      fetchAdmissions();
+    } catch (error: any) {
+      console.error('Error converting:', error);
+      alert(error.response?.data?.message || 'Error al convertir a estudiante');
+    } finally {
+      setFormLoading(false);
     }
   };
 
@@ -133,23 +269,6 @@ export default function AdmisionPage() {
       fetchAdmissions();
     } catch (error) {
       console.error('Error rejecting:', error);
-    } finally {
-      setFormLoading(false);
-    }
-  };
-
-  const handleConvertir = async () => {
-    if (!convertirModal) return;
-    setFormLoading(true);
-    try {
-      await api.post(`/admission/${convertirModal.id}/convert-to-student`, {
-        admissionGestion: gestion,
-      });
-      setConvertirModal(null);
-      setGestion(new Date().getFullYear().toString());
-      fetchAdmissions();
-    } catch (error) {
-      console.error('Error converting:', error);
     } finally {
       setFormLoading(false);
     }
@@ -246,7 +365,7 @@ export default function AdmisionPage() {
                     {admission.ci} {admission.ci_issued && `- ${admission.ci_issued}`}
                   </TableCell>
                   <TableCell>
-                    {admission.nombre} {admission.apellidoPaterno} {admission.apellidoMaterno}
+                    {admission.names} {admission.lastname_paternal} {admission.lastname_maternal}
                   </TableCell>
                   <TableCell>{admission.carrera?.name || '-'}</TableCell>
                   <TableCell>
@@ -270,7 +389,7 @@ export default function AdmisionPage() {
                         </>
                       )}
                       {admission.estado === 'verificado' && (
-                        <Button variant="ghost" size="icon" title="Convertir a estudiante" onClick={() => setConvertirModal(admission)}>
+                        <Button variant="ghost" size="icon" title="Convertir a estudiante" onClick={() => handleOpenConvert(admission)}>
                           <UserPlus className="w-4 h-4 text-blue-500" />
                         </Button>
                       )}
@@ -300,7 +419,7 @@ export default function AdmisionPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Nombre completo</p>
-                <p className="font-medium">{detalleModal.request.nombre} {detalleModal.request.apellidoPaterno} {detalleModal.request.apellidoMaterno}</p>
+                <p className="font-medium">{detalleModal.request.names} {detalleModal.request.lastname_paternal} {detalleModal.request.lastname_maternal}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">CI</p>
@@ -308,15 +427,27 @@ export default function AdmisionPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Fecha de nacimiento</p>
-                <p className="font-medium">{new Date(detalleModal.request.fechaNacimiento).toLocaleDateString('es-BO')}</p>
+                <p className="font-medium">{new Date(detalleModal.request.birthdate).toLocaleDateString('es-BO')}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Lugar de nacimiento</p>
+                <p className="font-medium">{detalleModal.request.birthplace || '-'}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Género</p>
-                <p className="font-medium">{detalleModal.request.genero === 'M' ? 'Masculino' : detalleModal.request.genero === 'F' ? 'Femenino' : '-'}</p>
+                <p className="font-medium">{detalleModal.request.gender === 'M' ? 'Masculino' : detalleModal.request.gender === 'F' ? 'Femenino' : '-'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Estado civil</p>
+                <p className="font-medium">{detalleModal.request.marital_status || '-'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Nacionalidad</p>
+                <p className="font-medium">{detalleModal.request.nationality || '-'}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Teléfono</p>
-                <p className="font-medium">{detalleModal.request.telefono || '-'}</p>
+                <p className="font-medium">{detalleModal.request.phone || '-'}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Email</p>
@@ -324,7 +455,7 @@ export default function AdmisionPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Dirección</p>
-                <p className="font-medium">{detalleModal.request.direccion || '-'}</p>
+                <p className="font-medium">{detalleModal.request.address || '-'}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Carrera</p>
@@ -392,7 +523,7 @@ export default function AdmisionPage() {
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            ¿Está seguro de rechazar el pre-registro de <strong>{rechazarModal?.nombre} {rechazarModal?.apellidoPaterno}</strong>?
+            ¿Está seguro de rechazar el pre-registro de <strong>{rechazarModal?.names} {rechazarModal?.lastname_paternal}</strong>?
           </p>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Motivo del rechazo *</label>
@@ -408,30 +539,100 @@ export default function AdmisionPage() {
         </div>
       </ConfirmModal>
 
-      {/* Modal Convertir */}
-      <ConfirmModal
-        open={!!convertirModal}
-        onClose={() => setConvertirModal(null)}
-        onConfirm={handleConvertir}
-        title="Convertir a Estudiante"
-        confirmText="Convertir"
-        loading={formLoading}
-      >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-600">
-            ¿Está seguro de convertir el pre-registro de <strong>{convertirModal?.nombre} {convertirModal?.apellidoPaterno}</strong> a estudiante?
-          </p>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Gestión de ingreso *</label>
-            <Input
-              value={gestion}
-              onChange={(e) => setGestion(e.target.value)}
-              placeholder="2026"
-              required
-            />
+      {/* Modal Convertir - Formulario completo */}
+      <Modal open={!!convertirModal} onClose={() => setConvertirModal(null)} title="Crear Estudiante" size="lg">
+        {convertirModal && (
+          <div className="space-y-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800">
+                <strong>Datos del pre-registro:</strong> {convertirModal.names} {convertirModal.lastname_paternal} {convertirModal.lastname_maternal}<br />
+                CI: {convertirModal.ci} {convertirModal.ci_issued && `- ${convertirModal.ci_issued}`}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Gestión de ingreso *</label>
+                <Select
+                  value={convertForm.admission_gestion}
+                  onChange={(e) => setConvertForm({ ...convertForm, admission_gestion: e.target.value })}
+                  options={gestiones.map(g => ({ value: g, label: g }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de ingreso *</label>
+                <Input
+                  type="date"
+                  value={convertForm.admission_date}
+                  onChange={(e) => setConvertForm({ ...convertForm, admission_date: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Carrera *</label>
+                <Select
+                  value={convertForm.career_id.toString()}
+                  onChange={(e) => {
+                    const careerId = parseInt(e.target.value);
+                    setConvertForm({ ...convertForm, career_id: careerId, study_plan_id: 0 });
+                    fetchStudyPlans(careerId);
+                  }}
+                  options={careers.map(c => ({ value: c.id.toString(), label: c.name }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Plan de estudio *</label>
+                <Select
+                  value={convertForm.study_plan_id.toString()}
+                  onChange={(e) => setConvertForm({ ...convertForm, study_plan_id: parseInt(e.target.value) })}
+                  options={studyPlans.map(sp => ({ value: sp.id.toString(), label: sp.rm_number }))}
+                  placeholder="Seleccionar plan..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Número de carpeta</label>
+                <Input
+                  value={convertForm.folder_number}
+                  onChange={(e) => setConvertForm({ ...convertForm, folder_number: e.target.value })}
+                  placeholder="Opcional"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Código Formulario 01</label>
+                <Input
+                  value={convertForm.form01_code}
+                  onChange={(e) => setConvertForm({ ...convertForm, form01_code: e.target.value })}
+                  placeholder="Opcional"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Número de Título Bachiller</label>
+                <Input
+                  value={convertForm.bachelor_title_number}
+                  onChange={(e) => setConvertForm({ ...convertForm, bachelor_title_number: e.target.value })}
+                  placeholder="Opcional"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Título Bachiller</label>
+                <Input
+                  type="date"
+                  value={convertForm.bachelor_title_date}
+                  onChange={(e) => setConvertForm({ ...convertForm, bachelor_title_date: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <Button variant="outline" onClick={() => setConvertirModal(null)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleConvert} isLoading={formLoading}>
+                Crear Estudiante
+              </Button>
+            </div>
           </div>
-        </div>
-      </ConfirmModal>
+        )}
+      </Modal>
 
       {/* Modal Eliminar */}
       <ConfirmModal
@@ -439,7 +640,7 @@ export default function AdmisionPage() {
         onClose={() => setDeleteModal(null)}
         onConfirm={handleDelete}
         title="Eliminar Pre-registro"
-        message={`¿Está seguro de eliminar el pre-registro de "${deleteModal?.nombre} ${deleteModal?.apellidoPaterno}"? Esta acción no se puede deshacer.`}
+        message={`¿Está seguro de eliminar el pre-registro de "${deleteModal?.names} ${deleteModal?.lastname_paternal}"? Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
         variant="destructive"
         loading={formLoading}
