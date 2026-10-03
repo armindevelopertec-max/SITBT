@@ -150,18 +150,18 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-dark-900/75 z-10" />
 
             <div className="relative z-20 h-full flex items-center justify-center text-center">
-              <div className="max-w-4xl px-6">
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-100 mb-6 tracking-tight leading-tight">
+              <div className="max-w-4xl px-4 sm:px-6">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-100 mb-4 sm:mb-6 tracking-tight leading-tight">
                   {slide.title}
                 </h1>
-                <p className="text-xl md:text-2xl text-primary-400 mb-10 max-w-2xl mx-auto">
+                <p className="text-lg sm:text-xl md:text-2xl text-primary-400 mb-6 sm:mb-10 max-w-2xl mx-auto">
                   {slide.subtitle}
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link href="/admision/pre-registro" className="px-10 py-4 bg-primary-500 text-dark-900 font-bold rounded-lg hover:bg-primary-400 transition-all text-lg">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                  <Link href="/admision/pre-registro" className="px-6 sm:px-8 lg:px-10 py-3 sm:py-4 bg-primary-500 text-dark-900 font-bold rounded-lg hover:bg-primary-400 transition-all text-base sm:text-lg">
                     Pre-registro ahora
                   </Link>
-                  <Link href="/carreras" className="px-10 py-4 border-2 border-primary-500 text-primary-400 font-bold rounded-lg hover:bg-primary-500/10 transition-all text-lg">
+                  <Link href="/carreras" className="px-6 sm:px-8 lg:px-10 py-3 sm:py-4 border-2 border-primary-500 text-primary-400 font-bold rounded-lg hover:bg-primary-500/10 transition-all text-base sm:text-lg">
                     Ver carreras
                   </Link>
                 </div>
@@ -170,11 +170,11 @@ export default function HomePage() {
           </div>
         ))}
 
-        <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-dark-700/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-dark-600 transition-all">
-          <ChevronLeft className="w-6 h-6 text-primary-400" />
+        <button onClick={prevSlide} className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-dark-700/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-dark-600 transition-all">
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-primary-400" />
         </button>
-        <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-dark-700/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-dark-600 transition-all">
-          <ChevronRight className="w-6 h-6 text-primary-400" />
+        <button onClick={nextSlide} className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-dark-700/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-dark-600 transition-all">
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-primary-400" />
         </button>
 
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2">
@@ -357,11 +357,11 @@ export default function HomePage() {
       </section>
 
       {/* Location */}
-      <section id="ubicacion" data-section className="bg-dark-800 py-24 border-t border-dark-600">
+      <section id="ubicacion" data-section className="bg-dark-800 py-16 sm:py-24 border-t border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-100 mb-6">Encuéntranos</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-100 mb-4 sm:mb-6">Encuéntranos</h2>
               <p className="text-gray-400 mb-8">
                 Estamos ubicados en una zona de fácil acceso en la ciudad de {institution?.ciudad || 'El Alto'}.
               </p>
@@ -397,7 +397,7 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-            <div className="rounded-2xl overflow-hidden h-80 lg:h-auto">
+            <div className="rounded-2xl overflow-hidden h-64 sm:h-80 lg:h-auto min-h-[300px]">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1893.8396095475862!2d-68.1708826691198!3d-16.504407754821006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x915edff3f214c707%3A0x53da8aae1940d8d!2sInstiuto%20Boliviana%20de%20Tecnolog%C3%ADa!5e0!3m2!1ses-419!2sbo!4v1791038047614!5m2!1ses-419!2sbo"
                 width="100%"

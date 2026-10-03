@@ -193,14 +193,14 @@ export default function CareersPage() {
   return (
     <div className="bg-dark-900">
       {/* Hero */}
-      <section className="relative h-80 overflow-hidden bg-dark-900">
+      <section className="relative h-64 sm:h-80 overflow-hidden bg-dark-900">
         <div className="absolute inset-0 opacity-30">
           <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80" alt="" className="w-full h-full object-cover" />
         </div>
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-100 mb-4">Nuestras Carreras</h1>
-            <p className="text-xl text-primary-400">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-100 mb-3 sm:mb-4">Nuestras Carreras</h1>
+            <p className="text-lg sm:text-xl text-primary-400">
               Programas técnicos superiores autorizados por el Ministerio de Educación
             </p>
           </div>
@@ -208,9 +208,9 @@ export default function CareersPage() {
       </section>
 
       {/* Careers */}
-      <section className="bg-dark-900 text-gray-100 py-24">
+      <section className="bg-dark-900 text-gray-100 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {careers.map((career) => (
               <div key={career.id} className="bg-dark-700 rounded-2xl overflow-hidden">
                 <div className="md:flex">
@@ -219,22 +219,22 @@ export default function CareersPage() {
                     <img
                       src={careerImages[career.id] || 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&q=80'}
                       alt={career.name}
-                      className="w-full h-64 md:h-full object-cover"
+                      className="w-full h-48 sm:h-64 md:h-full object-cover"
                     />
                   </div>
 
                   {/* Content */}
-                  <div className="md:w-2/3 p-8">
-                    <div className="flex items-start justify-between mb-4">
+                  <div className="md:w-2/3 p-6 sm:p-8">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
                       <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <h2 className="text-2xl font-bold">{career.name}</h2>
-                          <span className="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full flex items-center gap-1">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                          <h2 className="text-xl sm:text-2xl font-bold">{career.name}</h2>
+                          <span className="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full flex items-center gap-1 w-fit">
                             <CheckCircle className="w-4 h-4" />
                             Activo
                           </span>
                         </div>
-                        <p className="text-primary-400 font-medium">{career.title}</p>
+                        <p className="text-primary-400 font-medium text-sm sm:text-base">{career.title}</p>
                       </div>
                       <Link
                         href={`/admision/pre-registro?carrera=${career.id}`}
@@ -244,9 +244,9 @@ export default function CareersPage() {
                       </Link>
                     </div>
 
-                    <p className="text-gray-400 mb-6">{career.description}</p>
+                    <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">{career.description}</p>
 
-                    <div className="flex flex-wrap gap-6 text-sm text-gray-500 mb-6">
+                    <div className="flex flex-wrap gap-4 sm:gap-6 text-sm text-gray-500 mb-4 sm:mb-6">
                       <div className="flex items-center gap-2">
                         <Award className="w-4 h-4" />
                         <span>{career.area}</span>
@@ -265,20 +265,22 @@ export default function CareersPage() {
                       </div>
                     </div>
 
-                    <Link
-                      href={`/carreras/${career.id}`}
-                      className="inline-flex items-center gap-2 text-primary-400 font-semibold hover:text-primary-300 transition-colors"
-                    >
-                      Ver Malla Curricular <ArrowRight className="w-4 h-4" />
-                    </Link>
-
-                    <div className="mt-6 md:hidden">
+                    <div className="flex flex-col sm:flex-row gap-4">
                       <Link
-                        href={`/admision/pre-registro?carrera=${career.id}`}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all"
+                        href={`/carreras/${career.id}`}
+                        className="inline-flex items-center gap-2 text-primary-400 font-semibold hover:text-primary-300 transition-colors text-sm sm:text-base"
                       >
-                        Postular <ArrowRight className="w-4 h-4" />
+                        Ver Malla Curricular <ArrowRight className="w-4 h-4" />
                       </Link>
+
+                      <div className="mt-4 md:hidden">
+                        <Link
+                          href={`/admision/pre-registro?carrera=${career.id}`}
+                          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all"
+                        >
+                          Postular <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -289,17 +291,17 @@ export default function CareersPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-dark-700 py-16">
+      <section className="bg-dark-700 py-12 sm:py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-100 mb-4">¿Quieres más información?</h2>
-          <p className="text-gray-400 mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-3 sm:mb-4">¿Quieres más información?</h2>
+          <p className="text-gray-400 mb-5 sm:mb-6 text-sm sm:text-base">
             Contáctanos o visítanos para conocer más sobre nuestras carreras.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/contacto" className="px-6 py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            <Link href="/contacto" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all">
               Contactar
             </Link>
-            <Link href="/admision/pre-registro" className="px-6 py-3 border-2 border-primary-500 text-primary-400 font-semibold rounded-lg hover:bg-primary-500/10 transition-all">
+            <Link href="/admision/pre-registro" className="px-5 sm:px-6 py-2.5 sm:py-3 border-2 border-primary-500 text-primary-400 font-semibold rounded-lg hover:bg-primary-500/10 transition-all">
               Pre-registro
             </Link>
           </div>

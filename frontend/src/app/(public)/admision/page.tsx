@@ -54,14 +54,14 @@ export default function AdmisionPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative h-80 overflow-hidden bg-dark-800">
+      <section className="relative h-64 sm:h-80 overflow-hidden bg-dark-800">
         <div className="absolute inset-0 opacity-30">
           <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80" alt="" className="w-full h-full object-cover" />
         </div>
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-100 mb-4">Admisión 2026</h1>
-            <p className="text-xl text-primary-400">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-100 mb-3 sm:mb-4">Admisión 2026</h1>
+            <p className="text-lg sm:text-xl text-primary-400">
               Convierte tu vocación en tu profesión
             </p>
           </div>
@@ -69,16 +69,16 @@ export default function AdmisionPage() {
       </section>
 
       {/* Process */}
-      <section className="bg-dark-900 py-24 border-y border-dark-600">
+      <section className="bg-dark-900 py-16 sm:py-24 border-y border-dark-600">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10 sm:mb-16">
             <span className="inline-block px-4 py-1.5 bg-primary-500/10 text-primary-400 text-sm font-medium rounded-full mb-4">
               Proceso paso a paso
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-100 mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-100 mb-4">
               Proceso de <span className="text-primary-400">Admisión</span>
             </h2>
-            <p className="text-gray-400 text-lg max-w-xl mx-auto">
+            <p className="text-gray-400 text-base sm:text-lg max-w-xl mx-auto">
               Sigue estos pasos para completar tu inscripción
             </p>
           </div>
@@ -124,11 +124,11 @@ export default function AdmisionPage() {
       </section>
 
       {/* Requirements & Costs */}
-      <section className="bg-dark-700 py-24 border-y border-dark-600">
+      <section className="bg-dark-700 py-16 sm:py-24 border-y border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid md:grid-cols-2 gap-8 sm:gap-12">
             <div>
-              <h3 className="text-2xl font-bold text-gray-100 mb-6">Requisitos</h3>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-100 mb-4 sm:mb-6">Requisitos</h3>
               <ul className="space-y-4">
                 {requirements.map((req, index) => (
                   <li key={index} className="flex items-start gap-3">
@@ -140,16 +140,16 @@ export default function AdmisionPage() {
             </div>
 
             <div>
-              <h3 className="text-2xl font-bold text-gray-100 mb-6">Costos</h3>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-100 mb-4 sm:mb-6">Costos</h3>
               <div className="space-y-4">
                 {costs.map((cost, index) => (
-                  <div key={index} className="bg-dark-700 border border-dark-600 rounded-xl p-6 flex items-center justify-between">
+                  <div key={index} className="bg-dark-700 border border-dark-600 rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <span className="text-gray-300">{cost.concept}</span>
-                    <span className="text-2xl font-bold text-primary-400">{cost.amount}</span>
+                    <span className="text-xl sm:text-2xl font-bold text-primary-400">{cost.amount}</span>
                   </div>
                 ))}
               </div>
-              <div className="mt-8 p-6 bg-dark-700 border border-dark-600 rounded-xl">
+              <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-dark-700 border border-dark-600 rounded-xl">
                 <h4 className="font-semibold text-gray-100 mb-2">¿Necesitas información adicional?</h4>
                 <p className="text-gray-400 text-sm mb-4">
                   Contáctanos y te atenderemos personalmente

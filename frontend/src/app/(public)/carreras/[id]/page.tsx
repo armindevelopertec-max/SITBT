@@ -214,95 +214,95 @@ export default function CareerDetailPage() {
   return (
     <div className="bg-dark-900">
       {/* Hero */}
-      <section className="relative h-80 overflow-hidden bg-dark-800">
+      <section className="relative h-64 sm:h-80 overflow-hidden bg-dark-800">
         <div className="absolute inset-0 opacity-30">
           <img src={careerImage} alt="" className="w-full h-full object-cover" />
         </div>
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <Link href="/carreras" className="inline-flex items-center gap-2 text-gray-400 hover:text-primary-400 mb-6">
-              <ChevronLeft className="w-5 h-5" />
+            <Link href="/carreras" className="inline-flex items-center gap-2 text-gray-400 hover:text-primary-400 mb-4 sm:mb-6 text-sm sm:text-base">
+              <ChevronLeft className="w-4 h-5" />
               Volver a carreras
             </Link>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-100 mb-4">{career.name}</h1>
-            <p className="text-xl text-primary-400">{career.title}</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-100 mb-3 sm:mb-4">{career.name}</h1>
+            <p className="text-lg sm:text-xl text-primary-400">{career.title}</p>
           </div>
         </div>
       </section>
 
       {/* Career Info */}
-      <section className="bg-dark-800 py-12 border-b border-dark-600">
+      <section className="bg-dark-800 py-8 sm:py-12 border-b border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             <div className="text-center">
-              <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Award className="w-7 h-7" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <Award className="w-5 h-5 sm:w-7 sm:h-7" />
               </div>
-              <p className="text-gray-400 text-sm mb-1">Área</p>
-              <p className="text-gray-100 font-semibold">{career.area}</p>
+              <p className="text-gray-400 text-xs sm:text-sm mb-1">Área</p>
+              <p className="text-gray-100 font-semibold text-sm sm:text-base">{career.area}</p>
             </div>
             <div className="text-center">
-              <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Clock className="w-7 h-7" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <Clock className="w-5 h-5 sm:w-7 sm:h-7" />
               </div>
-              <p className="text-gray-400 text-sm mb-1">Duración</p>
-              <p className="text-gray-100 font-semibold">6 semestres</p>
+              <p className="text-gray-400 text-xs sm:text-sm mb-1">Duración</p>
+              <p className="text-gray-100 font-semibold text-sm sm:text-base">6 semestres</p>
             </div>
             <div className="text-center">
-              <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <FileText className="w-7 h-7" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <FileText className="w-5 h-5 sm:w-7 sm:h-7" />
               </div>
-              <p className="text-gray-400 text-sm mb-1">Resolución</p>
-              <p className="text-gray-100 font-semibold">{studyPlan?.rm_number}</p>
+              <p className="text-gray-400 text-xs sm:text-sm mb-1">Resolución</p>
+              <p className="text-gray-100 font-semibold text-xs sm:text-base">{studyPlan?.rm_number}</p>
             </div>
             <div className="text-center">
-              <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <GraduationCap className="w-7 h-7" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <GraduationCap className="w-5 h-5 sm:w-7 sm:h-7" />
               </div>
-              <p className="text-gray-400 text-sm mb-1">Horas Totales</p>
-              <p className="text-gray-100 font-semibold">{career.load_hours}</p>
+              <p className="text-gray-400 text-xs sm:text-sm mb-1">Horas Totales</p>
+              <p className="text-gray-100 font-semibold text-sm sm:text-base">{career.load_hours}</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Description */}
-      <section className="bg-dark-900 py-12">
+      <section className="bg-dark-900 py-10 sm:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <h2 className="text-2xl font-bold text-gray-100 mb-4">Acerca de la carrera</h2>
-            <p className="text-gray-400 leading-relaxed">{career.description}</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-4">Acerca de la carrera</h2>
+            <p className="text-gray-400 leading-relaxed text-sm sm:text-base">{career.description}</p>
           </div>
         </div>
       </section>
 
       {/* Study Plan */}
       {studyPlan && (
-        <section className="bg-dark-800 py-16 border-t border-dark-600">
+        <section className="bg-dark-800 py-12 sm:py-16 border-t border-dark-600">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-100 mb-4">Malla Curricular</h2>
-              <p className="text-gray-400">
+            <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-3 sm:mb-4">Malla Curricular</h2>
+              <p className="text-gray-400 text-sm sm:text-base">
                 Resolución Ministerial: {studyPlan.rm_number} del {studyPlan.rm_date}
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {Object.entries(studyPlan.subjectsBySemester).map(([semester, subjects]) => (
-                <div key={semester} className="bg-dark-700 border border-dark-600 rounded-xl p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-primary-500 text-dark-900 rounded-lg flex items-center justify-center font-bold">
+                <div key={semester} className="bg-dark-700 border border-dark-600 rounded-xl p-4 sm:p-6">
+                  <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-primary-500 text-dark-900 rounded-lg flex items-center justify-center font-bold text-sm sm:text-base">
                       {semester}
                     </div>
-                    <h3 className="text-lg font-bold text-gray-100">Semestre {semester}</h3>
+                    <h3 className="text-base sm:text-lg font-bold text-gray-100">Semestre {semester}</h3>
                   </div>
-                  <ul className="space-y-3">
+                  <ul className="space-y-2 sm:space-y-3">
                     {subjects.map((subject, idx) => (
-                      <li key={idx} className="border-b border-dark-600 pb-3 last:border-0 last:pb-0">
+                      <li key={idx} className="border-b border-dark-600 pb-2 sm:pb-3 last:border-0 last:pb-0">
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <span className="font-medium text-primary-400 text-sm">{subject.code}</span>
-                            <p className="text-gray-300 text-sm">{subject.name}</p>
+                            <span className="font-medium text-primary-400 text-xs sm:text-sm">{subject.code}</span>
+                            <p className="text-gray-300 text-xs sm:text-sm">{subject.name}</p>
                           </div>
                           <span className="text-gray-500 text-xs whitespace-nowrap">{subject.weekly_hours}h/sem</span>
                         </div>
@@ -317,15 +317,15 @@ export default function CareerDetailPage() {
       )}
 
       {/* CTA */}
-      <section className="bg-dark-900 py-16 border-t border-dark-600">
+      <section className="bg-dark-900 py-12 sm:py-16 border-t border-dark-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-100 mb-4">¿Interesado en esta carrera?</h2>
-          <p className="text-xl text-gray-400 mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-4">¿Interesado en esta carrera?</h2>
+          <p className="text-lg sm:text-xl text-gray-400 mb-6 sm:mb-8">
             Inscríbete ahora y forma parte de nuestra comunidad educativa
           </p>
           <Link
             href={`/admision/pre-registro?carrera=${career.id}`}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-primary-500 text-dark-900 font-bold rounded-lg hover:bg-primary-400 transition-all text-lg"
+            className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-primary-500 text-dark-900 font-bold rounded-lg hover:bg-primary-400 transition-all text-base sm:text-lg"
           >
             Postular ahora <ArrowRight className="w-5 h-5" />
           </Link>

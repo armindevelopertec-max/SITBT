@@ -42,11 +42,11 @@ export default function AccederPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-500/10 mb-4">
               <Lock className="w-8 h-8 text-primary-400" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-100">Acceso al Sistema</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-100">Acceso al Sistema</h1>
             <p className="text-gray-400 mt-2">Ingrese sus credenciales para continuar</p>
           </div>
 
-          <div className="bg-dark-700 border border-dark-600 rounded-2xl p-8">
+          <div className="bg-dark-700 border border-dark-600 rounded-2xl p-6 sm:p-8">
             {error && (
               <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />

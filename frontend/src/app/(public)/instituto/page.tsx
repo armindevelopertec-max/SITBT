@@ -29,26 +29,26 @@ export default function InstitutoPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative h-96 overflow-hidden bg-dark-800">
+      <section className="relative h-72 sm:h-80 md:h-96 overflow-hidden bg-dark-800">
         <div className="absolute inset-0 opacity-30">
           <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80" alt="" className="w-full h-full object-cover" />
         </div>
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-100 mb-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-100 mb-3 sm:mb-4">
               {institution?.nombre || 'Instituto Tecnológico Boliviano de Tecnología'}
             </h1>
-            <p className="text-xl text-primary-400">{institution?.lema || 'Conectando Mentes, Impulsando el Progreso'}</p>
+            <p className="text-lg sm:text-xl text-primary-400">{institution?.lema || 'Conectando Mentes, Impulsando el Progreso'}</p>
           </div>
         </div>
       </section>
 
       {/* About */}
-      <section className="bg-dark-900 py-24">
+      <section className="bg-dark-900 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-gray-100 mb-6">Sobre Nosotros</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-4 sm:mb-6">Sobre Nosotros</h2>
               <p className="text-gray-400 mb-6">
                 El {institution?.nombre || 'Instituto Tecnológico Boliviano de Tecnología'} (ITBT) es una institución 
                 educativa dedicada a la formación técnica profesional en Bolivia.
@@ -71,26 +71,26 @@ export default function InstitutoPage() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="bg-dark-800 py-24 border-y border-dark-600">
+      <section className="bg-dark-800 py-16 sm:py-24 border-y border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-dark-700 border border-dark-600 rounded-xl p-10">
-              <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mb-6">
-                <Target className="w-8 h-8" />
+          <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
+            <div className="bg-dark-700 border border-dark-600 rounded-xl p-6 sm:p-10">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                <Target className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-100 mb-4">Misión</h3>
-              <p className="text-gray-400 leading-relaxed">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-100 mb-3 sm:mb-4">Misión</h3>
+              <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
                 Formar profesionales técnicos competentes y éticos, con habilidades prácticas y
                 conocimientos actualizados, que contribuyan al desarrollo sostenible de Bolivia
                 mediante una educación técnica de excelencia.
               </p>
             </div>
-            <div className="bg-dark-700 border border-dark-600 rounded-xl p-10">
-              <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mb-6">
-                <Eye className="w-8 h-8" />
+            <div className="bg-dark-700 border border-dark-600 rounded-xl p-6 sm:p-10">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                <Eye className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-100 mb-4">Visión</h3>
-              <p className="text-gray-400 leading-relaxed">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-100 mb-3 sm:mb-4">Visión</h3>
+              <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
                 Ser una institución de referencia en educación técnica en Bolivia, reconocida por la excelencia
                 de sus programas, la innovación pedagógica y el compromiso con el desarrollo social y económico
                 del país.
@@ -101,23 +101,23 @@ export default function InstitutoPage() {
       </section>
 
       {/* Values */}
-      <section className="bg-dark-900 py-24">
+      <section className="bg-dark-900 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-100 mb-4">Nuestros Valores</h2>
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-4">Nuestros Valores</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Principios que guían nuestra labor educativa
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             {values.map((value, index) => (
-              <div key={index} className="text-center p-8 bg-dark-700 rounded-xl border border-dark-600">
-                <div className="w-16 h-16 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-6">
+              <div key={index} className="text-center p-6 sm:p-8 bg-dark-700 rounded-xl border border-dark-600">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
                   {value.icon}
                 </div>
-                <h4 className="text-xl font-bold text-gray-100 mb-3">{value.title}</h4>
-                <p className="text-gray-400">{value.description}</p>
+                <h4 className="text-lg sm:text-xl font-bold text-gray-100 mb-2 sm:mb-3">{value.title}</h4>
+                <p className="text-gray-400 text-sm sm:text-base">{value.description}</p>
               </div>
             ))}
           </div>
@@ -125,23 +125,23 @@ export default function InstitutoPage() {
       </section>
 
       {/* History */}
-      <section className="bg-dark-800 py-24 border-y border-dark-600">
+      <section className="bg-dark-800 py-16 sm:py-24 border-y border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-100 mb-4">Nuestra Historia</h2>
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-4">Nuestra Historia</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Más de 3 años formando profesionales técnicos
             </p>
           </div>
 
           <div className="relative">
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-px bg-dark-600" />
-            <div className="space-y-12">
+            <div className="absolute left-4 sm:left-1/2 transform sm:-translate-x-1/2 h-full w-px bg-dark-600" />
+            <div className="space-y-8 sm:space-y-12">
               {milestones.map((milestone, index) => (
                 <div key={index} className={`flex items-center ${index % 2 === 0 ? 'justify-start' : 'justify-end'}`}>
-                  <div className={`w-5/12 bg-dark-700 border border-dark-600 rounded-xl p-6 ${index % 2 === 0 ? 'text-right' : ''}`}>
-                    <div className="text-2xl font-bold text-primary-400 mb-2">{milestone.year}</div>
-                    <p className="text-gray-300">{milestone.event}</p>
+                  <div className={`w-[85%] sm:w-5/12 bg-dark-700 border border-dark-600 rounded-xl p-4 sm:p-6 ml-8 sm:ml-0 ${index % 2 === 0 ? 'sm:text-right' : ''} ${index % 2 !== 0 ? 'sm:mr-0' : ''}`}>
+                    <div className="text-xl sm:text-2xl font-bold text-primary-400 mb-1 sm:mb-2">{milestone.year}</div>
+                    <p className="text-gray-300 text-sm sm:text-base">{milestone.event}</p>
                   </div>
                 </div>
               ))}
@@ -151,21 +151,21 @@ export default function InstitutoPage() {
       </section>
 
       {/* Authorities */}
-      <section className="bg-dark-900 py-24">
+      <section className="bg-dark-900 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-100 mb-4">Autoridades</h2>
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-4">Autoridades</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Nuestro equipo directivo
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-3xl mx-auto">
             {authorities.map((auth, index) => (
-              <div key={index} className="text-center p-8 bg-dark-700 rounded-xl border border-dark-600">
-                <img src={auth.image} alt={auth.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-2 border-dark-600" />
-                <h4 className="text-lg font-bold text-gray-100">{auth.name}</h4>
-                <p className="text-primary-400 font-medium">{auth.role}</p>
+              <div key={index} className="text-center p-6 sm:p-8 bg-dark-700 rounded-xl border border-dark-600">
+                <img src={auth.image} alt={auth.name} className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mx-auto mb-4 object-cover border-2 border-dark-600" />
+                <h4 className="text-base sm:text-lg font-bold text-gray-100">{auth.name}</h4>
+                <p className="text-primary-400 font-medium text-sm sm:text-base">{auth.role}</p>
               </div>
             ))}
           </div>
@@ -173,13 +173,13 @@ export default function InstitutoPage() {
       </section>
 
       {/* Contact CTA */}
-      <section className="bg-dark-800 py-24 border-t border-dark-600">
+      <section className="bg-dark-800 py-16 sm:py-24 border-t border-dark-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-100 mb-6">¿Tienes preguntas?</h2>
-          <p className="text-xl text-gray-400 mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-4 sm:mb-6">¿Tienes preguntas?</h2>
+          <p className="text-lg sm:text-xl text-gray-400 mb-6 sm:mb-8">
             Contáctanos para obtener más información sobre nuestros programas
           </p>
-          <Link href="/contacto" className="inline-flex items-center gap-2 px-8 py-4 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all">
+          <Link href="/contacto" className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all">
             Contáctanos <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

@@ -127,9 +127,9 @@ function PreRegistroForm() {
     <div className="bg-dark-900 min-h-screen py-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-100 mb-4">Pre-registro</h1>
-          <p className="text-gray-400">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-100 mb-3 sm:mb-4">Pre-registro</h1>
+          <p className="text-gray-400 text-sm sm:text-base">
             Completa el formulario para iniciar tu proceso de admisión
           </p>
         </div>
@@ -143,15 +143,15 @@ function PreRegistroForm() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Datos Personales */}
-          <div className="bg-dark-700 rounded-2xl p-8">
-            <div className="flex items-center gap-3 mb-6">
+          <div className="bg-dark-700 rounded-2xl p-6 sm:p-8">
+            <div className="flex items-center gap-3 mb-4 sm:mb-6">
               <div className="w-10 h-10 bg-primary-500/20 text-primary-400 rounded-lg flex items-center justify-center">
                 <User className="w-5 h-5" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-100">Datos Personales</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-100">Datos Personales</h2>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Nombres *
@@ -400,12 +400,12 @@ function PreRegistroForm() {
           </div>
 
           {/* Datos Académicos */}
-          <div className="bg-dark-700 rounded-2xl p-8">
-            <div className="flex items-center gap-3 mb-6">
+          <div className="bg-dark-700 rounded-2xl p-6 sm:p-8">
+            <div className="flex items-center gap-3 mb-4 sm:mb-6">
               <div className="w-10 h-10 bg-primary-500/20 text-primary-400 rounded-lg flex items-center justify-center">
                 <BookOpen className="w-5 h-5" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-100">Datos Académicos</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-100">Datos Académicos</h2>
             </div>
 
             <div>
@@ -439,16 +439,16 @@ function PreRegistroForm() {
             const edadReal = edad - (mesDiff < 0 || (mesDiff === 0 && diaDiff < 0) ? 1 : 0);
             return edadReal < 18;
           })() && (
-          <div className="bg-dark-700 rounded-2xl p-8">
-            <div className="flex items-center gap-3 mb-6">
+          <div className="bg-dark-700 rounded-2xl p-6 sm:p-8">
+            <div className="flex items-center gap-3 mb-4 sm:mb-6">
               <div className="w-10 h-10 bg-primary-500/20 text-primary-400 rounded-lg flex items-center justify-center">
                 <User className="w-5 h-5" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-100">Datos del Tutor</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-100">Datos del Tutor</h2>
             </div>
-            <p className="text-gray-400 text-sm mb-6">Solo para menores de 18 años</p>
+            <p className="text-gray-400 text-sm mb-4 sm:mb-6">Solo para menores de 18 años</p>
 
-            <div className="grid md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Nombre del tutor
@@ -475,7 +475,7 @@ function PreRegistroForm() {
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Teléfono del tutor
                 </label>
@@ -492,8 +492,8 @@ function PreRegistroForm() {
           )}
 
           {/* Privacy */}
-          <div className="bg-dark-700/50 rounded-xl p-6">
-            <p className="text-sm text-gray-400">
+          <div className="bg-dark-700/50 rounded-xl p-4 sm:p-6">
+            <p className="text-xs sm:text-sm text-gray-400">
               Al enviar este formulario, aceptas nuestra{' '}
               <Link href="/legal/politica-privacidad" className="text-primary-400 hover:text-primary-300 underline">
                 Política de Privacidad
@@ -503,17 +503,17 @@ function PreRegistroForm() {
           </div>
 
           {/* Submit */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-end">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
             <Link
               href="/admision"
-              className="px-6 py-4 border border-dark-600 text-gray-300 font-medium rounded-lg hover:bg-zinc-800 transition-all text-center"
+              className="px-4 sm:px-6 py-3 sm:py-4 border border-dark-600 text-gray-300 font-medium rounded-lg hover:bg-zinc-800 transition-all text-center"
             >
               Cancelar
             </Link>
             <button
               type="submit"
               disabled={loading}
-              className="px-8 py-4 bg-primary-500 text-gray-100 font-semibold rounded-lg hover:bg-primary-700 disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
+              className="px-6 sm:px-8 py-3 sm:py-4 bg-primary-500 text-gray-100 font-semibold rounded-lg hover:bg-primary-700 disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
             >
               {loading ? (
                 <>

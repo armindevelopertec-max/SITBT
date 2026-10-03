@@ -125,24 +125,24 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <main className="flex-1">{children}</main>
 
       <footer className="bg-dark-800 border-t border-dark-600 text-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-            <div className="lg:col-span-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            <div className="sm:col-span-2 lg:col-span-1">
               <div className="flex items-center gap-3 mb-6">
                 {logoUrl ? (
                   <img
                     src={logoUrl}
                     alt={institutionName}
-                    className="h-12 w-auto object-contain"
+                    className="h-10 w-auto object-contain"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                     }}
                   />
                 ) : (
-                  <GraduationCap className="w-10 h-10 text-primary-400" />
+                  <GraduationCap className="w-8 h-8 lg:w-10 lg:h-10 text-primary-400" />
                 )}
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold text-gray-100 leading-tight">{institutionName}</span>
+                  <span className="text-base lg:text-lg font-bold text-gray-100 leading-tight">{institutionName}</span>
                   <span className="text-xs text-primary-400 tracking-wider">TÉCNICO SUPERIOR</span>
                 </div>
               </div>
@@ -190,7 +190,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </div>
           </div>
 
-          <div className="border-t border-dark-600 mt-12 pt-8">
+          <div className="border-t border-dark-600 mt-8 lg:mt-12 pt-6 lg:pt-8">
             <p className="text-center text-sm text-gray-500">
               &copy; {new Date().getFullYear()} {institutionName}. Todos los derechos reservados.
             </p>
