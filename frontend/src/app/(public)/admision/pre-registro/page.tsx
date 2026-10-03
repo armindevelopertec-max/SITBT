@@ -23,6 +23,7 @@ function PreRegistroForm() {
     lastname_maternal: '',
     ci: '',
     ci_issued: '',
+    ci_issued_other: '',
     birthdate: '',
     birthplace: '',
     gender: undefined,
@@ -228,8 +229,21 @@ function PreRegistroForm() {
                   <option value="CH">Chuquisaca</option>
                   <option value="BE">Beni</option>
                   <option value="PD">Pando</option>
+                  <option value="Otra">Otra</option>
                 </select>
               </div>
+              {form.ci_issued === 'Otra' && (
+                <div>
+                  <input
+                    type="text"
+                    name="ci_issued_other"
+                    value={form.ci_issued_other || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                    placeholder="Especificar extensión"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -343,9 +357,24 @@ function PreRegistroForm() {
                   <option value="Peruana">Peruana</option>
                   <option value="Chilena">Chilena</option>
                   <option value="Brasileña">Brasileña</option>
+                  <option value="Colombiana">Colombiana</option>
+                  <option value="Venezolana">Venezolana</option>
+                  <option value="Española">Española</option>
                   <option value="Otra">Otra</option>
                 </select>
               </div>
+              {form.nationality === 'Otra' && (
+                <div>
+                  <input
+                    type="text"
+                    name="nationality_other"
+                    value={form.nationality_other || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                    placeholder="Ingrese su nacionalidad"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">

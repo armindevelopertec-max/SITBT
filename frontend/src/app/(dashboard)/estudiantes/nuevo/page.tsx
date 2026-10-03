@@ -54,6 +54,7 @@ export default function NewStudentPage() {
   const [personData, setPersonData] = useState({
     ci: '',
     ci_issued: '',
+    ci_issued_other: '',
     names: '',
     lastname_paternal: '',
     lastname_maternal: '',
@@ -62,6 +63,7 @@ export default function NewStudentPage() {
     gender: '',
     marital_status: '',
     nationality: 'Boliviana',
+    nationality_other: '',
     phone: '',
     email: '',
     address: '',
@@ -266,7 +268,10 @@ export default function NewStudentPage() {
                 <Select
                   label="Extensión CI"
                   value={personData.ci_issued}
-                  onChange={(e) => setPersonData({ ...personData, ci_issued: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setPersonData({ ...personData, ci_issued: value });
+                  }}
                   options={[
                     { value: '', label: 'Seleccionar' },
                     { value: 'LP', label: 'La Paz' },
@@ -278,9 +283,20 @@ export default function NewStudentPage() {
                     { value: 'CH', label: 'Chuquisaca' },
                     { value: 'BE', label: 'Beni' },
                     { value: 'PD', label: 'Pando' },
+                    { value: 'Otra', label: 'Otra' },
                   ]}
                 />
               </div>
+              {personData.ci_issued === 'Otra' && (
+                <div>
+                  <Input
+                    label="Especificar extensión"
+                    value={personData.ci_issued_other || ''}
+                    onChange={(e) => setPersonData({ ...personData, ci_issued_other: e.target.value })}
+                    placeholder="Ej: LP"
+                  />
+                </div>
+              )}
               <div>
                 <Input
                   label="Nombres *"
@@ -395,7 +411,10 @@ export default function NewStudentPage() {
                 <Select
                   label="Nacionalidad"
                   value={personData.nationality}
-                  onChange={(e) => setPersonData({ ...personData, nationality: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setPersonData({ ...personData, nationality: value });
+                  }}
                   options={[
                     { value: 'Boliviana', label: 'Boliviana' },
                     { value: 'Argentina', label: 'Argentina' },
@@ -409,6 +428,16 @@ export default function NewStudentPage() {
                   ]}
                 />
               </div>
+              {personData.nationality === 'Otra' && (
+                <div>
+                  <Input
+                    label="Especificar nacionalidad"
+                    value={personData.nationality_other || ''}
+                    onChange={(e) => setPersonData({ ...personData, nationality_other: e.target.value })}
+                    placeholder="Ingrese su nacionalidad"
+                  />
+                </div>
+              )}
               <div>
                 <Input
                   label="Teléfono"

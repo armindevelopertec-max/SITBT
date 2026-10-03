@@ -268,11 +268,13 @@ export interface CreateAdmissionDto {
   lastname_maternal?: string;
   ci: string;
   ci_issued?: string;
+  ci_issued_other?: string;
+  nationality?: string;
+  nationality_other?: string;
   birthdate: string;
   birthplace?: string;
   gender?: 'M' | 'F';
   marital_status?: string;
-  nationality?: string;
   phone?: string;
   email: string;
   address?: string;
