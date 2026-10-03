@@ -54,7 +54,6 @@ export default function NewStudentPage() {
   const [personData, setPersonData] = useState({
     ci: '',
     ci_issued: '',
-    ci_issued_other: '',
     names: '',
     lastname_paternal: '',
     lastname_maternal: '',
@@ -268,10 +267,7 @@ export default function NewStudentPage() {
                 <Select
                   label="Extensión CI"
                   value={personData.ci_issued}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setPersonData({ ...personData, ci_issued: value });
-                  }}
+                  onChange={(e) => setPersonData({ ...personData, ci_issued: e.target.value })}
                   options={[
                     { value: '', label: 'Seleccionar' },
                     { value: 'LP', label: 'La Paz' },
@@ -283,20 +279,9 @@ export default function NewStudentPage() {
                     { value: 'CH', label: 'Chuquisaca' },
                     { value: 'BE', label: 'Beni' },
                     { value: 'PD', label: 'Pando' },
-                    { value: 'Otra', label: 'Otra' },
                   ]}
                 />
               </div>
-              {personData.ci_issued === 'Otra' && (
-                <div>
-                  <Input
-                    label="Especificar extensión"
-                    value={personData.ci_issued_other || ''}
-                    onChange={(e) => setPersonData({ ...personData, ci_issued_other: e.target.value })}
-                    placeholder="Ej: LP"
-                  />
-                </div>
-              )}
               <div>
                 <Input
                   label="Nombres *"
