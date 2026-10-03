@@ -168,7 +168,6 @@ export default function NewStudentPage() {
     if (!personData.ci) newErrors.ci = 'CI es requerido';
     if (!personData.names) newErrors.names = 'Nombres es requerido';
     if (!personData.lastname_paternal) newErrors.lastname_paternal = 'Apellido paterno es requerido';
-    if (!personData.lastname_maternal) newErrors.lastname_maternal = 'Apellido materno es requerido';
     if (!personData.birthdate) newErrors.birthdate = 'Fecha de nacimiento es requerida';
     if (!personData.gender) newErrors.gender = 'Género es requerido';
 
