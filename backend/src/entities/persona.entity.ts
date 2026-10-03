@@ -43,9 +43,6 @@ export class Persona {
   @Column({ type: 'varchar', length: 20, unique: true })
   ci: string;
 
-  @Column({ type: 'varchar', length: 5, nullable: true })
-  ci_issued: string;
-
   @Column({ type: 'varchar', length: 100 })
   names: string;
 

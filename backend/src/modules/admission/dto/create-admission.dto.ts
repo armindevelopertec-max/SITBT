@@ -21,11 +21,6 @@ export class CreateAdmissionDto {
   @IsString()
   ci: string;
 
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  ci_issued?: string;
-
   @ApiProperty()
   @IsDateString()
   birthdate: string;

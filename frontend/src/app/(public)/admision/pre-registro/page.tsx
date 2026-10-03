@@ -22,7 +22,6 @@ function PreRegistroForm() {
     lastname_paternal: '',
     lastname_maternal: '',
     ci: '',
-    ci_issued: '',
     birthdate: '',
     birthplace: '',
     gender: undefined,
@@ -206,29 +205,6 @@ function PreRegistroForm() {
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   placeholder="12345678"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Extensión CI
-                </label>
-                <select
-                  name="ci_issued"
-                  value={form.ci_issued || ''}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                >
-                  <option value="">Seleccionar</option>
-                  <option value="LP">La Paz</option>
-                  <option value="CB">Cochabamba</option>
-                  <option value="SC">Santa Cruz</option>
-                  <option value="OR">Oruro</option>
-                  <option value="PT">Potosí</option>
-                  <option value="TJ">Tarija</option>
-                  <option value="CH">Chuquisaca</option>
-                  <option value="BE">Beni</option>
-                  <option value="PD">Pando</option>
-                </select>
               </div>
 
               <div>

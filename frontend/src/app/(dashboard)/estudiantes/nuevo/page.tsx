@@ -53,7 +53,6 @@ export default function NewStudentPage() {
 
   const [personData, setPersonData] = useState({
     ci: '',
-    ci_issued: '',
     names: '',
     lastname_paternal: '',
     lastname_maternal: '',
@@ -261,25 +260,6 @@ export default function NewStudentPage() {
                   onChange={(e) => setPersonData({ ...personData, ci: e.target.value })}
                   error={errors.ci}
                   placeholder="12345678"
-                />
-              </div>
-              <div>
-                <Select
-                  label="Extensión CI"
-                  value={personData.ci_issued}
-                  onChange={(e) => setPersonData({ ...personData, ci_issued: e.target.value })}
-                  options={[
-                    { value: '', label: 'Seleccionar' },
-                    { value: 'LP', label: 'La Paz' },
-                    { value: 'CB', label: 'Cochabamba' },
-                    { value: 'SC', label: 'Santa Cruz' },
-                    { value: 'OR', label: 'Oruro' },
-                    { value: 'PT', label: 'Potosí' },
-                    { value: 'TJ', label: 'Tarija' },
-                    { value: 'CH', label: 'Chuquisaca' },
-                    { value: 'BE', label: 'Beni' },
-                    { value: 'PD', label: 'Pando' },
-                  ]}
                 />
               </div>
               <div>

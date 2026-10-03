@@ -21,7 +21,6 @@ export interface User {
 export interface Person {
   id: number;
   ci: string;
-  ci_issued?: string;
   names: string;
   lastname_paternal: string;
   lastname_maternal: string;
@@ -237,7 +236,6 @@ export interface AdmissionRequest {
   id: string;
   nombre: string;
   ci: string;
-  ci_issued?: string;
   fechaNacimiento: string;
   telefono?: string;
   email: string;
@@ -267,7 +265,6 @@ export interface CreateAdmissionDto {
   lastname_paternal?: string;
   lastname_maternal?: string;
   ci: string;
-  ci_issued?: string;
   nationality?: string;
   nationality_other?: string;
   birthdate: string;

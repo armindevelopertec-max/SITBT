@@ -44,9 +44,6 @@ export class AdmissionRequest {
   @Column({ type: 'varchar', length: 20 })
   ci: string;
 
-  @Column({ type: 'varchar', length: 5, nullable: true })
-  ci_issued: string;
-
   @Column({ name: 'fecha_nacimiento', type: 'date' })
   birthdate: Date;
 

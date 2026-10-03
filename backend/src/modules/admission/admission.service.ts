@@ -124,7 +124,6 @@ export class AdmissionService {
     if (!persona) {
       persona = this.personaRepository.create({
         ci: request.ci,
-        ci_issued: request.ci_issued,
         names: request.names,
         lastname_paternal: request.lastname_paternal || request.names.split(' ')[0] || request.names,
         lastname_maternal: request.lastname_maternal || request.names.split(' ').slice(1).join(' ') || '',

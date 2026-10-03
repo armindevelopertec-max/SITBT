@@ -16,12 +16,6 @@ export class CreatePersonDto {
   @MaxLength(20)
   ci: string;
 
-  @ApiPropertyOptional({ example: 'LP' })
-  @IsString()
-  @IsOptional()
-  @MaxLength(5)
-  ci_issued?: string;
-
   @ApiProperty({ example: 'Juan Carlos' })
   @IsString()
   @MaxLength(100)
