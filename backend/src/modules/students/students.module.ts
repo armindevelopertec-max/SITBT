@@ -9,9 +9,10 @@ import { PlanEstudio } from '../../entities/plan-estudio.entity';
 import { Usuario } from '../../entities/usuario.entity';
 import { UsuarioRol } from '../../entities/usuario-rol.entity';
 import { Rol } from '../../entities/rol.entity';
+import { Credencial } from '../../entities/credencial.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Estudiante, Persona, Carrera, PlanEstudio, Usuario, UsuarioRol, Rol])],
+  imports: [TypeOrmModule.forFeature([Estudiante, Persona, Carrera, PlanEstudio, Usuario, UsuarioRol, Rol, Credencial])],
   controllers: [StudentsController],
   providers: [StudentsService],
   exports: [StudentsService],

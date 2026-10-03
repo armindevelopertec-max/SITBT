@@ -281,7 +281,7 @@ export default function CareerDetailPage() {
         <section className="bg-dark-800 py-16 border-t border-dark-600">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-100 mb-4">Plan de Estudios</h2>
+              <h2 className="text-3xl font-bold text-gray-100 mb-4">Malla Curricular</h2>
               <p className="text-gray-400">
                 Resolución Ministerial: {studyPlan.rm_number} del {studyPlan.rm_date}
               </p>

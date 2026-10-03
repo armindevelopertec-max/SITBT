@@ -69,7 +69,7 @@ export default function NewStudentPage() {
   });
 
   const [studentData, setStudentData] = useState({
-    inscription_code: '',
+
     admission_gestion: new Date().getFullYear().toString(),
     admission_date: '',
     career_id: '',
@@ -94,30 +94,6 @@ export default function NewStudentPage() {
       setStudyPlans([]);
     }
   }, [studentData.career_id]);
-
-  const generateInscriptionCode = () => {
-    if (!personData.lastname_paternal || !personData.lastname_maternal || !personData.names || !studentData.career_id || !studentData.admission_gestion || !personData.ci) {
-      return;
-    }
-
-    const lastnamePaternal = personData.lastname_paternal.trim().toUpperCase();
-    const lastnameMaternal = personData.lastname_maternal.trim().toUpperCase();
-    const names = personData.names.trim().split(' ')[0].toUpperCase();
-    const career = careers.find(c => c.id.toString() === studentData.career_id);
-    const careerCode = career ? career.name.substring(0, 2).toUpperCase() : '';
-
-    const gestionParts = studentData.admission_gestion.split('/');
-    const yearLast2 = gestionParts[gestionParts.length - 1].slice(-2);
-
-    const ciLast2 = personData.ci.slice(-2);
-
-    const code = `${lastnamePaternal[0]}${lastnameMaternal[0]}${names[0]}-${careerCode}${yearLast2}${ciLast2}`;
-    setStudentData(prev => ({ ...prev, inscription_code: code }));
-  };
-
-  useEffect(() => {
-    generateInscriptionCode();
-  }, [personData.lastname_paternal, personData.lastname_maternal, personData.names, studentData.career_id, studentData.admission_gestion, personData.ci]);
 
   const fetchCareers = async () => {
     try {
@@ -174,7 +150,6 @@ export default function NewStudentPage() {
     if (!personData.birthdate) newErrors.birthdate = 'Fecha de nacimiento es requerida';
     if (!personData.gender) newErrors.gender = 'Género es requerido';
 
-    if (!studentData.inscription_code) newErrors.inscription_code = 'Código de inscripción es requerido';
     if (!studentData.admission_gestion) newErrors.admission_gestion = 'Gestión de ingreso es requerida';
     if (!studentData.admission_date) newErrors.admission_date = 'Fecha de ingreso es requerida';
     if (!studentData.career_id) newErrors.career_id = 'Carrera es requerida';
@@ -202,7 +177,6 @@ export default function NewStudentPage() {
 
       const studentPayload = {
         person_id: personId,
-        inscription_code: studentData.inscription_code,
         admission_gestion: studentData.admission_gestion,
         admission_date: studentData.admission_date,
         career_id: Number(studentData.career_id),
@@ -455,16 +429,6 @@ export default function NewStudentPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <Input
-                  label="Código de Inscripción *"
-                  value={studentData.inscription_code}
-                  error={errors.inscription_code}
-                  placeholder="Se genera automáticamente"
-                  readOnly
-                  className="bg-gray-50"
-                />
-              </div>
               <div>
                 <Select
                   label="Gestión de Ingreso *"

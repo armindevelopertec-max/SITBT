@@ -258,6 +258,10 @@ export interface AdmissionRequest {
   converted_student_id?: number;
   created_at?: string;
   updated_at?: string;
+  birthplace?: string;
+  birthplace_other?: string;
+  nationality?: string;
+  nationality_other?: string;
 }
 
 export interface CreateAdmissionDto {

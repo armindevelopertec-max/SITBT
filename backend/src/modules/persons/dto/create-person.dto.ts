@@ -41,6 +41,12 @@ export class CreatePersonDto {
   @MaxLength(100)
   birthplace?: string;
 
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  @MaxLength(100)
+  birthplace_other?: string;
+
   @ApiProperty({ enum: Gender })
   @IsEnum(Gender)
   gender: Gender;
@@ -55,6 +61,12 @@ export class CreatePersonDto {
   @IsOptional()
   @MaxLength(50)
   nationality?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  @MaxLength(100)
+  nationality_other?: string;
 
   @ApiPropertyOptional()
   @IsString()

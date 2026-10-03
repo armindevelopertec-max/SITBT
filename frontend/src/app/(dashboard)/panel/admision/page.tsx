@@ -65,6 +65,31 @@ interface StudyPlan {
   rm_number: string;
 }
 
+interface EditFormData {
+  names: string;
+  lastname_paternal: string;
+  lastname_maternal: string;
+  ci: string;
+  birthdate: string;
+  birthplace: string;
+  gender: string;
+  marital_status: string;
+  nationality: string;
+  phone: string;
+  email: string;
+  address: string;
+  nombreTutor: string;
+  ciTutor: string;
+  telefonoTutor: string;
+  carrera_id: number;
+}
+
+interface DetalleModalData {
+  request: AdmissionRequest;
+  showConvert: boolean;
+  editMode?: boolean;
+}
+
 interface ConvertFormData {
   admission_gestion: string;
   admission_date: string;
@@ -91,6 +116,7 @@ export default function AdmisionPage() {
 
   const [observaciones, setObservaciones] = useState('');
   const [formLoading, setFormLoading] = useState(false);
+  const [editForm, setEditForm] = useState<EditFormData | null>(null);
 
   const [careers, setCareers] = useState<Career[]>([]);
   const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
@@ -178,40 +204,9 @@ export default function AdmisionPage() {
     if (!convertirModal) return;
     setFormLoading(true);
     try {
-      const personaPayload = {
-        ci: convertirModal.ci,
-        ci_issued: convertirModal.ci_issued,
-        names: convertirModal.names,
-        lastname_paternal: convertirModal.lastname_paternal,
-        lastname_maternal: convertirModal.lastname_maternal,
-        birthdate: convertirModal.birthdate,
-        birthplace: convertirModal.birthplace,
-        gender: convertirModal.gender,
-        marital_status: convertirModal.marital_status,
-        nationality: convertirModal.nationality,
-        phone: convertirModal.phone,
-        email: convertirModal.email,
-        address: convertirModal.address,
-      };
-      const personResponse = await api.post('/personas', personaPayload);
-      const personId = personResponse.data.id;
-
-      const studentPayload = {
-        person_id: personId,
-        admission_gestion: convertForm.admission_gestion,
-        admission_date: convertForm.admission_date,
-        career_id: convertForm.career_id,
-        study_plan_id: convertForm.study_plan_id,
-        folder_number: convertForm.folder_number || undefined,
-        form01_code: convertForm.form01_code || undefined,
-        bachelor_title_number: convertForm.bachelor_title_number || undefined,
-        bachelor_title_date: convertForm.bachelor_title_date || undefined,
-      };
-
-      await api.post('/estudiantes', studentPayload);
-
-      const updatedRequest = { ...convertirModal, estado: 'convertido' };
-      await api.patch(`/admission/${convertirModal.id}`, { estado: 'convertido' });
+      await api.post(`/admission/${convertirModal.id}/convert-to-student`, {
+        admissionGestion: convertForm.admission_gestion,
+      });
 
       setConvertirModal(null);
       fetchAdmissions();
@@ -236,6 +231,17 @@ export default function AdmisionPage() {
   const getStatusBadge = (status: string) => {
     const config = statusLabels[status] || { label: status, color: 'bg-gray-100 text-gray-800' };
     return <Badge className={config.color}>{config.label}</Badge>;
+  };
+
+  const isMinor = (birthdate: string): boolean => {
+    if (!birthdate) return false;
+    const hoy = new Date();
+    const nacimiento = new Date(birthdate);
+    const edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mesDiff = hoy.getMonth() - nacimiento.getMonth();
+    const diaDiff = hoy.getDate() - nacimiento.getDate();
+    const edadReal = edad - (mesDiff < 0 || (mesDiff === 0 && diaDiff < 0) ? 1 : 0);
+    return edadReal < 18;
   };
 
   const handleVerificar = async () => {
@@ -283,6 +289,51 @@ export default function AdmisionPage() {
       fetchAdmissions();
     } catch (error) {
       console.error('Error deleting:', error);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleEnableEdit = (request: AdmissionRequest) => {
+    setEditForm({
+      names: request.names,
+      lastname_paternal: request.lastname_paternal || '',
+      lastname_maternal: request.lastname_maternal || '',
+      ci: request.ci,
+      birthdate: request.birthdate,
+      birthplace: request.birthplace || '',
+      gender: request.gender || '',
+      marital_status: request.marital_status || '',
+      nationality: request.nationality || '',
+      phone: request.phone || '',
+      email: request.email,
+      address: request.address || '',
+      nombreTutor: request.nombreTutor || '',
+      ciTutor: request.ciTutor || '',
+      telefonoTutor: request.telefonoTutor || '',
+      carrera_id: request.carrera_id,
+    });
+    setDetalleModal({ request, showConvert: request.estado === 'verificado', editMode: true });
+  };
+
+  const handleCancelEdit = () => {
+    setEditForm(null);
+    if (detalleModal) {
+      setDetalleModal({ ...detalleModal, editMode: false });
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!detalleModal || !editForm) return;
+    setFormLoading(true);
+    try {
+      await api.patch(`/admission/${detalleModal.request.id}`, editForm);
+      setDetalleModal(null);
+      setEditForm(null);
+      fetchAdmissions();
+    } catch (error) {
+      console.error('Error updating:', error);
+      alert('Error al actualizar los datos');
     } finally {
       setFormLoading(false);
     }
@@ -413,74 +464,184 @@ export default function AdmisionPage() {
       </Card>
 
       {/* Modal Detalle */}
-      <Modal open={!!detalleModal} onClose={() => setDetalleModal(null)} title="Detalle del Pre-registro" size="lg">
+      <Modal open={!!detalleModal} onClose={() => { setDetalleModal(null); setEditForm(null); }} title="Detalle del Pre-registro" size="lg">
         {detalleModal && (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-500">Nombre completo</p>
-                <p className="font-medium">{detalleModal.request.names} {detalleModal.request.lastname_paternal} {detalleModal.request.lastname_maternal}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">CI</p>
-                <p className="font-medium">{detalleModal.request.ci} {detalleModal.request.ci_issued && `- ${detalleModal.request.ci_issued}`}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Fecha de nacimiento</p>
-                <p className="font-medium">{new Date(detalleModal.request.birthdate).toLocaleDateString('es-BO')}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Lugar de nacimiento</p>
-                <p className="font-medium">{detalleModal.request.birthplace || '-'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Género</p>
-                <p className="font-medium">{detalleModal.request.gender === 'M' ? 'Masculino' : detalleModal.request.gender === 'F' ? 'Femenino' : '-'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Estado civil</p>
-                <p className="font-medium">{detalleModal.request.marital_status || '-'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Nacionalidad</p>
-                <p className="font-medium">{detalleModal.request.nationality || '-'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Teléfono</p>
-                <p className="font-medium">{detalleModal.request.phone || '-'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Email</p>
-                <p className="font-medium">{detalleModal.request.email}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Dirección</p>
-                <p className="font-medium">{detalleModal.request.address || '-'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Carrera</p>
-                <p className="font-medium">{detalleModal.request.carrera?.name || '-'}</p>
-              </div>
-              {detalleModal.request.nombreTutor && (
-                <>
-                  <div className="col-span-2 border-t pt-4 mt-2">
-                    <p className="text-sm font-semibold text-gray-700">Datos del Tutor</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Nombre del tutor</p>
-                    <p className="font-medium">{detalleModal.request.nombreTutor}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">CI del tutor</p>
-                    <p className="font-medium">{detalleModal.request.ciTutor || '-'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Teléfono del tutor</p>
-                    <p className="font-medium">{detalleModal.request.telefonoTutor || '-'}</p>
-                  </div>
-                </>
+            <div className="flex justify-end gap-2 mb-4">
+              {detalleModal.request.estado !== 'convertido' && !detalleModal.editMode && (
+                <Button variant="outline" size="sm" onClick={() => handleEnableEdit(detalleModal.request)}>
+                  Editar datos
+                </Button>
               )}
             </div>
+            {detalleModal.editMode && editForm ? (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-gray-500">Nombres</label>
+                  <Input value={editForm.names} onChange={(e) => setEditForm({ ...editForm, names: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500">Apellido Paterno</label>
+                  <Input value={editForm.lastname_paternal} onChange={(e) => setEditForm({ ...editForm, lastname_paternal: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500">Apellido Materno</label>
+                  <Input value={editForm.lastname_maternal} onChange={(e) => setEditForm({ ...editForm, lastname_maternal: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500">CI</label>
+                  <Input value={editForm.ci} onChange={(e) => setEditForm({ ...editForm, ci: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500">Fecha de nacimiento</label>
+                  <Input type="date" value={editForm.birthdate} onChange={(e) => setEditForm({ ...editForm, birthdate: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500">Lugar de nacimiento</label>
+                  <Input value={editForm.birthplace} onChange={(e) => setEditForm({ ...editForm, birthplace: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500 block mb-2">Género</label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2">
+                      <input type="radio" name="gender" value="M" checked={editForm.gender === 'M'} onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })} />
+                      <span className="text-sm">Masculino</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input type="radio" name="gender" value="F" checked={editForm.gender === 'F'} onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })} />
+                      <span className="text-sm">Femenino</span>
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500 block mb-2">Estado civil</label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2">
+                      <input type="radio" name="marital_status" value="Soltera(o)" checked={editForm.marital_status === 'Soltera(o)'} onChange={(e) => setEditForm({ ...editForm, marital_status: e.target.value })} />
+                      <span className="text-sm">Soltero(a)</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input type="radio" name="marital_status" value="Casada(o)" checked={editForm.marital_status === 'Casada(o)'} onChange={(e) => setEditForm({ ...editForm, marital_status: e.target.value })} />
+                      <span className="text-sm">Casado(a)</span>
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500">Nacionalidad</label>
+                  <Input value={editForm.nationality} onChange={(e) => setEditForm({ ...editForm, nationality: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500">Teléfono</label>
+                  <Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500">Email</label>
+                  <Input type="email" value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500">Dirección</label>
+                  <Input value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500">Carrera</label>
+                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg" value={editForm.carrera_id} onChange={(e) => setEditForm({ ...editForm, carrera_id: parseInt(e.target.value) })}>
+                    <option value={0}>Seleccionar carrera</option>
+                    {careers.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+                {isMinor(editForm.birthdate) && (
+                  <>
+                    <div className="col-span-2 border-t pt-4 mt-2">
+                      <p className="text-sm font-semibold text-gray-700">Datos del Tutor</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-500">Nombre del tutor</label>
+                      <Input value={editForm.nombreTutor} onChange={(e) => setEditForm({ ...editForm, nombreTutor: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-500">CI del tutor</label>
+                      <Input value={editForm.ciTutor} onChange={(e) => setEditForm({ ...editForm, ciTutor: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-500">Teléfono del tutor</label>
+                      <Input value={editForm.telefonoTutor} onChange={(e) => setEditForm({ ...editForm, telefonoTutor: e.target.value })} />
+                    </div>
+                  </>
+                )}
+                <div className="col-span-2 flex justify-end gap-2 mt-4">
+                  <Button variant="outline" onClick={handleCancelEdit} disabled={formLoading}>Cancelar</Button>
+                  <Button onClick={handleSaveEdit} disabled={formLoading}>{formLoading ? 'Guardando...' : 'Guardar cambios'}</Button>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Nombre completo</p>
+                  <p className="font-medium">{detalleModal.request.names} {detalleModal.request.lastname_paternal} {detalleModal.request.lastname_maternal}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">CI</p>
+                  <p className="font-medium">{detalleModal.request.ci} {detalleModal.request.ci_issued && `- ${detalleModal.request.ci_issued}`}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Fecha de nacimiento</p>
+                  <p className="font-medium">{new Date(detalleModal.request.birthdate).toLocaleDateString('es-BO')}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Lugar de nacimiento</p>
+                  <p className="font-medium">{detalleModal.request.birthplace || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Género</p>
+                  <p className="font-medium">{detalleModal.request.gender === 'M' ? 'Masculino' : detalleModal.request.gender === 'F' ? 'Femenino' : '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Estado civil</p>
+                  <p className="font-medium">{detalleModal.request.marital_status || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Nacionalidad</p>
+                  <p className="font-medium">{detalleModal.request.nationality || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Teléfono</p>
+                  <p className="font-medium">{detalleModal.request.phone || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="font-medium">{detalleModal.request.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Dirección</p>
+                  <p className="font-medium">{detalleModal.request.address || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Carrera</p>
+                  <p className="font-medium">{detalleModal.request.carrera?.name || '-'}</p>
+                </div>
+                {isMinor(detalleModal.request.birthdate) && detalleModal.request.nombreTutor && (
+                  <>
+                    <div className="col-span-2 border-t pt-4 mt-2">
+                      <p className="text-sm font-semibold text-gray-700">Datos del Tutor (menor de edad)</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Nombre del tutor</p>
+                      <p className="font-medium">{detalleModal.request.nombreTutor}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">CI del tutor</p>
+                      <p className="font-medium">{detalleModal.request.ciTutor || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Teléfono del tutor</p>
+                      <p className="font-medium">{detalleModal.request.telefonoTutor || '-'}</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         )}
       </Modal>

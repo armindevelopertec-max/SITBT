@@ -269,7 +269,7 @@ export default function CareersPage() {
                       href={`/carreras/${career.id}`}
                       className="inline-flex items-center gap-2 text-primary-400 font-semibold hover:text-primary-300 transition-colors"
                     >
-                      Ver Plan de Estudios <ArrowRight className="w-4 h-4" />
+                      Ver Malla Curricular <ArrowRight className="w-4 h-4" />
                     </Link>
 
                     <div className="mt-6 md:hidden">

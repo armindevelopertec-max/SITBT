@@ -6,9 +6,9 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  AfterLoad,
 } from 'typeorm';
 import { Carrera } from './carrera.entity';
-import { Usuario } from './usuario.entity';
 
 export enum Gender {
   M = 'M',
@@ -32,13 +32,17 @@ export class AdmissionRequest {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 100 })
-  names: string;
+  @Column({ name: 'nombre', type: 'varchar', length: 100 })
+  nombre: string;
 
   @Column({ name: 'apellido_paterno', type: 'varchar', length: 100, nullable: true })
-  lastname_paternal: string;
+  apellido_paterno: string;
 
   @Column({ name: 'apellido_materno', type: 'varchar', length: 100, nullable: true })
+  apellido_materno: string;
+
+  names: string;
+  lastname_paternal: string;
   lastname_maternal: string;
 
   @Column({ type: 'varchar', length: 20 })
@@ -50,6 +54,9 @@ export class AdmissionRequest {
   @Column({ type: 'varchar', length: 100, nullable: true })
   birthplace: string;
 
+  @Column({ name: 'birthplace_other', type: 'varchar', length: 100, nullable: true })
+  birthplace_other: string;
+
   @Column({ type: 'enum', enum: Gender, nullable: true })
   gender: string;
 
@@ -58,6 +65,9 @@ export class AdmissionRequest {
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   nationality: string;
+
+  @Column({ name: 'nationality_other', type: 'varchar', length: 100, nullable: true })
+  nationality_other: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
   phone: string;
@@ -84,18 +94,14 @@ export class AdmissionRequest {
   @JoinColumn({ name: 'carrera_id' })
   carrera: Carrera;
 
-  @Column({ type: 'enum', enum: AdmissionStatus, default: AdmissionStatus.PENDIENTE })
-  estado: AdmissionStatus;
+  @Column({ type: 'varchar', length: 20, default: 'pendiente' })
+  estado: string;
 
   @Column({ type: 'text', nullable: true })
   observaciones: string;
 
-  @Column({ nullable: true })
-  verificado_por: number;
-
-  @ManyToOne(() => Usuario)
-  @JoinColumn({ name: 'verificado_por' })
-  verificador: Usuario;
+  @Column({ name: 'verificado_por', type: 'int', nullable: true })
+  verificado_por: number | null;
 
   @Column({ name: 'fecha_verificacion', type: 'timestamp', nullable: true })
   fechaVerificacion: Date;
@@ -120,4 +126,11 @@ export class AdmissionRequest {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @AfterLoad()
+  setVirtualFields() {
+    if (this.nombre) this.names = this.nombre;
+    if (this.apellido_paterno) this.lastname_paternal = this.apellido_paterno;
+    if (this.apellido_materno) this.lastname_maternal = this.apellido_materno;
+  }
 }

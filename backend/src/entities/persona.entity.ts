@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+import { Estudiante } from './estudiante.entity';
 
 export enum Gender {
   M = 'M',
@@ -58,6 +59,9 @@ export class Persona {
   @Column({ type: 'varchar', length: 100, nullable: true })
   birthplace: string;
 
+  @Column({ name: 'birthplace_other', type: 'varchar', length: 100, nullable: true })
+  birthplace_other: string;
+
   @Column({ type: 'enum', enum: Gender })
   gender: Gender;
 
@@ -66,6 +70,9 @@ export class Persona {
 
   @Column({ type: 'varchar', length: 50, default: 'Boliviana' })
   nationality: string;
+
+  @Column({ name: 'nationality_other', type: 'varchar', length: 100, nullable: true })
+  nationality_other: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   dual_nationality: string;
@@ -99,6 +106,9 @@ export class Persona {
 
   @Column({ type: 'enum', enum: PersonStatus, default: PersonStatus.ACTIVO })
   status: PersonStatus;
+
+  @OneToMany(() => Estudiante, (estudiante) => estudiante.persona)
+  estudiantes: Estudiante[];
 
   @CreateDateColumn()
   created_at: Date;

@@ -44,7 +44,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
         password: configService.get('DB_PASSWORD', 'sitbt_password'),
         database: configService.get('DB_DATABASE', 'sitbt_db'),
         autoLoadEntities: true,
-        synchronize: false,
+        synchronize: true,
         logging: configService.get('DB_LOGGING', 'false') === 'true',
         timezone: 'America/La_Paz',
       }),

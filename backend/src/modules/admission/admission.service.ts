@@ -29,8 +29,48 @@ export class AdmissionService {
   ) {}
 
   async create(createDto: CreateAdmissionDto): Promise<AdmissionRequest> {
+    const { names, lastname_paternal, lastname_maternal, ...rest } = createDto as any;
+
+    const existingStudent = await this.estudianteRepository
+      .createQueryBuilder('student')
+      .innerJoin('student.persona', 'person')
+      .where('person.ci = :ci', { ci: createDto.ci })
+      .andWhere('student.status = :status', { status: 'activo' })
+      .getOne();
+
+    if (existingStudent) {
+      throw new BadRequestException('Esta persona ya está registrada como estudiante activo en otra carrera');
+    }
+
+    if (createDto.email) {
+      const existingEmail = await this.personaRepository
+        .createQueryBuilder('person')
+        .innerJoin('person.estudiantes', 'student')
+        .where('person.email = :email', { email: createDto.email })
+        .andWhere('student.status = :status', { status: 'activo' })
+        .getOne();
+      if (existingEmail) {
+        throw new BadRequestException('Ya existe un estudiante activo con este correo electrónico');
+      }
+    }
+
+    if (createDto.phone) {
+      const existingPhone = await this.personaRepository
+        .createQueryBuilder('person')
+        .innerJoin('person.estudiantes', 'student')
+        .where('person.phone = :phone', { phone: createDto.phone })
+        .andWhere('student.status = :status', { status: 'activo' })
+        .getOne();
+      if (existingPhone) {
+        throw new BadRequestException('Ya existe un estudiante activo con este número de celular');
+      }
+    }
+
     const request = this.admissionRepository.create({
-      ...createDto,
+      ...rest,
+      nombre: names,
+      apellido_paterno: lastname_paternal,
+      apellido_materno: lastname_maternal,
       birthdate: new Date(createDto.birthdate),
     } as Partial<AdmissionRequest>);
     return this.admissionRepository.save(request);
@@ -44,8 +84,7 @@ export class AdmissionService {
   ): Promise<{ data: AdmissionRequest[]; total: number; page: number; limit: number }> {
     const query = this.admissionRepository
       .createQueryBuilder('request')
-      .leftJoinAndSelect('request.carrera', 'carrera')
-      .leftJoinAndSelect('request.verificador', 'verificador');
+      .leftJoinAndSelect('request.carrera', 'carrera');
 
     if (estado) {
       query.andWhere('request.estado = :estado', { estado });
@@ -67,7 +106,7 @@ export class AdmissionService {
   async findOne(id: string): Promise<AdmissionRequest> {
     const request = await this.admissionRepository.findOne({
       where: { id },
-      relations: ['carrera', 'verificador'],
+      relations: ['carrera'],
     });
     if (!request) {
       throw new NotFoundException(`Admission request with ID ${id} not found`);
@@ -82,7 +121,6 @@ export class AdmissionService {
       if (updateDto.estado === AdmissionStatus.RECHAZADO && !updateDto.observaciones) {
         throw new BadRequestException('Observaciones requeridas al rechazar');
       }
-      updateDto.verificado_por = updateDto.verificado_por || 1;
     }
 
     Object.assign(request, updateDto);
@@ -111,6 +149,10 @@ export class AdmissionService {
   async convertToStudent(id: string, admissionGestion: string): Promise<{ student: Estudiante; persona: Persona }> {
     const request = await this.findOne(id);
 
+    if (request.estado === AdmissionStatus.CONVERTIDO) {
+      throw new BadRequestException('Esta solicitud ya fue convertida a estudiante');
+    }
+
     if (request.estado !== AdmissionStatus.VERIFICADO) {
       throw new BadRequestException('La solicitud debe estar verificada para convertir a estudiante');
     }
@@ -119,7 +161,50 @@ export class AdmissionService {
       throw new BadRequestException('La solicitud debe tener una carrera asignada');
     }
 
+    const existingStudent = await this.estudianteRepository.findOne({
+      where: { admission_request_id: id }
+    });
+    if (existingStudent) {
+      throw new BadRequestException('Ya existe un estudiante creado para esta solicitud');
+    }
+
+    if (request.email) {
+      const existingEmail = await this.personaRepository
+        .createQueryBuilder('person')
+        .innerJoin('person.estudiantes', 'student')
+        .where('person.email = :email', { email: request.email })
+        .andWhere('student.status = :status', { status: 'activo' })
+        .getOne();
+      if (existingEmail) {
+        throw new BadRequestException('Ya existe un estudiante activo con este correo electrónico');
+      }
+    }
+
+    if (request.phone) {
+      const existingPhone = await this.personaRepository
+        .createQueryBuilder('person')
+        .innerJoin('person.estudiantes', 'student')
+        .where('person.phone = :phone', { phone: request.phone })
+        .andWhere('student.status = :status', { status: 'activo' })
+        .getOne();
+      if (existingPhone) {
+        throw new BadRequestException('Ya existe un estudiante activo con este número de celular');
+      }
+    }
+
     let persona = await this.personaRepository.findOne({ where: { ci: request.ci } });
+
+    const existingStudentInCareer = await this.estudianteRepository
+      .createQueryBuilder('student')
+      .innerJoin('student.persona', 'person')
+      .where('person.ci = :ci', { ci: request.ci })
+      .andWhere('student.career_id = :careerId', { careerId: request.carrera_id })
+      .andWhere('student.status = :status', { status: 'activo' })
+      .getOne();
+
+    if (existingStudentInCareer) {
+      throw new BadRequestException('Esta persona ya está registrada como estudiante activo en esta carrera');
+    }
 
     if (!persona) {
       const finalBirthplace = request.birthplace === 'Otra' && request.birthplace_other ? request.birthplace_other : request.birthplace;
@@ -127,9 +212,9 @@ export class AdmissionService {
 
       persona = this.personaRepository.create({
         ci: request.ci,
-        names: request.names,
-        lastname_paternal: request.lastname_paternal || request.names.split(' ')[0] || request.names,
-        lastname_maternal: request.lastname_maternal || request.names.split(' ').slice(1).join(' ') || '',
+        names: request.nombre,
+        lastname_paternal: request.apellido_paterno || request.nombre.split(' ')[0] || request.nombre,
+        lastname_maternal: request.apellido_materno || request.nombre.split(' ').slice(1).join(' ') || '',
         birthdate: new Date(request.birthdate),
         birthplace: finalBirthplace,
         gender: request.gender as Gender,
@@ -168,7 +253,7 @@ export class AdmissionService {
       estado_matricula: StudentMatriculaStatus.MATRICULADO,
       origen: request.origen === 'web' ? StudentOrigin.WEB : StudentOrigin.SECRETARIA,
       admission_request_id: request.id,
-      verificado_por: request.verificado_por,
+      verificado_por: request.verificado_por || undefined,
       fecha_verificacion: new Date(),
       fecha_pre_registro: request.created_at,
     };
@@ -186,7 +271,7 @@ export class AdmissionService {
 
   private async generateInscriptionCode(request: AdmissionRequest): Promise<string> {
     const carrera = await this.estudianteRepository.manager.findOne(
-      require('../../entities/carrera.entity'),
+      Carrera,
       { where: { id: request.carrera_id } }
     ) as Carrera | null;
 
@@ -198,16 +283,24 @@ export class AdmissionService {
     const yearSuffix = gestion.slice(-2);
 
     const initials = (
-      (request.lastname_paternal?.[0] || '') +
-      (request.lastname_maternal?.[0] || '') +
-      (request.names?.[0] || '')
+      (request.apellido_paterno?.[0] || '') +
+      (request.apellido_materno?.[0] || '') +
+      (request.nombre?.[0] || '')
     ).toUpperCase();
 
     const careerCode = carrera.name.substring(0, 2).toUpperCase();
 
     const ciLast2 = request.ci.slice(-2);
 
-    return `${initials}-${careerCode}${yearSuffix}${ciLast2}`;
+    let code = `${initials}-${careerCode}${yearSuffix}${ciLast2}`;
+
+    let counter = 1;
+    while (await this.estudianteRepository.findOne({ where: { inscription_code: code } })) {
+      code = `${initials}-${careerCode}${yearSuffix}${ciLast2}-${counter}`;
+      counter++;
+    }
+
+    return code;
   }
 
   async remove(id: string): Promise<void> {

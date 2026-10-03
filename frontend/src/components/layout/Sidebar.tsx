@@ -56,7 +56,7 @@ const menuSections: MenuSection[] = [
       },
       {
         title: 'Carreras',
-        href: '/carreras',
+        href: '/panel/carreras',
         icon: <BookOpen className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'rector'],
       },

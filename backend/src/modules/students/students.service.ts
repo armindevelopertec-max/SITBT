@@ -10,6 +10,7 @@ import { Rol } from '../../entities/rol.entity';
 import { Carrera } from '../../entities/carrera.entity';
 import { InstitutionSettings } from '../../entities/institution-settings.entity';
 import { PlanEstudio } from '../../entities/plan-estudio.entity';
+import { Credencial } from '../../entities/credencial.entity';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 
@@ -34,6 +35,8 @@ export class StudentsService {
     private usuarioRolRepository: Repository<UsuarioRol>,
     @InjectRepository(Rol)
     private rolRepository: Repository<Rol>,
+    @InjectRepository(Credencial)
+    private credencialRepository: Repository<Credencial>,
   ) {}
 
   async create(createStudentDto: CreateStudentDto): Promise<CreatedStudentWithUser> {
@@ -47,6 +50,24 @@ export class StudentsService {
     const persona = await this.personaRepository.findOne({ where: { id: createStudentDto.person_id } });
     if (!persona) {
       throw new NotFoundException('Persona no encontrada');
+    }
+
+    if (createStudentDto.bachelor_title_number) {
+      const existingTitle = await this.studentRepository.findOne({
+        where: { bachelor_title_number: createStudentDto.bachelor_title_number },
+      });
+      if (existingTitle) {
+        throw new ConflictException('Ya existe un estudiante con este número de título de bachiller');
+      }
+    }
+
+    if (createStudentDto.folder_number) {
+      const existingFolder = await this.studentRepository.findOne({
+        where: { folder_number: createStudentDto.folder_number },
+      });
+      if (existingFolder) {
+        throw new ConflictException('Ya existe un estudiante con este número de folder');
+      }
     }
 
     let inscriptionCode = createStudentDto.inscription_code;
@@ -153,6 +174,25 @@ export class StudentsService {
 
   async update(id: number, updateStudentDto: UpdateStudentDto): Promise<Estudiante> {
     const student = await this.findOne(id);
+
+    if (updateStudentDto.bachelor_title_number) {
+      const existingTitle = await this.studentRepository.findOne({
+        where: { bachelor_title_number: updateStudentDto.bachelor_title_number },
+      });
+      if (existingTitle && existingTitle.id !== id) {
+        throw new ConflictException('Ya existe otro estudiante con este número de título de bachiller');
+      }
+    }
+
+    if (updateStudentDto.folder_number) {
+      const existingFolder = await this.studentRepository.findOne({
+        where: { folder_number: updateStudentDto.folder_number },
+      });
+      if (existingFolder && existingFolder.id !== id) {
+        throw new ConflictException('Ya existe otro estudiante con este número de folder');
+      }
+    }
+
     Object.assign(student, updateStudentDto);
     return this.studentRepository.save(student);
   }
@@ -160,10 +200,13 @@ export class StudentsService {
   async remove(id: number): Promise<void> {
     const student = await this.findOne(id);
 
+    await this.credencialRepository.delete({ student_id: id });
+
     const usuario = await this.usuarioRepository.findOne({
       where: { person_id: student.person_id },
     });
     if (usuario) {
+      await this.usuarioRolRepository.delete({ user_id: usuario.id });
       await this.usuarioRepository.remove(usuario);
     }
 
@@ -237,7 +280,7 @@ export class StudentsService {
 
   private async generateInscriptionCode(persona: Persona, careerId: number): Promise<string> {
     const carrera = await this.studentRepository.manager.findOne(
-      require('../../entities/carrera.entity'),
+      Carrera,
       { where: { id: careerId } }
     ) as Carrera | null;
 
@@ -258,6 +301,14 @@ export class StudentsService {
 
     const ciLast2 = persona.ci.slice(-2);
 
-    return `${initials}-${careerCode}${yearSuffix}${ciLast2}`;
+    let code = `${initials}-${careerCode}${yearSuffix}${ciLast2}`;
+
+    let counter = 1;
+    while (await this.studentRepository.findOne({ where: { inscription_code: code } })) {
+      code = `${initials}-${careerCode}${yearSuffix}${ciLast2}-${counter}`;
+      counter++;
+    }
+
+    return code;
   }
 }
