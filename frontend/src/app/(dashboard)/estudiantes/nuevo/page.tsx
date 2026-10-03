@@ -301,7 +301,7 @@ export default function NewStudentPage() {
               </div>
               <div>
                 <Input
-                  label="Apellido Materno *"
+                  label="Apellido Materno"
                   value={personData.lastname_maternal}
                   onChange={(e) => setPersonData({ ...personData, lastname_maternal: e.target.value })}
                   error={errors.lastname_maternal}
