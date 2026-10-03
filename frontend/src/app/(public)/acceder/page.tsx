@@ -1,0 +1,135 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useAuthStore } from '@/store/auth-store';
+import { GraduationCap, AlertCircle, Lock, User } from 'lucide-react';
+
+export default function AccederPage() {
+  const [error, setError] = useState<string | null>(null);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { login, isAuthenticated, _hasHydrated } = useAuthStore();
+
+  useEffect(() => {
+    if (_hasHydrated && isAuthenticated) {
+      router.push('/panel');
+    }
+  }, [_hasHydrated, isAuthenticated, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      await login(username, password);
+      router.push('/panel');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Credenciales inválidas');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-dark-900 flex flex-col">
+      <header className="bg-dark-800 border-b border-dark-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <GraduationCap className="w-10 h-10 text-primary-400" />
+            <div className="flex flex-col">
+              <span className="text-lg font-bold text-gray-100 leading-tight">ITBT</span>
+              <span className="text-xs text-primary-400 tracking-wider">TÉCNICO SUPERIOR</span>
+            </div>
+          </Link>
+          <Link href="/" className="text-gray-400 hover:text-primary-400 text-sm">
+            ← Volver al inicio
+          </Link>
+        </div>
+      </header>
+
+      <main className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-500/10 mb-4">
+              <Lock className="w-8 h-8 text-primary-400" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-100">Acceso al Sistema</h1>
+            <p className="text-gray-400 mt-2">Ingrese sus credenciales para continuar</p>
+          </div>
+
+          <div className="bg-dark-700 border border-dark-600 rounded-2xl p-8">
+            {error && (
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Usuario
+                </label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
+                    placeholder="Ingrese su usuario"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Contraseña
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
+                    placeholder="Ingrese su contraseña"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Iniciando sesión...
+                  </span>
+                ) : (
+                  'Ingresar'
+                )}
+              </button>
+            </form>
+          </div>
+
+          <p className="text-center text-xs text-gray-500 mt-6">
+            © {new Date().getFullYear()} ITBT - Todos los derechos reservados
+          </p>
+        </div>
+      </main>
+    </div>
+  );
+}

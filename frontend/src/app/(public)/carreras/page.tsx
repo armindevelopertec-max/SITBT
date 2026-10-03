@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { publicApi } from '@/lib/api';
-import { GraduationCap, Clock, Award, FileText, ArrowRight, CheckCircle, ChevronDown, ChevronUp, TrendingUp, Star, Users, Briefcase } from 'lucide-react';
+import { GraduationCap, ArrowRight, CheckCircle, Award, Clock, FileText } from 'lucide-react';
 import { useInstitution } from '@/contexts/InstitutionContext';
 
 interface Subject {
@@ -38,18 +38,10 @@ const careerImages: Record<number, string> = {
   2: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=800&q=80',
 };
 
-const achievements = [
-  { number: '+500', label: 'Egresados', icon: <Users className="w-6 h-6" /> },
-  { number: '+95%', label: 'Inserción laboral', icon: <TrendingUp className="w-6 h-6" /> },
-  { number: '2', label: 'R.M.', icon: <FileText className="w-6 h-6" /> },
-  { number: '3600', label: 'Horas', icon: <Clock className="w-6 h-6" /> },
-];
-
 export default function CareersPage() {
   const { institution } = useInstitution();
   const [careers, setCareers] = useState<CareerWithPlan[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedCareer, setExpandedCareer] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -215,23 +207,6 @@ export default function CareersPage() {
         </div>
       </section>
 
-      {/* Achievements */}
-      <section className="bg-dark-700 text-gray-100 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-4 gap-8 text-center">
-            {achievements.map((item, index) => (
-              <div key={index}>
-                <div className="w-12 h-12 bg-primary-500/20 text-primary-400 rounded-full flex items-center justify-center mx-auto mb-2">
-                  {item.icon}
-                </div>
-                <div className="text-2xl font-bold">{item.number}</div>
-                <div className="text-gray-400 text-sm">{item.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Careers */}
       <section className="bg-dark-900 text-gray-100 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -263,7 +238,7 @@ export default function CareersPage() {
                       </div>
                       <Link
                         href={`/admision/pre-registro?carrera=${career.id}`}
-                        className="hidden md:flex items-center gap-2 px-6 py-3 bg-primary-500 text-gray-100 font-semibold rounded-lg hover:bg-primary-700 transition-all"
+                        className="hidden md:flex items-center gap-2 px-6 py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all"
                       >
                         Postular <ArrowRight className="w-4 h-4" />
                       </Link>
@@ -290,49 +265,17 @@ export default function CareersPage() {
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => setExpandedCareer(expandedCareer === career.id ? null : career.id)}
-                      className="flex items-center gap-2 text-gray-100 font-semibold hover:text-gray-300 transition-colors"
+                    <Link
+                      href={`/carreras/${career.id}`}
+                      className="inline-flex items-center gap-2 text-primary-400 font-semibold hover:text-primary-300 transition-colors"
                     >
-                      {expandedCareer === career.id ? 'Ocultar' : 'Ver'} Plan de Estudios
-                      {expandedCareer === career.id ? (
-                        <ChevronUp className="w-5 h-5" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5" />
-                      )}
-                    </button>
-
-                    {expandedCareer === career.id && career.studyPlan && (
-                      <div className="mt-6 pt-6 border-t border-zinc-800">
-                        <div className="bg-dark-900 rounded-lg p-4 mb-6">
-                          <p className="text-sm text-gray-400">
-                            <strong>Resolución Ministerial:</strong> {career.studyPlan.rm_number} del {career.studyPlan.rm_date}
-                          </p>
-                        </div>
-
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {Object.entries(career.studyPlan.subjectsBySemester).map(([semester, subjects]) => (
-                            <div key={semester} className="bg-dark-900 rounded-lg p-4">
-                              <h4 className="font-semibold mb-3">Semestre {semester}</h4>
-                              <ul className="space-y-2">
-                                {subjects.map((subject, idx) => (
-                                  <li key={idx} className="text-sm border-b border-zinc-800 pb-2 last:border-0">
-                                    <span className="font-medium text-primary-400">{subject.code}</span>
-                                    <p className="text-gray-300">{subject.name}</p>
-                                    <p className="text-gray-500 text-xs">{subject.weekly_hours}h/sem</p>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                      Ver Plan de Estudios <ArrowRight className="w-4 h-4" />
+                    </Link>
 
                     <div className="mt-6 md:hidden">
                       <Link
                         href={`/admision/pre-registro?carrera=${career.id}`}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary-500 text-gray-100 font-semibold rounded-lg hover:bg-primary-700 transition-all"
+                        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all"
                       >
                         Postular <ArrowRight className="w-4 h-4" />
                       </Link>
@@ -353,10 +296,10 @@ export default function CareersPage() {
             Contáctanos o visítanos para conocer más sobre nuestras carreras.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/contacto" className="px-6 py-3 bg-dark-900 text-black font-semibold rounded-lg hover:bg-gray-100 transition-all">
+            <Link href="/contacto" className="px-6 py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all">
               Contactar
             </Link>
-            <Link href="/admision/pre-registro" className="px-6 py-3 border border-white text-gray-100 font-semibold rounded-lg hover:bg-dark-900/10 transition-all">
+            <Link href="/admision/pre-registro" className="px-6 py-3 border-2 border-primary-500 text-primary-400 font-semibold rounded-lg hover:bg-primary-500/10 transition-all">
               Pre-registro
             </Link>
           </div>

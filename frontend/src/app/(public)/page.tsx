@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { GraduationCap, Users, BookOpen, Award, ArrowRight, CheckCircle, Wrench, Zap, MapPin, Phone, Mail, Clock, ChevronLeft, ChevronRight, Star, Target, Eye, Heart, Globe, Shield, Award as AwardIcon, TrendingUp, Briefcase, Globe2, Laptop, Home, Info, HeartHandshake, GraduationCap as GraduationCapIcon, Lightbulb, MapPin as MapPinIcon, User } from 'lucide-react';
+import { GraduationCap, Users, BookOpen, ArrowRight, Wrench, Zap, MapPin, Phone, Mail, Clock, ChevronLeft, ChevronRight, Target, Eye, Heart, Globe, Shield, Briefcase, Laptop, Home, Info, HeartHandshake, GraduationCap as GraduationCapIcon, Lightbulb, MapPin as MapPinIcon, User } from 'lucide-react';
 import { useInstitution } from '@/contexts/InstitutionContext';
 
 const heroImages = [
@@ -58,13 +58,6 @@ const methodology = [
   { icon: <Briefcase className="w-8 h-8" />, title: 'Prácticas Profesionales', description: 'Conexión con empresas del sector para tu inserción laboral.' },
 ];
 
-const achievements = [
-  { number: '+95%', label: 'Tasa de empleabilidad', icon: <TrendingUp className="w-6 h-6" /> },
-  { number: '+3', label: 'Años de experiencia', icon: <AwardIcon className="w-6 h-6" /> },
-  { number: '+500', label: 'Egresados exitosos', icon: <Star className="w-6 h-6" /> },
-  { number: '2', label: 'R.M. activas', icon: <Globe2 className="w-6 h-6" /> },
-];
-
 const authorities = [
   { name: 'Lic. Juan Pérez', role: 'Director General', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop' },
   { name: 'Ing. María López', role: 'Jefe Académico', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop' },
@@ -92,7 +85,7 @@ export default function HomePage() {
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.5, rootMargin: '-20% 0px -30% 0px' }
     );
 
     const sections = document.querySelectorAll('[data-section]');
@@ -337,23 +330,6 @@ export default function HomePage() {
                 del país.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Achievements */}
-      <section className="bg-dark-800 py-16 border-y border-dark-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-4 gap-8 text-center">
-            {achievements.map((item, index) => (
-              <div key={index}>
-                <div className="w-16 h-16 bg-primary-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  {item.icon}
-                </div>
-                <div className="text-3xl font-bold text-primary-400 mb-1">{item.number}</div>
-                <div className="text-gray-400 text-sm">{item.label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
