@@ -33,6 +33,11 @@ export class CreateAdmissionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  birthplace_other?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   gender?: string;
 
   @ApiPropertyOptional()
@@ -44,6 +49,11 @@ export class CreateAdmissionDto {
   @IsOptional()
   @IsString()
   nationality?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  nationality_other?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

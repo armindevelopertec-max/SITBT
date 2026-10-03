@@ -122,16 +122,19 @@ export class AdmissionService {
     let persona = await this.personaRepository.findOne({ where: { ci: request.ci } });
 
     if (!persona) {
+      const finalBirthplace = request.birthplace === 'Otra' && request.birthplace_other ? request.birthplace_other : request.birthplace;
+      const finalNationality = request.nationality === 'Otra' && request.nationality_other ? request.nationality_other : request.nationality;
+
       persona = this.personaRepository.create({
         ci: request.ci,
         names: request.names,
         lastname_paternal: request.lastname_paternal || request.names.split(' ')[0] || request.names,
         lastname_maternal: request.lastname_maternal || request.names.split(' ').slice(1).join(' ') || '',
         birthdate: new Date(request.birthdate),
-        birthplace: request.birthplace,
+        birthplace: finalBirthplace,
         gender: request.gender as Gender,
         marital_status: request.marital_status as any,
-        nationality: request.nationality,
+        nationality: finalNationality,
         phone: request.phone,
         email: request.email,
         address: request.address,
