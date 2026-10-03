@@ -365,18 +365,31 @@ export default function NewStudentPage() {
                 {errors.gender && <p className="text-xs text-red-500 mt-1">{errors.gender}</p>}
               </div>
               <div>
-                <Select
-                  label="Estado Civil"
-                  value={personData.marital_status}
-                  onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
-                  options={[
-                    { value: 'Soltera(o)', label: 'Soltero(a)' },
-                    { value: 'Casada(o)', label: 'Casado(a)' },
-                    { value: 'Viuda(o)', label: 'Viudo(a)' },
-                    { value: 'Divorciada(o)', label: 'Divorciado(a)' },
-                  ]}
-                  placeholder="Seleccionar..."
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Estado Civil</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="marital_status"
+                      value="Soltera(o)"
+                      checked={personData.marital_status === 'Soltera(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-700">Soltero(a)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="marital_status"
+                      value="Casada(o)"
+                      checked={personData.marital_status === 'Casada(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-700">Casado(a)</span>
+                  </label>
+                </div>
               </div>
               <div>
                 <Select

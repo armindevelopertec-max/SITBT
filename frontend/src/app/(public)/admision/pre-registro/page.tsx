@@ -302,18 +302,30 @@ function PreRegistroForm() {
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Estado civil
                 </label>
-                <select
-                  name="marital_status"
-                  value={form.marital_status || ''}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                >
-                  <option value="">Seleccionar</option>
-                  <option value="Soltera(o)">Soltero(a)</option>
-                  <option value="Casada(o)">Casado(a)</option>
-                  <option value="Viuda(o)">Viudo(a)</option>
-                  <option value="Divorciada(o)">Divorciado(a)</option>
-                </select>
+                <div className="flex gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="marital_status"
+                      value="Soltera(o)"
+                      checked={form.marital_status === 'Soltera(o)'}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-primary-500 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-300">Soltero(a)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="marital_status"
+                      value="Casada(o)"
+                      checked={form.marital_status === 'Casada(o)'}
+                      onChange={handleChange}
+                      className="w-4 h-4 text-primary-500 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-300">Casado(a)</span>
+                  </label>
+                </div>
               </div>
 
               <div>
