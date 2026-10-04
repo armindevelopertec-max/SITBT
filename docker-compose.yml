@@ -100,13 +100,13 @@ services:
       - backend
 
   nginx:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
     container_name: sitbt_nginx
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - sitbt_network
     depends_on:
