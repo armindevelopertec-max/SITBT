@@ -11,7 +11,7 @@ import { Personal } from './personal.entity';
 import { Materia } from './materia.entity';
 import { Grupo } from './grupo.entity';
 
-export enum TeachingAssignmentStatus {
+export enum EstadoAsignacionDocente {
   ACTIVO = 'activo',
   FINALIZADO = 'finalizado',
 }
@@ -45,8 +45,8 @@ export class AsignacionDocente {
   @Column({ type: 'varchar', length: 10 })
   gestion: string;
 
-  @Column({ type: 'enum', enum: TeachingAssignmentStatus, default: TeachingAssignmentStatus.ACTIVO })
-  status: TeachingAssignmentStatus;
+  @Column({ type: 'enum', enum: EstadoAsignacionDocente, default: EstadoAsignacionDocente.ACTIVO })
+  status: EstadoAsignacionDocente;
 
   @CreateDateColumn()
   created_at: Date;

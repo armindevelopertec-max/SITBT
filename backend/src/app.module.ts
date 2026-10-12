@@ -13,11 +13,11 @@ import { ModuloMaterias } from './modules/materias/materias.module';
 import { ModuloTurnos } from './modules/turnos/turnos.module';
 import { ModuloGrupos } from './modules/grupos/grupos.module';
 import { ModuloInscripciones } from './modules/inscripciones/inscripciones.module';
-import { GradesModule } from './modules/grades/grades.module';
-import { TeachingAssignmentsModule } from './modules/teaching-assignments/teaching-assignments.module';
-import { CertificatesModule } from './modules/certificates/certificates.module';
-import { CredentialsModule } from './modules/credentials/credentials.module';
-import { PaymentsModule } from './modules/payments/payments.module';
+import { ModuloCalificaciones } from './modules/calificaciones/calificaciones.module';
+import { ModuloAsignacionesDocentes } from './modules/asignaciones-docentes/asignaciones-docentes.module';
+import { ModuloCertificados } from './modules/certificados/certificados.module';
+import { ModuloCredenciales } from './modules/credenciales/credenciales.module';
+import { ModuloPagos } from './modules/pagos/pagos.module';
 import { ConvalidationsModule } from './modules/convalidations/convalidations.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { StorageModule } from './modules/storage/storage.module';
@@ -63,11 +63,11 @@ import { PreinscripcionModule } from './modules/preinscripcion/preinscripcion.mo
     ModuloTurnos,
     ModuloGrupos,
     ModuloInscripciones,
-    GradesModule,
-    TeachingAssignmentsModule,
-    CertificatesModule,
-    CredentialsModule,
-    PaymentsModule,
+    ModuloCalificaciones,
+    ModuloAsignacionesDocentes,
+    ModuloCertificados,
+    ModuloCredenciales,
+    ModuloPagos,
     ConvalidationsModule,
     AuditModule,
     StorageModule,

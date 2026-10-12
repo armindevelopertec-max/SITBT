@@ -11,13 +11,13 @@ import { Estudiante } from './estudiante.entity';
 import { ConceptoPago } from './concepto-pago.entity';
 import { Usuario } from './usuario.entity';
 
-export enum PaymentMethod {
+export enum MetodoPago {
   EFECTIVO = 'efectivo',
   TRANSFERENCIA = 'transferencia',
   QR = 'qr',
 }
 
-export enum PaymentStatus {
+export enum EstadoPago {
   PAGADO = 'pagado',
   ANULADO = 'anulado',
   PENDIENTE = 'pendiente',
@@ -51,8 +51,8 @@ export class Pago {
   @Column({ type: 'timestamp', name: 'payment_date' })
   payment_date: Date;
 
-  @Column({ type: 'enum', enum: PaymentMethod, name: 'payment_method' })
-  payment_method: PaymentMethod;
+  @Column({ type: 'enum', enum: MetodoPago, name: 'payment_method' })
+  payment_method: MetodoPago;
 
   @Column({ type: 'varchar', length: 30, nullable: true, name: 'receipt_number' })
   receipt_number: string;
@@ -64,8 +64,8 @@ export class Pago {
   @JoinColumn({ name: 'received_by' })
   receptor: Usuario;
 
-  @Column({ type: 'enum', enum: PaymentStatus, default: PaymentStatus.PAGADO })
-  status: PaymentStatus;
+  @Column({ type: 'enum', enum: EstadoPago, default: EstadoPago.PAGADO })
+  status: EstadoPago;
 
   @Column({ type: 'text', nullable: true })
   notes: string;

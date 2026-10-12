@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Estudiante, StudentStatus } from '../../entities/estudiante.entity';
-import { Pago, PaymentStatus } from '../../entities/pago.entity';
+import { Pago, EstadoPago } from '../../entities/pago.entity';
 import { ConceptoPago, PaymentConceptType } from '../../entities/concepto-pago.entity';
 import { Inscripcion, EstadoInscripcion } from '../../entities/inscripcion.entity';
 import { MateriaPlan } from '../../entities/materia-plan.entity';
@@ -77,7 +77,7 @@ export class PreinscripcionService {
       where: {
         student_id: dto.studentId,
         gestion: dto.gestion,
-        status: PaymentStatus.PAGADO,
+        status: EstadoPago.PAGADO,
       },
       relations: ['concepto'],
     });

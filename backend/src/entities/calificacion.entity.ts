@@ -10,20 +10,20 @@ import {
 import { Inscripcion } from './inscripcion.entity';
 import { Personal } from './personal.entity';
 
-export enum GradeStatusRegular {
+export enum EstadoCalificacionRegular {
   APROBADO = 'aprobado',
   REPROBADO = 'reprobado',
   NO_PRESENTO = 'no_presento',
 }
 
-export enum GradeStatus2T {
+export enum EstadoCalificacion2T {
   APROBADO = 'aprobado',
   REPROBADO = 'reprobado',
   NO_PRESENTO = 'no_presento',
   NO_APLICA = 'no_aplica',
 }
 
-export enum GradeStatusDefinitivo {
+export enum EstadoCalificacionDefinitivo {
   APROBADO = 'aprobado',
   REPROBADO = 'reprobado',
   NO_PRESENTO = 'no_presento',
@@ -53,8 +53,8 @@ export class Calificacion {
   @Column({ type: 'varchar', length: 30, nullable: true })
   observation: string;
 
-  @Column({ type: 'enum', enum: GradeStatusRegular, nullable: true })
-  status_regular: GradeStatusRegular;
+  @Column({ type: 'enum', enum: EstadoCalificacionRegular, nullable: true })
+  status_regular: EstadoCalificacionRegular;
 
   @Column({ type: 'boolean', default: false, name: 'second_turn_eligible' })
   second_turn_eligible: boolean;
@@ -65,14 +65,14 @@ export class Calificacion {
   @Column({ type: 'boolean', default: false, name: 'second_turn_applied' })
   second_turn_applied: boolean;
 
-  @Column({ type: 'enum', enum: GradeStatus2T, default: GradeStatus2T.NO_APLICA, name: 'status_2t' })
-  status_2t: GradeStatus2T;
+  @Column({ type: 'enum', enum: EstadoCalificacion2T, default: EstadoCalificacion2T.NO_APLICA, name: 'status_2t' })
+  status_2t: EstadoCalificacion2T;
 
   @Column({ type: 'int', nullable: true, name: 'definitive_grade' })
   definitive_grade: number;
 
-  @Column({ type: 'enum', enum: GradeStatusDefinitivo, nullable: true, name: 'status_definitivo' })
-  status_definitivo: GradeStatusDefinitivo;
+  @Column({ type: 'enum', enum: EstadoCalificacionDefinitivo, nullable: true, name: 'status_definitivo' })
+  status_definitivo: EstadoCalificacionDefinitivo;
 
   @Column({ nullable: true })
   registered_by: number;

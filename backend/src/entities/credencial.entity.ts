@@ -11,19 +11,19 @@ import { Estudiante } from './estudiante.entity';
 import { Usuario } from './usuario.entity';
 import { Gestion } from './gestion.entity';
 
-export enum CredentialStatus {
+export enum EstadoCredencial {
   EMITIDA = 'emitida',
   ANULADA = 'anulada',
   REEMPLAZADA = 'reemplazada',
 }
 
-export enum CredentialEmissionType {
+export enum TipoEmisionCredencial {
   PRIMERA = 'primera',
   RENOVACION = 'renovacion',
   REIMPRESION = 'reimpresion',
 }
 
-export enum CredentialDeliveryStatus {
+export enum EstadoEntregaCredencial {
   GENERADO = 'generado',
   IMPRESO = 'impreso',
   ENTREGADO = 'entregado',
@@ -63,8 +63,8 @@ export class Credencial {
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'photo_url' })
   photo_url: string;
 
-  @Column({ type: 'enum', enum: CredentialStatus, default: CredentialStatus.EMITIDA })
-  status: CredentialStatus;
+  @Column({ type: 'enum', enum: EstadoCredencial, default: EstadoCredencial.EMITIDA })
+  status: EstadoCredencial;
 
   @Column()
   issued_by: number;
@@ -76,8 +76,8 @@ export class Credencial {
   @Column({ type: 'boolean', default: false })
   printed: boolean;
 
-  @Column({ type: 'enum', enum: CredentialEmissionType, default: CredentialEmissionType.PRIMERA })
-  tipo_emision: CredentialEmissionType;
+  @Column({ type: 'enum', enum: TipoEmisionCredencial, default: TipoEmisionCredencial.PRIMERA })
+  tipo_emision: TipoEmisionCredencial;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
   vigencia_hasta: string;
@@ -85,8 +85,8 @@ export class Credencial {
   @Column({ type: 'varchar', length: 255, nullable: true })
   qr_verificacion: string;
 
-  @Column({ type: 'enum', enum: CredentialDeliveryStatus, default: CredentialDeliveryStatus.GENERADO })
-  estado_entrega: CredentialDeliveryStatus;
+  @Column({ type: 'enum', enum: EstadoEntregaCredencial, default: EstadoEntregaCredencial.GENERADO })
+  estado_entrega: EstadoEntregaCredencial;
 
   @Column({ nullable: true })
   entregado_a: number;
