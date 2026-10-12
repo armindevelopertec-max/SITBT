@@ -12,11 +12,11 @@ export class Prerrequisito {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'materia_id' })
   subject_id: number;
 
   @ManyToOne(() => Materia)
-  @JoinColumn({ name: 'subject_id' })
+  @JoinColumn({ name: 'materia_id' })
   materia: Materia;
 
   @Column({ name: 'prerequisite_subject_id' })

@@ -16,32 +16,32 @@ export enum PaymentConceptStatus {
   INACTIVO = 'inactivo',
 }
 
-@Entity('payment_concepts')
+@Entity('conceptos_pago')
 export class ConceptoPago {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 20, unique: true })
+  @Column({ type: 'varchar', length: 20, unique: true, name: 'codigo' })
   code: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100 , name: 'nombre' })
   name: string;
 
-  @Column({ type: 'enum', enum: PaymentConceptType })
+  @Column({ type: 'enum', enum: PaymentConceptType , name: 'tipo' })
   type: PaymentConceptType;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'default_amount' })
+  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'monto_predeterminado' })
   default_amount: number;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true , name: 'descripcion' })
   description: string;
 
-  @Column({ type: 'enum', enum: PaymentConceptStatus, default: PaymentConceptStatus.ACTIVO })
+  @Column({ type: 'enum', enum: PaymentConceptStatus, default: PaymentConceptStatus.ACTIVO, name: 'estado' })
   status: PaymentConceptStatus;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

@@ -458,8 +458,8 @@ export class PreinscripcionService {
     const numDocumento = `BOL-INS-${dto.gestion}-${periodoNumero}-${student.inscription_code}-${Date.now()}`;
 
     const boleta = this.documentRepository.create({
-      estudiante_id: dto.studentId,
-      tipo: TipoDocumento.BOLETA_INSCRIPCION,
+      student_id: dto.studentId,
+      type: TipoDocumento.BOLETA_INSCRIPCION,
       numeroDocumento: numDocumento,
       gestion: dto.gestion,
       gestion_id: gestion.id,
@@ -507,9 +507,9 @@ export class PreinscripcionService {
 
     const boleta = await this.documentRepository.findOne({
       where: {
-        estudiante_id: estudianteId,
+        student_id: estudianteId,
         gestion: gestion,
-        tipo: TipoDocumento.BOLETA_INSCRIPCION,
+        type: TipoDocumento.BOLETA_INSCRIPCION,
       },
       order: { fechaEmision: 'DESC' },
     });
@@ -531,7 +531,7 @@ export class PreinscripcionService {
       boleta: boleta ? {
         numero: boleta.numeroDocumento,
         fechaEmision: boleta.fechaEmision,
-        estado: boleta.estado,
+        estado: boleta.status,
       } : null,
       materias: enrollments.map(e => ({
         id: e.id,

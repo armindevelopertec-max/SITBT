@@ -13,7 +13,7 @@ import { Estudiante, StudentMatriculaStatus, StudentOrigin } from '../../entitie
 import { Inscripcion } from '../../entities/inscripcion.entity';
 import { PlanEstudio } from '../../entities/plan-estudio.entity';
 import { Carrera } from '../../entities/carrera.entity';
-import { ConfiguracionInstitucional } from '../../entities/institution-settings.entity';
+import { ConfiguracionInstitucional } from '../../entities/configuracion-institucional.entity';
 
 @Injectable()
 export class ServicioAdmision {
@@ -87,7 +87,7 @@ export class ServicioAdmision {
       .leftJoinAndSelect('request.carrera', 'carrera');
 
     if (estado) {
-      query.andWhere('request.estado = :estado', { estado });
+      query.andWhere('request.status = :estado', { estado });
     }
 
     if (origen) {
@@ -117,7 +117,7 @@ export class ServicioAdmision {
   async update(id: string, updateDto: ActualizarAdmisionDto): Promise<SolicitudAdmision> {
     const request = await this.findOne(id);
 
-    if (updateDto.estado && updateDto.estado !== request.estado) {
+    if (updateDto.estado && updateDto.estado !== request.status) {
       if (updateDto.estado === EstadoAdmision.RECHAZADO && !updateDto.observaciones) {
         throw new BadRequestException('Observaciones requeridas al rechazar');
       }
@@ -149,15 +149,15 @@ export class ServicioAdmision {
   async convertToStudent(id: string, admissionGestion: string): Promise<{ student: Estudiante; persona: Persona }> {
     const request = await this.findOne(id);
 
-    if (request.estado === EstadoAdmision.CONVERTIDO) {
+    if (request.status === EstadoAdmision.CONVERTIDO) {
       throw new BadRequestException('Esta solicitud ya fue convertida a estudiante');
     }
 
-    if (request.estado !== EstadoAdmision.VERIFICADO) {
+    if (request.status !== EstadoAdmision.VERIFICADO) {
       throw new BadRequestException('La solicitud debe estar verificada para convertir a estudiante');
     }
 
-    if (!request.carrera_id) {
+    if (!request.career_id) {
       throw new BadRequestException('La solicitud debe tener una carrera asignada');
     }
 
@@ -198,7 +198,7 @@ export class ServicioAdmision {
       .createQueryBuilder('student')
       .innerJoin('student.persona', 'person')
       .where('person.ci = :ci', { ci: request.ci })
-      .andWhere('student.career_id = :careerId', { careerId: request.carrera_id })
+      .andWhere('student.career_id = :careerId', { careerId: request.career_id })
       .andWhere('student.status = :status', { status: 'activo' })
       .getOne();
 
@@ -212,9 +212,9 @@ export class ServicioAdmision {
 
       persona = this.personaRepository.create({
         ci: request.ci,
-        names: request.nombre,
-        lastname_paternal: request.apellido_paterno || request.nombre.split(' ')[0] || request.nombre,
-        lastname_maternal: request.apellido_materno || request.nombre.split(' ').slice(1).join(' ') || '',
+        names: request.name,
+        lastname_paternal: request.lastname_paternal || request.name.split(' ')[0] || request.name,
+        lastname_maternal: request.lastname_maternal || request.name.split(' ').slice(1).join(' ') || '',
         birthdate: new Date(request.birthdate),
         birthplace: finalBirthplace,
         gender: request.gender as Gender,
@@ -229,7 +229,7 @@ export class ServicioAdmision {
 
     const studyPlan = await this.estudianteRepository.manager.findOne(
       PlanEstudio,
-      { where: { career_id: request.carrera_id, status: 'vigente' as any } }
+      { where: { career_id: request.career_id, status: 'vigente' as any } }
     );
 
     if (!studyPlan) {
@@ -246,7 +246,7 @@ export class ServicioAdmision {
       folder_number: undefined,
       inscription_code: inscriptionCode,
       form01_code: undefined,
-      career_id: request.carrera_id,
+      career_id: request.career_id,
       study_plan_id: studyPlan.id,
       admission_date: new Date(),
       status: 'activo' as any,
@@ -262,7 +262,7 @@ export class ServicioAdmision {
 
     const savedStudent = (await this.estudianteRepository.save(estudiante)) as Estudiante;
 
-    request.estado = EstadoAdmision.CONVERTIDO;
+    request.status = EstadoAdmision.CONVERTIDO;
     request.converted_student_id = savedStudent.id;
     await this.admissionRepository.save(request);
 
@@ -272,7 +272,7 @@ export class ServicioAdmision {
   private async generateInscriptionCode(request: SolicitudAdmision): Promise<string> {
     const carrera = await this.estudianteRepository.manager.findOne(
       Carrera,
-      { where: { id: request.carrera_id } }
+      { where: { id: request.career_id } }
     ) as Carrera | null;
 
     if (!carrera) {
@@ -283,9 +283,9 @@ export class ServicioAdmision {
     const yearSuffix = gestion.slice(-2);
 
     const initials = (
-      (request.apellido_paterno?.[0] || '') +
-      (request.apellido_materno?.[0] || '') +
-      (request.nombre?.[0] || '')
+      (request.lastname_paternal?.[0] || '') +
+      (request.lastname_maternal?.[0] || '') +
+      (request.name?.[0] || '')
     ).toUpperCase();
 
     const careerCode = carrera.name.substring(0, 2).toUpperCase();
@@ -316,10 +316,10 @@ export class ServicioAdmision {
     convertidos: number;
   }> {
     const total = await this.admissionRepository.count();
-    const pendientes = await this.admissionRepository.count({ where: { estado: EstadoAdmision.PENDIENTE } });
-    const verificados = await this.admissionRepository.count({ where: { estado: EstadoAdmision.VERIFICADO } });
-    const rechazados = await this.admissionRepository.count({ where: { estado: EstadoAdmision.RECHAZADO } });
-    const convertidos = await this.admissionRepository.count({ where: { estado: EstadoAdmision.CONVERTIDO } });
+    const pendientes = await this.admissionRepository.count({ where: { status: EstadoAdmision.PENDIENTE } });
+    const verificados = await this.admissionRepository.count({ where: { status: EstadoAdmision.VERIFICADO } });
+    const rechazados = await this.admissionRepository.count({ where: { status: EstadoAdmision.RECHAZADO } });
+    const convertidos = await this.admissionRepository.count({ where: { status: EstadoAdmision.CONVERTIDO } });
 
     return { total, pendientes, verificados, rechazados, convertidos };
   }

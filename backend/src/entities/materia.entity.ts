@@ -6,20 +6,20 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('subjects')
+@Entity('materias')
 export class Materia {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 20, name: 'codigo' })
   code: string;
 
-  @Column({ type: 'varchar', length: 150 })
+  @Column({ type: 'varchar', length: 150, name: 'nombre' })
   name: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

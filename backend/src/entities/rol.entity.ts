@@ -16,21 +16,21 @@ export class Rol {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 30, unique: true })
+  @Column({ type: 'varchar', length: 30, unique: true, name: 'codigo' })
   code: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50 , name: 'nombre' })
   name: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true , name: 'descripcion' })
   description: string;
 
-  @Column({ type: 'enum', enum: EstadoRol, default: EstadoRol.ACTIVO })
+  @Column({ type: 'enum', enum: EstadoRol, default: EstadoRol.ACTIVO, name: 'estado' })
   status: EstadoRol;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

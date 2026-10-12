@@ -23,56 +23,56 @@ export enum EstadoPago {
   PENDIENTE = 'pendiente',
 }
 
-@Entity('payments')
+@Entity('pagos')
 export class Pago {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'estudiante_id' })
   student_id: number;
 
   @ManyToOne(() => Estudiante)
-  @JoinColumn({ name: 'student_id' })
+  @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
-  @Column()
+  @Column({ name: 'concepto_id' })
   concept_id: number;
 
   @ManyToOne(() => ConceptoPago)
-  @JoinColumn({ name: 'concept_id' })
+  @JoinColumn({ name: 'concepto_id' })
   concepto: ConceptoPago;
 
   @Column({ type: 'varchar', length: 10 })
   gestion: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'monto' })
   amount: number;
 
-  @Column({ type: 'timestamp', name: 'payment_date' })
+  @Column({ type: 'timestamp', name: 'fecha_pago' })
   payment_date: Date;
 
-  @Column({ type: 'enum', enum: MetodoPago, name: 'payment_method' })
+  @Column({ type: 'enum', enum: MetodoPago, name: 'metodo_pago' })
   payment_method: MetodoPago;
 
-  @Column({ type: 'varchar', length: 30, nullable: true, name: 'receipt_number' })
+  @Column({ type: 'varchar', length: 30, nullable: true, name: 'numero_recibo' })
   receipt_number: string;
 
-  @Column()
+  @Column({ name: 'recibido_por' })
   received_by: number;
 
   @ManyToOne(() => Usuario)
-  @JoinColumn({ name: 'received_by' })
+  @JoinColumn({ name: 'recibido_por' })
   receptor: Usuario;
 
-  @Column({ type: 'enum', enum: EstadoPago, default: EstadoPago.PAGADO })
+  @Column({ type: 'enum', enum: EstadoPago, default: EstadoPago.PAGADO , name: 'estado' })
   status: EstadoPago;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'notas' })
   notes: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

@@ -36,7 +36,7 @@ export enum PersonStatus {
   INACTIVO = 'inactivo',
 }
 
-@Entity('persons')
+@Entity('personas')
 export class Persona {
   @PrimaryGeneratedColumn()
   id: number;
@@ -44,75 +44,75 @@ export class Persona {
   @Column({ type: 'varchar', length: 20, unique: true })
   ci: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100, name: 'nombres' })
   names: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, name: 'apellido_paterno' })
   lastname_paternal: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, name: 'apellido_materno' })
   lastname_maternal: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', name: 'fecha_nacimiento' })
   birthdate: Date;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'lugar_nacimiento' })
   birthplace: string;
 
-  @Column({ name: 'birthplace_other', type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'lugar_nacimiento_otro' })
   birthplace_other: string;
 
-  @Column({ type: 'enum', enum: Gender })
+  @Column({ type: 'enum', enum: Gender, name: 'genero' })
   gender: Gender;
 
-  @Column({ type: 'enum', enum: MaritalStatus, nullable: true })
+  @Column({ type: 'enum', enum: MaritalStatus, nullable: true, name: 'estado_civil' })
   marital_status: MaritalStatus;
 
-  @Column({ type: 'varchar', length: 50, default: 'Boliviana' })
+  @Column({ type: 'varchar', length: 50, default: 'Boliviana', name: 'nacionalidad' })
   nationality: string;
 
-  @Column({ name: 'nationality_other', type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'nacionalidad_otra' })
   nationality_other: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true, name: 'doble_nacionalidad' })
   dual_nationality: string;
 
-  @Column({ type: 'varchar', length: 30, nullable: true })
+  @Column({ type: 'varchar', length: 30, nullable: true, name: 'numero_pasaporte' })
   passport_number: string;
 
-  @Column({ type: 'enum', enum: BloodType, nullable: true })
+  @Column({ type: 'enum', enum: BloodType, nullable: true, name: 'tipo_sangre' })
   blood_type: BloodType;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'discapacidad' })
   disability: string;
 
-  @Column({ type: 'varchar', length: 30, nullable: true })
+  @Column({ type: 'varchar', length: 30, nullable: true, name: 'numero_libreta_militar' })
   military_book_number: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true, name: 'lengua_materna' })
   mother_tongue: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
+  @Column({ type: 'varchar', length: 20, nullable: true, name: 'telefono' })
   phone: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'correo' })
   email: string;
 
-  @Column({ type: 'varchar', length: 200, nullable: true })
+  @Column({ type: 'varchar', length: 200, nullable: true, name: 'direccion' })
   address: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true, name: 'foto_url' })
   photo_url: string;
 
-  @Column({ type: 'enum', enum: PersonStatus, default: PersonStatus.ACTIVO })
+  @Column({ type: 'enum', enum: PersonStatus, default: PersonStatus.ACTIVO, name: 'estado' })
   status: PersonStatus;
 
   @OneToMany(() => Estudiante, (estudiante) => estudiante.persona)
   estudiantes: Estudiante[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

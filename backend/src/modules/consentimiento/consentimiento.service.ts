@@ -56,14 +56,14 @@ export class ServicioConsentimiento {
 
   async findByStudent(estudianteId: number): Promise<ConsentRecord[]> {
     return this.consentimientoRepository.find({
-      where: { estudiante_id: estudianteId },
+      where: { student_id: estudianteId },
       order: { fechaConsentimiento: 'DESC' },
     });
   }
 
   async getLatestConsent(estudianteId: number): Promise<ConsentRecord | null> {
     return this.consentimientoRepository.findOne({
-      where: { estudiante_id: estudianteId },
+      where: { student_id: estudianteId },
       order: { fechaConsentimiento: 'DESC' },
     });
   }
@@ -79,7 +79,7 @@ export class ServicioConsentimiento {
     consent.derechoEjercido = derecho;
     consent.derechoFecha = new Date();
     if (registradoPor) {
-      consent.registrado_por = registradoPor;
+      consent.registered_by = registradoPor;
     }
     return this.consentimientoRepository.save(consent);
   }
@@ -87,7 +87,7 @@ export class ServicioConsentimiento {
   async hasValidConsent(estudianteId: number, versionPolitica: string): Promise<boolean> {
     const consent = await this.consentimientoRepository.findOne({
       where: {
-        estudiante_id: estudianteId,
+        student_id: estudianteId,
         versionPolitica,
       },
     });

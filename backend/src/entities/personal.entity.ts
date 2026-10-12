@@ -24,16 +24,16 @@ export enum EstadoPersonal {
   LICENCIA = 'licencia',
 }
 
-@Entity('staff')
+@Entity('personal')
 export class Personal {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'person_id' })
+  @Column({ name: 'persona_id' })
   person_id: number;
 
   @ManyToOne(() => Persona)
-  @JoinColumn({ name: 'person_id' })
+  @JoinColumn({ name: 'persona_id' })
   persona: Persona;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'profesion' })
@@ -46,11 +46,11 @@ export class Personal {
   hire_date: Date;
 
   @Column({ type: 'varchar', length: 20, name: 'estado' })
-  status: EstadoPersonal;
+  status: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

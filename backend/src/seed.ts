@@ -5,7 +5,7 @@ import { Persona } from './entities/persona.entity';
 import { Usuario } from './entities/usuario.entity';
 import { Rol } from './entities/rol.entity';
 import { UsuarioRol } from './entities/usuario-rol.entity';
-import { ConfiguracionInstitucional } from './entities/institution-settings.entity';
+import { ConfiguracionInstitucional } from './entities/configuracion-institucional.entity';
 import { Estudiante } from './entities/estudiante.entity';
 import { Carrera } from './entities/carrera.entity';
 import { PlanEstudio } from './entities/plan-estudio.entity';
@@ -33,42 +33,42 @@ async function seed() {
 
   try {
     const roles = [
-      { code: 'administrador', name: 'Administrador', description: 'Acceso total al sistema' },
-      { code: 'secretaria', name: 'Secretaría', description: 'Gestión de personas y estudiantes' },
-      { code: 'director_academico', name: 'Director Académico', description: 'Gestión académica' },
-      { code: 'rector', name: 'Rector', description: 'Reportes globales' },
-      { code: 'docente', name: 'Docente', description: 'Calificaciones' },
-      { code: 'estudiante', name: 'Estudiante', description: 'Acceso a notas y kardex' },
-      { code: 'apoyo', name: 'Apoyo', description: 'Acceso limitado' },
+      { codigo: 'administrador', nombre: 'Administrador', descripcion: 'Acceso total al sistema' },
+      { codigo: 'secretaria', nombre: 'Secretaría', descripcion: 'Gestión de personas y estudiantes' },
+      { codigo: 'director_academico', nombre: 'Director Académico', descripcion: 'Gestión académica' },
+      { codigo: 'rector', nombre: 'Rector', descripcion: 'Reportes globales' },
+      { codigo: 'docente', nombre: 'Docente', descripcion: 'Calificaciones' },
+      { codigo: 'estudiante', nombre: 'Estudiante', descripcion: 'Acceso a notas y kardex' },
+      { codigo: 'apoyo', nombre: 'Apoyo', descripcion: 'Acceso limitado' },
     ];
 
     console.log('\n[1/4] Creando roles...');
     for (const role of roles) {
       const result: any[] = await queryRunner.query(
-        `SELECT id FROM roles WHERE code = $1`,
-        [role.code]
+        `SELECT id FROM roles WHERE codigo = $1`,
+        [role.codigo]
       );
       if (result.length === 0) {
         await queryRunner.query(
-          `INSERT INTO roles (code, name, description, status) VALUES ($1, $2, $3, 'activo')`,
-          [role.code, role.name, role.description]
+          `INSERT INTO roles (codigo, nombre, descripcion, estado) VALUES ($1, $2, $3, 'activo')`,
+          [role.codigo, role.nombre, role.descripcion]
         );
-        console.log(`  ✓ Rol creado: ${role.name}`);
+        console.log(`  ✓ Rol creado: ${role.nombre}`);
       } else {
-        console.log(`  - Rol ya existe: ${role.name}`);
+        console.log(`  - Rol ya existe: ${role.nombre}`);
       }
     }
 
-    console.log('\n[2/4] Creando persona administrador...');
+    console.log('\n[2/4] Creando persona administradora...');
     const personResult: any[] = await queryRunner.query(
-      `SELECT id FROM persons WHERE ci = $1`,
+      `SELECT id FROM personas WHERE ci = $1`,
       ['0000001']
     );
 
     let personId: number;
     if (personResult.length === 0) {
       const insertResult: any[] = await queryRunner.query(
-        `INSERT INTO persons (ci, names, lastname_paternal, lastname_maternal, birthdate, gender, marital_status, nationality, email, status)
+        `INSERT INTO personas (ci, nombres, apellido_paterno, apellido_materno, fecha_nacimiento, genero, estado_civil, nacionalidad, correo, estado)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'activo')
          RETURNING id`,
         ['0000001', 'Administrador', 'Sistema', 'SITBT', '1990-01-01', 'M', 'Soltera(o)', 'Boliviana', 'admin@sitbt.edu.bo']
@@ -82,7 +82,7 @@ async function seed() {
 
     console.log('\n[3/4] Creando usuario admin...');
     const userResult: any[] = await queryRunner.query(
-      `SELECT id FROM users WHERE username = $1`,
+      `SELECT id FROM usuarios WHERE nombre_usuario = $1`,
       ['admin']
     );
 
@@ -90,7 +90,7 @@ async function seed() {
     if (userResult.length === 0) {
       const passwordHash = await bcrypt.hash('admin123', 10);
       const insertResult: any[] = await queryRunner.query(
-        `INSERT INTO users (person_id, username, password_hash, status)
+        `INSERT INTO usuarios (persona_id, nombre_usuario, contrasena_hash, estado)
          VALUES ($1, $2, $3, 'activo')
          RETURNING id`,
         [personId, 'admin', passwordHash]
@@ -104,17 +104,17 @@ async function seed() {
 
     console.log('\n[4/4] Asignando rol administrador...');
     const adminRole: any[] = await queryRunner.query(
-      `SELECT id FROM roles WHERE code = 'administrador'`
+      `SELECT id FROM roles WHERE codigo = 'administrador'`
     );
 
     const userRoleResult: any[] = await queryRunner.query(
-      `SELECT id FROM user_roles WHERE user_id = $1 AND role_id = $2`,
+      `SELECT id FROM usuario_roles WHERE usuario_id = $1 AND rol_id = $2`,
       [userId, adminRole[0].id]
     );
 
     if (userRoleResult.length === 0) {
       await queryRunner.query(
-        `INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2)`,
+        `INSERT INTO usuario_roles (usuario_id, rol_id) VALUES ($1, $2)`,
         [userId, adminRole[0].id]
       );
       console.log('  ✓ Rol administrador asignado');
@@ -124,12 +124,12 @@ async function seed() {
 
     console.log('\n[5/5] Creando configuración institucional...');
     const settingsResult: any[] = await queryRunner.query(
-      `SELECT id FROM institution_settings LIMIT 1`
+      `SELECT id FROM configuracion_institucional LIMIT 1`
     );
 
     if (settingsResult.length === 0) {
       await queryRunner.query(
-        `INSERT INTO institution_settings (nombre, nombre_corto, lema, direccion, telefono, departamento, email, ciudad, pais, descripcion)
+        `INSERT INTO configuracion_institucional (nombre, nombre_corto, lema, direccion, telefono, departamento, correo, ciudad, pais, descripcion)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
         [
           'Instituto Tecnológico Boliviana de Tecnología',

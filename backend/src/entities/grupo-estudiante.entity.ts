@@ -9,25 +9,25 @@ import {
 import { Grupo } from './grupo.entity';
 import { Estudiante } from './estudiante.entity';
 
-@Entity('group_students')
+@Entity('grupos_estudiantes')
 export class GrupoEstudiante {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'grupo_id' })
   group_id: number;
 
   @ManyToOne(() => Grupo)
-  @JoinColumn({ name: 'group_id' })
+  @JoinColumn({ name: 'grupo_id' })
   grupo: Grupo;
 
-  @Column()
+  @Column({ })
   student_id: number;
 
   @ManyToOne(() => Estudiante)
-  @JoinColumn({ name: 'student_id' })
+  @JoinColumn({ })
   estudiante: Estudiante;
 
-  @CreateDateColumn({ name: 'enrolled_at' })
+  @CreateDateColumn({ name: 'inscrito_en' })
   enrolled_at: Date;
 }

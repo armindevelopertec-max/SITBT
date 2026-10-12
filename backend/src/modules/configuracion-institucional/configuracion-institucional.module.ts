@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfiguracionInstitucional } from '../../entities/institution-settings.entity';
+import { ConfiguracionInstitucional } from '../../entities/configuracion-institucional.entity';
 import { ServicioConfiguracionInstitucional } from './configuracion-institucional.service';
 import { ControladorConfiguracionInstitucional } from './configuracion-institucional.controller';
 

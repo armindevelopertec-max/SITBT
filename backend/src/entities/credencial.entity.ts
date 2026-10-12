@@ -29,16 +29,16 @@ export enum EstadoEntregaCredencial {
   ENTREGADO = 'entregado',
 }
 
-@Entity('credentials')
+@Entity('credenciales')
 export class Credencial {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'estudiante_id' })
   student_id: number;
 
   @ManyToOne(() => Estudiante)
-  @JoinColumn({ name: 'student_id' })
+  @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
   @Column({ type: 'varchar', length: 10 })
@@ -51,29 +51,29 @@ export class Credencial {
   @JoinColumn({ name: 'gestion_id' })
   gestionEntity: Gestion;
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer', name: 'semestre' })
   semester: number;
 
-  @Column({ type: 'date', name: 'issued_date' })
+  @Column({ type: 'date', name: 'fecha_emision' })
   issued_date: Date;
 
-  @Column({ type: 'date', name: 'valid_until' })
+  @Column({ type: 'date', name: 'valido_hasta' })
   valid_until: Date;
 
-  @Column({ type: 'varchar', length: 255, nullable: true, name: 'photo_url' })
+  @Column({ type: 'varchar', length: 255, nullable: true, name: 'foto_url' })
   photo_url: string;
 
-  @Column({ type: 'enum', enum: EstadoCredencial, default: EstadoCredencial.EMITIDA })
+  @Column({ type: 'enum', enum: EstadoCredencial, default: EstadoCredencial.EMITIDA , name: 'estado' })
   status: EstadoCredencial;
 
-  @Column()
+  @Column({ name: 'emitido_por' })
   issued_by: number;
 
   @ManyToOne(() => Usuario)
-  @JoinColumn({ name: 'issued_by' })
+  @JoinColumn({ name: 'emitido_por' })
   emisor: Usuario;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, name: 'impreso' })
   printed: boolean;
 
   @Column({ type: 'enum', enum: TipoEmisionCredencial, default: TipoEmisionCredencial.PRIMERA })
@@ -89,17 +89,17 @@ export class Credencial {
   estado_entrega: EstadoEntregaCredencial;
 
   @Column({ nullable: true })
-  entregado_a: number;
+  entregadoA: number;
 
   @Column({ type: 'timestamp', nullable: true })
-  fecha_entrega: Date;
+  fechaEntrega: Date;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'notas' })
   notes: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

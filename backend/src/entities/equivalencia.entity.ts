@@ -13,31 +13,31 @@ export enum EquivalenceType {
   MANUAL = 'manual',
 }
 
-@Entity('equivalences')
+@Entity('equivalencias')
 export class Equivalencia {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'source_subject_id' })
+  @Column({ name: 'materia_origen_id' })
   source_subject_id: number;
 
   @ManyToOne(() => Materia)
-  @JoinColumn({ name: 'source_subject_id' })
+  @JoinColumn({ name: 'materia_origen_id' })
   materia_origen: Materia;
 
-  @Column({ name: 'target_subject_id' })
+  @Column({ name: 'materia_destino_id' })
   target_subject_id: number;
 
   @ManyToOne(() => Materia)
-  @JoinColumn({ name: 'target_subject_id' })
+  @JoinColumn({ name: 'materia_destino_id' })
   materia_destino: Materia;
 
-  @Column({ type: 'enum', enum: EquivalenceType })
+  @Column({ type: 'enum', enum: EquivalenceType , name: 'tipo' })
   type: EquivalenceType;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'notas' })
   notes: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 }

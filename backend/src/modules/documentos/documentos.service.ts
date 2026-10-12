@@ -44,7 +44,7 @@ export class ServicioDocumentos {
     }
 
     if (estado) {
-      query.andWhere('document.estado = :estado', { estado });
+      query.andWhere('document.status = :estado', { estado });
     }
 
     const [data, total] = await query
@@ -99,7 +99,7 @@ export class ServicioDocumentos {
 
   async markAsDelivered(id: string, entregadoA: string): Promise<EmittedDocument> {
     const document = await this.findOne(id);
-    document.estado = EstadoDocumento.ENTREGADO;
+    document.status = EstadoDocumento.ENTREGADO;
     document.entregadoA = entregadoA;
     document.fechaEntrega = new Date();
     return this.documentoRepository.save(document);
@@ -163,8 +163,8 @@ export class ServicioDocumentos {
     const byStatusMap = new Map<EstadoDocumento, number>();
 
     documents.forEach((doc) => {
-      byTypeMap.set(doc.tipo, (byTypeMap.get(doc.tipo) || 0) + 1);
-      byStatusMap.set(doc.estado, (byStatusMap.get(doc.estado) || 0) + 1);
+      byTypeMap.set(doc.type, (byTypeMap.get(doc.type) || 0) + 1);
+      byStatusMap.set(doc.status, (byStatusMap.get(doc.status) || 0) + 1);
     });
 
     return {

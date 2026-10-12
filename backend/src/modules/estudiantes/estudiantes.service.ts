@@ -8,7 +8,7 @@ import { Usuario } from '../../entities/usuario.entity';
 import { UsuarioRol } from '../../entities/usuario-rol.entity';
 import { Rol } from '../../entities/rol.entity';
 import { Carrera } from '../../entities/carrera.entity';
-import { ConfiguracionInstitucional } from '../../entities/institution-settings.entity';
+import { ConfiguracionInstitucional } from '../../entities/configuracion-institucional.entity';
 import { PlanEstudio } from '../../entities/plan-estudio.entity';
 import { Credencial } from '../../entities/credencial.entity';
 import { CrearEstudianteDto } from './dto/crear-estudiante.dto';

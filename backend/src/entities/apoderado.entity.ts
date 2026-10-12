@@ -14,11 +14,11 @@ export class Apoderado {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'estudiante_id' })
   student_id: number;
 
   @ManyToOne(() => Estudiante)
-  @JoinColumn({ name: 'student_id' })
+  @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'father_names' })
@@ -60,12 +60,12 @@ export class Apoderado {
   @Column({ type: 'varchar', length: 20, nullable: true, name: 'mother_phone' })
   mother_phone: string;
 
-  @Column({ type: 'varchar', length: 200, nullable: true, name: 'mother_address' })
+  @Column({ type: 'varchar', length: 200, nullable: true })
   mother_address: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

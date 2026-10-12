@@ -13,11 +13,11 @@ export class EstadoPagoEstudiante {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'estudiante_id' })
   student_id: number;
 
   @ManyToOne(() => Estudiante)
-  @JoinColumn({ name: 'student_id' })
+  @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
   @Column({ type: 'varchar', length: 10 })
@@ -29,9 +29,9 @@ export class EstadoPagoEstudiante {
   @Column({ type: 'boolean', default: false, name: 'credential_paid' })
   credential_paid: boolean;
 
-  @Column({ type: 'boolean', default: false, name: 'inscription_enabled' })
+  @Column({ type: 'boolean', default: false })
   inscription_enabled: boolean;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

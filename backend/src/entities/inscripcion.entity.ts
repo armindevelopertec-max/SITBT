@@ -19,54 +19,54 @@ export enum EstadoInscripcion {
   CONVALIDADA = 'convalidada',
 }
 
-@Entity('enrollments')
+@Entity('inscripciones')
 export class Inscripcion {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'estudiante_id' })
   student_id: number;
 
   @ManyToOne(() => Estudiante)
-  @JoinColumn({ name: 'student_id' })
+  @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
-  @Column()
+  @Column({ name: 'materia_id' })
   subject_id: number;
 
   @ManyToOne(() => Materia)
-  @JoinColumn({ name: 'subject_id' })
+  @JoinColumn({ name: 'materia_id' })
   materia: Materia;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'materia_plan_id' })
   plan_subject_id: number | null;
 
   @ManyToOne(() => MateriaPlan, { nullable: true })
-  @JoinColumn({ name: 'plan_subject_id' })
+  @JoinColumn({ name: 'materia_plan_id' })
   materiaPlan: MateriaPlan;
 
-  @Column()
+  @Column({ name: 'grupo_id' })
   group_id: number;
 
   @ManyToOne(() => Grupo)
-  @JoinColumn({ name: 'group_id' })
+  @JoinColumn({ name: 'grupo_id' })
   grupo: Grupo;
 
   @Column({ type: 'varchar', length: 10 })
   gestion: string;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', name: 'semestre' })
   semester: number;
 
-  @Column({ type: 'enum', enum: EstadoInscripcion, default: EstadoInscripcion.CURSANDO })
+  @Column({ type: 'enum', enum: EstadoInscripcion, default: EstadoInscripcion.CURSANDO , name: 'estado' })
   status: EstadoInscripcion;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: true, name: 'nota_final' })
   final_grade: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

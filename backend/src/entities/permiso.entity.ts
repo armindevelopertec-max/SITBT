@@ -24,17 +24,17 @@ export class Permiso {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'rol_id' })
   role_id: number;
 
   @ManyToOne(() => Rol)
-  @JoinColumn({ name: 'role_id' })
+  @JoinColumn({ name: 'rol_id' })
   rol: Rol;
 
   @Column({ type: 'varchar', length: 50 })
   module: string;
 
-  @Column({ type: 'enum', enum: PermissionAction })
+  @Column({ type: 'enum', enum: PermissionAction, name: 'accion' })
   action: PermissionAction;
 
   @Column({ type: 'enum', enum: PermissionStatus, default: PermissionStatus.ACTIVO })

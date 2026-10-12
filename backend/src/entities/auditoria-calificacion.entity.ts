@@ -9,34 +9,34 @@ import {
 import { Calificacion } from './calificacion.entity';
 import { Usuario } from './usuario.entity';
 
-@Entity('grade_audit')
+@Entity('auditoria_calificacion')
 export class AuditoriaCalificacion {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'calificacion_id' })
   grade_id: number;
 
   @ManyToOne(() => Calificacion)
-  @JoinColumn({ name: 'grade_id' })
+  @JoinColumn({ name: 'calificacion_id' })
   calificacion: Calificacion;
 
-  @Column({ type: 'varchar', length: 30, name: 'field_changed' })
+  @Column({ type: 'varchar', length: 30, name: 'campo_cambiado' })
   field_changed: string;
 
-  @Column({ type: 'varchar', length: 50, name: 'old_value', nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true, name: 'valor_anterior' })
   old_value: string;
 
-  @Column({ type: 'varchar', length: 50, name: 'new_value', nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true, name: 'valor_nuevo' })
   new_value: string;
 
-  @Column()
+  @Column({ })
   user_id: number;
 
   @ManyToOne(() => Usuario)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ })
   usuario: Usuario;
 
-  @CreateDateColumn({ name: 'changed_at' })
+  @CreateDateColumn({ name: 'cambiado_en' })
   changed_at: Date;
 }

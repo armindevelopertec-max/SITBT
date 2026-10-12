@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ConfiguracionInstitucional } from '../../entities/institution-settings.entity';
+import { ConfiguracionInstitucional } from '../../entities/configuracion-institucional.entity';
 import { CrearConfiguracionInstitucionalDto } from './dto/crear-configuracion-institucional.dto';
 import { ActualizarConfiguracionInstitucionalDto } from './dto/actualizar-configuracion-institucional.dto';
 
@@ -54,12 +54,12 @@ export class ServicioConfiguracionInstitucional {
       }
     }
     return {
-      nombre: settings.nombre,
+      name: settings.name,
       nombre_corto: settings.nombre_corto,
       lema: settings.lema,
       logo_url: logoUrl,
-      direccion: settings.direccion,
-      telefono: settings.telefono,
+      address: settings.address,
+      phone: settings.phone,
       departamento: settings.departamento,
       email: settings.email,
       website: settings.website,

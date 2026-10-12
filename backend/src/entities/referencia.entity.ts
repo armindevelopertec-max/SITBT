@@ -14,11 +14,11 @@ export class Referencia {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'estudiante_id' })
   student_id: number;
 
   @ManyToOne(() => Estudiante)
-  @JoinColumn({ name: 'student_id' })
+  @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'contact1_name' })
@@ -30,12 +30,12 @@ export class Referencia {
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'contact2_name' })
   contact2_name: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true, name: 'contact2_phone' })
+  @Column({ type: 'varchar', length: 20, nullable: true })
   contact2_phone: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

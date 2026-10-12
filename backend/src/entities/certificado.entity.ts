@@ -9,34 +9,34 @@ import {
 import { Estudiante } from './estudiante.entity';
 import { Usuario } from './usuario.entity';
 
-@Entity('certificates')
+@Entity('certificados')
 export class Certificado {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'estudiante_id' })
   student_id: number;
 
   @ManyToOne(() => Estudiante)
-  @JoinColumn({ name: 'student_id' })
+  @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50 , name: 'tipo' })
   type: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', name: 'fecha' })
   date: Date;
 
-  @Column({ type: 'varchar', length: 30, unique: true })
+  @Column({ type: 'varchar', length: 30, unique: true, name: 'codigo' })
   code: string;
 
-  @Column()
+  @Column({ name: 'emitido_por' })
   issued_by: number;
 
   @ManyToOne(() => Usuario)
-  @JoinColumn({ name: 'issued_by' })
+  @JoinColumn({ })
   emisor: Usuario;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 }

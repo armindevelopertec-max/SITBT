@@ -16,41 +16,41 @@ export enum EstadoAsignacionDocente {
   FINALIZADO = 'finalizado',
 }
 
-@Entity('teaching_assignments')
+@Entity('asignaciones_docentes')
 export class AsignacionDocente {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'teacher_id' })
+  @Column({ name: 'docente_id' })
   teacher_id: number;
 
   @ManyToOne(() => Personal)
-  @JoinColumn({ name: 'teacher_id' })
+  @JoinColumn({ name: 'docente_id' })
   docente: Personal;
 
-  @Column()
+  @Column({ name: 'materia_id' })
   subject_id: number;
 
   @ManyToOne(() => Materia)
-  @JoinColumn({ name: 'subject_id' })
+  @JoinColumn({ name: 'materia_id' })
   materia: Materia;
 
-  @Column()
+  @Column({ name: 'grupo_id' })
   group_id: number;
 
   @ManyToOne(() => Grupo)
-  @JoinColumn({ name: 'group_id' })
+  @JoinColumn({ name: 'grupo_id' })
   grupo: Grupo;
 
   @Column({ type: 'varchar', length: 10 })
   gestion: string;
 
-  @Column({ type: 'enum', enum: EstadoAsignacionDocente, default: EstadoAsignacionDocente.ACTIVO })
+  @Column({ type: 'enum', enum: EstadoAsignacionDocente, default: EstadoAsignacionDocente.ACTIVO, name: 'estado' })
   status: EstadoAsignacionDocente;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

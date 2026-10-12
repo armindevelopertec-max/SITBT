@@ -24,54 +24,54 @@ export enum EstadoConvalidacion {
   RECHAZADA = 'rechazada',
 }
 
-@Entity('student_convalidations')
+@Entity('convalidaciones_estudiante')
 export class ConvalidacionEstudiante {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'estudiante_id' })
   student_id: number;
 
   @ManyToOne(() => Estudiante)
-  @JoinColumn({ name: 'student_id' })
+  @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'equivalencia_id' })
   equivalence_id: number;
 
   @ManyToOne(() => Equivalencia)
-  @JoinColumn({ name: 'equivalence_id' })
+  @JoinColumn({ name: 'equivalencia_id' })
   equivalencia: Equivalencia;
 
-  @Column({ name: 'target_subject_id' })
+  @Column({ name: 'materia_destino_id' })
   target_subject_id: number;
 
   @ManyToOne(() => Materia)
-  @JoinColumn({ name: 'target_subject_id' })
+  @JoinColumn({ name: 'materia_destino_id' })
   materia_destino: Materia;
 
-  @Column({ type: 'enum', enum: TipoConvalidacion })
+  @Column({ type: 'enum', enum: TipoConvalidacion , name: 'tipo' })
   type: TipoConvalidacion;
 
-  @Column({ type: 'varchar', length: 50, nullable: true, name: 'resolution_number' })
+  @Column({ type: 'varchar', length: 50, nullable: true, name: 'numero_resolucion' })
   resolution_number: string;
 
-  @Column({ type: 'date', nullable: true, name: 'resolution_date' })
+  @Column({ type: 'date', nullable: true, name: 'fecha_resolucion' })
   resolution_date: Date;
 
-  @Column({ type: 'enum', enum: EstadoConvalidacion, default: EstadoConvalidacion.PENDIENTE })
+  @Column({ type: 'enum', enum: EstadoConvalidacion, default: EstadoConvalidacion.PENDIENTE , name: 'estado' })
   status: EstadoConvalidacion;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'aprobado_por' })
   approved_by: number;
 
   @ManyToOne(() => Usuario)
-  @JoinColumn({ name: 'approved_by' })
+  @JoinColumn({ })
   aprobador: Usuario;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

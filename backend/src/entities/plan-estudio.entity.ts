@@ -14,33 +14,33 @@ export enum EstadoPlanEstudio {
   HISTORICO = 'historico',
 }
 
-@Entity('study_plans')
+@Entity('planes_estudio')
 export class PlanEstudio {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'carrera_id' })
   career_id: number;
 
   @ManyToOne(() => Carrera)
-  @JoinColumn({ name: 'career_id' })
+  @JoinColumn({ name: 'carrera_id' })
   carrera: Carrera;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, name: 'numero_rm' })
   rm_number: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', name: 'fecha_rm' })
   rm_date: Date;
 
-  @Column({ type: 'enum', enum: EstadoPlanEstudio, default: EstadoPlanEstudio.VIGENTE })
+  @Column({ type: 'enum', enum: EstadoPlanEstudio, default: EstadoPlanEstudio.VIGENTE , name: 'estado' })
   status: EstadoPlanEstudio;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'notas' })
   notes: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'creado_en' })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }

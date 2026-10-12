@@ -29,61 +29,61 @@ export enum EstadoCalificacionDefinitivo {
   NO_PRESENTO = 'no_presento',
 }
 
-@Entity('grades')
+@Entity('calificaciones')
 export class Calificacion {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'inscripcion_id' })
   enrollment_id: number;
 
   @ManyToOne(() => Inscripcion)
-  @JoinColumn({ name: 'enrollment_id' })
+  @JoinColumn({ name: 'inscripcion_id' })
   inscripcion: Inscripcion;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: true, name: 'parcial_1' })
   partial_1: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: true, name: 'parcial_2' })
   partial_2: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: true, name: 'promedio_final' })
   final_average: number;
 
-  @Column({ type: 'varchar', length: 30, nullable: true })
+  @Column({ type: 'varchar', length: 30, nullable: true, name: 'observacion' })
   observation: string;
 
-  @Column({ type: 'enum', enum: EstadoCalificacionRegular, nullable: true })
+  @Column({ type: 'enum', enum: EstadoCalificacionRegular, nullable: true, name: 'estado_regular' })
   status_regular: EstadoCalificacionRegular;
 
-  @Column({ type: 'boolean', default: false, name: 'second_turn_eligible' })
+  @Column({ type: 'boolean', default: false, name: 'apto_segunda_turno' })
   second_turn_eligible: boolean;
 
-  @Column({ type: 'int', nullable: true, name: 'second_turn_score' })
+  @Column({ type: 'int', nullable: true, name: 'nota_segunda_turno' })
   second_turn_score: number;
 
-  @Column({ type: 'boolean', default: false, name: 'second_turn_applied' })
+  @Column({ type: 'boolean', default: false, name: 'segunda_turno_aplicado' })
   second_turn_applied: boolean;
 
-  @Column({ type: 'enum', enum: EstadoCalificacion2T, default: EstadoCalificacion2T.NO_APLICA, name: 'status_2t' })
+  @Column({ type: 'enum', enum: EstadoCalificacion2T, default: EstadoCalificacion2T.NO_APLICA, name: 'estado_2t' })
   status_2t: EstadoCalificacion2T;
 
-  @Column({ type: 'int', nullable: true, name: 'definitive_grade' })
+  @Column({ type: 'int', nullable: true, name: 'nota_definitiva' })
   definitive_grade: number;
 
-  @Column({ type: 'enum', enum: EstadoCalificacionDefinitivo, nullable: true, name: 'status_definitivo' })
+  @Column({ type: 'enum', enum: EstadoCalificacionDefinitivo, nullable: true, name: 'estado_definitivo' })
   status_definitivo: EstadoCalificacionDefinitivo;
 
   @Column({ nullable: true })
   registered_by: number;
 
   @ManyToOne(() => Personal)
-  @JoinColumn({ name: 'registered_by' })
+  @JoinColumn({ })
   docente: Personal;
 
-  @CreateDateColumn({ name: 'registered_at' })
+  @CreateDateColumn({ name: 'registrado_en' })
   registered_at: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'actualizado_en' })
   updated_at: Date;
 }
