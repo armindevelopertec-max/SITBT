@@ -1,13 +1,13 @@
-import { cn } from '@/lib/utils';
-import { InputHTMLAttributes, forwardRef, TextareaHTMLAttributes } from 'react';
+import { cn } from '@/lib/utilidades';
+import { HTMLAttributes, InputHTMLAttributes, TextareaHTMLAttributes, forwardRef } from 'react';
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface PropsEntrada extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helperText?: string;
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
+const Entrada = forwardRef<HTMLInputElement, PropsEntrada>(
   ({ className, label, error, helperText, type = 'text', id, ...props }, ref) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
 
@@ -36,9 +36,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
   }
 );
 
-Input.displayName = 'Input';
+Entrada.displayName = 'Entrada';
 
-const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(
+const AreaTexto = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(
   ({ className, ...props }, ref) => {
     return (
       <textarea
@@ -53,7 +53,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLText
   }
 );
 
-Textarea.displayName = 'Textarea';
+AreaTexto.displayName = 'AreaTexto';
 
-export { Input, Textarea };
-export type { InputProps };
+export { Entrada, AreaTexto };
+export type { PropsEntrada };

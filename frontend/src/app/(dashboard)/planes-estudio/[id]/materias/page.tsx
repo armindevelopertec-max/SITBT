@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
+import { Insignia } from '@/components/ui/insignia';
 import { api } from '@/lib/api';
 import { ArrowLeft, Plus, Trash2, Loader2, BookOpen, Edit2, Save, X, Check, Search } from 'lucide-react';
 
@@ -216,10 +216,10 @@ export default function PlanMateriasPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <Breadcrumb items={[
+        </Boton>
+        <Migas items={[
           { label: 'Configuración', href: '/configuracion' },
           { label: 'Planes de Estudio', href: '/planes-estudio' },
           { label: `${plan?.rm_number} - ${plan?.carrera?.name || 'Cargando...'}` }
@@ -232,11 +232,11 @@ export default function PlanMateriasPage() {
             Plan de Estudios: {plan?.rm_number}
           </h1>
           <div className="flex items-center gap-3 mt-1">
-            <Badge variant="outline">{plan?.carrera?.code}</Badge>
+            <Insignia variant="outline">{plan?.carrera?.code}</Insignia>
             <span className="text-gray-500">{plan?.carrera?.name}</span>
-            <Badge variant={plan?.status === 'vigente' ? 'exito' : 'secondary'}>
+            <Insignia variant={plan?.status === 'vigente' ? 'exito' : 'secondary'}>
               {plan?.status}
-            </Badge>
+            </Insignia>
           </div>
         </div>
       </div>
@@ -249,19 +249,19 @@ export default function PlanMateriasPage() {
 
       <div className="space-y-6">
         {materiasPlan.length === 0 && addingToSemester === null ? (
-          <Card variant="bordered">
-            <CardContent className="py-12 text-center text-gray-500">
+          <Tarjeta variant="bordered">
+            <ContenidoTarjeta className="py-12 text-center text-gray-500">
               <BookOpen className="w-12 h-12 mx-auto mb-4 text-gray-300" />
               <p className="text-lg font-medium mb-2">No hay materias asignadas</p>
               <p className="text-sm mb-4">
                 Comienza agregando materias a los semestres.
               </p>
-              <Button onClick={() => handleStartAdd(1)}>
+              <Boton onClick={() => handleStartAdd(1)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Agregar Materias al Semestre 1
-              </Button>
-            </CardContent>
-          </Card>
+              </Boton>
+            </ContenidoTarjeta>
+          </Tarjeta>
         ) : (
           Array.from({ length: getMaxSemester() }, (_, i) => i + 1).map(semester => {
             const materiasSemestre = getSemesterMaterias(semester);
@@ -269,26 +269,26 @@ export default function PlanMateriasPage() {
             const isAdding = addingToSemester === semester;
 
             return (
-              <Card key={semester} variant="bordered">
-                <CardHeader className="bg-gray-50 py-3">
+              <Tarjeta key={semester} variant="bordered">
+                <EncabezadoTarjeta className="bg-gray-50 py-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Semestre {semester}</CardTitle>
+                    <TituloTarjeta className="text-lg">Semestre {semester}</TituloTarjeta>
                     <div className="flex items-center gap-4">
                       <span className="text-sm text-gray-500">
                         {materiasSemestre.length} materia{materiasSemestre.length !== 1 ? 's' : ''}
                       </span>
-                      <Badge variant="outline">{totalHoras} horas/semana</Badge>
+                      <Insignia variant="outline">{totalHoras} horas/semana</Insignia>
                       {!isAdding && (
-                        <Button size="sm" variant="outline" onClick={() => handleStartAdd(semester)}>
+                        <Boton size="sm" variant="outline" onClick={() => handleStartAdd(semester)}>
                           <Plus className="w-4 h-4 mr-1" />
                           Agregar
-                        </Button>
+                        </Boton>
                       )}
                     </div>
                   </div>
-                </CardHeader>
+                </EncabezadoTarjeta>
 
-                <CardContent className="p-4">
+                <ContenidoTarjeta className="p-4">
                   {isAdding && (
                     <div className="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
                       <div className="flex items-center gap-2 mb-3">
@@ -301,7 +301,7 @@ export default function PlanMateriasPage() {
                           <div className="flex-1">
                             <label className="block text-xs font-medium text-gray-600 mb-1">Materia</label>
                             <div className="relative">
-                              <Input
+                              <Entrada
                                 type="text"
                                 placeholder="Buscar por codigo o nombre..."
                                 value={materiaSearch}
@@ -335,7 +335,7 @@ export default function PlanMateriasPage() {
 
                           <div className="w-24">
                             <label className="block text-xs font-medium text-gray-600 mb-1">Horas/Sem</label>
-                            <Input
+                            <Entrada
                               type="number"
                               value={newWeeklyHours || ''}
                               onChange={(e) => setNewWeeklyHours(parseInt(e.target.value) || 0)}
@@ -347,7 +347,7 @@ export default function PlanMateriasPage() {
                           <div className="flex-1">
                             <label className="block text-xs font-medium text-gray-600 mb-1">Prerequisito (opcional)</label>
                             <div className="relative">
-                              <Input
+                              <Entrada
                                 type="text"
                                 placeholder="Buscar..."
                                 value={prerequisiteSearch}
@@ -381,13 +381,13 @@ export default function PlanMateriasPage() {
                         </div>
 
                         <div className="flex justify-end gap-2">
-                          <Button variant="outline" size="sm" onClick={handleCancelAdd}>
+                          <Boton variant="outline" size="sm" onClick={handleCancelAdd}>
                             Cancelar
-                          </Button>
-                          <Button size="sm" onClick={handleSaveNewMateria} disabled={saving}>
+                          </Boton>
+                          <Boton size="sm" onClick={handleSaveNewMateria} disabled={saving}>
                             {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Plus className="w-4 h-4 mr-1" />}
                             Agregar
-                          </Button>
+                          </Boton>
                         </div>
                       </div>
                     </div>
@@ -398,46 +398,46 @@ export default function PlanMateriasPage() {
                       Sin materias en este semestre
                     </div>
                   ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Codigo</TableHead>
-                          <TableHead>Materia</TableHead>
-                          <TableHead className="text-center">Horas/Sem</TableHead>
-                          <TableHead>Prerequisito</TableHead>
-                          <TableHead className="text-right w-24">Acciones</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
+                    <Tabla>
+                      <EncabezadoTabla>
+                        <FilaTabla>
+                          <CeldaEncabezado>Codigo</CeldaEncabezado>
+                          <CeldaEncabezado>Materia</CeldaEncabezado>
+                          <CeldaEncabezado className="text-center">Horas/Sem</CeldaEncabezado>
+                          <CeldaEncabezado>Prerequisito</CeldaEncabezado>
+                          <CeldaEncabezado className="text-right w-24">Acciones</CeldaEncabezado>
+                        </FilaTabla>
+                      </EncabezadoTabla>
+                      <CuerpoTabla>
                         {materiasSemestre.map(mp => (
-                          <TableRow key={mp.id}>
-                            <TableCell className="font-medium">{mp.materia_code || mp.subject_id}</TableCell>
-                            <TableCell>{mp.materia_name || '-'}</TableCell>
-                            <TableCell className="text-center">{mp.weekly_hours}</TableCell>
-                            <TableCell>
+                          <FilaTabla key={mp.id}>
+                            <CeldaTabla className="font-medium">{mp.materia_code || mp.subject_id}</CeldaTabla>
+                            <CeldaTabla>{mp.materia_name || '-'}</CeldaTabla>
+                            <CeldaTabla className="text-center">{mp.weekly_hours}</CeldaTabla>
+                            <CeldaTabla>
                               {mp.prerequisite_id ? (
-                                <Badge variant="secondary">{mp.prerequisite_code || mp.prerequisite_id}</Badge>
+                                <Insignia variant="secondary">{mp.prerequisite_code || mp.prerequisite_id}</Insignia>
                               ) : (
                                 <span className="text-gray-400 text-sm">-</span>
                               )}
-                            </TableCell>
-                            <TableCell className="text-right">
+                            </CeldaTabla>
+                            <CeldaTabla className="text-right">
                               <div className="flex items-center justify-end gap-1">
-                                <Button variant="ghost" size="icon" onClick={() => handleStartEditMateria(mp)}>
+                                <Boton variant="ghost" size="icon" onClick={() => handleStartEditMateria(mp)}>
                                   <Edit2 className="w-4 h-4" />
-                                </Button>
-                                <Button variant="ghost" size="icon" onClick={() => handleRemoveMateria(mp.id)}>
+                                </Boton>
+                                <Boton variant="ghost" size="icon" onClick={() => handleRemoveMateria(mp.id)}>
                                   <Trash2 className="w-4 h-4 text-red-500" />
-                                </Button>
+                                </Boton>
                               </div>
-                            </TableCell>
-                          </TableRow>
+                            </CeldaTabla>
+                          </FilaTabla>
                         ))}
-                      </TableBody>
-                    </Table>
+                      </CuerpoTabla>
+                    </Tabla>
                   )}
-                </CardContent>
-              </Card>
+                </ContenidoTarjeta>
+              </Tarjeta>
             );
           })
         )}

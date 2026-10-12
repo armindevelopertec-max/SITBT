@@ -2,18 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDocuments } from '@/hooks/useDocuments';
+import { usarDocumentos } from '@/hooks/usarDocumentos';
 import { api } from '@/lib/api';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Boton } from '@/components/ui/boton';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Entrada } from '@/components/ui/entrada';
+import { Selector } from '@/components/ui/selector';
 import { ArrowLeft, FileText, Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
 
 export default function EmitDocumentPage() {
   const router = useRouter();
-  const { generateBoleta, generateRecibo } = useDocuments();
+  const { generateBoleta, generateRecibo } = usarDocumentos();
 
   const [documentType, setDocumentType] = useState<string>('');
   const [studentId, setStudentId] = useState<string>('');
@@ -72,10 +72,10 @@ export default function EmitDocumentPage() {
     <div className="p-6">
       <div className="flex items-center gap-4 mb-6">
         <Link href="/documentos">
-          <Button variant="ghost" size="sm">
+          <Boton variant="ghost" size="sm">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver
-          </Button>
+          </Boton>
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Emitir Documento</h1>
@@ -89,20 +89,20 @@ export default function EmitDocumentPage() {
         </div>
       )}
 
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Tarjeta className="max-w-2xl">
+        <EncabezadoTarjeta>
+          <TituloTarjeta className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
             Datos del documento
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </TituloTarjeta>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Tipo de documento *
               </label>
-              <Select
+              <Selector
                 value={documentType}
                 onChange={(e) => setDocumentType(e.target.value)}
                 options={[
@@ -123,7 +123,7 @@ export default function EmitDocumentPage() {
               </label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
+                <Entrada
                   placeholder="Buscar por nombre o CI..."
                   className="pl-10"
                   value={studentSearch}
@@ -171,7 +171,7 @@ export default function EmitDocumentPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Gestión *
               </label>
-              <Select
+              <Selector
                 value={gestion}
                 onChange={(e) => setGestion(e.target.value)}
                 options={[
@@ -184,18 +184,18 @@ export default function EmitDocumentPage() {
 
             <div className="flex justify-end gap-4">
               <Link href="/documentos">
-                <Button variant="outline" type="button">
+                <Boton variant="outline" type="button">
                   Cancelar
-                </Button>
+                </Boton>
               </Link>
-              <Button type="submit" disabled={loading || !documentType || !studentId}>
+              <Boton type="submit" disabled={loading || !documentType || !studentId}>
                 {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Generar documento
-              </Button>
+              </Boton>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </ContenidoTarjeta>
+      </Tarjeta>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-export type Role =
+export type Rol =
   | 'administrador'
   | 'secretaria'
   | 'director_academico'
@@ -7,18 +7,18 @@ export type Role =
   | 'estudiante'
   | 'apoyo';
 
-export interface User {
+export interface Usuario {
   id: number;
   username: string;
   email?: string;
-  role: Role;
+  role: Rol;
   person_id?: number;
   is_active: boolean;
   created_at?: string;
   updated_at?: string;
 }
 
-export interface Person {
+export interface Persona {
   id: number;
   ci: string;
   names: string;
@@ -44,13 +44,13 @@ export interface Person {
   updated_at?: string;
 }
 
-export interface Student {
+export interface Estudiante {
   id: number;
   person_id: number;
   inscription_code: string;
   admission_date: string;
   status: 'activo' | 'inactivo' | 'egresado' | 'suspendido';
-  persona?: Person;
+  persona?: Persona;
   created_at?: string;
   updated_at?: string;
   estado_matricula?: 'pre_registro' | 'verificado' | 'matriculado' | 'egresado' | 'retirado';
@@ -61,19 +61,19 @@ export interface Student {
   fecha_pre_registro?: string;
 }
 
-export interface Staff {
+export interface Personal {
   id: number;
   person_id: number;
   profession?: string;
   position: string;
   hire_date: string;
   status: 'activo' | 'inactivo' | 'licencia';
-  persona?: Person;
+  persona?: Persona;
   created_at?: string;
   updated_at?: string;
 }
 
-export interface Career {
+export interface Carrera {
   id: number;
   code: string;
   name: string;
@@ -86,7 +86,7 @@ export interface Career {
   updated_at?: string;
 }
 
-export interface Subject {
+export interface Materia {
   id: number;
   nombre: string;
   codigo: string;
@@ -95,12 +95,12 @@ export interface Subject {
   horasSemanales: number;
   semester: number;
   careerId: number;
-  career?: Career;
+  carrera?: Carrera;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface Group {
+export interface Grupo {
   id: number;
   nombre: string;
   codigo: string;
@@ -110,36 +110,36 @@ export interface Group {
   docenteId?: number;
   capacidad: number;
   estado: 'activo' | 'inactivo';
-  career?: Career;
+  carrera?: Carrera;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface Enrollment {
+export interface Inscripcion {
   id: number;
   studentId: number;
   groupId: number;
   fechaInscripcion: string;
   estado: 'confirmado' | 'pendiente' | 'cancelado';
-  student?: Student;
-  group?: Group;
+  estudiante?: Estudiante;
+  grupo?: Grupo;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface Grade {
+export interface Calificacion {
   id: number;
   enrollmentId: number;
   tipoEvaluacion: 'examen_parcial' | 'examen_final' | 'practica' | 'trabajo' | 'participacion';
   nota: number;
   observacion?: string;
   fechaEvaluacion: string;
-  enrollment?: Enrollment;
+  inscripcion?: Inscripcion;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface Payment {
+export interface Pago {
   id: number;
   studentId: number;
   concepto: string;
@@ -148,39 +148,39 @@ export interface Payment {
   fechaPago?: string;
   estado: 'pendiente' | 'pagado' | 'vencido' | 'anulado';
   metodoPago?: 'efectivo' | 'transferencia' | 'cheque' | 'tarjeta';
-  student?: Student;
+  estudiante?: Estudiante;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface Certificate {
+export interface Certificado {
   id: number;
   studentId: number;
   tipo: 'certificado_inscripcion' | 'certificado_estudios' | 'certificado_graduacion' | 'otro';
   fechaEmision: string;
   estado: 'pendiente' | 'emitido' | 'entregado' | 'anulado';
   observaciones?: string;
-  student?: Student;
+  estudiante?: Estudiante;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface Convalidation {
+export interface Convalidacion {
   id: number;
   studentId: number;
   materiaOrigen: string;
   materiaConvalidada: string;
-  institutionOrigen?: string;
+  institucionOrigen?: string;
   fechaConvalidation: string;
   estado: 'pendiente' | 'aprobado' | 'rechazado';
   observaciones?: string;
-  student?: Student;
+  estudiante?: Estudiante;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface AuthState {
-  user: User | null;
+export interface EstadoAutenticacion {
+  user: Usuario | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -188,18 +188,18 @@ export interface AuthState {
   setHasHydrated: (state: boolean) => void;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
-  setUser: (user: User) => void;
+  setUser: (user: Usuario) => void;
 }
 
-export interface MenuItem {
+export interface ElementoMenu {
   title: string;
   href: string;
   icon: string;
-  roles: Role[];
-  children?: MenuItem[];
+  roles: Rol[];
+  children?: ElementoMenu[];
 }
 
-export interface BreadcrumbItem {
+export interface ElementoMigas {
   label: string;
   href?: string;
 }
@@ -229,10 +229,10 @@ export interface Gestion {
   updated_at?: string;
 }
 
-export type AdmissionStatus = 'pendiente' | 'verificado' | 'rechazado' | 'convertido';
-export type AdmissionOrigin = 'web' | 'secretaria';
+export type EstadoAdmision = 'pendiente' | 'verificado' | 'rechazado' | 'convertido';
+export type OrigenAdmision = 'web' | 'secretaria';
 
-export interface AdmissionRequest {
+export interface SolicitudAdmision {
   id: string;
   nombre: string;
   ci: string;
@@ -245,13 +245,13 @@ export interface AdmissionRequest {
   telefonoTutor?: string;
   genero?: 'M' | 'F';
   carrera_id?: number;
-  carrera?: Career;
-  estado: AdmissionStatus;
+  carrera?: Carrera;
+  estado: EstadoAdmision;
   observaciones?: string;
   verificado_por?: number;
-  verificador?: User;
+  verificador?: Usuario;
   fechaVerificacion?: string;
-  origen: AdmissionOrigin;
+  origen: OrigenAdmision;
   documentoCiPath?: string;
   certificadoBachillerPath?: string;
   fotoPath?: string;
@@ -264,7 +264,7 @@ export interface AdmissionRequest {
   nationality_other?: string;
 }
 
-export interface CreateAdmissionDto {
+export interface CrearAdmisionDto {
   names: string;
   lastname_paternal?: string;
   lastname_maternal?: string;
@@ -283,13 +283,13 @@ export interface CreateAdmissionDto {
   ciTutor?: string;
   telefonoTutor?: string;
   carrera_id?: number;
-  origen?: AdmissionOrigin;
+  origen?: OrigenAdmision;
 }
 
-export interface ConsentRecord {
+export interface RegistroConsentimiento {
   id: string;
   estudiante_id: number;
-  estudiante?: Student;
+  estudiante?: Estudiante;
   versionPolitica: string;
   fechaConsentimiento: string;
   ipConsentimiento?: string;
@@ -302,7 +302,7 @@ export interface ConsentRecord {
   created_at?: string;
 }
 
-export interface StudentExtended extends Student {
+export interface EstudianteExtendido extends Estudiante {
   estado_matricula: 'pre_registro' | 'verificado' | 'matriculado' | 'egresado' | 'retirado';
   origen: 'web' | 'secretaria';
   admission_request_id?: string;
@@ -311,13 +311,13 @@ export interface StudentExtended extends Student {
   fecha_pre_registro?: string;
 }
 
-export type CredentialEmissionType = 'primera' | 'renovacion' | 'reimpresion';
-export type CredentialDeliveryStatus = 'generado' | 'impreso' | 'entregado';
+export type TipoEmisionCredencial = 'primera' | 'renovacion' | 'reimpresion';
+export type EstadoEntregaCredencial = 'generado' | 'impreso' | 'entregado';
 
-export interface CredentialExtended {
+export interface CredencialExtendida {
   id: number;
   student_id: number;
-  estudiante?: Student;
+  estudiante?: Estudiante;
   gestion: string;
   gestion_id?: number;
   semester: number;
@@ -325,10 +325,10 @@ export interface CredentialExtended {
   valid_until: string;
   photo_url?: string;
   status: 'emitida' | 'anulada' | 'reemplazada';
-  tipo_emision: CredentialEmissionType;
+  tipo_emision: TipoEmisionCredencial;
   vigencia_hasta?: string;
   qr_verificacion?: string;
-  estado_entrega: CredentialDeliveryStatus;
+  estado_entrega: EstadoEntregaCredencial;
   entregado_a?: number;
   fecha_entrega?: string;
   created_at?: string;

@@ -1,14 +1,14 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utilidades';
 import { SelectHTMLAttributes, forwardRef } from 'react';
 
-interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+interface PropsSelector extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   options: { value: string | number; label: string }[];
   placeholder?: string;
 }
 
-const Select = forwardRef<HTMLSelectElement, SelectProps>(
+const Selector = forwardRef<HTMLSelectElement, PropsSelector>(
   ({ className, label, error, options, placeholder, id, ...props }, ref) => {
     const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
 
@@ -46,7 +46,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
   }
 );
 
-Select.displayName = 'Select';
+Selector.displayName = 'Selector';
 
-export { Select };
-export type { SelectProps };
+export { Selector };
+export type { PropsSelector };

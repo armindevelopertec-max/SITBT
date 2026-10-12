@@ -1,12 +1,12 @@
 'use client';
 
-import { InstitutionProvider } from '@/contexts/InstitutionContext';
-import PublicLayout from '@/components/layout/PublicLayout';
+import { ProveedorInstitucion } from '@/contexts/ContextoInstitucional';
+import DisenoPublico from '@/components/layout/DisenoPublico';
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <InstitutionProvider>
-      <PublicLayout>{children}</PublicLayout>
-    </InstitutionProvider>
+    <ProveedorInstitucion>
+      <DisenoPublico>{children}</DisenoPublico>
+    </ProveedorInstitucion>
   );
 }

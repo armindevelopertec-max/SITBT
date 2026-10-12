@@ -2,20 +2,20 @@
 
 import Link from 'next/link';
 import { ChevronRight, Home } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utilidades';
 
-interface BreadcrumbItem {
+interface ElementoMigas {
   label: string;
   href?: string;
 }
 
 interface BreadcrumbProps {
-  items: BreadcrumbItem[];
+  items: ElementoMigas[];
 }
 
-export function Breadcrumb({ items }: BreadcrumbProps) {
+export function Migas({ items }: BreadcrumbProps) {
   return (
-    <nav className="flex" aria-label="Breadcrumb">
+    <nav className="flex" aria-label="Migas">
       <ol className="flex items-center gap-2">
         <li>
           <Link

@@ -1,9 +1,9 @@
 'use client';
 
 import { Fragment, ReactNode } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utilidades';
 import { X } from 'lucide-react';
-import { Button } from './button';
+import { Boton } from './boton';
 
 interface ModalProps {
   open: boolean;
@@ -106,16 +106,16 @@ export function ConfirmModal({
     <Modal open={open} onClose={onClose} title={title} description={message} size="sm">
       {children}
       <div className="flex justify-end gap-3 mt-6">
-        <Button variant="outline" onClick={onClose} disabled={loading}>
+        <Boton variant="outline" onClick={onClose} disabled={loading}>
           {cancelText}
-        </Button>
-        <Button
+        </Boton>
+        <Boton
           variant={variant === 'destructive' ? 'destructive' : 'primary'}
           onClick={onConfirm}
           isLoading={loading}
         >
           {confirmText}
-        </Button>
+        </Boton>
       </div>
     </Modal>
   );

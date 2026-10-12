@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 
-export interface InstitutionSettings {
+export interface ConfiguracionInstitucional {
   nombre: string;
   nombre_corto: string;
   lema: string | null;
@@ -16,8 +16,8 @@ export interface InstitutionSettings {
   descripcion: string | null;
 }
 
-export function useInstitutionSettings() {
-  const [settings, setSettings] = useState<InstitutionSettings | null>(null);
+export function usarConfiguracionInstitucional() {
+  const [settings, setSettings] = useState<ConfiguracionInstitucional | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,10 +25,10 @@ export function useInstitutionSettings() {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.get('/institution-settings/public');
+      const response = await api.get('/configuracion-institucional/public');
       setSettings(response.data);
     } catch (err: any) {
-      console.error('Error fetching institution settings:', err);
+      console.error('Error fetching institucion? settings:', err);
       setError(err.response?.data?.message || 'Error al cargar configuración');
       setSettings({
         nombre: 'Instituto Tecnológico Boliviana de Tecnología',

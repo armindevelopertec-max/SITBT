@@ -2,17 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
+import { Insignia } from '@/components/ui/insignia';
 import { Modal, ConfirmModal } from '@/components/ui/modal';
 import { Plus, Search, Edit2, Trash2, Loader2, User, Eye, Key, Filter } from 'lucide-react';
 import { api } from '@/lib/api';
-import { Student } from '@/types';
-import { Select } from '@/components/ui/select';
+import { Estudiante } from '@/types';
+import { Selector } from '@/components/ui/selector';
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   pre_registro: { label: 'Pre-registro', color: 'bg-purple-100 text-purple-800' },
@@ -29,13 +29,13 @@ const originLabels: Record<string, string> = {
 
 export default function StudentsPage() {
   const router = useRouter();
-  const [students, setStudents] = useState<Student[]>([]);
+  const [students, setStudents] = useState<Estudiante[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [estadoFilter, setEstadoFilter] = useState<string>('');
   const [origenFilter, setOrigenFilter] = useState<string>('');
 
-  const [deleteModal, setDeleteModal] = useState<Student | null>(null);
+  const [deleteModal, setDeleteModal] = useState<Estudiante | null>(null);
   const [credentialsModal, setCredentialsModal] = useState<{ username: string; password: string; nombre: string; studentId: number; personId: number } | null>(null);
   const [resetLoading, setResetLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
@@ -69,7 +69,7 @@ export default function StudentsPage() {
 
   const getStatusBadge = (status: string) => {
     const config = statusLabels[status] || { label: status, color: 'bg-gray-100 text-gray-800' };
-    return <Badge className={config.color}>{config.label}</Badge>;
+    return <Insignia className={config.color}>{config.label}</Insignia>;
   };
 
   const handleDelete = async () => {
@@ -86,7 +86,7 @@ export default function StudentsPage() {
     }
   };
 
-  const viewCredentials = async (student: Student) => {
+  const viewCredentials = async (student: Estudiante) => {
     try {
       const response = await api.get(`/usuarios?person_id=${student.person_id}`);
       const users = response.data.data;
@@ -133,23 +133,23 @@ export default function StudentsPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Estudiantes' }]} />
+      <Migas items={[{ label: 'Estudiantes' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Estudiantes</h1>
-        <Button onClick={() => router.push('/estudiantes/nuevo')}>
+        <Boton onClick={() => router.push('/estudiantes/nuevo')}>
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Estudiante
-        </Button>
+        </Boton>
       </div>
 
-      <Card variant="bordered">
-        <CardHeader>
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <CardTitle>Lista de Estudiantes ({filteredStudents.length})</CardTitle>
+            <TituloTarjeta>Lista de Estudiantes ({filteredStudents.length})</TituloTarjeta>
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex gap-2">
-                <Select
+                <Selector
                   value={estadoFilter}
                   onChange={(e) => setEstadoFilter(e.target.value)}
                   options={[
@@ -162,7 +162,7 @@ export default function StudentsPage() {
                   ]}
                   placeholder="Estado"
                 />
-                <Select
+                <Selector
                   value={origenFilter}
                   onChange={(e) => setOrigenFilter(e.target.value)}
                   options={[
@@ -175,7 +175,7 @@ export default function StudentsPage() {
               </div>
               <div className="relative w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
+                <Entrada
                   placeholder="Buscar por nombre o CI..."
                   className="pl-10"
                   value={searchTerm}
@@ -184,61 +184,61 @@ export default function StudentsPage() {
               </div>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>CI</TableHead>
-                <TableHead>Nombre Completo</TableHead>
-                <TableHead>Código</TableHead>
-                <TableHead>Origen</TableHead>
-                <TableHead>Estado Matrícula</TableHead>
-                <TableHead>Fecha Ingreso</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta>
+          <Tabla>
+            <EncabezadoTabla>
+              <FilaTabla>
+                <CeldaEncabezado>CI</CeldaEncabezado>
+                <CeldaEncabezado>Nombre Completo</CeldaEncabezado>
+                <CeldaEncabezado>Código</CeldaEncabezado>
+                <CeldaEncabezado>Origen</CeldaEncabezado>
+                <CeldaEncabezado>Estado Matrícula</CeldaEncabezado>
+                <CeldaEncabezado>Fecha Ingreso</CeldaEncabezado>
+                <CeldaEncabezado>Acciones</CeldaEncabezado>
+              </FilaTabla>
+            </EncabezadoTabla>
+            <CuerpoTabla>
               {filteredStudents.map((student) => (
-                <TableRow key={student.id}>
-                  <TableCell className="font-medium">
+                <FilaTabla key={student.id}>
+                  <CeldaTabla className="font-medium">
                     {student.persona?.ci}
-                  </TableCell>
-                  <TableCell>
+                  </CeldaTabla>
+                  <CeldaTabla>
                     {student.persona?.names} {student.persona?.lastname_paternal} {student.persona?.lastname_maternal}
-                  </TableCell>
-                  <TableCell>{student.inscription_code}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{originLabels[student.origen || 'secretaria'] || '-'}</Badge>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(student.estado_matricula || 'matriculado')}</TableCell>
-                  <TableCell>{new Date(student.admission_date).toLocaleDateString('es-BO')}</TableCell>
-                  <TableCell>
+                  </CeldaTabla>
+                  <CeldaTabla>{student.inscription_code}</CeldaTabla>
+                  <CeldaTabla>
+                    <Insignia variant="outline">{originLabels[student.origen || 'secretaria'] || '-'}</Insignia>
+                  </CeldaTabla>
+                  <CeldaTabla>{getStatusBadge(student.estado_matricula || 'matriculado')}</CeldaTabla>
+                  <CeldaTabla>{new Date(student.admission_date).toLocaleDateString('es-BO')}</CeldaTabla>
+                  <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" title="Ver credenciales" onClick={() => viewCredentials(student)}>
+                      <Boton variant="ghost" size="icon" title="Ver credenciales" onClick={() => viewCredentials(student)}>
                         <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" title="Editar" onClick={() => router.push(`/estudiantes/editar/${student.id}`)}>
+                      </Boton>
+                      <Boton variant="ghost" size="icon" title="Editar" onClick={() => router.push(`/estudiantes/editar/${student.id}`)}>
                         <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" title="Eliminar" onClick={() => setDeleteModal(student)}>
+                      </Boton>
+                      <Boton variant="ghost" size="icon" title="Eliminar" onClick={() => setDeleteModal(student)}>
                         <Trash2 className="w-4 h-4 text-red-500" />
-                      </Button>
+                      </Boton>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               ))}
               {filteredStudents.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                <FilaTabla>
+                  <CeldaTabla colSpan={7} className="text-center py-8 text-gray-500">
                     {searchTerm || estadoFilter || origenFilter ? 'No se encontraron estudiantes' : 'No hay estudiantes registrados'}
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </CuerpoTabla>
+          </Tabla>
+        </ContenidoTarjeta>
+      </Tarjeta>
 
       <ConfirmModal
         open={!!deleteModal}
@@ -277,10 +277,10 @@ export default function StudentsPage() {
               ⚠️ Esta contraseña es temporal. El estudiante debe cambiarla después de iniciar sesión.
             </p>
             <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setCredentialsModal(null)}>Cerrar</Button>
-              <Button onClick={handleResetPassword} isLoading={resetLoading} disabled={credentialsModal.username === 'No tiene usuario' || credentialsModal.username === 'Error al cargar'}>
+              <Boton variant="outline" onClick={() => setCredentialsModal(null)}>Cerrar</Boton>
+              <Boton onClick={handleResetPassword} isLoading={resetLoading} disabled={credentialsModal.username === 'No tiene usuario' || credentialsModal.username === 'Error al cargar'}>
                 Restablecer Contraseña
-              </Button>
+              </Boton>
             </div>
           </div>
         )}

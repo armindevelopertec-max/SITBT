@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth-store';
-import Sidebar from '@/components/layout/Sidebar';
-import Header from '@/components/layout/Header';
-import { cn } from '@/lib/utils';
+import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
+import BarraLateral from '@/components/layout/BarraLateral';
+import Encabezado from '@/components/layout/Encabezado';
+import { cn } from '@/lib/utilidades';
 
 export default function DashboardLayout({
   children,
@@ -16,7 +16,7 @@ export default function DashboardLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
-  const { isAuthenticated, _hasHydrated } = useAuthStore();
+  const { isAuthenticated, _hasHydrated } = usarAlmacenAutenticacion();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -56,11 +56,11 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Sidebar
-        isCollapsed={isMobile ? false : sidebarCollapsed}
-        isOpen={isMobile ? sidebarOpen : true}
-        onClose={() => setSidebarOpen(false)}
-        onCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+      <BarraLateral
+        colapsada={isMobile ? false : sidebarCollapsed}
+        abierta={isMobile ? sidebarOpen : true}
+        onCerrar={() => setSidebarOpen(false)}
+        onColapsar={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
       {isMobile && sidebarOpen && (
         <div
@@ -74,7 +74,7 @@ export default function DashboardLayout({
           isMobile ? '' : (sidebarCollapsed ? 'ml-16' : 'ml-64')
         )}
       >
-        <Header onMenuClick={handleMenuClick} />
+        <Encabezado onMenuClick={handleMenuClick} />
         <main className="p-6">{children}</main>
       </div>
     </div>

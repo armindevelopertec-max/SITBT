@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Selector } from '@/components/ui/selector';
 import { api } from '@/lib/api';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
@@ -131,10 +131,10 @@ export default function EditarPlanPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+          <Boton variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <Breadcrumb items={[
+          </Boton>
+          <Migas items={[
             { label: 'Configuración', href: '/configuracion' },
             { label: 'Planes de Estudio', href: '/planes-estudio' },
             { label: 'Editar Plan' }
@@ -150,10 +150,10 @@ export default function EditarPlanPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <Breadcrumb items={[
+        </Boton>
+        <Migas items={[
           { label: 'Configuración', href: '/configuracion' },
           { label: 'Planes de Estudio', href: '/planes-estudio' },
           { label: 'Editar Plan' }
@@ -165,14 +165,14 @@ export default function EditarPlanPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle>Datos del Plan de Estudio</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Datos del Plan de Estudio</TituloTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Select
+                <Selector
                   label="Carrera *"
                   value={formData.career_id}
                   onChange={(e) => setFormData({ ...formData, career_id: e.target.value })}
@@ -183,7 +183,7 @@ export default function EditarPlanPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Número RM *"
                   value={formData.rm_number}
                   onChange={(e) => setFormData({ ...formData, rm_number: e.target.value.toUpperCase() })}
@@ -195,7 +195,7 @@ export default function EditarPlanPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Input
+                <Entrada
                   label="Fecha RM *"
                   type="date"
                   value={formData.rm_date}
@@ -204,7 +204,7 @@ export default function EditarPlanPage() {
                 />
               </div>
               <div>
-                <Select
+                <Selector
                   label="Estado"
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
@@ -217,15 +217,15 @@ export default function EditarPlanPage() {
             </div>
 
             <div>
-              <Input
+              <Entrada
                 label="Notas"
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Notas adicionales..."
               />
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
 
         {errors.submit && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -234,10 +234,10 @@ export default function EditarPlanPage() {
         )}
 
         <div className="flex justify-end gap-3">
-          <Button variant="outline" type="button" onClick={() => router.back()}>
+          <Boton variant="outline" type="button" onClick={() => router.back()}>
             Cancelar
-          </Button>
-          <Button type="submit" disabled={saving}>
+          </Boton>
+          <Boton type="submit" disabled={saving}>
             {saving ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -249,7 +249,7 @@ export default function EditarPlanPage() {
                 Actualizar Plan
               </>
             )}
-          </Button>
+          </Boton>
         </div>
       </form>
     </div>

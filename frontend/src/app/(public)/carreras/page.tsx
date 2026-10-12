@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { publicApi } from '@/lib/api';
 import { GraduationCap, ArrowRight, CheckCircle, Award, Clock, FileText } from 'lucide-react';
-import { useInstitution } from '@/contexts/InstitutionContext';
+import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
-interface Subject {
+interface Materia {
   code: string;
   name: string;
   weekly_hours: number;
@@ -15,10 +15,10 @@ interface Subject {
 interface StudyPlan {
   rm_number: string;
   rm_date: string;
-  subjectsBySemester: Record<number, Subject[]>;
+  subjectsBySemester: Record<number, Materia[]>;
 }
 
-interface Career {
+interface Carrera {
   id: number;
   code: string;
   name: string;
@@ -29,7 +29,7 @@ interface Career {
   status: string;
 }
 
-interface CareerWithPlan extends Career {
+interface CareerWithPlan extends Carrera {
   studyPlan?: StudyPlan;
 }
 
@@ -39,14 +39,14 @@ const careerImages: Record<number, string> = {
 };
 
 export default function CareersPage() {
-  const { institution } = useInstitution();
+  const { institucion } = usarInstitucion();
   const [careers, setCareers] = useState<CareerWithPlan[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await publicApi.get<{ data: Career[] }>('/carreras', { params: { status: 'activo' } });
+        const response = await publicApi.get<{ data: Carrera[] }>('/carreras', { params: { status: 'activo' } });
         const careersWithPlans: CareerWithPlan[] = response.data.data.map((career) => ({
           ...career,
           studyPlan: getStudyPlanForCareer(career.id),

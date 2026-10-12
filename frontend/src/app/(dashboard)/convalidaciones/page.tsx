@@ -1,11 +1,11 @@
 'use client';
 
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
+import { Insignia } from '@/components/ui/insignia';
 import { Plus, Search, Edit2, Trash2, Check, X } from 'lucide-react';
 
 const convalidationsData = [
@@ -23,71 +23,71 @@ const estadoColors: Record<string, 'exito' | 'advertencia' | 'error'> = {
 export default function ConvalidationsPage() {
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Convalidaciones' }]} />
+      <Migas items={[{ label: 'Convalidaciones' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Convalidaciones</h1>
-        <Button>
+        <Boton>
           <Plus className="w-4 h-4 mr-2" />
           Nueva Convalidación
-        </Button>
+        </Boton>
       </div>
 
-      <Card variant="bordered">
-        <CardHeader>
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
-            <CardTitle>Lista de Convalidaciones</CardTitle>
+            <TituloTarjeta>Lista de Convalidaciones</TituloTarjeta>
             <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input placeholder="Buscar convalidación..." className="pl-10" />
+              <Entrada placeholder="Buscar convalidación..." className="pl-10" />
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Estudiante</TableHead>
-                <TableHead>Materia Origen</TableHead>
-                <TableHead>Materia Convalidada</TableHead>
-                <TableHead>Institución</TableHead>
-                <TableHead>Fecha</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta>
+          <Tabla>
+            <EncabezadoTabla>
+              <FilaTabla>
+                <CeldaEncabezado>Estudiante</CeldaEncabezado>
+                <CeldaEncabezado>Materia Origen</CeldaEncabezado>
+                <CeldaEncabezado>Materia Convalidada</CeldaEncabezado>
+                <CeldaEncabezado>Institución</CeldaEncabezado>
+                <CeldaEncabezado>Fecha</CeldaEncabezado>
+                <CeldaEncabezado>Estado</CeldaEncabezado>
+                <CeldaEncabezado>Acciones</CeldaEncabezado>
+              </FilaTabla>
+            </EncabezadoTabla>
+            <CuerpoTabla>
               {convalidationsData.map((conv) => (
-                <TableRow key={conv.id}>
-                  <TableCell className="font-medium">{conv.estudiante}</TableCell>
-                  <TableCell>{conv.materiaOrigen}</TableCell>
-                  <TableCell>{conv.materiaConvalidada}</TableCell>
-                  <TableCell>{conv.institucion}</TableCell>
-                  <TableCell>{conv.fecha}</TableCell>
-                  <TableCell>
-                    <Badge variant={estadoColors[conv.estado]} className="capitalize">
+                <FilaTabla key={conv.id}>
+                  <CeldaTabla className="font-medium">{conv.estudiante}</CeldaTabla>
+                  <CeldaTabla>{conv.materiaOrigen}</CeldaTabla>
+                  <CeldaTabla>{conv.materiaConvalidada}</CeldaTabla>
+                  <CeldaTabla>{conv.institucion}</CeldaTabla>
+                  <CeldaTabla>{conv.fecha}</CeldaTabla>
+                  <CeldaTabla>
+                    <Insignia variant={estadoColors[conv.estado]} className="capitalize">
                       {conv.estado}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
+                    </Insignia>
+                  </CeldaTabla>
+                  <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" title="Aprobar">
+                      <Boton variant="ghost" size="icon" title="Aprobar">
                         <Check className="w-4 h-4 text-green-500" />
-                      </Button>
-                      <Button variant="ghost" size="icon" title="Rechazar">
+                      </Boton>
+                      <Boton variant="ghost" size="icon" title="Rechazar">
                         <X className="w-4 h-4 text-red-500" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
+                      </Boton>
+                      <Boton variant="ghost" size="icon">
                         <Edit2 className="w-4 h-4" />
-                      </Button>
+                      </Boton>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </CuerpoTabla>
+          </Tabla>
+        </ContenidoTarjeta>
+      </Tarjeta>
     </div>
   );
 }

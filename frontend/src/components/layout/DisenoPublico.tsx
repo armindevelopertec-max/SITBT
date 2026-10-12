@@ -4,15 +4,15 @@ import Link from 'next/link';
 import { GraduationCap, MapPin, Phone, Mail, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { useInstitution } from '@/contexts/InstitutionContext';
+import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
-  const { institution } = useInstitution();
+export default function DisenoPublico({ children }: { children: React.ReactNode }) {
+  const { institucion } = usarInstitucion();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const logoUrl = institution?.logo_url;
-  const institutionName = institution?.nombre_corto || 'ITBT';
+  const logoUrl = institucion?.logo_url;
+  const nombreInstitucion = institucion?.nombre_corto || 'ITBT';
 
   const navItems = [
     { href: '/', label: 'Inicio' },
@@ -31,7 +31,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               {logoUrl ? (
                 <img
                   src={logoUrl}
-                  alt={institutionName}
+                  alt={nombreInstitucion}
                   className="h-12 w-auto object-contain transition-transform group-hover:scale-105"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
@@ -41,7 +41,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 <GraduationCap className="w-10 h-10 text-primary-400" />
               )}
               <div className="flex flex-col">
-                <span className="text-lg font-bold text-gray-100 tracking-tight leading-tight">{institutionName}</span>
+                <span className="text-lg font-bold text-gray-100 tracking-tight leading-tight">{nombreInstitucion}</span>
                 <span className="text-xs text-primary-400 tracking-wider">TÉCNICO SUPERIOR</span>
               </div>
             </Link>
@@ -132,7 +132,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 {logoUrl ? (
                   <img
                     src={logoUrl}
-                    alt={institutionName}
+                    alt={nombreInstitucion}
                     className="h-10 w-auto object-contain"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
@@ -142,15 +142,15 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                   <GraduationCap className="w-8 h-8 lg:w-10 lg:h-10 text-primary-400" />
                 )}
                 <div className="flex flex-col">
-                  <span className="text-base lg:text-lg font-bold text-gray-100 leading-tight">{institutionName}</span>
+                  <span className="text-base lg:text-lg font-bold text-gray-100 leading-tight">{nombreInstitucion}</span>
                   <span className="text-xs text-primary-400 tracking-wider">TÉCNICO SUPERIOR</span>
                 </div>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                {institution?.nombre || 'Instituto Tecnológico Boliviano de Tecnología'}
+                {institucion?.nombre || 'Instituto Tecnológico Boliviano de Tecnología'}
               </p>
               <p className="text-gray-400 text-sm mt-2">
-                {institution?.ciudad || 'El Alto'}, {institution?.pais || 'Bolivia'}
+                {institucion?.ciudad || 'El Alto'}, {institucion?.pais || 'Bolivia'}
               </p>
             </div>
 
@@ -176,15 +176,15 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               <ul className="space-y-3 text-sm text-gray-400">
                 <li className="flex items-start gap-3">
                   <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>{institution?.direccion || 'Av. de los Heroes, Z. Ferropetrol'}</span>
+                  <span>{institucion?.direccion || 'Av. de los Heroes, Z. Ferropetrol'}</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Phone className="w-4 h-4 flex-shrink-0" />
-                  <span>{institution?.telefono || '7525247'}</span>
+                  <span>{institucion?.telefono || '7525247'}</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail className="w-4 h-4 flex-shrink-0" />
-                  <span>{institution?.email || 'ITBT@edu.bo'}</span>
+                  <span>{institucion?.email || 'ITBT@edu.bo'}</span>
                 </li>
               </ul>
             </div>
@@ -192,7 +192,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
           <div className="border-t border-dark-600 mt-8 lg:mt-12 pt-6 lg:pt-8">
             <p className="text-center text-sm text-gray-500">
-              &copy; {new Date().getFullYear()} {institutionName}. Todos los derechos reservados.
+              &copy; {new Date().getFullYear()} {nombreInstitucion}. Todos los derechos reservados.
             </p>
           </div>
         </div>

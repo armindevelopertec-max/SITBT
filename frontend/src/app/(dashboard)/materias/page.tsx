@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
 import { ConfirmModal } from '@/components/ui/modal';
 import { api } from '@/lib/api';
 import { Search, Plus, Edit2, Trash2, Loader2 } from 'lucide-react';
@@ -71,19 +71,19 @@ export default function MateriasPage() {
 
   return (
     <div className="space-y-4">
-      <Breadcrumb items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Materias' }]} />
+      <Migas items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Materias' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">Materias</h1>
-        <Button size="sm" onClick={() => router.push('/materias/nuevo')}>
+        <Boton size="sm" onClick={() => router.push('/materias/nuevo')}>
           <Plus className="w-3 h-3 mr-1" />
           Nueva
-        </Button>
+        </Boton>
       </div>
 
       <div className="relative">
         <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400" />
-        <Input
+        <Entrada
           placeholder="Buscar..."
           className="pl-7 h-8 text-sm"
           value={searchQuery}
@@ -107,12 +107,12 @@ export default function MateriasPage() {
                 <p className="text-sm font-medium break-words">{materia.name}</p>
               </div>
               <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => router.push(`/materias/${materia.id}`)}>
+                <Boton variant="ghost" size="icon" className="h-6 w-6" onClick={() => router.push(`/materias/${materia.id}`)}>
                   <Edit2 className="w-3 h-3" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setDeletingMateria(materia); setDeleteModalOpen(true); }}>
+                </Boton>
+                <Boton variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setDeletingMateria(materia); setDeleteModalOpen(true); }}>
                   <Trash2 className="w-3 h-3 text-red-500" />
-                </Button>
+                </Boton>
               </div>
             </div>
           ))}

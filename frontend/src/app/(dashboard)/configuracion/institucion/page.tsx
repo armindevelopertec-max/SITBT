@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ImageUpload } from '@/components/ui/image-upload';
-import { useInstitutionSettings } from '@/hooks/useInstitutionSettings';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta, DescripcionTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { CargarImagen } from '@/components/ui/cargar-imagen';
+import { usarConfiguracionInstitucional } from '@/hooks/usarConfiguracionInstitucional';
 import { Save, Building2, Phone, MapPin, Pencil, X } from 'lucide-react';
 import api from '@/lib/api';
 
@@ -31,7 +31,7 @@ const settingsSchema = z.object({
 type SettingsForm = z.infer<typeof settingsSchema>;
 
 export default function ConfiguracionPage() {
-  const { settings, loading, refetch } = useInstitutionSettings();
+  const { settings, loading, refetch } = usarConfiguracionInstitucional();
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -55,7 +55,7 @@ export default function ConfiguracionPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <Breadcrumb items={[{ label: 'Configuración' }, { label: 'Institución' }]} />
+        <Migas items={[{ label: 'Configuración' }, { label: 'Institución' }]} />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
         </div>
@@ -68,7 +68,7 @@ export default function ConfiguracionPage() {
       setSaving(true);
       setMessage(null);
       const submitData = { ...data, logo_url: logoUrl };
-      await api.put('/institution-settings', submitData);
+      await api.put('/configuracion-institucional', submitData);
       setMessage({ type: 'success', text: 'Configuración guardada correctamente' });
       setIsEditing(false);
       refetch();
@@ -111,7 +111,7 @@ export default function ConfiguracionPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Configuración' }, { label: 'Institución' }]} />
+      <Migas items={[{ label: 'Configuración' }, { label: 'Institución' }]} />
 
       <div className="flex items-center justify-between">
         <div>
@@ -121,10 +121,10 @@ export default function ConfiguracionPage() {
           </p>
         </div>
         {!isEditing && (
-          <Button onClick={handleEdit}>
+          <Boton onClick={handleEdit}>
             <Pencil className="w-4 h-4 mr-2" />
             Editar
-          </Button>
+          </Boton>
         )}
       </div>
 
@@ -142,145 +142,145 @@ export default function ConfiguracionPage() {
 
       {isEditing ? (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <Card variant="bordered">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Tarjeta variant="bordered">
+            <EncabezadoTarjeta>
+              <TituloTarjeta className="flex items-center gap-2">
                 <Building2 className="w-5 h-5" />
                 Datos Generales
-              </CardTitle>
-              <CardDescription>Información básica de la institución</CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Input
+              </TituloTarjeta>
+              <DescripcionTarjeta>Información básica de la institución</DescripcionTarjeta>
+            </EncabezadoTarjeta>
+            <ContenidoTarjeta className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Entrada
                 label="Nombre Completo"
                 placeholder="Instituto Tecnológico Boliviana de Tecnología"
                 error={errors.nombre?.message}
                 {...register('nombre')}
               />
-              <Input
+              <Entrada
                 label="Nombre Corto / Sigla"
                 placeholder="SITBT"
                 error={errors.nombre_corto?.message}
                 {...register('nombre_corto')}
               />
               <div className="md:col-span-2">
-                <Input
+                <Entrada
                   label="Lema"
                   placeholder="Formando profesionales técnicos de excelencia"
                   {...register('lema')}
                 />
               </div>
               <div className="md:col-span-2">
-                <Input
+                <Entrada
                   label="Descripción"
                   placeholder="Breve descripción de la institución..."
                   {...register('descripcion')}
                 />
               </div>
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
 
-          <Card variant="bordered">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Tarjeta variant="bordered">
+            <EncabezadoTarjeta>
+              <TituloTarjeta className="flex items-center gap-2">
                 <Building2 className="w-5 h-5" />
                 Identidad Visual
-              </CardTitle>
-              <CardDescription>Logo institucional que aparecerá en documentos</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ImageUpload
+              </TituloTarjeta>
+              <DescripcionTarjeta>Logo institucional que aparecerá en documentos</DescripcionTarjeta>
+            </EncabezadoTarjeta>
+            <ContenidoTarjeta>
+              <CargarImagen
                 label="Logo de la Institución"
                 value={logoUrl}
                 onChange={(url) => setLogoUrl(url)}
                 helperText="PNG, JPG o WEBP (máx. 5MB). El logo se subirá a MinIO automáticamente."
               />
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
 
-          <Card variant="bordered">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Tarjeta variant="bordered">
+            <EncabezadoTarjeta>
+              <TituloTarjeta className="flex items-center gap-2">
                 <MapPin className="w-5 h-5" />
                 Ubicación
-              </CardTitle>
-              <CardDescription>Dirección y ubicación geográfica</CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              </TituloTarjeta>
+              <DescripcionTarjeta>Dirección y ubicación geográfica</DescripcionTarjeta>
+            </EncabezadoTarjeta>
+            <ContenidoTarjeta className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
-                <Input
+                <Entrada
                   label="Dirección"
                   placeholder="Av. Bolivia No. 1234, Zona Central"
                   {...register('direccion')}
                 />
               </div>
-              <Input
+              <Entrada
                 label="Ciudad"
                 placeholder="La Paz"
                 {...register('ciudad')}
               />
-              <Input
+              <Entrada
                 label="País"
                 placeholder="Bolivia"
                 {...register('pais')}
               />
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
 
-          <Card variant="bordered">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Tarjeta variant="bordered">
+            <EncabezadoTarjeta>
+              <TituloTarjeta className="flex items-center gap-2">
                 <Phone className="w-5 h-5" />
                 Contacto
-              </CardTitle>
-              <CardDescription>Información de contacto oficial</CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Input
+              </TituloTarjeta>
+              <DescripcionTarjeta>Información de contacto oficial</DescripcionTarjeta>
+            </EncabezadoTarjeta>
+            <ContenidoTarjeta className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Entrada
                 label="Teléfono"
                 placeholder="+591 2 1234567"
                 {...register('telefono')}
               />
-              <Input
+              <Entrada
                 label="Departamento"
                 placeholder="La Paz"
                 {...register('departamento')}
               />
-              <Input
+              <Entrada
                 label="Email"
                 placeholder="contacto@sitbt.edu.bo"
                 error={errors.email?.message}
                 {...register('email')}
               />
-              <Input
+              <Entrada
                 label="Website"
                 placeholder="https://www.sitbt.edu.bo"
                 {...register('website')}
               />
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
 
           <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={handleCancel}>
+            <Boton type="button" variant="outline" onClick={handleCancel}>
               <X className="w-4 h-4 mr-2" />
               Cancelar
-            </Button>
-            <Button type="submit" isLoading={saving}>
+            </Boton>
+            <Boton type="submit" isLoading={saving}>
               <Save className="w-4 h-4 mr-2" />
               Guardar Cambios
-            </Button>
+            </Boton>
           </div>
         </form>
       ) : (
         <div className="space-y-6">
-          <Card variant="bordered">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Tarjeta variant="bordered">
+            <EncabezadoTarjeta>
+              <TituloTarjeta className="flex items-center gap-2">
                 <Building2 className="w-5 h-5" />
                 Datos Generales
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </TituloTarjeta>
+            </EncabezadoTarjeta>
+            <ContenidoTarjeta className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Nombre Completo</p>
@@ -299,17 +299,17 @@ export default function ConfiguracionPage() {
                   <p className="text-gray-900">{settings?.descripcion || '-'}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
 
-          <Card variant="bordered">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Tarjeta variant="bordered">
+            <EncabezadoTarjeta>
+              <TituloTarjeta className="flex items-center gap-2">
                 <Building2 className="w-5 h-5" />
                 Identidad Visual
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+              </TituloTarjeta>
+            </EncabezadoTarjeta>
+            <ContenidoTarjeta>
               <div className="flex items-center gap-6">
                 {settings?.logo_url ? (
                   <img
@@ -329,17 +329,17 @@ export default function ConfiguracionPage() {
                   </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
 
-          <Card variant="bordered">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Tarjeta variant="bordered">
+            <EncabezadoTarjeta>
+              <TituloTarjeta className="flex items-center gap-2">
                 <MapPin className="w-5 h-5" />
                 Ubicación
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+              </TituloTarjeta>
+            </EncabezadoTarjeta>
+            <ContenidoTarjeta>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Dirección</p>
@@ -354,17 +354,17 @@ export default function ConfiguracionPage() {
                   <p className="text-gray-900">{settings?.pais || '-'}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
 
-          <Card variant="bordered">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Tarjeta variant="bordered">
+            <EncabezadoTarjeta>
+              <TituloTarjeta className="flex items-center gap-2">
                 <Phone className="w-5 h-5" />
                 Contacto
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+              </TituloTarjeta>
+            </EncabezadoTarjeta>
+            <ContenidoTarjeta>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Teléfono</p>
@@ -383,8 +383,8 @@ export default function ConfiguracionPage() {
                   <p className="text-gray-900">{settings?.website || '-'}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
         </div>
       )}
     </div>

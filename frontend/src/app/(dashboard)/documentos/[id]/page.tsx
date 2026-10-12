@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useDocuments, EmittedDocument } from '@/hooks/useDocuments';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { usarDocumentos, DocumentoEmitido } from '@/hooks/usarDocumentos';
+import { Boton } from '@/components/ui/boton';
+import { Insignia } from '@/components/ui/insignia';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
 import { ArrowLeft, Printer, CheckCircle, XCircle, FileText, Calendar, User } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -30,9 +30,9 @@ const estadoLabels: Record<string, { label: string; color: string }> = {
 export default function DocumentDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { getDocument, markAsPrinted, markAsDelivered, annulDocument } = useDocuments();
+  const { getDocument, markAsPrinted, markAsDelivered, annulDocument } = usarDocumentos();
 
-  const [document, setDocument] = useState<EmittedDocument | null>(null);
+  const [document, setDocument] = useState<DocumentoEmitido | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -115,30 +115,30 @@ export default function DocumentDetailPage() {
     <div className="p-6">
       <div className="flex items-center gap-4 mb-6">
         <Link href="/documentos">
-          <Button variant="ghost" size="sm">
+          <Boton variant="ghost" size="sm">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver
-          </Button>
+          </Boton>
         </Link>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-gray-900">Detalle de Documento</h1>
           <p className="text-gray-500">ID: {document.id.slice(0, 8)}...</p>
         </div>
-        <Badge className={estado?.color}>
+        <Insignia className={estado?.color}>
           {estado?.label}
-        </Badge>
+        </Insignia>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Tarjeta>
+            <EncabezadoTarjeta>
+              <TituloTarjeta className="flex items-center gap-2">
                 <FileText className="w-5 h-5" />
                 {tipoLabels[document.tipo] || document.tipo}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </TituloTarjeta>
+            </EncabezadoTarjeta>
+            <ContenidoTarjeta className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Número de documento</p>
@@ -168,18 +168,18 @@ export default function DocumentDetailPage() {
                   <p className="font-medium">{document.observaciones}</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
 
           {document.estudiante && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <Tarjeta>
+              <EncabezadoTarjeta>
+                <TituloTarjeta className="flex items-center gap-2">
                   <User className="w-5 h-5" />
                   Estudiante
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+                </TituloTarjeta>
+              </EncabezadoTarjeta>
+              <ContenidoTarjeta>
                 <p className="font-medium">
                   {document.estudiante.persona?.names}{' '}
                   {document.estudiante.persona?.lastname_paternal}{' '}
@@ -191,55 +191,55 @@ export default function DocumentDetailPage() {
                 <p className="text-sm text-gray-500">
                   Código: {document.estudiante.inscription_code}
                 </p>
-              </CardContent>
-            </Card>
+              </ContenidoTarjeta>
+            </Tarjeta>
           )}
 
           {document.fechaEntrega && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Entrega</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <Tarjeta>
+              <EncabezadoTarjeta>
+                <TituloTarjeta>Entrega</TituloTarjeta>
+              </EncabezadoTarjeta>
+              <ContenidoTarjeta>
                 <p className="font-medium">Entregado a: {document.entregadoA}</p>
                 <p className="text-sm text-gray-500">
                   Fecha: {format(new Date(document.fechaEntrega), "d 'de' MMMM 'de' yyyy HH:mm", { locale: es })}
                 </p>
-              </CardContent>
-            </Card>
+              </ContenidoTarjeta>
+            </Tarjeta>
           )}
         </div>
 
         <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Acciones</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <Tarjeta>
+            <EncabezadoTarjeta>
+              <TituloTarjeta>Acciones</TituloTarjeta>
+            </EncabezadoTarjeta>
+            <ContenidoTarjeta className="space-y-3">
               {document.estado === 'generado' && (
-                <Button
+                <Boton
                   className="w-full"
                   onClick={handlePrint}
                   disabled={actionLoading}
                 >
                   <Printer className="w-4 h-4 mr-2" />
                   Marcar como impreso
-                </Button>
+                </Boton>
               )}
 
               {document.estado === 'impreso' && (
-                <Button
+                <Boton
                   className="w-full bg-green-600 hover:bg-green-700"
                   onClick={handleDeliver}
                   disabled={actionLoading}
                 >
                   <CheckCircle className="w-4 h-4 mr-2" />
                   Registrar entrega
-                </Button>
+                </Boton>
               )}
 
               {(document.estado === 'generado' || document.estado === 'impreso') && (
-                <Button
+                <Boton
                   variant="destructive"
                   className="w-full"
                   onClick={handleAnnul}
@@ -247,15 +247,15 @@ export default function DocumentDetailPage() {
                 >
                   <XCircle className="w-4 h-4 mr-2" />
                   Anular documento
-                </Button>
+                </Boton>
               )}
 
-              <Button variant="outline" className="w-full" disabled={!document.pdfPath}>
+              <Boton variant="outline" className="w-full" disabled={!document.pdfPath}>
                 <FileText className="w-4 h-4 mr-2" />
                 Descargar PDF
-              </Button>
-            </CardContent>
-          </Card>
+              </Boton>
+            </ContenidoTarjeta>
+          </Tarjeta>
         </div>
       </div>
     </div>

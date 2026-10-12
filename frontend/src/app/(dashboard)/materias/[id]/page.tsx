@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
 import { api } from '@/lib/api';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
@@ -109,10 +109,10 @@ export default function EditarMateriaPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+          <Boton variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <Breadcrumb items={[
+          </Boton>
+          <Migas items={[
             { label: 'Configuración', href: '/configuracion' },
             { label: 'Materias', href: '/materias' },
             { label: 'Editar Materia' }
@@ -128,10 +128,10 @@ export default function EditarMateriaPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <Breadcrumb items={[
+        </Boton>
+        <Migas items={[
           { label: 'Configuración', href: '/configuracion' },
           { label: 'Materias', href: '/materias' },
           { label: 'Editar Materia' }
@@ -143,14 +143,14 @@ export default function EditarMateriaPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle>Datos de la Materia</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Datos de la Materia</TituloTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Input
+                <Entrada
                   label="Código *"
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
@@ -159,7 +159,7 @@ export default function EditarMateriaPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Nombre *"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -168,8 +168,8 @@ export default function EditarMateriaPage() {
                 />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
 
         {errors.submit && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -178,10 +178,10 @@ export default function EditarMateriaPage() {
         )}
 
         <div className="flex justify-end gap-3">
-          <Button variant="outline" type="button" onClick={() => router.back()}>
+          <Boton variant="outline" type="button" onClick={() => router.back()}>
             Cancelar
-          </Button>
-          <Button type="submit" disabled={saving}>
+          </Boton>
+          <Boton type="submit" disabled={saving}>
             {saving ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -193,7 +193,7 @@ export default function EditarMateriaPage() {
                 Actualizar Materia
               </>
             )}
-          </Button>
+          </Boton>
         </div>
       </form>
     </div>

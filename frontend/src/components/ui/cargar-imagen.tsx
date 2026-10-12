@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { Image, Upload, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utilidades';
 
 interface ImageUploadProps {
   label?: string;
@@ -15,9 +15,9 @@ interface ImageUploadProps {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
-const getUploadUrl = () => API_URL ? `${API_URL}/storage/upload` : `${API_BASE}/api/storage/upload`;
+const getUploadUrl = () => API_URL ? `${API_URL}/almacenamiento/upload` : `${API_BASE}/api/almacenamiento/upload`;
 
-export function ImageUpload({
+export function CargarImagen({
   label,
   value,
   onChange,

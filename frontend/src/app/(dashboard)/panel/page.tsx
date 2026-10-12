@@ -1,13 +1,13 @@
 'use client';
 
-import { useAuthStore } from '@/store/auth-store';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Migas } from '@/components/ui/migas';
 import { Users, GraduationCap, UserCog, BookOpen, TrendingUp, Calendar, DollarSign, Award } from 'lucide-react';
-import { getRoleLabel } from '@/lib/auth';
+import { etiquetaRol } from '@/lib/autenticacion';
 
 export default function DashboardPage() {
-  const { user } = useAuthStore();
+  const { user } = usarAlmacenAutenticacion();
 
   const stats = [
     { title: 'Total Estudiantes', value: '1,234', icon: GraduationCap, color: 'text-blue-600', bgColor: 'bg-blue-100' },
@@ -26,7 +26,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Dashboard' }]} />
+      <Migas items={[{ label: 'Dashboard' }]} />
 
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Bienvenido, {user?.username}</h1>
@@ -37,8 +37,8 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
-          <Card key={stat.title} variant="bordered">
-            <CardContent className="p-6">
+          <Tarjeta key={stat.title} variant="bordered">
+            <ContenidoTarjeta className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">{stat.title}</p>
@@ -53,17 +53,17 @@ export default function DashboardPage() {
                 <span className="text-green-600 font-medium">+12%</span>
                 <span className="ml-1">vs mes anterior</span>
               </div>
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle>Actividad Reciente</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Actividad Reciente</TituloTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta>
             <div className="space-y-4">
               {recentActivity.map((activity) => (
                 <div key={activity.id} className="flex items-center gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
@@ -77,14 +77,14 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
 
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle>Calendario Académico</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Calendario Académico</TituloTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta>
             <div className="space-y-4">
               {[
                 { date: '15 Oct', event: 'Inicio de exámenes parciales', type: 'Examen' },
@@ -105,8 +105,8 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
       </div>
     </div>
   );

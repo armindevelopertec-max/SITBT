@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Selector } from '@/components/ui/selector';
+import { Insignia } from '@/components/ui/insignia';
 import { Modal } from '@/components/ui/modal';
 import { ConfirmModal } from '@/components/ui/modal';
 import { api } from '@/lib/api';
@@ -52,7 +52,7 @@ export default function GestionesPage() {
       cerrada: 'error',
       pendiente: 'advertencia',
     };
-    return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>;
+    return <Insignia variant={variants[status] || 'secondary'}>{status}</Insignia>;
   };
 
   const getPeriodBadge = (type: string) => {
@@ -61,7 +61,7 @@ export default function GestionesPage() {
       semestral: 'secondary',
       trimestral: 'outline',
     };
-    return <Badge variant={variants[type] || 'secondary'}>{type}</Badge>;
+    return <Insignia variant={variants[type] || 'secondary'}>{type}</Insignia>;
   };
 
   const handleOpenModal = (gestion?: Gestion) => {
@@ -217,42 +217,42 @@ export default function GestionesPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Gestiones' }]} />
+      <Migas items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Gestiones' }]} />
 
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestiones Académicas</h1>
           <p className="text-gray-500">Administra los períodos académicos</p>
         </div>
-        <Button onClick={() => handleOpenModal()}>
+        <Boton onClick={() => handleOpenModal()}>
           <Plus className="w-4 h-4 mr-2" />
           Nueva Gestión
-        </Button>
+        </Boton>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[...gestiones].sort((a, b) => (b.is_current ? 1 : 0) - (a.is_current ? 1 : 0)).map((gestion) => (
-          <Card key={gestion.id} variant="bordered">
-            <CardHeader className="pb-3">
+          <Tarjeta key={gestion.id} variant="bordered">
+            <EncabezadoTarjeta className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
                     <Calendar className="w-5 h-5 text-primary-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg flex items-center gap-2">
+                    <TituloTarjeta className="text-lg flex items-center gap-2">
                       {gestion.year}
                       {gestion.is_current && (
                         <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                       )}
-                    </CardTitle>
+                    </TituloTarjeta>
                     <p className="text-sm text-gray-500">{gestion.period_type}</p>
                   </div>
                 </div>
                 {getStatusBadge(gestion.status)}
               </div>
-            </CardHeader>
-            <CardContent>
+            </EncabezadoTarjeta>
+            <ContenidoTarjeta>
               {gestion.periodos && gestion.periodos.length > 0 && (
                 <div className="space-y-2 mb-4">
                   <p className="text-sm font-medium text-gray-700">Períodos:</p>
@@ -268,34 +268,34 @@ export default function GestionesPage() {
                       <div className="flex items-center gap-2">
                         {getStatusBadge(periodo.status)}
                         {periodo.status === 'pendiente' && (
-                          <Button
+                          <Boton
                             size="sm"
                             variant="ghost"
                             className="h-6 w-6 p-0"
                             onClick={() => handleOpenPeriodo(periodo.id, `${periodo.number} - ${periodo.name}`)}
                           >
                             <Unlock className="w-3 h-3" />
-                          </Button>
+                          </Boton>
                         )}
                         {periodo.status === 'abierta' && (
-                          <Button
+                          <Boton
                             size="sm"
                             variant="ghost"
                             className="h-6 w-6 p-0"
                             onClick={() => handleClosePeriodo(periodo.id, `${periodo.number} - ${periodo.name}`)}
                           >
                             <Lock className="w-3 h-3" />
-                          </Button>
+                          </Boton>
                         )}
                         {periodo.status === 'cerrada' && (
-                          <Button
+                          <Boton
                             size="sm"
                             variant="ghost"
                             className="h-6 w-6 p-0"
                             onClick={() => handleOpenPeriodo(periodo.id, `${periodo.number} - ${periodo.name}`)}
                           >
                             <Unlock className="w-3 h-3" />
-                          </Button>
+                          </Boton>
                         )}
                       </div>
                     </div>
@@ -309,37 +309,37 @@ export default function GestionesPage() {
 
               <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
                 {gestion.status === 'pendiente' && (
-                  <Button size="sm" variant="outline" className="flex-1" onClick={() => handleOpen(gestion)}>
+                  <Boton size="sm" variant="outline" className="flex-1" onClick={() => handleOpen(gestion)}>
                     <Unlock className="w-4 h-4 mr-1" />
                     Abrir
-                  </Button>
+                  </Boton>
                 )}
                 {gestion.status === 'abierta' && (
-                  <Button size="sm" variant="outline" className="flex-1" onClick={() => handleClose(gestion)}>
+                  <Boton size="sm" variant="outline" className="flex-1" onClick={() => handleClose(gestion)}>
                     <Lock className="w-4 h-4 mr-1" />
                     Cerrar
-                  </Button>
+                  </Boton>
                 )}
                 {gestion.status === 'cerrada' && (
-                  <Button size="sm" variant="outline" className="flex-1" onClick={() => handleOpen(gestion)}>
+                  <Boton size="sm" variant="outline" className="flex-1" onClick={() => handleOpen(gestion)}>
                     <Unlock className="w-4 h-4 mr-1" />
                     Reabrir
-                  </Button>
+                  </Boton>
                 )}
                 {!gestion.is_current && (
-                  <Button
+                  <Boton
                     size="sm"
                     variant="ghost"
                     onClick={() => handleSetCurrent(gestion)}
                     title="Marcar como actual"
                   >
                     <StarOff className="w-4 h-4" />
-                  </Button>
+                  </Boton>
                 )}
-                <Button size="sm" variant="ghost" onClick={() => handleOpenModal(gestion)}>
+                <Boton size="sm" variant="ghost" onClick={() => handleOpenModal(gestion)}>
                   <Edit2 className="w-4 h-4" />
-                </Button>
-                <Button
+                </Boton>
+                <Boton
                   size="sm"
                   variant="ghost"
                   onClick={() => {
@@ -348,20 +348,20 @@ export default function GestionesPage() {
                   }}
                 >
                   <Trash2 className="w-4 h-4 text-red-500" />
-                </Button>
+                </Boton>
               </div>
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
         ))}
 
         {gestiones.length === 0 && (
           <div className="col-span-full text-center py-12 text-gray-500">
             <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-300" />
             <p>No hay gestiones registradas</p>
-            <Button variant="outline" className="mt-4" onClick={() => handleOpenModal()}>
+            <Boton variant="outline" className="mt-4" onClick={() => handleOpenModal()}>
               <Plus className="w-4 h-4 mr-2" />
               Crear primera gestión
-            </Button>
+            </Boton>
           </div>
         )}
       </div>
@@ -374,14 +374,14 @@ export default function GestionesPage() {
       >
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <Input
+            <Entrada
               label="Año *"
               value={formData.year}
               onChange={(e) => setFormData({ ...formData, year: e.target.value })}
               placeholder="2025"
               disabled={!!editingGestion}
             />
-            <Select
+            <Selector
               label="Régimen *"
               value={formData.period_type}
               onChange={(e) => setFormData({ ...formData, period_type: e.target.value })}
@@ -429,12 +429,12 @@ export default function GestionesPage() {
           )}
 
           <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button variant="outline" onClick={handleCloseModal}>
+            <Boton variant="outline" onClick={handleCloseModal}>
               Cancelar
-            </Button>
-            <Button onClick={handleSave} disabled={saving || !formData.year}>
+            </Boton>
+            <Boton onClick={handleSave} disabled={saving || !formData.year}>
               {saving ? 'Guardando...' : 'Guardar'}
-            </Button>
+            </Boton>
           </div>
         </div>
       </Modal>

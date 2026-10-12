@@ -1,8 +1,8 @@
 import { api } from '@/lib/api';
 import { useState } from 'react';
-import { ConsentRecord } from '@/types';
+import { RegistroConsentimiento } from '@/types';
 
-export function useConsent() {
+export function usarConsentimiento() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -12,11 +12,11 @@ export function useConsent() {
     nombreTutor?: string;
     ciTutor?: string;
     firmaBase64?: string;
-  }): Promise<ConsentRecord> => {
+  }): Promise<RegistroConsentimiento> => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.post<ConsentRecord>('/consent', data);
+      const response = await api.post<RegistroConsentimiento>('/consentimiento', data);
       return response.data;
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al registrar consentimiento');
@@ -26,14 +26,14 @@ export function useConsent() {
     }
   };
 
-  const getConsentByStudent = async (estudianteId: number): Promise<ConsentRecord[]> => {
-    const response = await api.get<ConsentRecord[]>(`/consent/student/${estudianteId}`);
+  const getConsentByStudent = async (estudianteId: number): Promise<RegistroConsentimiento[]> => {
+    const response = await api.get<RegistroConsentimiento[]>(`/consentimiento/student/${estudianteId}`);
     return response.data;
   };
 
-  const getLatestConsent = async (estudianteId: number): Promise<ConsentRecord | null> => {
+  const getLatestConsent = async (estudianteId: number): Promise<RegistroConsentimiento | null> => {
     try {
-      const response = await api.get<ConsentRecord | null>(`/consent/student/${estudianteId}/latest`);
+      const response = await api.get<RegistroConsentimiento | null>(`/consentimiento/student/${estudianteId}/latest`);
       return response.data;
     } catch {
       return null;
@@ -41,7 +41,7 @@ export function useConsent() {
   };
 
   const hasValidConsent = async (estudianteId: number, version: string): Promise<boolean> => {
-    const response = await api.get<boolean>(`/consent/check/${estudianteId}/${version}`);
+    const response = await api.get<boolean>(`/consentimiento/check/${estudianteId}/${version}`);
     return response.data;
   };
 

@@ -1,15 +1,15 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utilidades';
 import { HTMLAttributes, forwardRef } from 'react';
 
-type BadgeVariant = 'default' | 'primary' | 'secondary' | 'exito' | 'advertencia' | 'error' | 'outline';
+type VarianteInsignia = 'default' | 'primary' | 'secondary' | 'exito' | 'advertencia' | 'error' | 'outline';
 
-interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: BadgeVariant;
+interface PropsInsignia extends HTMLAttributes<HTMLSpanElement> {
+  variant?: VarianteInsignia;
 }
 
-const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
+const Insignia = forwardRef<HTMLSpanElement, PropsInsignia>(
   ({ className, variant = 'default', ...props }, ref) => {
-    const variants: Record<BadgeVariant, string> = {
+    const variants: Record<VarianteInsignia, string> = {
       default: 'bg-gray-100 text-gray-800',
       primary: 'bg-primary-100 text-primary-800',
       secondary: 'bg-secondary-100 text-secondary-800',
@@ -33,7 +33,7 @@ const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
   }
 );
 
-Badge.displayName = 'Badge';
+Insignia.displayName = 'Insignia';
 
-export { Badge };
-export type { BadgeProps, BadgeVariant };
+export { Insignia };
+export type { PropsInsignia, VarianteInsignia };

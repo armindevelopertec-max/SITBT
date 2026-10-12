@@ -1,6 +1,6 @@
-import { User, Role } from '@/types';
+import { Usuario, Rol } from '@/types';
 
-export const ROLES: Record<Role, { label: string; color: string }> = {
+export const ROLES: Record<Rol, { label: string; color: string }> = {
   administrador: { label: 'Administrador', color: 'bg-red-100 text-red-800' },
   secretaria: { label: 'Secretaria', color: 'bg-pink-100 text-pink-800' },
   director_academico: { label: 'Director Académico', color: 'bg-purple-100 text-purple-800' },
@@ -10,14 +10,14 @@ export const ROLES: Record<Role, { label: string; color: string }> = {
   apoyo: { label: 'Apoyo', color: 'bg-gray-100 text-gray-800' },
 };
 
-export const getRoleLabel = (role: Role): string => {
-  return ROLES[role]?.label || role;
+export const etiquetaRol = (rol: Rol): string => {
+  return ROLES[rol]?.label || rol;
 };
 
-export const getRoleColor = (role: Role): string => {
-  return ROLES[role]?.color || 'bg-gray-100 text-gray-800';
+export const colorRol = (rol: Rol): string => {
+  return ROLES[rol]?.color || 'bg-gray-100 text-gray-800';
 };
 
-export const formatRoleName = (user: User): string => {
-  return getRoleLabel(user.role);
+export const formatearNombreRol = (usuario: Usuario): string => {
+  return etiquetaRol(usuario.role);
 };

@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
 import { api } from '@/lib/api';
 import { ArrowLeft, Save, Loader2, Search, X } from 'lucide-react';
 
-interface Student {
+interface Estudiante {
   id: number;
   inscription_code: string;
   status: string;
@@ -48,7 +48,7 @@ export default function NewCredentialPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [searchStudent, setSearchStudent] = useState('');
-  const [students, setStudents] = useState<Student[]>([]);
+  const [students, setStudents] = useState<Estudiante[]>([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -65,7 +65,7 @@ export default function NewCredentialPage() {
 
   const [gestiones, setGestiones] = useState<Gestion[]>([]);
 
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [selectedStudent, setSelectedStudent] = useState<Estudiante | null>(null);
 
   useEffect(() => {
     fetchStudents();
@@ -109,7 +109,7 @@ export default function NewCredentialPage() {
     }).slice(0, 10);
   }, [students, searchStudent]);
 
-  const selectStudent = (student: Student) => {
+  const selectStudent = (student: Estudiante) => {
     setSelectedStudent(student);
     setFormData({ ...formData, student_id: student.id });
     setSearchStudent('');
@@ -169,10 +169,10 @@ export default function NewCredentialPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <Breadcrumb items={[
+        </Boton>
+        <Migas items={[
           { label: 'Credenciales', href: '/credenciales' },
           { label: 'Nueva Credencial' }
         ]} />
@@ -183,11 +183,11 @@ export default function NewCredentialPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle>Seleccionar Estudiante</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Seleccionar Estudiante</TituloTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta className="space-y-4">
             {selectedStudent ? (
               <div className="flex items-center justify-between p-4 bg-primary-50 border border-primary-200 rounded-lg">
                 <div className="flex items-center gap-3">
@@ -204,15 +204,15 @@ export default function NewCredentialPage() {
                     <p className="text-sm text-gray-500">{selectedStudent.carrera?.name || 'Sin carrera'}</p>
                   </div>
                 </div>
-                <Button type="button" variant="ghost" size="icon" onClick={clearStudent}>
+                <Boton type="button" variant="ghost" size="icon" onClick={clearStudent}>
                   <X className="w-4 h-4" />
-                </Button>
+                </Boton>
               </div>
             ) : (
               <div>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
+                  <Entrada
                     placeholder="Buscar estudiante por nombre, CI o código..."
                     className="pl-10"
                     value={searchStudent}
@@ -255,14 +255,14 @@ export default function NewCredentialPage() {
                 )}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
 
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle>Datos de la Credencial</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Datos de la Credencial</TituloTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -308,7 +308,7 @@ export default function NewCredentialPage() {
                 {errors.semester && <p className="text-sm text-red-600 mt-1">{errors.semester}</p>}
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Fecha de Emisión *"
                   type="date"
                   value={formData.issued_date}
@@ -317,7 +317,7 @@ export default function NewCredentialPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Válida Hasta *"
                   type="date"
                   value={formData.valid_until}
@@ -328,7 +328,7 @@ export default function NewCredentialPage() {
             </div>
 
             <div>
-              <Input
+              <Entrada
                 label="URL de Foto"
                 value={formData.photo_url}
                 onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
@@ -345,8 +345,8 @@ export default function NewCredentialPage() {
                 placeholder="Observaciones adicionales..."
               />
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
 
         {errors.submit && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
@@ -355,10 +355,10 @@ export default function NewCredentialPage() {
         )}
 
         <div className="flex justify-end gap-3">
-          <Button variant="outline" type="button" onClick={() => router.back()}>
+          <Boton variant="outline" type="button" onClick={() => router.back()}>
             Cancelar
-          </Button>
-          <Button type="submit" disabled={loading}>
+          </Boton>
+          <Boton type="submit" disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -370,7 +370,7 @@ export default function NewCredentialPage() {
                 Crear Credencial
               </>
             )}
-          </Button>
+          </Boton>
         </div>
       </form>
     </div>

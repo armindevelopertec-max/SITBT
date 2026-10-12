@@ -1,37 +1,37 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utilidades';
 import { HTMLAttributes, forwardRef, TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from 'react';
 
-const Table = forwardRef<HTMLTableElement, TableHTMLAttributes<HTMLTableElement>>(
+const Tabla = forwardRef<HTMLTableElement, TableHTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
     <div className="w-full overflow-auto">
       <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
     </div>
   )
 );
-Table.displayName = 'Table';
+Tabla.displayName = 'Tabla';
 
-const TableHeader = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTableSectionElement>>(
+const EncabezadoTabla = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTableSectionElement>>(
   ({ className, ...props }, ref) => (
     <thead ref={ref} className={cn('bg-gray-50 border-b border-gray-200', className)} {...props} />
   )
 );
-TableHeader.displayName = 'TableHeader';
+EncabezadoTabla.displayName = 'EncabezadoTabla';
 
-const TableBody = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTableSectionElement>>(
+const CuerpoTabla = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTableSectionElement>>(
   ({ className, ...props }, ref) => (
     <tbody ref={ref} className={cn('divide-y divide-gray-200', className)} {...props} />
   )
 );
-TableBody.displayName = 'TableBody';
+CuerpoTabla.displayName = 'CuerpoTabla';
 
-const TableRow = forwardRef<HTMLTableRowElement, HTMLAttributes<HTMLTableRowElement>>(
+const FilaTabla = forwardRef<HTMLTableRowElement, HTMLAttributes<HTMLTableRowElement>>(
   ({ className, ...props }, ref) => (
     <tr ref={ref} className={cn('hover:bg-gray-50 transition-colors', className)} {...props} />
   )
 );
-TableRow.displayName = 'TableRow';
+FilaTabla.displayName = 'FilaTabla';
 
-const TableHead = forwardRef<HTMLTableCellElement, ThHTMLAttributes<HTMLTableCellElement>>(
+const CeldaEncabezado = forwardRef<HTMLTableCellElement, ThHTMLAttributes<HTMLTableCellElement>>(
   ({ className, ...props }, ref) => (
     <th
       ref={ref}
@@ -43,20 +43,20 @@ const TableHead = forwardRef<HTMLTableCellElement, ThHTMLAttributes<HTMLTableCel
     />
   )
 );
-TableHead.displayName = 'TableHead';
+CeldaEncabezado.displayName = 'CeldaEncabezado';
 
-const TableCell = forwardRef<HTMLTableCellElement, TdHTMLAttributes<HTMLTableCellElement>>(
+const CeldaTabla = forwardRef<HTMLTableCellElement, TdHTMLAttributes<HTMLTableCellElement>>(
   ({ className, ...props }, ref) => (
     <td ref={ref} className={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)} {...props} />
   )
 );
-TableCell.displayName = 'TableCell';
+CeldaTabla.displayName = 'CeldaTabla';
 
-const TableCaption = forwardRef<HTMLTableCaptionElement, HTMLAttributes<HTMLTableCaptionElement>>(
+const PieTabla = forwardRef<HTMLTableCaptionElement, HTMLAttributes<HTMLTableCaptionElement>>(
   ({ className, ...props }, ref) => (
     <caption ref={ref} className={cn('mt-4 text-sm text-gray-500', className)} {...props} />
   )
 );
-TableCaption.displayName = 'TableCaption';
+PieTabla.displayName = 'PieTabla';
 
-export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption };
+export { Tabla, EncabezadoTabla, CuerpoTabla, FilaTabla, CeldaEncabezado, CeldaTabla, PieTabla };

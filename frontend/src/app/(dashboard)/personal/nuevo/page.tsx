@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Selector } from '@/components/ui/selector';
 import { Modal } from '@/components/ui/modal';
 import { api } from '@/lib/api';
 import { ArrowLeft, Save, Loader2, User, Key } from 'lucide-react';
@@ -121,10 +121,10 @@ export default function NewStaffPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <Breadcrumb items={[
+        </Boton>
+        <Migas items={[
           { label: 'Personal', href: '/personal' },
           { label: 'Nuevo Personal' }
         ]} />
@@ -135,14 +135,14 @@ export default function NewStaffPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle>Datos Personales</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Datos Personales</TituloTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Input
+                <Entrada
                   label="Cédula de Identidad *"
                   value={personData.ci}
                   onChange={(e) => setPersonData({ ...personData, ci: toUpper(e.target.value) })}
@@ -151,7 +151,7 @@ export default function NewStaffPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Nombres *"
                   value={personData.names}
                   onChange={(e) => setPersonData({ ...personData, names: toUpper(e.target.value) })}
@@ -160,7 +160,7 @@ export default function NewStaffPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Apellido Paterno *"
                   value={personData.lastname_paternal}
                   onChange={(e) => setPersonData({ ...personData, lastname_paternal: toUpper(e.target.value) })}
@@ -169,7 +169,7 @@ export default function NewStaffPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Apellido Materno"
                   value={personData.lastname_maternal}
                   onChange={(e) => setPersonData({ ...personData, lastname_maternal: toUpper(e.target.value) })}
@@ -177,7 +177,7 @@ export default function NewStaffPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Fecha de Nacimiento *"
                   type="date"
                   value={personData.birthdate}
@@ -186,7 +186,7 @@ export default function NewStaffPage() {
                 />
               </div>
               <div>
-                <Select
+                <Selector
                   label="Lugar de Nacimiento"
                   value={personData.birthplace}
                   onChange={(e) => {
@@ -209,7 +209,7 @@ export default function NewStaffPage() {
               </div>
               {personData.birthplace === 'Otra' && (
                 <div>
-                  <Input
+                  <Entrada
                     label="Especificar lugar"
                     value={personData.birthplace_other}
                     onChange={(e) => setPersonData({ ...personData, birthplace_other: toUpper(e.target.value) })}
@@ -295,7 +295,7 @@ export default function NewStaffPage() {
                 </div>
               </div>
               <div>
-                <Select
+                <Selector
                   label="Nacionalidad"
                   value={personData.nationality}
                   onChange={(e) => {
@@ -316,7 +316,7 @@ export default function NewStaffPage() {
               </div>
               {personData.nationality === 'Otra' && (
                 <div>
-                  <Input
+                  <Entrada
                     label="Especificar nacionalidad"
                     value={personData.nationality_other}
                     onChange={(e) => setPersonData({ ...personData, nationality_other: toUpper(e.target.value) })}
@@ -325,7 +325,7 @@ export default function NewStaffPage() {
                 </div>
               )}
               <div>
-                <Input
+                <Entrada
                   label="Teléfono"
                   value={personData.phone}
                   onChange={(e) => setPersonData({ ...personData, phone: e.target.value })}
@@ -333,7 +333,7 @@ export default function NewStaffPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Correo Electrónico"
                   type="email"
                   value={personData.email}
@@ -342,7 +342,7 @@ export default function NewStaffPage() {
                 />
               </div>
               <div className="md:col-span-2 lg:col-span-3">
-                <Input
+                <Entrada
                   label="Dirección"
                   value={personData.address}
                   onChange={(e) => setPersonData({ ...personData, address: toUpper(e.target.value) })}
@@ -350,17 +350,17 @@ export default function NewStaffPage() {
                 />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
 
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle>Datos del Personal</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Datos del Personal</TituloTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Input
+                <Entrada
                   label="Profesión"
                   value={staffData.profession}
                   onChange={(e) => setStaffData({ ...staffData, profession: e.target.value })}
@@ -368,7 +368,7 @@ export default function NewStaffPage() {
                 />
               </div>
               <div>
-                <Select
+                <Selector
                   label="Cargo *"
                   value={staffData.position}
                   onChange={(e) => setStaffData({ ...staffData, position: e.target.value })}
@@ -385,7 +385,7 @@ export default function NewStaffPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Fecha de Contrato *"
                   type="date"
                   value={staffData.hire_date}
@@ -394,8 +394,8 @@ export default function NewStaffPage() {
                 />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
 
         {errors.submit && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -404,10 +404,10 @@ export default function NewStaffPage() {
         )}
 
         <div className="flex justify-end gap-3">
-          <Button variant="outline" type="button" onClick={() => router.back()}>
+          <Boton variant="outline" type="button" onClick={() => router.back()}>
             Cancelar
-          </Button>
-          <Button type="submit" disabled={loading}>
+          </Boton>
+          <Boton type="submit" disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -419,7 +419,7 @@ export default function NewStaffPage() {
                 Guardar Personal
               </>
             )}
-          </Button>
+          </Boton>
         </div>
       </form>
 
@@ -452,12 +452,12 @@ export default function NewStaffPage() {
               ⚠️ Se recomienda que el usuario cambie su contraseña después de iniciar sesión.
             </p>
             <div className="flex justify-end">
-              <Button onClick={() => {
+              <Boton onClick={() => {
                 setCredentialsModal(null);
                 router.push('/personal');
               }}>
                 Entendido
-              </Button>
+              </Boton>
             </div>
           </div>
         </Modal>

@@ -1,16 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
+import { Insignia } from '@/components/ui/insignia';
 import { Modal, ConfirmModal } from '@/components/ui/modal';
 import { Search, Loader2, Eye, CheckCircle, XCircle, UserPlus, FileText } from 'lucide-react';
 import { api } from '@/lib/api';
-import { Select } from '@/components/ui/select';
+import { Selector } from '@/components/ui/selector';
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   pendiente: { label: 'Pendiente', color: 'bg-yellow-100 text-yellow-800' },
@@ -24,7 +24,7 @@ const originLabels: Record<string, string> = {
   secretaria: 'Secretaría',
 };
 
-interface AdmissionRequest {
+interface SolicitudAdmision {
   id: string;
   names: string;
   lastname_paternal: string;
@@ -53,7 +53,7 @@ interface AdmissionRequest {
   created_at: string;
 }
 
-interface Career {
+interface Carrera {
   id: number;
   name: string;
   code: string;
@@ -85,7 +85,7 @@ interface EditFormData {
 }
 
 interface DetalleModalData {
-  request: AdmissionRequest;
+  request: SolicitudAdmision;
   showConvert: boolean;
   editMode?: boolean;
 }
@@ -102,23 +102,23 @@ interface ConvertFormData {
 }
 
 export default function AdmisionPage() {
-  const [admissions, setAdmissions] = useState<AdmissionRequest[]>([]);
+  const [admissions, setAdmissions] = useState<SolicitudAdmision[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [estadoFilter, setEstadoFilter] = useState<string>('');
   const [origenFilter, setOrigenFilter] = useState<string>('');
 
   const [detalleModal, setDetalleModal] = useState<DetalleModalData | null>(null);
-  const [verificarModal, setVerificarModal] = useState<AdmissionRequest | null>(null);
-  const [rechazarModal, setRechazarModal] = useState<AdmissionRequest | null>(null);
-  const [convertirModal, setConvertirModal] = useState<AdmissionRequest | null>(null);
-  const [deleteModal, setDeleteModal] = useState<AdmissionRequest | null>(null);
+  const [verificarModal, setVerificarModal] = useState<SolicitudAdmision | null>(null);
+  const [rechazarModal, setRechazarModal] = useState<SolicitudAdmision | null>(null);
+  const [convertirModal, setConvertirModal] = useState<SolicitudAdmision | null>(null);
+  const [deleteModal, setDeleteModal] = useState<SolicitudAdmision | null>(null);
 
   const [observaciones, setObservaciones] = useState('');
   const [formLoading, setFormLoading] = useState(false);
   const [editForm, setEditForm] = useState<EditFormData | null>(null);
 
-  const [careers, setCareers] = useState<Career[]>([]);
+  const [careers, setCareers] = useState<Carrera[]>([]);
   const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
   const [gestiones, setGestiones] = useState<string[]>([]);
   const [convertForm, setConvertForm] = useState<ConvertFormData>({
@@ -140,7 +140,7 @@ export default function AdmisionPage() {
 
   const fetchAdmissions = async () => {
     try {
-      const response = await api.get('/admission');
+      const response = await api.get('/admision');
       setAdmissions(response.data.data);
     } catch (error) {
       console.error('Error fetching admissions:', error);
@@ -183,7 +183,7 @@ export default function AdmisionPage() {
     }
   };
 
-  const handleOpenConvert = (request: AdmissionRequest) => {
+  const handleOpenConvert = (request: SolicitudAdmision) => {
     setConvertirModal(request);
     setConvertForm({
       admission_gestion: new Date().getFullYear().toString(),
@@ -204,7 +204,7 @@ export default function AdmisionPage() {
     if (!convertirModal) return;
     setFormLoading(true);
     try {
-      await api.post(`/admission/${convertirModal.id}/convert-to-student`, {
+      await api.post(`/admision/${convertirModal.id}/convert-to-student`, {
         admissionGestion: convertForm.admission_gestion,
       });
 
@@ -230,7 +230,7 @@ export default function AdmisionPage() {
 
   const getStatusBadge = (status: string) => {
     const config = statusLabels[status] || { label: status, color: 'bg-gray-100 text-gray-800' };
-    return <Badge className={config.color}>{config.label}</Badge>;
+    return <Insignia className={config.color}>{config.label}</Insignia>;
   };
 
   const isMinor = (birthdate: string): boolean => {
@@ -248,7 +248,7 @@ export default function AdmisionPage() {
     if (!verificarModal) return;
     setFormLoading(true);
     try {
-      await api.post(`/admission/${verificarModal.id}/verify`, {
+      await api.post(`/admision/${verificarModal.id}/verify`, {
         verificadoPor: 1,
         observaciones,
       });
@@ -266,7 +266,7 @@ export default function AdmisionPage() {
     if (!rechazarModal) return;
     setFormLoading(true);
     try {
-      await api.post(`/admission/${rechazarModal.id}/reject`, {
+      await api.post(`/admision/${rechazarModal.id}/reject`, {
         verificadoPor: 1,
         observaciones,
       });
@@ -284,7 +284,7 @@ export default function AdmisionPage() {
     if (!deleteModal) return;
     setFormLoading(true);
     try {
-      await api.delete(`/admission/${deleteModal.id}`);
+      await api.delete(`/admision/${deleteModal.id}`);
       setDeleteModal(null);
       fetchAdmissions();
     } catch (error) {
@@ -294,7 +294,7 @@ export default function AdmisionPage() {
     }
   };
 
-  const handleEnableEdit = (request: AdmissionRequest) => {
+  const handleEnableEdit = (request: SolicitudAdmision) => {
     setEditForm({
       names: request.names,
       lastname_paternal: request.lastname_paternal || '',
@@ -327,7 +327,7 @@ export default function AdmisionPage() {
     if (!detalleModal || !editForm) return;
     setFormLoading(true);
     try {
-      await api.patch(`/admission/${detalleModal.request.id}`, editForm);
+      await api.patch(`/admision/${detalleModal.request.id}`, editForm);
       setDetalleModal(null);
       setEditForm(null);
       fetchAdmissions();
@@ -349,19 +349,19 @@ export default function AdmisionPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Admisión' }]} />
+      <Migas items={[{ label: 'Admisión' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Admisión</h1>
       </div>
 
-      <Card variant="bordered">
-        <CardHeader>
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <CardTitle>Pre-registros ({filteredAdmissions.length})</CardTitle>
+            <TituloTarjeta>Pre-registros ({filteredAdmissions.length})</TituloTarjeta>
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex gap-2">
-                <Select
+                <Selector
                   value={estadoFilter}
                   onChange={(e) => setEstadoFilter(e.target.value)}
                   options={[
@@ -373,7 +373,7 @@ export default function AdmisionPage() {
                   ]}
                   placeholder="Estado"
                 />
-                <Select
+                <Selector
                   value={origenFilter}
                   onChange={(e) => setOrigenFilter(e.target.value)}
                   options={[
@@ -386,7 +386,7 @@ export default function AdmisionPage() {
               </div>
               <div className="relative w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
+                <Entrada
                   placeholder="Buscar por nombre o CI..."
                   className="pl-10"
                   value={searchTerm}
@@ -395,73 +395,73 @@ export default function AdmisionPage() {
               </div>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>CI</TableHead>
-                <TableHead>Nombre Completo</TableHead>
-                <TableHead>Carrera</TableHead>
-                <TableHead>Origen</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Fecha</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta>
+          <Tabla>
+            <EncabezadoTabla>
+              <FilaTabla>
+                <CeldaEncabezado>CI</CeldaEncabezado>
+                <CeldaEncabezado>Nombre Completo</CeldaEncabezado>
+                <CeldaEncabezado>Carrera</CeldaEncabezado>
+                <CeldaEncabezado>Origen</CeldaEncabezado>
+                <CeldaEncabezado>Estado</CeldaEncabezado>
+                <CeldaEncabezado>Fecha</CeldaEncabezado>
+                <CeldaEncabezado>Acciones</CeldaEncabezado>
+              </FilaTabla>
+            </EncabezadoTabla>
+            <CuerpoTabla>
               {filteredAdmissions.map((admission) => (
-                <TableRow key={admission.id}>
-                  <TableCell className="font-medium">
+                <FilaTabla key={admission.id}>
+                  <CeldaTabla className="font-medium">
                     {admission.ci} {admission.ci_issued && `- ${admission.ci_issued}`}
-                  </TableCell>
-                  <TableCell>
+                  </CeldaTabla>
+                  <CeldaTabla>
                     {admission.names} {admission.lastname_paternal} {admission.lastname_maternal}
-                  </TableCell>
-                  <TableCell>{admission.carrera?.name || '-'}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{originLabels[admission.origen] || '-'}</Badge>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(admission.estado)}</TableCell>
-                  <TableCell>{new Date(admission.created_at).toLocaleString('es-BO', { hour12: false })}</TableCell>
-                  <TableCell>
+                  </CeldaTabla>
+                  <CeldaTabla>{admission.carrera?.name || '-'}</CeldaTabla>
+                  <CeldaTabla>
+                    <Insignia variant="outline">{originLabels[admission.origen] || '-'}</Insignia>
+                  </CeldaTabla>
+                  <CeldaTabla>{getStatusBadge(admission.estado)}</CeldaTabla>
+                  <CeldaTabla>{new Date(admission.created_at).toLocaleString('es-BO', { hour12: false })}</CeldaTabla>
+                  <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" title="Ver detalles" onClick={() => setDetalleModal({ request: admission, showConvert: admission.estado === 'verificado' })}>
+                      <Boton variant="ghost" size="icon" title="Ver detalles" onClick={() => setDetalleModal({ request: admission, showConvert: admission.estado === 'verificado' })}>
                         <Eye className="w-4 h-4" />
-                      </Button>
+                      </Boton>
                       {admission.estado === 'pendiente' && (
                         <>
-                          <Button variant="ghost" size="icon" title="Verificar" onClick={() => setVerificarModal(admission)}>
+                          <Boton variant="ghost" size="icon" title="Verificar" onClick={() => setVerificarModal(admission)}>
                             <CheckCircle className="w-4 h-4 text-green-500" />
-                          </Button>
-                          <Button variant="ghost" size="icon" title="Rechazar" onClick={() => setRechazarModal(admission)}>
+                          </Boton>
+                          <Boton variant="ghost" size="icon" title="Rechazar" onClick={() => setRechazarModal(admission)}>
                             <XCircle className="w-4 h-4 text-red-500" />
-                          </Button>
+                          </Boton>
                         </>
                       )}
                       {admission.estado === 'verificado' && (
-                        <Button variant="ghost" size="icon" title="Convertir a estudiante" onClick={() => handleOpenConvert(admission)}>
+                        <Boton variant="ghost" size="icon" title="Convertir a estudiante" onClick={() => handleOpenConvert(admission)}>
                           <UserPlus className="w-4 h-4 text-blue-500" />
-                        </Button>
+                        </Boton>
                       )}
-                      <Button variant="ghost" size="icon" title="Eliminar" onClick={() => setDeleteModal(admission)}>
+                      <Boton variant="ghost" size="icon" title="Eliminar" onClick={() => setDeleteModal(admission)}>
                         <FileText className="w-4 h-4 text-red-500" />
-                      </Button>
+                      </Boton>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               ))}
               {filteredAdmissions.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                <FilaTabla>
+                  <CeldaTabla colSpan={7} className="text-center py-8 text-gray-500">
                     {searchTerm || estadoFilter || origenFilter ? 'No se encontraron registros' : 'No hay pre-registros'}
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </CuerpoTabla>
+          </Tabla>
+        </ContenidoTarjeta>
+      </Tarjeta>
 
       {/* Modal Detalle */}
       <Modal open={!!detalleModal} onClose={() => { setDetalleModal(null); setEditForm(null); }} title="Detalle del Pre-registro" size="lg">
@@ -469,36 +469,36 @@ export default function AdmisionPage() {
           <div className="space-y-4">
             <div className="flex justify-end gap-2 mb-4">
               {detalleModal.request.estado !== 'convertido' && !detalleModal.editMode && (
-                <Button variant="outline" size="sm" onClick={() => handleEnableEdit(detalleModal.request)}>
+                <Boton variant="outline" size="sm" onClick={() => handleEnableEdit(detalleModal.request)}>
                   Editar datos
-                </Button>
+                </Boton>
               )}
             </div>
             {detalleModal.editMode && editForm ? (
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-gray-500">Nombres</label>
-                  <Input value={editForm.names} onChange={(e) => setEditForm({ ...editForm, names: e.target.value })} />
+                  <Entrada value={editForm.names} onChange={(e) => setEditForm({ ...editForm, names: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Apellido Paterno</label>
-                  <Input value={editForm.lastname_paternal} onChange={(e) => setEditForm({ ...editForm, lastname_paternal: e.target.value })} />
+                  <Entrada value={editForm.lastname_paternal} onChange={(e) => setEditForm({ ...editForm, lastname_paternal: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Apellido Materno</label>
-                  <Input value={editForm.lastname_maternal} onChange={(e) => setEditForm({ ...editForm, lastname_maternal: e.target.value })} />
+                  <Entrada value={editForm.lastname_maternal} onChange={(e) => setEditForm({ ...editForm, lastname_maternal: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">CI</label>
-                  <Input value={editForm.ci} onChange={(e) => setEditForm({ ...editForm, ci: e.target.value })} />
+                  <Entrada value={editForm.ci} onChange={(e) => setEditForm({ ...editForm, ci: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Fecha de nacimiento</label>
-                  <Input type="date" value={editForm.birthdate} onChange={(e) => setEditForm({ ...editForm, birthdate: e.target.value })} />
+                  <Entrada type="date" value={editForm.birthdate} onChange={(e) => setEditForm({ ...editForm, birthdate: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Lugar de nacimiento</label>
-                  <Input value={editForm.birthplace} onChange={(e) => setEditForm({ ...editForm, birthplace: e.target.value })} />
+                  <Entrada value={editForm.birthplace} onChange={(e) => setEditForm({ ...editForm, birthplace: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500 block mb-2">Género</label>
@@ -528,19 +528,19 @@ export default function AdmisionPage() {
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Nacionalidad</label>
-                  <Input value={editForm.nationality} onChange={(e) => setEditForm({ ...editForm, nationality: e.target.value })} />
+                  <Entrada value={editForm.nationality} onChange={(e) => setEditForm({ ...editForm, nationality: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Teléfono</label>
-                  <Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} />
+                  <Entrada value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Email</label>
-                  <Input type="email" value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
+                  <Entrada type="email" value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Dirección</label>
-                  <Input value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} />
+                  <Entrada value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Carrera</label>
@@ -558,21 +558,21 @@ export default function AdmisionPage() {
                     </div>
                     <div>
                       <label className="text-sm text-gray-500">Nombre del tutor</label>
-                      <Input value={editForm.nombreTutor} onChange={(e) => setEditForm({ ...editForm, nombreTutor: e.target.value })} />
+                      <Entrada value={editForm.nombreTutor} onChange={(e) => setEditForm({ ...editForm, nombreTutor: e.target.value })} />
                     </div>
                     <div>
                       <label className="text-sm text-gray-500">CI del tutor</label>
-                      <Input value={editForm.ciTutor} onChange={(e) => setEditForm({ ...editForm, ciTutor: e.target.value })} />
+                      <Entrada value={editForm.ciTutor} onChange={(e) => setEditForm({ ...editForm, ciTutor: e.target.value })} />
                     </div>
                     <div>
                       <label className="text-sm text-gray-500">Teléfono del tutor</label>
-                      <Input value={editForm.telefonoTutor} onChange={(e) => setEditForm({ ...editForm, telefonoTutor: e.target.value })} />
+                      <Entrada value={editForm.telefonoTutor} onChange={(e) => setEditForm({ ...editForm, telefonoTutor: e.target.value })} />
                     </div>
                   </>
                 )}
                 <div className="col-span-2 flex justify-end gap-2 mt-4">
-                  <Button variant="outline" onClick={handleCancelEdit} disabled={formLoading}>Cancelar</Button>
-                  <Button onClick={handleSaveEdit} disabled={formLoading}>{formLoading ? 'Guardando...' : 'Guardar cambios'}</Button>
+                  <Boton variant="outline" onClick={handleCancelEdit} disabled={formLoading}>Cancelar</Boton>
+                  <Boton onClick={handleSaveEdit} disabled={formLoading}>{formLoading ? 'Guardando...' : 'Guardar cambios'}</Boton>
                 </div>
               </div>
             ) : (
@@ -714,7 +714,7 @@ export default function AdmisionPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Gestión de ingreso *</label>
-                <Select
+                <Selector
                   value={convertForm.admission_gestion}
                   onChange={(e) => setConvertForm({ ...convertForm, admission_gestion: e.target.value })}
                   options={gestiones.map(g => ({ value: g, label: g }))}
@@ -722,7 +722,7 @@ export default function AdmisionPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de ingreso *</label>
-                <Input
+                <Entrada
                   type="date"
                   value={convertForm.admission_date}
                   onChange={(e) => setConvertForm({ ...convertForm, admission_date: e.target.value })}
@@ -730,7 +730,7 @@ export default function AdmisionPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Carrera *</label>
-                <Select
+                <Selector
                   value={convertForm.career_id.toString()}
                   onChange={(e) => {
                     const careerId = parseInt(e.target.value);
@@ -742,7 +742,7 @@ export default function AdmisionPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Plan de estudio *</label>
-                <Select
+                <Selector
                   value={convertForm.study_plan_id.toString()}
                   onChange={(e) => setConvertForm({ ...convertForm, study_plan_id: parseInt(e.target.value) })}
                   options={studyPlans.map(sp => ({ value: sp.id.toString(), label: sp.rm_number }))}
@@ -751,7 +751,7 @@ export default function AdmisionPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Número de carpeta</label>
-                <Input
+                <Entrada
                   value={convertForm.folder_number}
                   onChange={(e) => setConvertForm({ ...convertForm, folder_number: e.target.value })}
                   placeholder="Opcional"
@@ -759,7 +759,7 @@ export default function AdmisionPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Código Formulario 01</label>
-                <Input
+                <Entrada
                   value={convertForm.form01_code}
                   onChange={(e) => setConvertForm({ ...convertForm, form01_code: e.target.value })}
                   placeholder="Opcional"
@@ -767,7 +767,7 @@ export default function AdmisionPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Número de Título Bachiller</label>
-                <Input
+                <Entrada
                   value={convertForm.bachelor_title_number}
                   onChange={(e) => setConvertForm({ ...convertForm, bachelor_title_number: e.target.value })}
                   placeholder="Opcional"
@@ -775,7 +775,7 @@ export default function AdmisionPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Título Bachiller</label>
-                <Input
+                <Entrada
                   type="date"
                   value={convertForm.bachelor_title_date}
                   onChange={(e) => setConvertForm({ ...convertForm, bachelor_title_date: e.target.value })}
@@ -784,12 +784,12 @@ export default function AdmisionPage() {
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button variant="outline" onClick={() => setConvertirModal(null)}>
+              <Boton variant="outline" onClick={() => setConvertirModal(null)}>
                 Cancelar
-              </Button>
-              <Button onClick={handleConvert} isLoading={formLoading}>
+              </Boton>
+              <Boton onClick={handleConvert} isLoading={formLoading}>
                 Crear Estudiante
-              </Button>
+              </Boton>
             </div>
           </div>
         )}

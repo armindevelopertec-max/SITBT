@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { GraduationCap, CheckCircle, Users, BookOpen, CreditCard, FileText, ArrowRight, MapPin, Phone, Mail, Clock, ArrowRight as ArrowRightIcon } from 'lucide-react';
-import { useInstitution } from '@/contexts/InstitutionContext';
+import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
 const processSteps = [
   {
@@ -49,7 +49,7 @@ const costs = [
 
 
 export default function AdmisionPage() {
-  const { institution } = useInstitution();
+  const { institucion } = usarInstitucion();
 
   return (
     <div>

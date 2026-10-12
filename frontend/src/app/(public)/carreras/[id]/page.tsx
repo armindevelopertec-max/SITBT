@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { publicApi } from '@/lib/api';
 import { GraduationCap, Clock, Award, FileText, ArrowRight, CheckCircle, ChevronLeft, Zap, Wrench } from 'lucide-react';
-import { useInstitution } from '@/contexts/InstitutionContext';
+import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
-interface Subject {
+interface Materia {
   code: string;
   name: string;
   weekly_hours: number;
@@ -16,10 +16,10 @@ interface Subject {
 interface StudyPlan {
   rm_number: string;
   rm_date: string;
-  subjectsBySemester: Record<number, Subject[]>;
+  subjectsBySemester: Record<number, Materia[]>;
 }
 
-interface Career {
+interface Carrera {
   id: number;
   code: string;
   name: string;
@@ -160,8 +160,8 @@ const studyPlansData: Record<number, StudyPlan> = {
 
 export default function CareerDetailPage() {
   const params = useParams();
-  const { institution } = useInstitution();
-  const [career, setCareer] = useState<Career | null>(null);
+  const { institucion } = usarInstitucion();
+  const [career, setCareer] = useState<Carrera | null>(null);
   const [loading, setLoading] = useState(true);
 
   const careerId = parseInt(params.id as string);
@@ -172,7 +172,7 @@ export default function CareerDetailPage() {
   useEffect(() => {
     const fetchCareer = async () => {
       try {
-        const response = await publicApi.get<{ data: Career[] }>('/carreras', {
+        const response = await publicApi.get<{ data: Carrera[] }>('/carreras', {
           params: { status: 'activo' },
         });
         const found = response.data.data.find((c) => c.id === careerId);
@@ -230,7 +230,7 @@ export default function CareerDetailPage() {
         </div>
       </section>
 
-      {/* Career Info */}
+      {/* Carrera Info */}
       <section className="bg-dark-800 py-8 sm:py-12 border-b border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">

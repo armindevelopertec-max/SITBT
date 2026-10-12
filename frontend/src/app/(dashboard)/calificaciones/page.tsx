@@ -1,11 +1,11 @@
 'use client';
 
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
+import { Insignia } from '@/components/ui/insignia';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 
 const gradesData = [
@@ -24,66 +24,66 @@ const getNotaColor = (nota: number) => {
 export default function GradesPage() {
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Calificaciones' }]} />
+      <Migas items={[{ label: 'Calificaciones' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Calificaciones</h1>
-        <Button>
+        <Boton>
           <Plus className="w-4 h-4 mr-2" />
           Nueva Calificación
-        </Button>
+        </Boton>
       </div>
 
-      <Card variant="bordered">
-        <CardHeader>
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
-            <CardTitle>Lista de Calificaciones</CardTitle>
+            <TituloTarjeta>Lista de Calificaciones</TituloTarjeta>
             <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input placeholder="Buscar calificación..." className="pl-10" />
+              <Entrada placeholder="Buscar calificación..." className="pl-10" />
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Estudiante</TableHead>
-                <TableHead>Materia</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Nota</TableHead>
-                <TableHead>Fecha</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta>
+          <Tabla>
+            <EncabezadoTabla>
+              <FilaTabla>
+                <CeldaEncabezado>Estudiante</CeldaEncabezado>
+                <CeldaEncabezado>Materia</CeldaEncabezado>
+                <CeldaEncabezado>Tipo</CeldaEncabezado>
+                <CeldaEncabezado>Nota</CeldaEncabezado>
+                <CeldaEncabezado>Fecha</CeldaEncabezado>
+                <CeldaEncabezado>Acciones</CeldaEncabezado>
+              </FilaTabla>
+            </EncabezadoTabla>
+            <CuerpoTabla>
               {gradesData.map((grade) => (
-                <TableRow key={grade.id}>
-                  <TableCell className="font-medium">{grade.estudiante}</TableCell>
-                  <TableCell>{grade.materia}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{grade.tipo}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getNotaColor(grade.nota)}>{grade.nota}</Badge>
-                  </TableCell>
-                  <TableCell>{grade.fecha}</TableCell>
-                  <TableCell>
+                <FilaTabla key={grade.id}>
+                  <CeldaTabla className="font-medium">{grade.estudiante}</CeldaTabla>
+                  <CeldaTabla>{grade.materia}</CeldaTabla>
+                  <CeldaTabla>
+                    <Insignia variant="outline">{grade.tipo}</Insignia>
+                  </CeldaTabla>
+                  <CeldaTabla>
+                    <Insignia variant={getNotaColor(grade.nota)}>{grade.nota}</Insignia>
+                  </CeldaTabla>
+                  <CeldaTabla>{grade.fecha}</CeldaTabla>
+                  <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon">
+                      <Boton variant="ghost" size="icon">
                         <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
+                      </Boton>
+                      <Boton variant="ghost" size="icon">
                         <Trash2 className="w-4 h-4 text-red-500" />
-                      </Button>
+                      </Boton>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </CuerpoTabla>
+          </Tabla>
+        </ContenidoTarjeta>
+      </Tarjeta>
     </div>
   );
 }

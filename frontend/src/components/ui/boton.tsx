@@ -1,13 +1,13 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utilidades';
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface PropsBoton extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';
   size?: 'sm' | 'md' | 'lg' | 'icon';
   isLoading?: boolean;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+const Boton = forwardRef<HTMLButtonElement, PropsBoton>(
   ({ className, variant = 'primary', size = 'md', isLoading, children, disabled, onClick, type = 'button', ...props }, ref) => {
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
 
@@ -51,7 +51,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 
-Button.displayName = 'Button';
+Boton.displayName = 'Boton';
 
-export { Button };
-export type { ButtonProps };
+export { Boton };
+export type { PropsBoton };

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth-store';
+import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
 import { AlertCircle, Lock, User } from 'lucide-react';
 
 export default function AccederPage() {
@@ -11,7 +11,7 @@ export default function AccederPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { login, isAuthenticated, _hasHydrated } = useAuthStore();
+  const { login, isAuthenticated, _hasHydrated } = usarAlmacenAutenticacion();
 
   useEffect(() => {
     if (_hasHydrated && isAuthenticated) {

@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { publicApi } from '@/lib/api';
-import { Career, CreateAdmissionDto } from '@/types';
+import { Carrera, CrearAdmisionDto } from '@/types';
 import { GraduationCap, AlertCircle, CheckCircle, Loader2, ArrowRight, FileText, User, BookOpen, Phone, Mail } from 'lucide-react';
 import Link from 'next/link';
 
@@ -12,12 +12,12 @@ function PreRegistroForm() {
   const searchParams = useSearchParams();
   const carreraPreseleccionada = searchParams.get('carrera');
 
-  const [careers, setCareers] = useState<Career[]>([]);
+  const [careers, setCareers] = useState<Carrera[]>([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [form, setForm] = useState<CreateAdmissionDto>({
+  const [form, setForm] = useState<CrearAdmisionDto>({
     names: '',
     lastname_paternal: '',
     lastname_maternal: '',
@@ -41,7 +41,7 @@ function PreRegistroForm() {
   useEffect(() => {
     const fetchCareers = async () => {
       try {
-        const response = await publicApi.get<{ data: Career[] }>('/carreras', {
+        const response = await publicApi.get<{ data: Carrera[] }>('/carreras', {
           params: { status: 'activo' },
         });
         setCareers(response.data.data);
@@ -68,7 +68,7 @@ function PreRegistroForm() {
     setError(null);
 
     try {
-      await publicApi.post('/admission', form);
+      await publicApi.post('/admision', form);
       setSuccess(true);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al enviar el pre-registro');
@@ -126,7 +126,7 @@ function PreRegistroForm() {
   return (
     <div className="bg-dark-900 min-h-screen py-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+        {/* Encabezado */}
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-100 mb-3 sm:mb-4">Pre-registro</h1>
           <p className="text-gray-400 text-sm sm:text-base">

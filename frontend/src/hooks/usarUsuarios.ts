@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import api from '@/lib/api';
-import { Role } from '@/types';
+import { Rol } from '@/types';
 
-export interface UserResponse {
+export interface UsuarioRespuesta {
   id: number;
   username: string;
   status: 'activo' | 'inactivo' | 'bloqueado';
@@ -24,70 +24,70 @@ export interface UserResponse {
   updated_at?: string;
 }
 
-export interface CreateUserData {
+export interface CreateUsuarioData {
   person_id: number;
   username: string;
   password: string;
-  role_code?: Role;
+  role_code?: Rol;
 }
 
-export interface UpdateUserData {
+export interface UpdateUsuarioData {
   username?: string;
   status?: 'activo' | 'inactivo' | 'bloqueado';
   password?: string;
 }
 
-export interface ResetPasswordData {
+export interface DatosResetearContrasena {
   newPassword: string;
 }
 
-export function useUsers() {
-  const [users, setUsers] = useState<UserResponse[]>([]);
+export function usarUsuarios() {
+  const [users, setUsuarios] = useState<UsuarioRespuesta[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
 
-  const fetchUsers = useCallback(async (page = 1, limit = 20) => {
+  const fetchUsuarios = useCallback(async (page = 1, limit = 20) => {
     try {
       setLoading(true);
       setError(null);
       const response = await api.get(`/usuarios?page=${page}&limit=${limit}`);
       const { data, total, page: currentPage, limit: currentLimit } = response.data;
-      setUsers(data);
+      setUsuarios(data);
       setPagination({ page: currentPage, limit: currentLimit, total });
     } catch (err: any) {
-      console.error('Error fetching users:', err);
+      console.error('Error al obtener usuarios:', err);
       setError(err.response?.data?.message || 'Error al cargar usuarios');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const fetchActiveUsers = useCallback(async () => {
+  const fetchActiveUsuarios = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const response = await api.get('/usuarios/active');
-      setUsers(response.data);
+      setUsuarios(response.data);
     } catch (err: any) {
-      console.error('Error fetching active users:', err);
+      console.error('Error al obtener usuarios activos:', err);
       setError(err.response?.data?.message || 'Error al cargar usuarios activos');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const getUserById = useCallback(async (id: number): Promise<UserResponse | null> => {
+  const getUsuarioById = useCallback(async (id: number): Promise<UsuarioRespuesta | null> => {
     try {
       const response = await api.get(`/usuarios/${id}`);
       return response.data;
     } catch (err: any) {
-      console.error('Error fetching user:', err);
+      console.error('Error al obtener usuario:', err);
       return null;
     }
   }, []);
 
-  const getUserRoles = useCallback(async (userId: number) => {
+  const getUsuarioRoles = useCallback(async (userId: number) => {
     try {
       const response = await api.get(`/usuarios/${userId}/roles`);
       return response.data;
@@ -97,11 +97,11 @@ export function useUsers() {
     }
   }, []);
 
-  const createUser = useCallback(async (userData: CreateUserData) => {
+  const crearUsuario = useCallback(async (userData: CreateUsuarioData) => {
     try {
       setLoading(true);
       const response = await api.post('/usuarios', userData);
-      await fetchUsers(pagination.page, pagination.limit);
+      await fetchUsuarios(pagination.page, pagination.limit);
       return response.data;
     } catch (err: any) {
       console.error('Error creating user:', err);
@@ -109,13 +109,13 @@ export function useUsers() {
     } finally {
       setLoading(false);
     }
-  }, [fetchUsers, pagination.page, pagination.limit]);
+  }, [fetchUsuarios, pagination.page, pagination.limit]);
 
-  const updateUser = useCallback(async (id: number, userData: UpdateUserData) => {
+  const actualizarUsuario = useCallback(async (id: number, userData: UpdateUsuarioData) => {
     try {
       setLoading(true);
       const response = await api.patch(`/usuarios/${id}`, userData);
-      await fetchUsers(pagination.page, pagination.limit);
+      await fetchUsuarios(pagination.page, pagination.limit);
       return response.data;
     } catch (err: any) {
       console.error('Error updating user:', err);
@@ -123,57 +123,57 @@ export function useUsers() {
     } finally {
       setLoading(false);
     }
-  }, [fetchUsers, pagination.page, pagination.limit]);
+  }, [fetchUsuarios, pagination.page, pagination.limit]);
 
-  const deleteUser = useCallback(async (id: number) => {
+  const eliminarUsuario = useCallback(async (id: number) => {
     try {
       setLoading(true);
       await api.delete(`/usuarios/${id}`);
-      await fetchUsers(pagination.page, pagination.limit);
+      await fetchUsuarios(pagination.page, pagination.limit);
     } catch (err: any) {
       console.error('Error deleting user:', err);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, [fetchUsers, pagination.page, pagination.limit]);
+  }, [fetchUsuarios, pagination.page, pagination.limit]);
 
-  const changePassword = useCallback(async (id: number, newPassword: string) => {
+  const cambiarContrasena = useCallback(async (id: number, newPassword: string) => {
     try {
       await api.post(`/usuarios/${id}/change-password`, { newPassword });
     } catch (err: any) {
-      console.error('Error changing password:', err);
+      console.error('Error al cambiar contraseña:', err);
       throw err;
     }
   }, []);
 
-  const assignRole = useCallback(async (userId: number, roleId: number) => {
+  const asignarRol = useCallback(async (userId: number, roleId: number) => {
     try {
       await api.post(`/usuarios/${userId}/assign-role/${roleId}`);
     } catch (err: any) {
-      console.error('Error assigning role:', err);
+      console.error('Error al asignar rol:', err);
       throw err;
     }
   }, []);
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+    fetchUsuarios();
+  }, [fetchUsuarios]);
 
   return {
     users,
     loading,
     error,
     pagination,
-    refetch: () => fetchUsers(pagination.page, pagination.limit),
-    fetchUsers,
-    fetchActiveUsers,
-    getUserById,
-    getUserRoles,
-    createUser,
-    updateUser,
-    deleteUser,
-    changePassword,
-    assignRole,
+    refetch: () => fetchUsuarios(pagination.page, pagination.limit),
+    fetchUsuarios,
+    fetchActiveUsuarios,
+    getUsuarioById,
+    getUsuarioRoles,
+    crearUsuario,
+    actualizarUsuario,
+    eliminarUsuario,
+    cambiarContrasena,
+    asignarRol,
   };
 }

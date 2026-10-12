@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Selector } from '@/components/ui/selector';
 import { api } from '@/lib/api';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
@@ -189,10 +189,10 @@ export default function EditarGrupoPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+          <Boton variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <Breadcrumb items={[
+          </Boton>
+          <Migas items={[
             { label: 'Configuración', href: '/configuracion' },
             { label: 'Grupos', href: '/grupos' },
             { label: 'Editar Grupo' }
@@ -208,10 +208,10 @@ export default function EditarGrupoPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <Breadcrumb items={[
+        </Boton>
+        <Migas items={[
           { label: 'Configuración', href: '/configuracion' },
           { label: 'Grupos', href: '/grupos' },
           { label: 'Editar Grupo' }
@@ -223,14 +223,14 @@ export default function EditarGrupoPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle>Datos del Grupo</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Datos del Grupo</TituloTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Select
+                <Selector
                   label="Carrera *"
                   value={formData.career_id}
                   onChange={(e) => setFormData({ ...formData, career_id: e.target.value, study_plan_id: '' })}
@@ -241,7 +241,7 @@ export default function EditarGrupoPage() {
                 />
               </div>
               <div>
-                <Select
+                <Selector
                   label="Plan de Estudio *"
                   value={formData.study_plan_id}
                   onChange={(e) => setFormData({ ...formData, study_plan_id: e.target.value })}
@@ -252,7 +252,7 @@ export default function EditarGrupoPage() {
                 />
               </div>
               <div>
-                <Select
+                <Selector
                   label="Semestre *"
                   value={formData.semester}
                   onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
@@ -265,7 +265,7 @@ export default function EditarGrupoPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Select
+                <Selector
                   label="Turno *"
                   value={formData.shift_id}
                   onChange={(e) => setFormData({ ...formData, shift_id: e.target.value })}
@@ -276,7 +276,7 @@ export default function EditarGrupoPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Paralelo *"
                   value={formData.parallel}
                   onChange={(e) => setFormData({ ...formData, parallel: e.target.value.toUpperCase() })}
@@ -285,7 +285,7 @@ export default function EditarGrupoPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Gestión *"
                   value={formData.gestion}
                   onChange={(e) => setFormData({ ...formData, gestion: e.target.value })}
@@ -296,7 +296,7 @@ export default function EditarGrupoPage() {
             </div>
 
             <div className="md:w-1/3">
-              <Input
+              <Entrada
                 label="Capacidad"
                 type="number"
                 value={formData.capacity}
@@ -304,8 +304,8 @@ export default function EditarGrupoPage() {
                 placeholder="30"
               />
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
 
         {errors.submit && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -314,10 +314,10 @@ export default function EditarGrupoPage() {
         )}
 
         <div className="flex justify-end gap-3">
-          <Button variant="outline" type="button" onClick={() => router.back()}>
+          <Boton variant="outline" type="button" onClick={() => router.back()}>
             Cancelar
-          </Button>
-          <Button type="submit" disabled={saving}>
+          </Boton>
+          <Boton type="submit" disabled={saving}>
             {saving ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -329,7 +329,7 @@ export default function EditarGrupoPage() {
                 Actualizar Grupo
               </>
             )}
-          </Button>
+          </Boton>
         </div>
       </form>
     </div>

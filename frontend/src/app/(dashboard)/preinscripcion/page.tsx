@@ -1,16 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Selector } from '@/components/ui/selector';
+import { Insignia } from '@/components/ui/insignia';
 import { api } from '@/lib/api';
 import { Search, Loader2, CheckCircle, AlertCircle, User, BookOpen, Calendar, CreditCard, FileText, Users } from 'lucide-react';
 
-interface Student {
+interface Estudiante {
   id: number;
   inscription_code: string;
   admission_gestion: string;
@@ -49,7 +49,7 @@ interface SubjectToEnroll {
   prerequisiteName?: string;
 }
 
-interface Group {
+interface Grupo {
   id: number;
   semester: number;
   parallel: string;
@@ -87,13 +87,13 @@ export default function PreinscripcionPage() {
   const [step, setStep] = useState<Step>('search');
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [students, setStudents] = useState<Student[]>([]);
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [students, setStudents] = useState<Estudiante[]>([]);
+  const [selectedStudent, setSelectedStudent] = useState<Estudiante | null>(null);
 
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null);
   const [subjects, setSubjects] = useState<SubjectToEnroll[]>([]);
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectToEnroll[]>([]);
-  const [groups, setGroups] = useState<Group[]>([]);
+  const [groups, setGroups] = useState<Grupo[]>([]);
   const [turnos, setTurnos] = useState<Turno[]>([]);
   const [selectedTurno, setSelectedTurno] = useState<number | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
@@ -145,7 +145,7 @@ export default function PreinscripcionPage() {
     }
   };
 
-  const selectStudent = async (student: Student) => {
+  const selectStudent = async (student: Estudiante) => {
     setSelectedStudent(student);
     setStep('payments');
     await checkPayments(student.id);
@@ -259,24 +259,24 @@ export default function PreinscripcionPage() {
 
   const renderSearch = () => (
     <div className="space-y-6">
-      <Card variant="bordered">
-        <CardHeader>
-          <CardTitle>Buscar Estudiante</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
+          <TituloTarjeta>Buscar Estudiante</TituloTarjeta>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta className="space-y-4">
           <div className="flex gap-4">
             <div className="flex-1">
-              <Input
+              <Entrada
                 placeholder="Buscar por nombre, CI o código de inscripción..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && searchStudents()}
               />
             </div>
-            <Button onClick={searchStudents} disabled={loading}>
+            <Boton onClick={searchStudents} disabled={loading}>
               <Search className="w-4 h-4 mr-2" />
               Buscar
-            </Button>
+            </Boton>
           </div>
 
           {loading && (
@@ -307,9 +307,9 @@ export default function PreinscripcionPage() {
                       {student.carrera?.name} · Ingreso: {student.admission_gestion}
                     </p>
                   </div>
-                  <Badge variant={student.admission_gestion === currentGestion ? 'exito' : 'secondary'}>
+                  <Insignia variant={student.admission_gestion === currentGestion ? 'exito' : 'secondary'}>
                     {student.admission_gestion === currentGestion ? 'Nuevo' : 'Antiguo'}
-                  </Badge>
+                  </Insignia>
                 </div>
               ))}
             </div>
@@ -318,21 +318,21 @@ export default function PreinscripcionPage() {
           {searchQuery && !loading && students.length === 0 && (
             <p className="text-center text-gray-500 py-4">No se encontraron estudiantes</p>
           )}
-        </CardContent>
-      </Card>
+        </ContenidoTarjeta>
+      </Tarjeta>
     </div>
   );
 
   const renderPayments = () => (
     <div className="space-y-6">
-      <Card variant="bordered">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
+          <TituloTarjeta className="flex items-center gap-2">
             <User className="w-5 h-5" />
             {selectedStudent?.persona?.names} {selectedStudent?.persona?.lastname_paternal}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </TituloTarjeta>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta>
           <div className="grid grid-cols-3 gap-4 text-sm">
             <div>
               <p className="text-gray-500">CI</p>
@@ -347,17 +347,17 @@ export default function PreinscripcionPage() {
               <p className="font-medium">{selectedStudent?.carrera?.name}</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </ContenidoTarjeta>
+      </Tarjeta>
 
-      <Card variant="bordered">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
+          <TituloTarjeta className="flex items-center gap-2">
             <CreditCard className="w-5 h-5" />
             Estado de Pagos - {currentPeriodo}/{currentGestion}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </TituloTarjeta>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta className="space-y-4">
           {loading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
@@ -394,7 +394,7 @@ export default function PreinscripcionPage() {
                             {new Date(payment.paymentDate).toLocaleDateString('es-BO')}
                           </p>
                         </div>
-                        <Badge variant="exito">Bs. {payment.amount}</Badge>
+                        <Insignia variant="exito">Bs. {payment.amount}</Insignia>
                       </div>
                     ))}
                   </div>
@@ -408,7 +408,7 @@ export default function PreinscripcionPage() {
                     {paymentStatus.missingPayments.map((payment, i) => (
                       <div key={i} className="flex justify-between items-center p-3 bg-red-50 rounded">
                         <p className="font-medium">{payment.concept}</p>
-                        <Badge variant="error">Bs. {payment.amount}</Badge>
+                        <Insignia variant="error">Bs. {payment.amount}</Insignia>
                       </div>
                     ))}
                   </div>
@@ -418,30 +418,30 @@ export default function PreinscripcionPage() {
           ) : null}
 
           <div className="flex gap-3 pt-4">
-            <Button variant="outline" onClick={() => setStep('search')}>
+            <Boton variant="outline" onClick={() => setStep('search')}>
               Volver
-            </Button>
+            </Boton>
             {paymentStatus?.canEnroll && (
-              <Button onClick={() => setStep('subjects')}>
+              <Boton onClick={() => setStep('subjects')}>
                 Continuar
-              </Button>
+              </Boton>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </ContenidoTarjeta>
+      </Tarjeta>
     </div>
   );
 
   const renderSubjects = () => (
     <div className="space-y-6">
-      <Card variant="bordered">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
+          <TituloTarjeta className="flex items-center gap-2">
             <BookOpen className="w-5 h-5" />
             Materias a Cursar - {currentPeriodo}/{currentGestion}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </TituloTarjeta>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta className="space-y-4">
           {paymentStatus?.isNewStudent && (
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4">
               <p className="text-sm text-blue-800">
@@ -480,7 +480,7 @@ export default function PreinscripcionPage() {
                   <div className="flex items-center gap-2">
                     <p className="font-medium">{subject.subjectName}</p>
                     {subject.isFromFailed && (
-                      <Badge variant="advertencia">Reprobada</Badge>
+                      <Insignia variant="advertencia">Reprobada</Insignia>
                     )}
                   </div>
                   <p className="text-sm text-gray-500">
@@ -497,31 +497,31 @@ export default function PreinscripcionPage() {
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button variant="outline" onClick={() => setStep('payments')}>
+            <Boton variant="outline" onClick={() => setStep('payments')}>
               Volver
-            </Button>
-            <Button
+            </Boton>
+            <Boton
               onClick={() => setStep('groups')}
               disabled={selectedSubjects.length === 0}
             >
               Continuar ({selectedSubjects.length} materias)
-            </Button>
+            </Boton>
           </div>
-        </CardContent>
-      </Card>
+        </ContenidoTarjeta>
+      </Tarjeta>
     </div>
   );
 
   const renderGroups = () => (
     <div className="space-y-6">
-      <Card variant="bordered">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
+          <TituloTarjeta className="flex items-center gap-2">
             <Users className="w-5 h-5" />
             Seleccionar Turno y Grupo
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </TituloTarjeta>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta className="space-y-4">
           <div className="grid grid-cols-2 gap-6">
             <div>
               <h4 className="font-medium mb-3">Turnos disponibles</h4>
@@ -588,18 +588,18 @@ export default function PreinscripcionPage() {
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button variant="outline" onClick={() => setStep('subjects')}>
+            <Boton variant="outline" onClick={() => setStep('subjects')}>
               Volver
-            </Button>
-            <Button
+            </Boton>
+            <Boton
               onClick={() => setStep('confirm')}
               disabled={!selectedGroup}
             >
               Confirmar Inscripción
-            </Button>
+            </Boton>
           </div>
-        </CardContent>
-      </Card>
+        </ContenidoTarjeta>
+      </Tarjeta>
     </div>
   );
 
@@ -608,14 +608,14 @@ export default function PreinscripcionPage() {
 
     return (
       <div className="space-y-6">
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
               Confirmar Inscripción
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            </TituloTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta className="space-y-4">
             <div className="p-4 bg-gray-50 rounded-lg space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Estudiante:</span>
@@ -649,7 +649,7 @@ export default function PreinscripcionPage() {
                     <CheckCircle className="w-4 h-4 text-green-600" />
                     <span>{subject.subjectName}</span>
                     {subject.isFromFailed && (
-                      <Badge variant="advertencia" className="text-xs">Reprobada</Badge>
+                      <Insignia variant="advertencia" className="text-xs">Reprobada</Insignia>
                     )}
                   </div>
                 ))}
@@ -663,24 +663,24 @@ export default function PreinscripcionPage() {
             )}
 
             <div className="flex gap-3 pt-4">
-              <Button variant="outline" onClick={() => setStep('groups')}>
+              <Boton variant="outline" onClick={() => setStep('groups')}>
                 Volver
-              </Button>
-              <Button onClick={confirmEnrollment} disabled={loading}>
+              </Boton>
+              <Boton onClick={confirmEnrollment} disabled={loading}>
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Confirmar
-              </Button>
+              </Boton>
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
       </div>
     );
   };
 
   const renderSuccess = () => (
     <div className="space-y-6">
-      <Card variant="bordered">
-        <CardContent className="p-8 text-center">
+      <Tarjeta variant="bordered">
+        <ContenidoTarjeta className="p-8 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
@@ -709,28 +709,28 @@ export default function PreinscripcionPage() {
           </div>
 
           <div className="flex gap-3 justify-center">
-            <Button variant="outline" onClick={resetFlow}>
+            <Boton variant="outline" onClick={resetFlow}>
               Nueva Inscripción
-            </Button>
-            <Button onClick={() => window.print()}>
+            </Boton>
+            <Boton onClick={() => window.print()}>
               Imprimir Comprobante
-            </Button>
+            </Boton>
           </div>
-        </CardContent>
-      </Card>
+        </ContenidoTarjeta>
+      </Tarjeta>
     </div>
   );
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Preinscripcion' }]} />
+      <Migas items={[{ label: 'Preinscripcion' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Preinscripción Semestral</h1>
         <div className="flex items-center gap-2 text-sm">
-          <Badge variant={currentPeriodo === 'I' ? 'primary' : 'secondary'}>
+          <Insignia variant={currentPeriodo === 'I' ? 'primary' : 'secondary'}>
             {currentPeriodo}/{currentGestion}
-          </Badge>
+          </Insignia>
         </div>
       </div>
 

@@ -2,32 +2,32 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/store/auth-store';
-import { useInstitutionSettings } from '@/hooks/useInstitutionSettings';
+import { cn } from '@/lib/utilidades';
+import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
+import { usarConfiguracionInstitucional } from '@/hooks/usarConfiguracionInstitucional';
 import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, ClipboardList, Award, CreditCard, FileText, RefreshCw, BarChart3, Shield, User, BookMarked, CalendarCheck, Settings, Building2, Calendar, ClipboardCheck, FileBadge } from 'lucide-react';
-import { Role } from '@/types';
+import { Rol } from '@/types';
 
-interface MenuItem {
+interface ElementoMenu {
   title: string;
   href: string;
   icon: React.ReactNode;
-  roles: Role[];
+  roles: Rol[];
 }
 
-interface MenuSection {
+interface SeccionMenu {
   title?: string;
-  items: MenuItem[];
+  items: ElementoMenu[];
 }
 
-interface SidebarProps {
-  isCollapsed: boolean;
-  isOpen?: boolean;
-  onClose?: () => void;
-  onCollapse?: () => void;
+interface PropsBarraLateral {
+  colapsada: boolean;
+  abierta?: boolean;
+  onCerrar?: () => void;
+  onColapsar?: () => void;
 }
 
-const menuSections: MenuSection[] = [
+const seccionesMenu: SeccionMenu[] = [
   {
     items: [
       {
@@ -158,12 +158,12 @@ const menuSections: MenuSection[] = [
   },
 ];
 
-export default function Sidebar({ isCollapsed, isOpen = true, onClose, onCollapse }: SidebarProps) {
+export default function BarraLateral({ colapsada, abierta = true, onCerrar, onColapsar }: PropsBarraLateral) {
   const pathname = usePathname();
-  const { user } = useAuthStore();
-  const { settings } = useInstitutionSettings();
+  const { user } = usarAlmacenAutenticacion();
+  const { settings } = usarConfiguracionInstitucional();
 
-  const filteredSections = menuSections
+  const filteredSections = seccionesMenu
     .map((section) => ({
       ...section,
       items: section.items.filter((item) => user && item.roles.includes(user.role)),
@@ -174,13 +174,13 @@ export default function Sidebar({ isCollapsed, isOpen = true, onClose, onCollaps
     <aside
       className={cn(
         'fixed left-0 top-0 z-40 h-screen bg-white border-r border-gray-200 transition-all duration-300',
-        isCollapsed ? 'w-16' : 'w-64',
-        !isOpen ? '-translate-x-full lg:translate-x-0' : 'translate-x-0'
+        colapsada ? 'w-16' : 'w-64',
+        !abierta ? '-translate-x-full lg:translate-x-0' : 'translate-x-0'
       )}
     >
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between h-20 px-4 border-b border-gray-200">
-          {!isCollapsed ? (
+          {!colapsada ? (
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-2">
                 {settings?.logo_url ? (
@@ -220,17 +220,17 @@ export default function Sidebar({ isCollapsed, isOpen = true, onClose, onCollaps
             )
           )}
           <button
-            onClick={onCollapse}
+            onClick={onColapsar}
             className="hidden lg:block p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            {isCollapsed ? (
+            {colapsada ? (
               <Menu className="w-5 h-5 text-gray-600" />
             ) : (
               <X className="w-5 h-5 text-gray-600" />
             )}
           </button>
           <button
-            onClick={onClose}
+            onClick={onCerrar}
             className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <X className="w-5 h-5 text-gray-600" />
@@ -240,7 +240,7 @@ export default function Sidebar({ isCollapsed, isOpen = true, onClose, onCollaps
         <nav className="flex-1 overflow-y-auto py-4 px-2">
           {filteredSections.map((section, sectionIndex) => (
             <div key={section.title || sectionIndex} className="mb-4">
-              {section.title && !isCollapsed && (
+              {section.title && !colapsada && (
                 <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                   {section.title}
                 </div>
@@ -260,7 +260,7 @@ export default function Sidebar({ isCollapsed, isOpen = true, onClose, onCollaps
                       <span className={cn(pathname === item.href && 'text-primary-600')}>
                         {item.icon}
                       </span>
-                      {!isCollapsed && (
+                      {!colapsada && (
                         <span className="font-medium">{item.title}</span>
                       )}
                     </Link>
@@ -271,7 +271,7 @@ export default function Sidebar({ isCollapsed, isOpen = true, onClose, onCollaps
           ))}
         </nav>
 
-        {!isCollapsed && (
+        {!colapsada && (
           <div className="p-4 border-t border-gray-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">

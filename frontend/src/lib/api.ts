@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useAuthStore } from '@/store/auth-store';
+import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
@@ -20,7 +20,7 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    let token = useAuthStore.getState().token;
+    let token = usarAlmacenAutenticacion.getState().token;
     if (!token && typeof window !== 'undefined') {
       token = localStorage.getItem('token');
     }
@@ -38,7 +38,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      useAuthStore.getState().logout();
+      usarAlmacenAutenticacion.getState().logout();
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }

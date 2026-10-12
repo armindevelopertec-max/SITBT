@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Selector } from '@/components/ui/selector';
 import { api } from '@/lib/api';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
-interface Career {
+interface Carrera {
   id: number;
   code: string;
   name: string;
@@ -79,7 +79,7 @@ export default function EditStudentPage() {
   const [loadingCareers, setLoadingCareers] = useState(true);
   const [loadingPlans, setLoadingPlans] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [careers, setCareers] = useState<Career[]>([]);
+  const [careers, setCareers] = useState<Carrera[]>([]);
   const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
   const [periodos, setPeriodos] = useState<{ gestion: Gestion; periodo: Periodo }[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -291,10 +291,10 @@ export default function EditStudentPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <Breadcrumb items={[
+        </Boton>
+        <Migas items={[
           { label: 'Estudiantes', href: '/estudiantes' },
           { label: 'Editar Estudiante' }
         ]} />
@@ -305,14 +305,14 @@ export default function EditStudentPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle>Datos Personales</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Datos Personales</TituloTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Input
+                <Entrada
                   label="Cédula de Identidad *"
                   value={personData.ci}
                   onChange={(e) => setPersonData({ ...personData, ci: e.target.value })}
@@ -321,7 +321,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Extensión CI"
                   value={personData.ci_issued}
                   onChange={(e) => setPersonData({ ...personData, ci_issued: e.target.value })}
@@ -329,7 +329,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Nombres *"
                   value={personData.names}
                   onChange={(e) => setPersonData({ ...personData, names: e.target.value })}
@@ -338,7 +338,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Apellido Paterno *"
                   value={personData.lastname_paternal}
                   onChange={(e) => setPersonData({ ...personData, lastname_paternal: e.target.value })}
@@ -347,7 +347,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Apellido Materno *"
                   value={personData.lastname_maternal}
                   onChange={(e) => setPersonData({ ...personData, lastname_maternal: e.target.value })}
@@ -356,7 +356,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Fecha de Nacimiento *"
                   type="date"
                   value={personData.birthdate}
@@ -365,7 +365,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Lugar de Nacimiento"
                   value={personData.birthplace}
                   onChange={(e) => setPersonData({ ...personData, birthplace: e.target.value })}
@@ -373,7 +373,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Select
+                <Selector
                   label="Género *"
                   value={personData.gender}
                   onChange={(e) => setPersonData({ ...personData, gender: e.target.value })}
@@ -386,7 +386,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Select
+                <Selector
                   label="Estado Civil"
                   value={personData.marital_status}
                   onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
@@ -400,7 +400,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Nacionalidad"
                   value={personData.nationality}
                   onChange={(e) => setPersonData({ ...personData, nationality: e.target.value })}
@@ -408,7 +408,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Teléfono"
                   value={personData.phone}
                   onChange={(e) => setPersonData({ ...personData, phone: e.target.value })}
@@ -416,7 +416,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Correo Electrónico"
                   type="email"
                   value={personData.email}
@@ -425,7 +425,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div className="md:col-span-2 lg:col-span-3">
-                <Input
+                <Entrada
                   label="Dirección"
                   value={personData.address}
                   onChange={(e) => setPersonData({ ...personData, address: e.target.value })}
@@ -433,17 +433,17 @@ export default function EditStudentPage() {
                 />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
 
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle>Datos del Estudiante</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Datos del Estudiante</TituloTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Input
+                <Entrada
                   label="Código de Inscripción *"
                   value={studentData.inscription_code}
                   error={errors.inscription_code}
@@ -452,7 +452,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Select
+                <Selector
                   label="Gestión de Ingreso *"
                   value={studentData.admission_gestion}
                   onChange={(e) => setStudentData({ ...studentData, admission_gestion: e.target.value })}
@@ -465,7 +465,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Fecha de Ingreso *"
                   type="date"
                   value={studentData.admission_date}
@@ -474,7 +474,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Select
+                <Selector
                   label="Carrera *"
                   value={String(studentData.career_id)}
                   onChange={(e) => setStudentData({ ...studentData, career_id: e.target.value, study_plan_id: '' })}
@@ -485,7 +485,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Select
+                <Selector
                   label="Plan de Estudio *"
                   value={String(studentData.study_plan_id)}
                   onChange={(e) => setStudentData({ ...studentData, study_plan_id: e.target.value })}
@@ -496,7 +496,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Select
+                <Selector
                   label="Estado"
                   value={studentData.status}
                   onChange={(e) => setStudentData({ ...studentData, status: e.target.value })}
@@ -511,7 +511,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Número de Folder"
                   value={studentData.folder_number}
                   onChange={(e) => setStudentData({ ...studentData, folder_number: e.target.value })}
@@ -519,7 +519,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Código Formulario 01"
                   value={studentData.form01_code}
                   onChange={(e) => setStudentData({ ...studentData, form01_code: e.target.value })}
@@ -527,7 +527,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Número de Título de Bachiller"
                   value={studentData.bachelor_title_number}
                   onChange={(e) => setStudentData({ ...studentData, bachelor_title_number: e.target.value })}
@@ -535,7 +535,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <Input
+                <Entrada
                   label="Fecha de Título de Bachiller"
                   type="date"
                   value={studentData.bachelor_title_date}
@@ -543,8 +543,8 @@ export default function EditStudentPage() {
                 />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
 
         {errors.submit && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -553,10 +553,10 @@ export default function EditStudentPage() {
         )}
 
         <div className="flex justify-end gap-3">
-          <Button variant="outline" type="button" onClick={() => router.back()}>
+          <Boton variant="outline" type="button" onClick={() => router.back()}>
             Cancelar
-          </Button>
-          <Button type="submit" disabled={loading}>
+          </Boton>
+          <Boton type="submit" disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -568,7 +568,7 @@ export default function EditStudentPage() {
                 Guardar Cambios
               </>
             )}
-          </Button>
+          </Boton>
         </div>
       </form>
     </div>

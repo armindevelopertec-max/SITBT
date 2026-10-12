@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Selector } from '@/components/ui/selector';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
+import { Insignia } from '@/components/ui/insignia';
 import { Modal, ConfirmModal } from '@/components/ui/modal';
 import { api } from '@/lib/api';
 import { Search, Plus, Edit2, Trash2, Loader2 } from 'lucide-react';
@@ -48,7 +48,7 @@ interface ConceptoPago {
   default_amount: number;
 }
 
-interface Student {
+interface Estudiante {
   id: number;
   inscription_code: string;
   persona?: {
@@ -101,8 +101,8 @@ export default function PaymentsPage() {
   });
 
   const [searchStudent, setSearchStudent] = useState('');
-  const [students, setStudents] = useState<Student[]>([]);
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [students, setStudents] = useState<Estudiante[]>([]);
+  const [selectedStudent, setSelectedStudent] = useState<Estudiante | null>(null);
 
   useEffect(() => {
     fetchPagos();
@@ -156,7 +156,7 @@ export default function PaymentsPage() {
     }
   };
 
-  const selectStudent = (student: Student) => {
+  const selectStudent = (student: Estudiante) => {
     setSelectedStudent(student);
     setFormData({ ...formData, student_id: student.id });
     setSearchStudent('');
@@ -246,31 +246,31 @@ export default function PaymentsPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Pagos' }]} />
+      <Migas items={[{ label: 'Pagos' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestion de Pagos</h1>
-        <Button onClick={openNewModal}>
+        <Boton onClick={openNewModal}>
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Pago
-        </Button>
+        </Boton>
       </div>
 
-      <Card variant="bordered">
-        <CardHeader>
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <CardTitle>Lista de Pagos</CardTitle>
+            <TituloTarjeta>Lista de Pagos</TituloTarjeta>
             <div className="flex-1 flex flex-col md:flex-row gap-4 md:justify-end">
               <div className="relative w-full md:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
+                <Entrada
                   placeholder="Buscar..."
                   className="pl-10"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Select
+              <Selector
                 value={filterGestion}
                 onChange={(e) => setFilterGestion(e.target.value)}
                 options={[
@@ -278,7 +278,7 @@ export default function PaymentsPage() {
                   ...gestiones.map(g => ({ value: g.year, label: g.year }))
                 ]}
               />
-              <Select
+              <Selector
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 options={[
@@ -290,72 +290,72 @@ export default function PaymentsPage() {
               />
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta>
           {loading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Estudiante</TableHead>
-                  <TableHead>Concepto</TableHead>
-                  <TableHead>Monto</TableHead>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead>Metodo</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <Tabla>
+              <EncabezadoTabla>
+                <FilaTabla>
+                  <CeldaEncabezado>Estudiante</CeldaEncabezado>
+                  <CeldaEncabezado>Concepto</CeldaEncabezado>
+                  <CeldaEncabezado>Monto</CeldaEncabezado>
+                  <CeldaEncabezado>Fecha</CeldaEncabezado>
+                  <CeldaEncabezado>Metodo</CeldaEncabezado>
+                  <CeldaEncabezado>Estado</CeldaEncabezado>
+                  <CeldaEncabezado>Acciones</CeldaEncabezado>
+                </FilaTabla>
+              </EncabezadoTabla>
+              <CuerpoTabla>
                 {filteredPagos.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                  <FilaTabla>
+                    <CeldaTabla colSpan={7} className="text-center py-8 text-gray-500">
                       No hay pagos registrados
-                    </TableCell>
-                  </TableRow>
+                    </CeldaTabla>
+                  </FilaTabla>
                 ) : (
                   filteredPagos.map((pago) => (
-                    <TableRow key={pago.id}>
-                      <TableCell className="font-medium">
+                    <FilaTabla key={pago.id}>
+                      <CeldaTabla className="font-medium">
                         <div>
                           <p>{pago.estudiante?.persona?.names} {pago.estudiante?.persona?.lastname_paternal}</p>
                           <p className="text-xs text-gray-500">{pago.estudiante?.inscription_code}</p>
                         </div>
-                      </TableCell>
-                      <TableCell>{pago.concepto?.name || '-'}</TableCell>
-                      <TableCell>Bs. {pago.amount}</TableCell>
-                      <TableCell>{new Date(pago.payment_date).toLocaleDateString('es-BO')}</TableCell>
-                      <TableCell>{methodLabels[pago.payment_method] || pago.payment_method}</TableCell>
-                      <TableCell>
-                        <Badge variant={statusColors[pago.status] || 'secondary'}>
+                      </CeldaTabla>
+                      <CeldaTabla>{pago.concepto?.name || '-'}</CeldaTabla>
+                      <CeldaTabla>Bs. {pago.amount}</CeldaTabla>
+                      <CeldaTabla>{new Date(pago.payment_date).toLocaleDateString('es-BO')}</CeldaTabla>
+                      <CeldaTabla>{methodLabels[pago.payment_method] || pago.payment_method}</CeldaTabla>
+                      <CeldaTabla>
+                        <Insignia variant={statusColors[pago.status] || 'secondary'}>
                           {pago.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
+                        </Insignia>
+                      </CeldaTabla>
+                      <CeldaTabla>
                         <div className="flex items-center gap-2">
                           {pago.status === 'PAGADO' && (
-                            <Button
+                            <Boton
                               variant="ghost"
                               size="icon"
                               title="Anular"
                               onClick={() => handleAnnul(pago)}
                             >
                               <Trash2 className="w-4 h-4 text-red-500" />
-                            </Button>
+                            </Boton>
                           )}
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </CeldaTabla>
+                    </FilaTabla>
                   ))
                 )}
-              </TableBody>
-            </Table>
+              </CuerpoTabla>
+            </Tabla>
           )}
-        </CardContent>
-      </Card>
+        </ContenidoTarjeta>
+      </Tarjeta>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Nuevo Pago" size="lg">
         <div className="space-y-4">
@@ -371,20 +371,20 @@ export default function PaymentsPage() {
                     {selectedStudent.persona?.ci} · {selectedStudent.inscription_code}
                   </p>
                 </div>
-                <Button variant="ghost" size="icon" onClick={clearStudent}>
+                <Boton variant="ghost" size="icon" onClick={clearStudent}>
                   <Trash2 className="w-4 h-4" />
-                </Button>
+                </Boton>
               </div>
             ) : (
               <div>
                 <div className="flex gap-2">
-                  <Input
+                  <Entrada
                     placeholder="Buscar por nombre o CI..."
                     value={searchStudent}
                     onChange={(e) => setSearchStudent(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && searchStudents()}
                   />
-                  <Button onClick={searchStudents}>Buscar</Button>
+                  <Boton onClick={searchStudents}>Buscar</Boton>
                 </div>
                 {students.length > 0 && (
                   <div className="mt-2 border rounded-lg overflow-hidden max-h-40 overflow-y-auto">
@@ -424,7 +424,7 @@ export default function PaymentsPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Monto *</label>
-              <Input
+              <Entrada
                 type="number"
                 value={formData.amount}
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
@@ -436,7 +436,7 @@ export default function PaymentsPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Pago *</label>
-              <Input
+              <Entrada
                 type="date"
                 value={formData.payment_date}
                 onChange={(e) => setFormData({ ...formData, payment_date: e.target.value })}
@@ -444,7 +444,7 @@ export default function PaymentsPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Gestion *</label>
-              <Input
+              <Entrada
                 value={formData.gestion}
                 onChange={(e) => setFormData({ ...formData, gestion: e.target.value })}
               />
@@ -466,7 +466,7 @@ export default function PaymentsPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Numero de Recibo</label>
-              <Input
+              <Entrada
                 value={formData.receipt_number}
                 onChange={(e) => setFormData({ ...formData, receipt_number: e.target.value })}
                 placeholder="R-001"
@@ -485,16 +485,16 @@ export default function PaymentsPage() {
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" onClick={() => setModalOpen(false)}>
+            <Boton variant="outline" onClick={() => setModalOpen(false)}>
               Cancelar
-            </Button>
-            <Button onClick={handleSubmit} disabled={loadingSave || !formData.student_id || !formData.concept_id || !formData.amount}>
+            </Boton>
+            <Boton onClick={handleSubmit} disabled={loadingSave || !formData.student_id || !formData.concept_id || !formData.amount}>
               {loadingSave ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
                 'Guardar'
               )}
-            </Button>
+            </Boton>
           </div>
         </div>
       </Modal>

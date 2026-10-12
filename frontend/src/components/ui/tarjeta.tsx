@@ -1,11 +1,11 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utilidades';
 import { HTMLAttributes, forwardRef } from 'react';
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {
+interface PropsTarjeta extends HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'bordered' | 'elevated';
 }
 
-const Card = forwardRef<HTMLDivElement, CardProps>(
+const Tarjeta = forwardRef<HTMLDivElement, PropsTarjeta>(
   ({ className, variant = 'default', ...props }, ref) => {
     const variants = {
       default: 'bg-white',
@@ -27,41 +27,41 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
   }
 );
 
-Card.displayName = 'Card';
+Tarjeta.displayName = 'Tarjeta';
 
-const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+const EncabezadoTarjeta = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('px-6 py-4 border-b border-gray-200', className)} {...props} />
   )
 );
-CardHeader.displayName = 'CardHeader';
+EncabezadoTarjeta.displayName = 'EncabezadoTarjeta';
 
-const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement>>(
+const TituloTarjeta = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
     <h3 ref={ref} className={cn('text-lg font-semibold text-gray-900', className)} {...props} />
   )
 );
-CardTitle.displayName = 'CardTitle';
+TituloTarjeta.displayName = 'TituloTarjeta';
 
-const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement>>(
+const DescripcionTarjeta = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
     <p ref={ref} className={cn('text-sm text-gray-500 mt-1', className)} {...props} />
   )
 );
-CardDescription.displayName = 'CardDescription';
+DescripcionTarjeta.displayName = 'DescripcionTarjeta';
 
-const CardContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+const ContenidoTarjeta = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('px-6 py-4', className)} {...props} />
   )
 );
-CardContent.displayName = 'CardContent';
+ContenidoTarjeta.displayName = 'ContenidoTarjeta';
 
-const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+const PieTarjeta = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('px-6 py-4 border-t border-gray-200 bg-gray-50', className)} {...props} />
   )
 );
-CardFooter.displayName = 'CardFooter';
+PieTarjeta.displayName = 'PieTarjeta';
 
-export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter };
+export { Tarjeta, EncabezadoTarjeta, TituloTarjeta, DescripcionTarjeta, ContenidoTarjeta, PieTarjeta };

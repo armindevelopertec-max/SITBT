@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utilidades';
 import { Search, X, ChevronDown } from 'lucide-react';
 
 interface SearchableSelectProps {
@@ -12,7 +12,7 @@ interface SearchableSelectProps {
   className?: string;
 }
 
-export function SearchableSelect({
+export function SelectorBuscable({
   value,
   onChange,
   options,

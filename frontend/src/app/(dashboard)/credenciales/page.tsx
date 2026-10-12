@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
 import { ConfirmModal } from '@/components/ui/modal';
 import { api } from '@/lib/api';
 import { Search, Plus, Printer, X, Loader2, Trash2 } from 'lucide-react';
@@ -181,7 +181,7 @@ function CredentialCard({ credential, selected, onClick }: { credential: Credenc
   );
 }
 
-function CredentialPreview({ credential, institution }: { credential: Credencial; institution?: Institution }) {
+function CredentialPreview({ credential, institucion }: { credential: Credencial; institucion?: Institution }) {
   const student = credential.estudiante;
   const person = student?.persona;
   const surnames = person ? `${person.lastname_paternal} ${person.lastname_maternal}` : '—';
@@ -189,10 +189,10 @@ function CredentialPreview({ credential, institution }: { credential: Credencial
   const careerName = student?.carrera?.name || '—';
   const CREAM = '#faf7f1';
 
-  const instName = institution?.nombre || 'INSTITUCIÓN EDUCATIVA';
-  const instShort = institution?.nombre_corto || 'IE';
-  const lema = institution?.lema || '"Conectando Mentes, Impulsando el Progreso"';
-  const logoUrl = institution?.logo_url;
+  const instName = institucion?.nombre || 'INSTITUCIÓN EDUCATIVA';
+  const instShort = institucion?.nombre_corto || 'IE';
+  const lema = institucion?.lema || '"Conectando Mentes, Impulsando el Progreso"';
+  const logoUrl = institucion?.logo_url;
 
   const band = { height: 62, background: '#14213d26', display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px', position: 'relative' as const, zIndex: 1 };
 
@@ -275,7 +275,7 @@ export default function CredentialsPage() {
   const [cancelModal, setCancelModal] = useState<Credencial | null>(null);
   const [deleteModal, setDeleteModal] = useState<Credencial | null>(null);
   const [saving, setSaving] = useState(false);
-  const [institution, setInstitution] = useState<Institution | undefined>(undefined);
+  const [institucion, setInstitucion] = useState<Institution | undefined>(undefined);
 
   useEffect(() => {
     fetchCredentials();
@@ -295,10 +295,10 @@ export default function CredentialsPage() {
 
   const fetchInstitution = async () => {
     try {
-      const response = await api.get('/institution-settings/public');
-      setInstitution(response.data);
+      const response = await api.get('/configuracion-institucional/public');
+      setInstitucion(response.data);
     } catch (error) {
-      console.error('Error fetching institution:', error);
+      console.error('Error fetching institucion?:', error);
     }
   };
 
@@ -382,20 +382,20 @@ export default function CredentialsPage() {
         }
       `}</style>
 
-      <Breadcrumb items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Credenciales' }]} />
+      <Migas items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Credenciales' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">Credenciales</h1>
-        <Button size="sm" onClick={() => router.push('/credenciales/nuevo')}>
+        <Boton size="sm" onClick={() => router.push('/credenciales/nuevo')}>
           <Plus className="w-3 h-3 mr-1" />
           Nueva
-        </Button>
+        </Boton>
       </div>
 
       <div className="flex gap-2 flex-wrap items-center">
         <div className="relative flex-1 min-w-[200px] max-w-[300px]">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400" />
-          <Input placeholder="Buscar por nombre o código..." className="pl-7 h-8 text-sm" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Entrada placeholder="Buscar por nombre o código..." className="pl-7 h-8 text-sm" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <select className="h-8 text-sm border rounded px-2" value={gestionFilter} onChange={(e) => setGestionFilter(e.target.value)}>
           <option value="ALL">Todas las gestiones</option>
@@ -428,24 +428,24 @@ export default function CredentialsPage() {
 
       <div className="print-area">
         {selected ? (
-          <Card variant="bordered">
-            <CardContent className="p-6">
-              <CredentialPreview credential={selected} institution={institution} />
+          <Tarjeta variant="bordered">
+            <ContenidoTarjeta className="p-6">
+              <CredentialPreview credential={selected} institucion={institucion} />
               <div className="flex gap-2 mt-4 justify-center">
-                <Button size="sm" onClick={handlePrint}>
+                <Boton size="sm" onClick={handlePrint}>
                   <Printer className="w-3 h-3 mr-1" />
                   Imprimir
-                </Button>
+                </Boton>
                 {selected.status === 'emitida' && (
-                  <Button size="sm" variant="outline" className="text-red-600" onClick={() => setCancelModal(selected)}>
+                  <Boton size="sm" variant="outline" className="text-red-600" onClick={() => setCancelModal(selected)}>
                     <X className="w-3 h-3 mr-1" />
                     Anular
-                  </Button>
+                  </Boton>
                 )}
-                <Button size="sm" variant="outline" className="text-red-600" onClick={() => setDeleteModal(selected)}>
+                <Boton size="sm" variant="outline" className="text-red-600" onClick={() => setDeleteModal(selected)}>
                   <Trash2 className="w-3 h-3 mr-1" />
                   Eliminar
-                </Button>
+                </Boton>
               </div>
               <div className="mt-4 pt-4 border-t grid grid-cols-4 gap-3 text-xs">
                 <div>
@@ -465,16 +465,16 @@ export default function CredentialsPage() {
                   <p className="font-medium">{formatDate(selected.issued_date)}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
         ) : (
-          <Card variant="bordered">
-            <CardContent className="p-12 text-center">
+          <Tarjeta variant="bordered">
+            <ContenidoTarjeta className="p-12 text-center">
               <div className="text-4xl mb-2">🎓</div>
               <p className="text-gray-500">Selecciona una credencial para visualizarla</p>
               <p className="text-xs text-gray-400 mt-1">Usa el buscador para filtrar por nombre o código</p>
-            </CardContent>
-          </Card>
+            </ContenidoTarjeta>
+          </Tarjeta>
         )}
       </div>
 

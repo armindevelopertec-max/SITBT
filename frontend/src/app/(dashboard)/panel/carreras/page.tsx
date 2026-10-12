@@ -1,17 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
+import { Insignia } from '@/components/ui/insignia';
 import { Modal } from '@/components/ui/modal';
 import { Loader2, Plus, Pencil, Trash2, Search, BookOpen } from 'lucide-react';
 import { api } from '@/lib/api';
 
-interface Career {
+interface Carrera {
   id: number;
   name: string;
   code: string;
@@ -29,14 +29,14 @@ interface CareerFormData {
 }
 
 export default function CarrerasPage() {
-  const [careers, setCareers] = useState<Career[]>([]);
+  const [careers, setCareers] = useState<Carrera[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCareer, setEditingCareer] = useState<Career | null>(null);
+  const [editingCareer, setEditingCareer] = useState<Carrera | null>(null);
   const [formLoading, setFormLoading] = useState(false);
-  const [deleteModal, setDeleteModal] = useState<Career | null>(null);
+  const [deleteModal, setDeleteModal] = useState<Carrera | null>(null);
   const [form, setForm] = useState<CareerFormData>({
     name: '',
     code: '',
@@ -71,7 +71,7 @@ export default function CarrerasPage() {
     );
   });
 
-  const handleOpenModal = (career?: Career) => {
+  const handleOpenModal = (career?: Carrera) => {
     if (career) {
       setEditingCareer(career);
       setForm({
@@ -131,7 +131,7 @@ export default function CarrerasPage() {
     const config = status === 'activo'
       ? { label: 'Activo', color: 'bg-green-100 text-green-800' }
       : { label: 'Inactivo', color: 'bg-red-100 text-red-800' };
-    return <Badge className={config.color}>{config.label}</Badge>;
+    return <Insignia className={config.color}>{config.label}</Insignia>;
   };
 
   if (loading) {
@@ -144,18 +144,18 @@ export default function CarrerasPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Panel' }, { label: 'Carreras' }]} />
+      <Migas items={[{ label: 'Panel' }, { label: 'Carreras' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Carreras</h1>
-        <Button onClick={() => handleOpenModal()}>
+        <Boton onClick={() => handleOpenModal()}>
           <Plus className="w-4 h-4 mr-2" />
           Nueva Carrera
-        </Button>
+        </Boton>
       </div>
 
-      <Card variant="bordered">
-        <CardHeader>
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex flex-col md:flex-row gap-4 md:items-center">
               <select
@@ -169,7 +169,7 @@ export default function CarrerasPage() {
               </select>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
+                <Entrada
                   placeholder="Buscar por nombre, código o área..."
                   className="pl-10 w-64"
                   value={searchTerm}
@@ -178,57 +178,57 @@ export default function CarrerasPage() {
               </div>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Código</TableHead>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Área</TableHead>
-                <TableHead>Descripción</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta>
+          <Tabla>
+            <EncabezadoTabla>
+              <FilaTabla>
+                <CeldaEncabezado>Código</CeldaEncabezado>
+                <CeldaEncabezado>Nombre</CeldaEncabezado>
+                <CeldaEncabezado>Área</CeldaEncabezado>
+                <CeldaEncabezado>Descripción</CeldaEncabezado>
+                <CeldaEncabezado>Estado</CeldaEncabezado>
+                <CeldaEncabezado>Acciones</CeldaEncabezado>
+              </FilaTabla>
+            </EncabezadoTabla>
+            <CuerpoTabla>
               {filteredCareers.map((career) => (
-                <TableRow key={career.id}>
-                  <TableCell className="font-medium">{career.code}</TableCell>
-                  <TableCell>{career.name}</TableCell>
-                  <TableCell>{career.area || '-'}</TableCell>
-                  <TableCell className="max-w-xs truncate">{career.description || '-'}</TableCell>
-                  <TableCell>{getStatusBadge(career.status)}</TableCell>
-                  <TableCell>
+                <FilaTabla key={career.id}>
+                  <CeldaTabla className="font-medium">{career.code}</CeldaTabla>
+                  <CeldaTabla>{career.name}</CeldaTabla>
+                  <CeldaTabla>{career.area || '-'}</CeldaTabla>
+                  <CeldaTabla className="max-w-xs truncate">{career.description || '-'}</CeldaTabla>
+                  <CeldaTabla>{getStatusBadge(career.status)}</CeldaTabla>
+                  <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleOpenModal(career)}>
+                      <Boton variant="ghost" size="icon" onClick={() => handleOpenModal(career)}>
                         <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => setDeleteModal(career)}>
+                      </Boton>
+                      <Boton variant="ghost" size="icon" onClick={() => setDeleteModal(career)}>
                         <Trash2 className="w-4 h-4 text-red-500" />
-                      </Button>
+                      </Boton>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               ))}
               {filteredCareers.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                <FilaTabla>
+                  <CeldaTabla colSpan={6} className="text-center py-8 text-gray-500">
                     {searchTerm || statusFilter ? 'No se encontraron carreras' : 'No hay carreras registradas'}
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </CuerpoTabla>
+          </Tabla>
+        </ContenidoTarjeta>
+      </Tarjeta>
 
       {/* Modal Crear/Editar */}
       <Modal open={isModalOpen} onClose={handleCloseModal} title={editingCareer ? 'Editar Carrera' : 'Nueva Carrera'} size="md">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Código *</label>
-            <Input
+            <Entrada
               value={form.code}
               onChange={(e) => setForm({ ...form, code: e.target.value })}
               placeholder="Ej: ING-SIS"
@@ -237,7 +237,7 @@ export default function CarrerasPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-            <Input
+            <Entrada
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="Ej: Ingeniería de Sistemas"
@@ -270,12 +270,12 @@ export default function CarrerasPage() {
             />
           </div>
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={handleCloseModal}>
+            <Boton type="button" variant="outline" onClick={handleCloseModal}>
               Cancelar
-            </Button>
-            <Button type="submit" disabled={formLoading}>
+            </Boton>
+            <Boton type="submit" disabled={formLoading}>
               {formLoading ? 'Guardando...' : editingCareer ? 'Actualizar' : 'Crear'}
-            </Button>
+            </Boton>
           </div>
         </form>
       </Modal>
@@ -287,12 +287,12 @@ export default function CarrerasPage() {
             ¿Está seguro de eliminar la carrera <strong>{deleteModal?.name}</strong>?
           </p>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setDeleteModal(null)}>
+            <Boton variant="outline" onClick={() => setDeleteModal(null)}>
               Cancelar
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={formLoading}>
+            </Boton>
+            <Boton variant="destructive" onClick={handleDelete} disabled={formLoading}>
               {formLoading ? 'Eliminando...' : 'Eliminar'}
-            </Button>
+            </Boton>
           </div>
         </div>
       </Modal>

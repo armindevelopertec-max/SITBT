@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
+import { Insignia } from '@/components/ui/insignia';
 import { Modal, ConfirmModal } from '@/components/ui/modal';
 import { Plus, Search, Edit2, Trash2, Loader2, User, Eye, Key } from 'lucide-react';
 import { api } from '@/lib/api';
-import { Staff } from '@/types';
+import { Personal } from '@/types';
 
 const POSITION_OPTIONS = [
   { value: 'docente', label: 'Docente' },
@@ -24,11 +24,11 @@ const POSITION_OPTIONS = [
 
 export default function StaffPage() {
   const router = useRouter();
-  const [staff, setStaff] = useState<Staff[]>([]);
+  const [staff, setStaff] = useState<Personal[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [deleteModal, setDeleteModal] = useState<Staff | null>(null);
+  const [deleteModal, setDeleteModal] = useState<Personal | null>(null);
   const [credentialsModal, setCredentialsModal] = useState<{ username: string; password: string; nombre: string; staffId: number; personId: number } | null>(null);
 
   const [formLoading, setFormLoading] = useState(false);
@@ -64,7 +64,7 @@ export default function StaffPage() {
       inactivo: 'error',
       licencia: 'advertencia',
     };
-    return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>;
+    return <Insignia variant={variants[status] || 'secondary'}>{status}</Insignia>;
   };
 
   const getRolBadge = (position: string) => {
@@ -76,7 +76,7 @@ export default function StaffPage() {
       apoyo: 'secondary',
       bibliotecario: 'secondary',
     };
-    return <Badge variant={variants[position] || 'secondary'}>{position.replace('_', ' ')}</Badge>;
+    return <Insignia variant={variants[position] || 'secondary'}>{position.replace('_', ' ')}</Insignia>;
   };
 
   const handleDelete = async () => {
@@ -93,7 +93,7 @@ export default function StaffPage() {
     }
   };
 
-  const viewCredentials = async (s: Staff) => {
+  const viewCredentials = async (s: Personal) => {
     try {
       const response = await api.get(`/usuarios?person_id=${s.person_id}`);
       const users = response.data.data;
@@ -140,23 +140,23 @@ export default function StaffPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Personal' }]} />
+      <Migas items={[{ label: 'Personal' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Personal</h1>
-        <Button onClick={() => router.push('/personal/nuevo')}>
+        <Boton onClick={() => router.push('/personal/nuevo')}>
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Personal
-        </Button>
+        </Boton>
       </div>
 
-      <Card variant="bordered">
-        <CardHeader>
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
-            <CardTitle>Lista de Personal ({staff.length})</CardTitle>
+            <TituloTarjeta>Lista de Personal ({staff.length})</TituloTarjeta>
             <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
+              <Entrada
                 placeholder="Buscar por nombre o CI..."
                 className="pl-10"
                 value={searchTerm}
@@ -164,57 +164,57 @@ export default function StaffPage() {
               />
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>CI</TableHead>
-                <TableHead>Nombre Completo</TableHead>
-                <TableHead>Cargo</TableHead>
-                <TableHead>Profesión</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta>
+          <Tabla>
+            <EncabezadoTabla>
+              <FilaTabla>
+                <CeldaEncabezado>CI</CeldaEncabezado>
+                <CeldaEncabezado>Nombre Completo</CeldaEncabezado>
+                <CeldaEncabezado>Cargo</CeldaEncabezado>
+                <CeldaEncabezado>Profesión</CeldaEncabezado>
+                <CeldaEncabezado>Estado</CeldaEncabezado>
+                <CeldaEncabezado>Acciones</CeldaEncabezado>
+              </FilaTabla>
+            </EncabezadoTabla>
+            <CuerpoTabla>
               {filteredStaff.map((s) => (
-                <TableRow key={s.id}>
-                  <TableCell className="font-medium">
+                <FilaTabla key={s.id}>
+                  <CeldaTabla className="font-medium">
                     {s.persona?.ci}
-                  </TableCell>
-                  <TableCell>
+                  </CeldaTabla>
+                  <CeldaTabla>
                     {s.persona?.names} {s.persona?.lastname_paternal} {s.persona?.lastname_maternal}
-                  </TableCell>
-                  <TableCell>{getRolBadge(s.position)}</TableCell>
-                  <TableCell>{s.profession || '-'}</TableCell>
-                  <TableCell>{getStatusBadge(s.status)}</TableCell>
-                  <TableCell>
+                  </CeldaTabla>
+                  <CeldaTabla>{getRolBadge(s.position)}</CeldaTabla>
+                  <CeldaTabla>{s.profession || '-'}</CeldaTabla>
+                  <CeldaTabla>{getStatusBadge(s.status)}</CeldaTabla>
+                  <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" title="Ver credenciales" onClick={() => viewCredentials(s)}>
+                      <Boton variant="ghost" size="icon" title="Ver credenciales" onClick={() => viewCredentials(s)}>
                         <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" title="Editar" onClick={() => router.push(`/personal/editar/${s.id}`)}>
+                      </Boton>
+                      <Boton variant="ghost" size="icon" title="Editar" onClick={() => router.push(`/personal/editar/${s.id}`)}>
                         <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" title="Eliminar" onClick={() => setDeleteModal(s)}>
+                      </Boton>
+                      <Boton variant="ghost" size="icon" title="Eliminar" onClick={() => setDeleteModal(s)}>
                         <Trash2 className="w-4 h-4 text-red-500" />
-                      </Button>
+                      </Boton>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               ))}
               {filteredStaff.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                <FilaTabla>
+                  <CeldaTabla colSpan={6} className="text-center py-8 text-gray-500">
                     {searchTerm ? 'No se encontró personal' : 'No hay personal registrado'}
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </CuerpoTabla>
+          </Tabla>
+        </ContenidoTarjeta>
+      </Tarjeta>
 
       <ConfirmModal
         open={!!deleteModal}
@@ -253,10 +253,10 @@ export default function StaffPage() {
               ⚠️ Esta contraseña es temporal. El usuario debe cambiarla después de iniciar sesión.
             </p>
             <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setCredentialsModal(null)}>Cerrar</Button>
-              <Button onClick={handleResetPassword} isLoading={resetLoading} disabled={credentialsModal.username === 'No tiene usuario' || credentialsModal.username === 'Error al cargar'}>
+              <Boton variant="outline" onClick={() => setCredentialsModal(null)}>Cerrar</Boton>
+              <Boton onClick={handleResetPassword} isLoading={resetLoading} disabled={credentialsModal.username === 'No tiene usuario' || credentialsModal.username === 'Error al cargar'}>
                 Restablecer Contraseña
-              </Button>
+              </Boton>
             </div>
           </div>
         )}

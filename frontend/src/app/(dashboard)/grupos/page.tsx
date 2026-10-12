@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Selector } from '@/components/ui/selector';
+import { Insignia } from '@/components/ui/insignia';
 import { Modal } from '@/components/ui/modal';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
 import { ConfirmModal } from '@/components/ui/modal';
 import { api } from '@/lib/api';
 import { Search, Plus, Edit2, Trash2, Loader2, Users, UserCheck, BookOpen, ArrowLeft } from 'lucide-react';
@@ -297,37 +297,37 @@ export default function GruposPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Grupos' }]} />
+      <Migas items={[{ label: 'Grupos' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestion de Grupos</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setGenerateModalOpen(true)}>
+          <Boton variant="outline" onClick={() => setGenerateModalOpen(true)}>
             <BookOpen className="w-4 h-4 mr-2" />
             Generar Grupos
-          </Button>
-          <Button onClick={() => setModalOpen(true)}>
+          </Boton>
+          <Boton onClick={() => setModalOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Nuevo Grupo
-          </Button>
+          </Boton>
         </div>
       </div>
 
-      <Card variant="bordered">
-        <CardHeader>
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <CardTitle>Lista de Grupos</CardTitle>
+            <TituloTarjeta>Lista de Grupos</TituloTarjeta>
             <div className="flex-1 flex flex-col md:flex-row gap-4 md:justify-end">
               <div className="relative w-full md:w-48">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
+                <Entrada
                   placeholder="Buscar grupo..."
                   className="pl-10"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Select
+              <Selector
                 value={filterGestion}
                 onChange={(e) => setFilterGestion(e.target.value)}
                 options={[
@@ -335,7 +335,7 @@ export default function GruposPage() {
                   ...gestiones.map(g => ({ value: g.year, label: g.year }))
                 ]}
               />
-              <Select
+              <Selector
                 value={filterCarrera}
                 onChange={(e) => setFilterCarrera(e.target.value)}
                 options={[
@@ -343,7 +343,7 @@ export default function GruposPage() {
                   ...carreras.map(c => ({ value: c.id.toString(), label: c.name }))
                 ]}
               />
-              <Select
+              <Selector
                 value={filterSemestre}
                 onChange={(e) => setFilterSemestre(e.target.value)}
                 options={[
@@ -353,86 +353,86 @@ export default function GruposPage() {
               />
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta>
           {loading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Código</TableHead>
-                  <TableHead>Materia</TableHead>
-                  <TableHead>Sem</TableHead>
-                  <TableHead>Cap</TableHead>
-                  <TableHead>Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <Tabla>
+              <EncabezadoTabla>
+                <FilaTabla>
+                  <CeldaEncabezado>Código</CeldaEncabezado>
+                  <CeldaEncabezado>Materia</CeldaEncabezado>
+                  <CeldaEncabezado>Sem</CeldaEncabezado>
+                  <CeldaEncabezado>Cap</CeldaEncabezado>
+                  <CeldaEncabezado>Acciones</CeldaEncabezado>
+                </FilaTabla>
+              </EncabezadoTabla>
+              <CuerpoTabla>
                 {filteredGrupos.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                  <FilaTabla>
+                    <CeldaTabla colSpan={5} className="text-center py-8 text-gray-500">
                       No se encontraron grupos
-                    </TableCell>
-                  </TableRow>
+                    </CeldaTabla>
+                  </FilaTabla>
                 ) : (
                   filteredGrupos.map((grupo) => (
-                    <TableRow
+                    <FilaTabla
                       key={grupo.id}
                       className={selectedGrupo?.id === grupo.id ? 'bg-primary-50' : ''}
                     >
-                      <TableCell className="font-medium">
+                      <CeldaTabla className="font-medium">
                         <button
                           onClick={() => fetchGrupoDetails(grupo)}
                           className="text-primary-600 hover:underline text-left"
                         >
                           <div className="font-bold">{grupo.code}</div>
                         </button>
-                      </TableCell>
-                      <TableCell>
+                      </CeldaTabla>
+                      <CeldaTabla>
                         <div className="text-sm font-medium">{grupo.materia?.code || '-'}</div>
                         <div className="text-xs text-gray-500">{grupo.materia?.name || '-'}</div>
-                      </TableCell>
-                      <TableCell>{grupo.semester}°</TableCell>
-                      <TableCell>{grupo.capacity}</TableCell>
-                      <TableCell>
+                      </CeldaTabla>
+                      <CeldaTabla>{grupo.semester}°</CeldaTabla>
+                      <CeldaTabla>{grupo.capacity}</CeldaTabla>
+                      <CeldaTabla>
                         <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => router.push(`/grupos/${grupo.id}`)}>
+                          <Boton variant="ghost" size="icon" onClick={() => router.push(`/grupos/${grupo.id}`)}>
                             <Edit2 className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => {
+                          </Boton>
+                          <Boton variant="ghost" size="icon" onClick={() => {
                             setDeletingGrupo(grupo);
                             setDeleteModalOpen(true);
                           }}>
                             <Trash2 className="w-4 h-4 text-red-500" />
-                          </Button>
+                          </Boton>
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </CeldaTabla>
+                    </FilaTabla>
                   ))
                 )}
-              </TableBody>
-            </Table>
+              </CuerpoTabla>
+            </Tabla>
           )}
-        </CardContent>
-      </Card>
+        </ContenidoTarjeta>
+      </Tarjeta>
 
       {selectedGrupo && (
-        <Card variant="bordered">
-          <CardHeader>
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
+              <TituloTarjeta className="flex items-center gap-2">
                 <Users className="w-5 h-5" />
                 Detalles del Grupo: {selectedGrupo.parallel} - {selectedGrupo.turno?.name}
-              </CardTitle>
-              <Button variant="ghost" size="icon" onClick={() => setSelectedGrupo(null)}>
+              </TituloTarjeta>
+              <Boton variant="ghost" size="icon" onClick={() => setSelectedGrupo(null)}>
                 <ArrowLeft className="w-4 h-4" />
-              </Button>
+              </Boton>
             </div>
-          </CardHeader>
-          <CardContent>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta>
             {loadingDetails ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
@@ -486,8 +486,8 @@ export default function GruposPage() {
                 </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
       )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Nuevo Grupo" size="lg">
@@ -495,7 +495,7 @@ export default function GruposPage() {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Gestion *</label>
-              <Input
+              <Entrada
                 value={newForm.gestion}
                 onChange={(e) => setNewForm({ ...newForm, gestion: e.target.value })}
               />
@@ -513,7 +513,7 @@ export default function GruposPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Paralelo *</label>
-              <Input
+              <Entrada
                 value={newForm.parallel}
                 onChange={(e) => setNewForm({ ...newForm, parallel: e.target.value.toUpperCase() })}
                 placeholder="A"
@@ -537,7 +537,7 @@ export default function GruposPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad</label>
-              <Input
+              <Entrada
                 type="number"
                 value={newForm.capacity}
                 onChange={(e) => setNewForm({ ...newForm, capacity: e.target.value })}
@@ -561,12 +561,12 @@ export default function GruposPage() {
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" onClick={() => setModalOpen(false)}>
+            <Boton variant="outline" onClick={() => setModalOpen(false)}>
               Cancelar
-            </Button>
-            <Button onClick={handleCreate} disabled={saving || !newForm.career_id || !newForm.semester || !newForm.parallel}>
+            </Boton>
+            <Boton onClick={handleCreate} disabled={saving || !newForm.career_id || !newForm.semester || !newForm.parallel}>
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Crear Grupo'}
-            </Button>
+            </Boton>
           </div>
         </div>
       </Modal>
@@ -595,7 +595,7 @@ export default function GruposPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Gestión *</label>
-              <Input
+              <Entrada
                 value={generateForm.gestion}
                 onChange={(e) => setGenerateForm({ ...generateForm, gestion: e.target.value })}
               />
@@ -692,7 +692,7 @@ export default function GruposPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad por grupo</label>
-            <Input
+            <Entrada
               type="number"
               value={generateForm.capacidad}
               onChange={(e) => setGenerateForm({ ...generateForm, capacidad: e.target.value })}
@@ -707,15 +707,15 @@ export default function GruposPage() {
           )}
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" onClick={() => { setGenerateModalOpen(false); setGenerateResult(null); setPlanesCarrera([]); }}>
+            <Boton variant="outline" onClick={() => { setGenerateModalOpen(false); setGenerateResult(null); setPlanesCarrera([]); }}>
               Cerrar
-            </Button>
-            <Button
+            </Boton>
+            <Boton
               onClick={handleGenerate}
               disabled={saving || !generateForm.study_plan_id || generateForm.shift_ids.length === 0 || generateForm.parallels.length === 0}
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Generar Grupos'}
-            </Button>
+            </Boton>
           </div>
         </div>
       </Modal>

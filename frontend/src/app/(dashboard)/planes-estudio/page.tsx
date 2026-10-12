@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Entrada } from '@/components/ui/entrada';
+import { Selector } from '@/components/ui/selector';
+import { Insignia } from '@/components/ui/insignia';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
 import { ConfirmModal } from '@/components/ui/modal';
 import { api } from '@/lib/api';
 import { Search, Plus, Edit2, Trash2, Loader2, BookOpen } from 'lucide-react';
@@ -111,31 +111,31 @@ export default function PlanesEstudioPage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Planes de Estudio' }]} />
+      <Migas items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Planes de Estudio' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Planes de Estudio</h1>
-        <Button onClick={() => router.push('/planes-estudio/nuevo')}>
+        <Boton onClick={() => router.push('/planes-estudio/nuevo')}>
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Plan
-        </Button>
+        </Boton>
       </div>
 
-      <Card variant="bordered">
-        <CardHeader>
+      <Tarjeta variant="bordered">
+        <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <CardTitle>Lista de Planes</CardTitle>
+            <TituloTarjeta>Lista de Planes</TituloTarjeta>
             <div className="flex-1 flex flex-col md:flex-row gap-4 md:justify-end">
               <div className="relative w-full md:w-48">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
+                <Entrada
                   placeholder="Buscar plan..."
                   className="pl-10"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Select
+              <Selector
                 value={filterCarrera}
                 onChange={(e) => setFilterCarrera(e.target.value)}
                 options={[
@@ -144,7 +144,7 @@ export default function PlanesEstudioPage() {
                 ]}
                 placeholder="Carrera"
               />
-              <Select
+              <Selector
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 options={[
@@ -156,56 +156,56 @@ export default function PlanesEstudioPage() {
               />
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>RM</TableHead>
-                <TableHead>Fecha RM</TableHead>
-                <TableHead>Carrera</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta>
+          <Tabla>
+            <EncabezadoTabla>
+              <FilaTabla>
+                <CeldaEncabezado>RM</CeldaEncabezado>
+                <CeldaEncabezado>Fecha RM</CeldaEncabezado>
+                <CeldaEncabezado>Carrera</CeldaEncabezado>
+                <CeldaEncabezado>Estado</CeldaEncabezado>
+                <CeldaEncabezado>Acciones</CeldaEncabezado>
+              </FilaTabla>
+            </EncabezadoTabla>
+            <CuerpoTabla>
               {filteredPlanes.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                <FilaTabla>
+                  <CeldaTabla colSpan={5} className="text-center py-8 text-gray-500">
                     No se encontraron planes de estudio
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               ) : (
                 filteredPlanes.map((plan) => (
-                  <TableRow key={plan.id}>
-                    <TableCell className="font-medium">{plan.rm_number}</TableCell>
-                    <TableCell>{new Date(plan.rm_date).toLocaleDateString()}</TableCell>
-                    <TableCell>{plan.carrera?.name || '-'}</TableCell>
-                    <TableCell>
-                      <Badge variant={plan.status === 'vigente' ? 'exito' : 'secondary'}>
+                  <FilaTabla key={plan.id}>
+                    <CeldaTabla className="font-medium">{plan.rm_number}</CeldaTabla>
+                    <CeldaTabla>{new Date(plan.rm_date).toLocaleDateString()}</CeldaTabla>
+                    <CeldaTabla>{plan.carrera?.name || '-'}</CeldaTabla>
+                    <CeldaTabla>
+                      <Insignia variant={plan.status === 'vigente' ? 'exito' : 'secondary'}>
                         {plan.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
+                      </Insignia>
+                    </CeldaTabla>
+                    <CeldaTabla>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => router.push(`/planes-estudio/${plan.id}`)}>
+                        <Boton variant="ghost" size="icon" onClick={() => router.push(`/planes-estudio/${plan.id}`)}>
                           <Edit2 className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => router.push(`/planes-estudio/${plan.id}/materias`)}>
+                        </Boton>
+                        <Boton variant="ghost" size="icon" onClick={() => router.push(`/planes-estudio/${plan.id}/materias`)}>
                           <BookOpen className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => { setDeletingPlan(plan); setDeleteModalOpen(true); }}>
+                        </Boton>
+                        <Boton variant="ghost" size="icon" onClick={() => { setDeletingPlan(plan); setDeleteModalOpen(true); }}>
                           <Trash2 className="w-4 h-4 text-red-500" />
-                        </Button>
+                        </Boton>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </CeldaTabla>
+                  </FilaTabla>
                 ))
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </CuerpoTabla>
+          </Tabla>
+        </ContenidoTarjeta>
+      </Tarjeta>
 
       <ConfirmModal
         open={deleteModalOpen}

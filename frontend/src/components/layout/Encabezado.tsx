@@ -2,26 +2,26 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth-store';
-import { getRoleLabel, getRoleColor } from '@/lib/auth';
+import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
+import { etiquetaRol, colorRol } from '@/lib/autenticacion';
 import { Bell, LogOut, User, Settings, ChevronDown, Menu } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utilidades';
 
-interface HeaderProps {
+interface PropsEncabezado {
   title?: string;
   onMenuClick?: () => void;
 }
 
-export default function Header({ title, onMenuClick }: HeaderProps) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+export default function Encabezado({ title, onMenuClick }: PropsEncabezado) {
+  const [desplegableAbierto, setDesplegableAbierto] = useState(false);
+  const refDesplegable = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { user, logout } = usarAlmacenAutenticacion();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
+      if (refDesplegable.current && !refDesplegable.current.contains(event.target as Node)) {
+        setDesplegableAbierto(false);
       }
     };
 
@@ -55,9 +55,9 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
           </button>
 
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative" ref={refDesplegable}>
             <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onClick={() => setDesplegableAbierto(!desplegableAbierto)}
               className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
@@ -70,12 +70,12 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
               <ChevronDown
                 className={cn(
                   'w-4 h-4 text-gray-400 transition-transform hidden sm:block',
-                  isDropdownOpen && 'rotate-180'
+                  desplegableAbierto && 'rotate-180'
                 )}
               />
             </button>
 
-            {isDropdownOpen && (
+            {desplegableAbierto && (
               <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="px-4 py-3 border-b border-gray-100">
                   <p className="text-sm font-medium text-gray-900">{user?.username}</p>
@@ -83,10 +83,10 @@ export default function Header({ title, onMenuClick }: HeaderProps) {
                   <span
                     className={cn(
                       'inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full capitalize',
-                      user?.role && getRoleColor(user.role as any)
+                      user?.role && colorRol(user.role as any)
                     )}
                   >
-                    {user?.role && getRoleLabel(user.role)}
+                    {user?.role && etiquetaRol(user.role)}
                   </span>
                 </div>
 

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { GraduationCap, Users, BookOpen, Award, ArrowRight, CheckCircle, MapPin, Phone, Mail, Clock, Target, Eye, Shield, Star } from 'lucide-react';
-import { useInstitution } from '@/contexts/InstitutionContext';
+import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
 const milestones = [
   { year: '2014', event: 'Fundación del Instituto' },
@@ -24,7 +24,7 @@ const values = [
 ];
 
 export default function InstitutoPage() {
-  const { institution } = useInstitution();
+  const { institucion } = usarInstitucion();
 
   return (
     <div>
@@ -36,9 +36,9 @@ export default function InstitutoPage() {
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-100 mb-3 sm:mb-4">
-              {institution?.nombre || 'Instituto Tecnológico Boliviano de Tecnología'}
+              {institucion?.nombre || 'Instituto Tecnológico Boliviano de Tecnología'}
             </h1>
-            <p className="text-lg sm:text-xl text-primary-400">{institution?.lema || 'Conectando Mentes, Impulsando el Progreso'}</p>
+            <p className="text-lg sm:text-xl text-primary-400">{institucion?.lema || 'Conectando Mentes, Impulsando el Progreso'}</p>
           </div>
         </div>
       </section>
@@ -50,7 +50,7 @@ export default function InstitutoPage() {
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-4 sm:mb-6">Sobre Nosotros</h2>
               <p className="text-gray-400 mb-6">
-                El {institution?.nombre || 'Instituto Tecnológico Boliviano de Tecnología'} (ITBT) es una institución 
+                El {institucion?.nombre || 'Instituto Tecnológico Boliviano de Tecnología'} (ITBT) es una institución 
                 educativa dedicada a la formación técnica profesional en Bolivia.
               </p>
               <p className="text-gray-400 mb-6">

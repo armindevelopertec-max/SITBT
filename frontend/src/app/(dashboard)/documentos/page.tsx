@@ -1,19 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useDocuments, EmittedDocument } from '@/hooks/useDocuments';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { usarDocumentos, DocumentoEmitido } from '@/hooks/usarDocumentos';
+import { Boton } from '@/components/ui/boton';
+import { Insignia } from '@/components/ui/insignia';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Select } from '@/components/ui/select';
+  Tabla,
+  CuerpoTabla,
+  CeldaTabla,
+  CeldaEncabezado,
+  EncabezadoTabla,
+  FilaTabla,
+} from '@/components/ui/tabla';
+import { Selector } from '@/components/ui/selector';
 import { FileText, Eye, Printer, CheckCircle, XCircle, Plus, Search, Download } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -36,8 +36,8 @@ const estadoLabels: Record<string, { label: string; color: string }> = {
 };
 
 export default function DocumentsPage() {
-  const { loading, fetchDocuments, getStatistics } = useDocuments();
-  const [documents, setDocuments] = useState<EmittedDocument[]>([]);
+  const { loading, fetchDocuments, getStatistics } = usarDocumentos();
+  const [documents, setDocuments] = useState<DocumentoEmitido[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [tipoFilter, setTipoFilter] = useState<string>('');
@@ -68,10 +68,10 @@ export default function DocumentsPage() {
           <p className="text-gray-600">Gestión de documentos emitidos</p>
         </div>
         <Link href="/documentos/emitir">
-          <Button className="flex items-center gap-2">
+          <Boton className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
             Emitir documento
-          </Button>
+          </Boton>
         </Link>
       </div>
 
@@ -104,10 +104,10 @@ export default function DocumentsPage() {
       )}
 
       {/* Filters */}
-      <Card className="mb-6">
-        <CardContent className="pt-6">
+      <Tarjeta className="mb-6">
+        <ContenidoTarjeta className="pt-6">
           <div className="flex gap-4">
-            <Select
+            <Selector
               value={tipoFilter}
               onChange={(e) => setTipoFilter(e.target.value)}
               options={[
@@ -119,7 +119,7 @@ export default function DocumentsPage() {
               ]}
               placeholder="Tipo de documento"
             />
-            <Select
+            <Selector
               value={estadoFilter}
               onChange={(e) => setEstadoFilter(e.target.value)}
               options={[
@@ -132,88 +132,88 @@ export default function DocumentsPage() {
               placeholder="Estado"
             />
           </div>
-        </CardContent>
-      </Card>
+        </ContenidoTarjeta>
+      </Tarjeta>
 
-      {/* Table */}
-      <Card>
-        <CardContent className="pt-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Número</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Estudiante</TableHead>
-                <TableHead>Gestión</TableHead>
-                <TableHead>Fecha</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+      {/* Tabla */}
+      <Tarjeta>
+        <ContenidoTarjeta className="pt-6">
+          <Tabla>
+            <EncabezadoTabla>
+              <FilaTabla>
+                <CeldaEncabezado>Número</CeldaEncabezado>
+                <CeldaEncabezado>Tipo</CeldaEncabezado>
+                <CeldaEncabezado>Estudiante</CeldaEncabezado>
+                <CeldaEncabezado>Gestión</CeldaEncabezado>
+                <CeldaEncabezado>Fecha</CeldaEncabezado>
+                <CeldaEncabezado>Estado</CeldaEncabezado>
+                <CeldaEncabezado className="text-right">Acciones</CeldaEncabezado>
+              </FilaTabla>
+            </EncabezadoTabla>
+            <CuerpoTabla>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                <FilaTabla>
+                  <CeldaTabla colSpan={7} className="text-center py-8">
                     Cargando...
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               ) : documents.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                <FilaTabla>
+                  <CeldaTabla colSpan={7} className="text-center py-8 text-gray-500">
                     No hay documentos
-                  </TableCell>
-                </TableRow>
+                  </CeldaTabla>
+                </FilaTabla>
               ) : (
                 documents.map((doc) => (
-                  <TableRow key={doc.id}>
-                    <TableCell className="font-medium">{doc.numeroDocumento}</TableCell>
-                    <TableCell>
-                      <Badge className={tipoLabels[doc.tipo]?.color}>
+                  <FilaTabla key={doc.id}>
+                    <CeldaTabla className="font-medium">{doc.numeroDocumento}</CeldaTabla>
+                    <CeldaTabla>
+                      <Insignia className={tipoLabels[doc.tipo]?.color}>
                         {tipoLabels[doc.tipo]?.label || doc.tipo}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
+                      </Insignia>
+                    </CeldaTabla>
+                    <CeldaTabla>
                       {doc.estudiante
                         ? `${doc.estudiante.persona?.names} ${doc.estudiante.persona?.lastname_paternal}`
                         : `ID: ${doc.estudiante_id}`}
-                    </TableCell>
-                    <TableCell>{doc.gestion}</TableCell>
-                    <TableCell>
+                    </CeldaTabla>
+                    <CeldaTabla>{doc.gestion}</CeldaTabla>
+                    <CeldaTabla>
                       {doc.fechaEmision
                         ? format(new Date(doc.fechaEmision), "d 'de' MMMM 'de' yyyy", { locale: es })
                         : '-'}
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={estadoLabels[doc.estado]?.color}>
+                    </CeldaTabla>
+                    <CeldaTabla>
+                      <Insignia className={estadoLabels[doc.estado]?.color}>
                         {estadoLabels[doc.estado]?.label || doc.estado}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
+                      </Insignia>
+                    </CeldaTabla>
+                    <CeldaTabla className="text-right">
                       <div className="flex justify-end gap-2">
                         <Link href={`/documentos/${doc.id}`}>
-                          <Button variant="ghost" size="sm">
+                          <Boton variant="ghost" size="sm">
                             <Eye className="w-4 h-4" />
-                          </Button>
+                          </Boton>
                         </Link>
                         {doc.estado !== 'entregado' && doc.estado !== 'anulado' && (
-                          <Button variant="ghost" size="sm" title="Imprimir">
+                          <Boton variant="ghost" size="sm" title="Imprimir">
                             <Printer className="w-4 h-4" />
-                          </Button>
+                          </Boton>
                         )}
                         {doc.estado === 'impreso' && (
-                          <Button variant="ghost" size="sm" title="Registrar entrega" className="text-green-600">
+                          <Boton variant="ghost" size="sm" title="Registrar entrega" className="text-green-600">
                             <CheckCircle className="w-4 h-4" />
-                          </Button>
+                          </Boton>
                         )}
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </CeldaTabla>
+                  </FilaTabla>
                 ))
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </CuerpoTabla>
+          </Tabla>
+        </ContenidoTarjeta>
+      </Tarjeta>
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">
@@ -221,22 +221,22 @@ export default function DocumentsPage() {
           Mostrando {documents.length} documentos
         </div>
         <div className="flex gap-2">
-          <Button
+          <Boton
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
           >
             Anterior
-          </Button>
-          <Button
+          </Boton>
+          <Boton
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => p + 1)}
             disabled={documents.length < 20}
           >
             Siguiente
-          </Button>
+          </Boton>
         </div>
       </div>
     </div>

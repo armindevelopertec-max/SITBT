@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { User, AuthState } from '@/types';
+import { Usuario, EstadoAutenticacion } from '@/types';
 import api from '@/lib/api';
 
-export const useAuthStore = create<AuthState>()(
+export const usarAlmacenAutenticacion = create<EstadoAutenticacion>()(
   persist(
     (set, get) => ({
       user: null,
@@ -19,13 +19,13 @@ export const useAuthStore = create<AuthState>()(
       login: async (username: string, password: string) => {
         set({ isLoading: true });
         try {
-          const response = await api.post('/auth/login', { username, password });
+          const response = await api.post('/autenticacion/login', { username, password });
           const { access_token, user } = response.data;
 
           const roles = user.roles as any[];
           const firstRole = roles && roles.length > 0 ? roles[0].code : 'administrador';
 
-          const transformedUser: User = {
+          const transformedUser: Usuario = {
             id: user.id,
             username: user.username,
             email: user.person?.email || '',
@@ -55,12 +55,12 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
-      setUser: (user: User) => {
+      setUser: (user: Usuario) => {
         set({ user });
       },
     }),
     {
-      name: 'auth-storage',
+      name: 'almacen-autenticacion',
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },

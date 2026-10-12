@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { GraduationCap, Users, BookOpen, ArrowRight, Wrench, Zap, MapPin, Phone, Mail, Clock, ChevronLeft, ChevronRight, Target, Eye, Heart, Globe, Shield, Briefcase, Laptop, Home, Info, HeartHandshake, GraduationCap as GraduationCapIcon, Lightbulb, MapPin as MapPinIcon, User } from 'lucide-react';
-import { useInstitution } from '@/contexts/InstitutionContext';
+import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
 const heroImages = [
   {
@@ -65,7 +65,7 @@ const authorities = [
 ];
 
 export default function HomePage() {
-  const { institution } = useInstitution();
+  const { institucion } = usarInstitucion();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeSection, setActiveSection] = useState('inicio');
 
@@ -196,7 +196,7 @@ export default function HomePage() {
               Formación <span className="text-primary-400">Técnica</span> de Excelencia
             </h2>
             <p className="text-xl text-gray-400">
-              {institution?.lema || 'Conectando Mentes, Impulsando el Progreso'}
+              {institucion?.lema || 'Conectando Mentes, Impulsando el Progreso'}
             </p>
           </div>
 
@@ -363,28 +363,28 @@ export default function HomePage() {
             <div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-100 mb-4 sm:mb-6">Encuéntranos</h2>
               <p className="text-gray-400 mb-8">
-                Estamos ubicados en una zona de fácil acceso en la ciudad de {institution?.ciudad || 'El Alto'}.
+                Estamos ubicados en una zona de fácil acceso en la ciudad de {institucion?.ciudad || 'El Alto'}.
               </p>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <MapPin className="w-6 h-6 text-primary-400 mt-1" />
                   <div>
                     <h4 className="font-semibold text-gray-100">Dirección</h4>
-                    <p className="text-gray-400">{institution?.direccion || 'Av. de los Heroes, Z. Ferropetrol N.- 11'}, {institution?.ciudad || 'El Alto'}</p>
+                    <p className="text-gray-400">{institucion?.direccion || 'Av. de los Heroes, Z. Ferropetrol N.- 11'}, {institucion?.ciudad || 'El Alto'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Phone className="w-6 h-6 text-primary-400 mt-1" />
                   <div>
                     <h4 className="font-semibold text-gray-100">Teléfono</h4>
-                    <p className="text-gray-400">{institution?.telefono || '7525247'}</p>
+                    <p className="text-gray-400">{institucion?.telefono || '7525247'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Mail className="w-6 h-6 text-primary-400 mt-1" />
                   <div>
                     <h4 className="font-semibold text-gray-100">Email</h4>
-                    <p className="text-gray-400">{institution?.email || 'ITBT@edu.bo'}</p>
+                    <p className="text-gray-400">{institucion?.email || 'ITBT@edu.bo'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -417,7 +417,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-100 mb-6">¿Listo para comenzar tu carrera técnica?</h2>
           <p className="text-xl text-gray-400 mb-8">
-            Inscríbete ahora y forma parte del {institution?.nombre || 'Instituto Tecnológico Boliviano de Tecnología'}
+            Inscríbete ahora y forma parte del {institucion?.nombre || 'Instituto Tecnológico Boliviano de Tecnología'}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/admision/pre-registro" className="px-8 py-4 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all">

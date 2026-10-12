@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle, ArrowRight, MessageCircle } from 'lucide-react';
-import { useInstitution } from '@/contexts/InstitutionContext';
+import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
 export default function ContactoPage() {
-  const { institution } = useInstitution();
+  const { institucion } = usarInstitucion();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -85,8 +85,8 @@ export default function ContactoPage() {
                   <div>
                     <h4 className="font-semibold text-gray-100 mb-1">Dirección</h4>
                     <p className="text-gray-400 text-sm sm:text-base">
-                      {institution?.direccion || 'Av. de los Heroes, Z. Ferropetrol N.- 11'}<br />
-                      {institution?.ciudad || 'El Alto'}, Bolivia
+                      {institucion?.direccion || 'Av. de los Heroes, Z. Ferropetrol N.- 11'}<br />
+                      {institucion?.ciudad || 'El Alto'}, Bolivia
                     </p>
                   </div>
                 </div>
@@ -97,7 +97,7 @@ export default function ContactoPage() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-100 mb-1">Teléfono</h4>
-                    <p className="text-gray-400 text-sm sm:text-base">{institution?.telefono || '7525247'}</p>
+                    <p className="text-gray-400 text-sm sm:text-base">{institucion?.telefono || '7525247'}</p>
                   </div>
                 </div>
 
@@ -107,7 +107,7 @@ export default function ContactoPage() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-100 mb-1">Email</h4>
-                    <p className="text-gray-400 text-sm sm:text-base">{institution?.email || 'ITBT@edu.bo'}</p>
+                    <p className="text-gray-400 text-sm sm:text-base">{institucion?.email || 'ITBT@edu.bo'}</p>
                   </div>
                 </div>
 

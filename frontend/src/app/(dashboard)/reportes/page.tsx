@@ -1,10 +1,10 @@
 'use client';
 
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
+import { Migas } from '@/components/ui/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta, DescripcionTarjeta } from '@/components/ui/tarjeta';
+import { Boton } from '@/components/ui/boton';
+import { Selector } from '@/components/ui/selector';
+import { Entrada } from '@/components/ui/entrada';
 import { BarChart3, FileText, Download, Users, GraduationCap, DollarSign, BookOpen } from 'lucide-react';
 
 const reportTypes = [
@@ -27,47 +27,47 @@ const quickReports = [
 export default function ReportsPage() {
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: 'Reportes' }]} />
+      <Migas items={[{ label: 'Reportes' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Reportes y Estadísticas</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card variant="bordered" className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Generar Reporte</CardTitle>
-            <CardDescription>Seleccione el tipo de reporte y los parámetros</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Select
+        <Tarjeta variant="bordered" className="lg:col-span-2">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Generar Reporte</TituloTarjeta>
+            <DescripcionTarjeta>Seleccione el tipo de reporte y los parámetros</DescripcionTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta className="space-y-4">
+            <Selector
               label="Tipo de Reporte"
               options={reportTypes}
               placeholder="Seleccione un tipo de reporte"
             />
             <div className="grid grid-cols-2 gap-4">
-              <Input label="Fecha Inicio" type="date" />
-              <Input label="Fecha Fin" type="date" />
+              <Entrada label="Fecha Inicio" type="date" />
+              <Entrada label="Fecha Fin" type="date" />
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline">
+              <Boton variant="outline">
                 <Download className="w-4 h-4 mr-2" />
                 Vista Previa
-              </Button>
-              <Button>
+              </Boton>
+              <Boton>
                 <Download className="w-4 h-4 mr-2" />
                 Descargar PDF
-              </Button>
+              </Boton>
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
 
-        <Card variant="bordered">
-          <CardHeader>
-            <CardTitle>Reportes Rápidos</CardTitle>
-            <CardDescription>Acceso directo a los reportes más comunes</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <Tarjeta variant="bordered">
+          <EncabezadoTarjeta>
+            <TituloTarjeta>Reportes Rápidos</TituloTarjeta>
+            <DescripcionTarjeta>Acceso directo a los reportes más comunes</DescripcionTarjeta>
+          </EncabezadoTarjeta>
+          <ContenidoTarjeta>
             <div className="grid grid-cols-2 gap-3">
               {quickReports.map((report) => (
                 <button
@@ -81,8 +81,8 @@ export default function ReportsPage() {
                 </button>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </ContenidoTarjeta>
+        </Tarjeta>
       </div>
     </div>
   );
