@@ -99,11 +99,11 @@ services:
     depends_on:
       - backend
 
-  nginx:
+  caddy:
     build:
       context: .
-      dockerfile: nginx.Dockerfile
-    container_name: sitbt_nginx
+      dockerfile: caddy.Dockerfile
+    container_name: sitbt_caddy
     ports:
       - "80:80"
       - "443:443"

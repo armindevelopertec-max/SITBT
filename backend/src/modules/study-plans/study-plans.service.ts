@@ -156,20 +156,15 @@ export class StudyPlansService {
         ps.semester,
         ps.weekly_hours,
         ps.prerequisite_id,
-        ps.code,
-        s.id as "materia.id",
-        s.code as "materia.code",
-        s.name as "materia.name",
-        s.created_at as "materia.created_at",
-        s.updated_at as "materia.updated_at",
-        prereq.id as "prerequisite.id",
-        prereq.code as "prerequisite.code",
-        prereq.name as "prerequisite.name",
-        prereq_plan.code as "prerequisite_plan_code"
+        s.id as materia_id,
+        s.code as materia_code,
+        s.name as materia_name,
+        prereq.id as prerequisite_id,
+        prereq.code as prerequisite_code,
+        prereq.name as prerequisite_name
       FROM plan_subjects ps
       JOIN subjects s ON s.id = ps.subject_id
       LEFT JOIN subjects prereq ON prereq.id = ps.prerequisite_id
-      LEFT JOIN plan_subjects prereq_plan ON prereq_plan.subject_id = ps.prerequisite_id AND prereq_plan.study_plan_id = ps.study_plan_id
       WHERE ps.study_plan_id = $1
       ORDER BY ps.semester, s.code
     `, [planId]);

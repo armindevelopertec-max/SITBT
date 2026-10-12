@@ -12,6 +12,10 @@ export class CreateGroupDto {
 
   @ApiProperty()
   @IsInt()
+  subject_id: number;
+
+  @ApiProperty()
+  @IsInt()
   semester: number;
 
   @ApiProperty()
@@ -27,6 +31,11 @@ export class CreateGroupDto {
   @IsString()
   @MaxLength(10)
   gestion: string;
+
+  @ApiProperty({ example: 'I' })
+  @IsString()
+  @MaxLength(2)
+  periodo: string;
 
   @ApiPropertyOptional({ example: 30 })
   @IsInt()

@@ -7,9 +7,11 @@ import { GroupsController } from './groups.controller';
 import { Carrera } from '../../entities/carrera.entity';
 import { PlanEstudio } from '../../entities/plan-estudio.entity';
 import { Turno } from '../../entities/turno.entity';
+import { MateriaPlan } from '../../entities/materia-plan.entity';
+import { Materia } from '../../entities/materia.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Grupo, GrupoEstudiante, Carrera, PlanEstudio, Turno])],
+  imports: [TypeOrmModule.forFeature([Grupo, GrupoEstudiante, Carrera, PlanEstudio, Turno, MateriaPlan, Materia])],
   controllers: [GroupsController],
   providers: [GroupsService],
   exports: [GroupsService],

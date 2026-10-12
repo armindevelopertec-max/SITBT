@@ -20,7 +20,6 @@ interface StaffData {
   persona?: {
     id: number;
     ci: string;
-    ci_issued: string;
     names: string;
     lastname_paternal: string;
     lastname_maternal: string;
@@ -35,6 +34,12 @@ interface StaffData {
   };
 }
 
+const DEPARTMENTS = ['La Paz', 'Cochabamba', 'Santa Cruz', 'Oruro', 'Potosí', 'Tarija', 'Chuquisaca', 'Beni', 'Pando'];
+
+const NATIONALITIES = [
+  'Boliviana', 'Argentina', 'Peruana', 'Chilena', 'Brasileña', 'Colombiana', 'Venezolana', 'Española', 'Otra'
+];
+
 export default function EditStaffPage() {
   const router = useRouter();
   const params = useParams();
@@ -46,7 +51,6 @@ export default function EditStaffPage() {
 
   const [personData, setPersonData] = useState({
     ci: '',
-    ci_issued: '',
     names: '',
     lastname_paternal: '',
     lastname_maternal: '',
@@ -67,6 +71,11 @@ export default function EditStaffPage() {
     status: 'activo',
   });
 
+  const toUpper = (value: string) => value.toUpperCase();
+
+  const isOtherDepartment = !DEPARTMENTS.includes(personData.birthplace);
+  const isOtherNationality = !NATIONALITIES.includes(personData.nationality);
+
   useEffect(() => {
     if (staffId) {
       fetchStaff();
@@ -82,7 +91,6 @@ export default function EditStaffPage() {
       if (staff.persona) {
         setPersonData({
           ci: staff.persona.ci || '',
-          ci_issued: staff.persona.ci_issued || '',
           names: staff.persona.names || '',
           lastname_paternal: staff.persona.lastname_paternal || '',
           lastname_maternal: staff.persona.lastname_maternal || '',
@@ -116,7 +124,6 @@ export default function EditStaffPage() {
     if (!personData.ci) newErrors.ci = 'CI es requerido';
     if (!personData.names) newErrors.names = 'Nombres es requerido';
     if (!personData.lastname_paternal) newErrors.lastname_paternal = 'Apellido paterno es requerido';
-    if (!personData.lastname_maternal) newErrors.lastname_maternal = 'Apellido materno es requerido';
     if (!personData.birthdate) newErrors.birthdate = 'Fecha de nacimiento es requerida';
     if (!personData.gender) newErrors.gender = 'Género es requerido';
 
@@ -137,9 +144,22 @@ export default function EditStaffPage() {
       const staffResponse = await api.get(`/personal/${staffId}`);
       const staff: StaffData = staffResponse.data;
 
+      const finalBirthplace = isOtherDepartment ? personData.birthplace : personData.birthplace;
+      const finalNationality = isOtherNationality ? personData.nationality : personData.nationality;
+
       await api.patch(`/personas/${staff.person_id}`, {
-        ...personData,
+        ci: personData.ci,
+        names: personData.names,
+        lastname_paternal: personData.lastname_paternal,
+        lastname_maternal: personData.lastname_maternal,
+        birthdate: personData.birthdate,
+        birthplace: finalBirthplace,
         gender: personData.gender,
+        marital_status: personData.marital_status || undefined,
+        nationality: finalNationality,
+        phone: personData.phone || undefined,
+        email: personData.email || undefined,
+        address: personData.address || undefined,
         status: 'activo',
       });
 
@@ -198,24 +218,16 @@ export default function EditStaffPage() {
                 <Input
                   label="Cédula de Identidad *"
                   value={personData.ci}
-                  onChange={(e) => setPersonData({ ...personData, ci: e.target.value })}
+                  onChange={(e) => setPersonData({ ...personData, ci: toUpper(e.target.value) })}
                   error={errors.ci}
                   placeholder="12345678"
                 />
               </div>
               <div>
                 <Input
-                  label="Extensión CI"
-                  value={personData.ci_issued}
-                  onChange={(e) => setPersonData({ ...personData, ci_issued: e.target.value })}
-                  placeholder="LP, CB, SC..."
-                />
-              </div>
-              <div>
-                <Input
                   label="Nombres *"
                   value={personData.names}
-                  onChange={(e) => setPersonData({ ...personData, names: e.target.value })}
+                  onChange={(e) => setPersonData({ ...personData, names: toUpper(e.target.value) })}
                   error={errors.names}
                   placeholder="Juan Carlos"
                 />
@@ -224,17 +236,16 @@ export default function EditStaffPage() {
                 <Input
                   label="Apellido Paterno *"
                   value={personData.lastname_paternal}
-                  onChange={(e) => setPersonData({ ...personData, lastname_paternal: e.target.value })}
+                  onChange={(e) => setPersonData({ ...personData, lastname_paternal: toUpper(e.target.value) })}
                   error={errors.lastname_paternal}
                   placeholder="Perez"
                 />
               </div>
               <div>
                 <Input
-                  label="Apellido Materno *"
+                  label="Apellido Materno"
                   value={personData.lastname_maternal}
-                  onChange={(e) => setPersonData({ ...personData, lastname_maternal: e.target.value })}
-                  error={errors.lastname_maternal}
+                  onChange={(e) => setPersonData({ ...personData, lastname_maternal: toUpper(e.target.value) })}
                   placeholder="Gomez"
                 />
               </div>
@@ -248,48 +259,132 @@ export default function EditStaffPage() {
                 />
               </div>
               <div>
-                <Input
+                <Select
                   label="Lugar de Nacimiento"
-                  value={personData.birthplace}
-                  onChange={(e) => setPersonData({ ...personData, birthplace: e.target.value })}
-                  placeholder="La Paz"
+                  value={isOtherDepartment ? 'Otra' : personData.birthplace}
+                  onChange={(e) => {
+                    setPersonData({
+                      ...personData,
+                      birthplace: e.target.value === 'Otra' ? '' : e.target.value
+                    });
+                  }}
+                  options={[
+                    { value: '', label: 'Seleccionar' },
+                    ...DEPARTMENTS.map(d => ({ value: d, label: d })),
+                    { value: 'Otra', label: 'Otra' },
+                  ]}
                 />
+              </div>
+              {isOtherDepartment && (
+                <div>
+                  <Input
+                    label="Especificar lugar"
+                    value={personData.birthplace}
+                    onChange={(e) => setPersonData({ ...personData, birthplace: toUpper(e.target.value) })}
+                    placeholder="Ingrese el lugar"
+                  />
+                </div>
+              )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Género *</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="M"
+                      checked={personData.gender === 'M'}
+                      onChange={(e) => setPersonData({ ...personData, gender: e.target.value })}
+                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-700">Masculino</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value="F"
+                      checked={personData.gender === 'F'}
+                      onChange={(e) => setPersonData({ ...personData, gender: e.target.value })}
+                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-700">Femenino</span>
+                  </label>
+                </div>
+                {errors.gender && <p className="text-xs text-red-500 mt-1">{errors.gender}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Estado Civil</label>
+                <div className="flex flex-wrap gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="marital_status"
+                      value="Soltera(o)"
+                      checked={personData.marital_status === 'Soltera(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-700">Soltero(a)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="marital_status"
+                      value="Casada(o)"
+                      checked={personData.marital_status === 'Casada(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-700">Casado(a)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="marital_status"
+                      value="Viuda(o)"
+                      checked={personData.marital_status === 'Viuda(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-700">Viudo(a)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="marital_status"
+                      value="Divorciada(o)"
+                      checked={personData.marital_status === 'Divorciada(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-gray-700">Divorciado(a)</span>
+                  </label>
+                </div>
               </div>
               <div>
                 <Select
-                  label="Género *"
-                  value={personData.gender}
-                  onChange={(e) => setPersonData({ ...personData, gender: e.target.value })}
-                  error={errors.gender}
-                  options={[
-                    { value: 'M', label: 'Masculino' },
-                    { value: 'F', label: 'Femenino' },
-                  ]}
-                  placeholder="Seleccionar..."
-                />
-              </div>
-              <div>
-                <Select
-                  label="Estado Civil"
-                  value={personData.marital_status}
-                  onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
-                  options={[
-                    { value: 'Soltera(o)', label: 'Soltero(a)' },
-                    { value: 'Casada(o)', label: 'Casado(a)' },
-                    { value: 'Viuda(o)', label: 'Viudo(a)' },
-                    { value: 'Divorciada(o)', label: 'Divorciado(a)' },
-                  ]}
-                  placeholder="Seleccionar..."
-                />
-              </div>
-              <div>
-                <Input
                   label="Nacionalidad"
-                  value={personData.nationality}
-                  onChange={(e) => setPersonData({ ...personData, nationality: e.target.value })}
-                  placeholder="Boliviana"
+                  value={isOtherNationality ? 'Otra' : personData.nationality}
+                  onChange={(e) => {
+                    setPersonData({
+                      ...personData,
+                      nationality: e.target.value === 'Otra' ? '' : e.target.value
+                    });
+                  }}
+                  options={NATIONALITIES.map(n => ({ value: n, label: n }))}
                 />
               </div>
+              {isOtherNationality && (
+                <div>
+                  <Input
+                    label="Especificar nacionalidad"
+                    value={personData.nationality}
+                    onChange={(e) => setPersonData({ ...personData, nationality: toUpper(e.target.value) })}
+                    placeholder="Ingrese la nacionalidad"
+                  />
+                </div>
+              )}
               <div>
                 <Input
                   label="Teléfono"
@@ -311,7 +406,7 @@ export default function EditStaffPage() {
                 <Input
                   label="Dirección"
                   value={personData.address}
-                  onChange={(e) => setPersonData({ ...personData, address: e.target.value })}
+                  onChange={(e) => setPersonData({ ...personData, address: toUpper(e.target.value) })}
                   placeholder="Av. 16 de Julio, La Paz"
                 />
               </div>

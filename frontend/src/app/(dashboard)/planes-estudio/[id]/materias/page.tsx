@@ -23,9 +23,12 @@ interface MateriaPlan {
   subject_id: number;
   semester: number;
   weekly_hours: number;
-  materia?: Materia;
+  materia_id?: number;
+  materia_code?: string;
+  materia_name?: string;
   prerequisite_id?: number;
-  prerequisite?: Materia;
+  prerequisite_code?: string;
+  prerequisite_name?: string;
 }
 
 interface PlanEstudio {
@@ -408,12 +411,12 @@ export default function PlanMateriasPage() {
                       <TableBody>
                         {materiasSemestre.map(mp => (
                           <TableRow key={mp.id}>
-                            <TableCell className="font-medium">{mp.materia?.code || mp.subject_id}</TableCell>
-                            <TableCell>{mp.materia?.name || '-'}</TableCell>
+                            <TableCell className="font-medium">{mp.materia_code || mp.subject_id}</TableCell>
+                            <TableCell>{mp.materia_name || '-'}</TableCell>
                             <TableCell className="text-center">{mp.weekly_hours}</TableCell>
                             <TableCell>
                               {mp.prerequisite_id ? (
-                                <Badge variant="secondary">{mp.prerequisite?.code || mp.prerequisite_id}</Badge>
+                                <Badge variant="secondary">{mp.prerequisite_code || mp.prerequisite_id}</Badge>
                               ) : (
                                 <span className="text-gray-400 text-sm">-</span>
                               )}

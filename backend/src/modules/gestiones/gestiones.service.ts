@@ -238,10 +238,19 @@ export class GestionesService {
   }
 
   async openPeriodo(periodoId: number): Promise<Periodo> {
-    const periodo = await this.periodoRepository.findOne({ where: { id: periodoId } });
+    const periodo = await this.periodoRepository.findOne({
+      where: { id: periodoId },
+      relations: ['gestion'],
+    });
     if (!periodo) {
       throw new NotFoundException(`Período con ID ${periodoId} no encontrado`);
     }
+
+    await this.periodoRepository.update(
+      { gestion_id: periodo.gestion_id, status: GestionStatus.ABIERTA },
+      { status: GestionStatus.CERRADA },
+    );
+
     periodo.status = GestionStatus.ABIERTA;
     return this.periodoRepository.save(periodo);
   }

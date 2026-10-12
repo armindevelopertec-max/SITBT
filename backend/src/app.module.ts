@@ -27,6 +27,7 @@ import { AdmissionModule } from './modules/admission/admission.module';
 import { ConsentModule } from './modules/consent/consent.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { PreinscripcionModule } from './modules/preinscripcion/preinscripcion.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     ConsentModule,
     DocumentsModule,
     NotificationsModule,
+    PreinscripcionModule,
   ],
 })
 export class AppModule {}

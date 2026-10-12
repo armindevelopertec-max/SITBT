@@ -14,6 +14,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
+import { GenerateGroupsDto } from './dto/generate-groups.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Grupos')
@@ -26,6 +27,11 @@ export class GroupsController {
   @Post()
   create(@Body() createGroupDto: CreateGroupDto) {
     return this.groupsService.create(createGroupDto);
+  }
+
+  @Post('generate')
+  generate(@Body() generateGroupsDto: GenerateGroupsDto) {
+    return this.groupsService.generateGroups(generateGroupsDto);
   }
 
   @Get()

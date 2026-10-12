@@ -1,0 +1,84 @@
+# Caddyfile - SITBT Reverse Proxy
+# Documentación: https://caddyserver.com/docs/caddyfile
+
+# ============================================================
+# Entorno DESARROLLO: HTTP en :80
+# ============================================================
+:80 {
+    encode gzip zstd
+
+    # Limitar tamaño de subida (archivos del backend)
+    request_body 100MB
+
+    # --- Rutas que van al BACKEND (NestJS) ---
+    handle /api/* {
+        reverse_proxy backend:4000 {
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+    handle /auth* {
+        reverse_proxy backend:4000 {
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+    handle /storage/files/* {
+        reverse_proxy backend:4000 {
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # --- Resto va al FRONTEND (Next.js) ---
+    handle {
+        reverse_proxy frontend:3000 {
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+}
+
+# ============================================================
+# PRODUCCIÓN (descomentar cuando tengas dominio + DNS apuntando al servidor)
+# Caddy gestiona HTTPS y certificados Let's Encrypt automáticamente.
+# Reemplaza "tudominio.com" por tu dominio real.
+# ============================================================
+# tudominio.com, www.tudominio.com {
+#     encode gzip zstd
+#     request_body 100MB
+#
+#     handle /api/* {
+#         reverse_proxy backend:4000 {
+#             header_up X-Real-IP {remote_host}
+#             header_up X-Forwarded-For {remote_host}
+#             header_up X-Forwarded-Proto {scheme}
+#         }
+#     }
+#     handle /auth* {
+#         reverse_proxy backend:4000 {
+#             header_up X-Real-IP {remote_host}
+#             header_up X-Forwarded-For {remote_host}
+#             header_up X-Forwarded-Proto {scheme}
+#         }
+#     }
+#     handle /storage/files/* {
+#         reverse_proxy backend:4000 {
+#             header_up X-Real-IP {remote_host}
+#             header_up X-Forwarded-For {remote_host}
+#             header_up X-Forwarded-Proto {scheme}
+#         }
+#     }
+#
+#     handle {
+#         reverse_proxy frontend:3000 {
+#             header_up X-Real-IP {remote_host}
+#             header_up X-Forwarded-For {remote_host}
+#             header_up X-Forwarded-Proto {scheme}
+#         }
+#     }
+# }

@@ -73,8 +73,8 @@ const menuSections: MenuSection[] = [
         roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente'],
       },
       {
-        title: 'Inscripciones',
-        href: '/inscripciones',
+        title: 'Preinscripcion',
+        href: '/preinscripcion',
         icon: <CalendarCheck className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico'],
       },
