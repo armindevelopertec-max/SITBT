@@ -13,7 +13,7 @@ import { Estudiante, StudentMatriculaStatus, StudentOrigin } from '../../entitie
 import { Inscripcion } from '../../entities/inscripcion.entity';
 import { PlanEstudio } from '../../entities/plan-estudio.entity';
 import { Carrera } from '../../entities/carrera.entity';
-import { InstitutionSettings } from '../../entities/institution-settings.entity';
+import { ConfiguracionInstitucional } from '../../entities/institution-settings.entity';
 
 @Injectable()
 export class ServicioAdmision {

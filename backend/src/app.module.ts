@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ModuloAutenticacion } from './modules/autenticacion/autenticacion.module';
-import { PersonsModule } from './modules/persons/persons.module';
-import { StudentsModule } from './modules/students/students.module';
+import { ModuloPersonas } from './modules/personas/personas.module';
+import { ModuloEstudiantes } from './modules/estudiantes/estudiantes.module';
 import { ModuloPersonal } from './modules/personal/personal.module';
 import { ModuloUsuarios } from './modules/usuarios/usuarios.module';
 import { ModuloRoles } from './modules/roles/roles.module';
@@ -18,15 +18,15 @@ import { ModuloAsignacionesDocentes } from './modules/asignaciones-docentes/asig
 import { ModuloCertificados } from './modules/certificados/certificados.module';
 import { ModuloCredenciales } from './modules/credenciales/credenciales.module';
 import { ModuloPagos } from './modules/pagos/pagos.module';
-import { ConvalidationsModule } from './modules/convalidations/convalidations.module';
-import { AuditModule } from './modules/audit/audit.module';
-import { StorageModule } from './modules/storage/storage.module';
-import { InstitutionSettingsModule } from './modules/institution-settings/institution-settings.module';
+import { ModuloConvalidaciones } from './modules/convalidaciones/convalidaciones.module';
+import { ModuloAuditoria } from './modules/auditoria/auditoria.module';
+import { ModuloAlmacenamiento } from './modules/almacenamiento/almacenamiento.module';
+import { ModuloConfiguracionInstitucional } from './modules/configuracion-institucional/configuracion-institucional.module';
 import { GestionesModule } from './modules/gestiones/gestiones.module';
 import { ModuloAdmision } from './modules/admision/admision.module';
-import { ConsentModule } from './modules/consent/consent.module';
-import { DocumentsModule } from './modules/documents/documents.module';
-import { NotificationsModule } from './modules/notifications/notifications.module';
+import { ModuloConsentimiento } from './modules/consentimiento/consentimiento.module';
+import { ModuloDocumentos } from './modules/documentos/documentos.module';
+import { ModuloNotificaciones } from './modules/notificaciones/notificaciones.module';
 import { PreinscripcionModule } from './modules/preinscripcion/preinscripcion.module';
 
 @Module({
@@ -52,8 +52,8 @@ import { PreinscripcionModule } from './modules/preinscripcion/preinscripcion.mo
       inject: [ConfigService],
     }),
     ModuloAutenticacion,
-    PersonsModule,
-    StudentsModule,
+    ModuloPersonas,
+    ModuloEstudiantes,
     ModuloPersonal,
     ModuloUsuarios,
     ModuloRoles,
@@ -68,15 +68,15 @@ import { PreinscripcionModule } from './modules/preinscripcion/preinscripcion.mo
     ModuloCertificados,
     ModuloCredenciales,
     ModuloPagos,
-    ConvalidationsModule,
-    AuditModule,
-    StorageModule,
-    InstitutionSettingsModule,
+    ModuloConvalidaciones,
+    ModuloAuditoria,
+    ModuloAlmacenamiento,
+    ModuloConfiguracionInstitucional,
     GestionesModule,
     ModuloAdmision,
-    ConsentModule,
-    DocumentsModule,
-    NotificationsModule,
+    ModuloConsentimiento,
+    ModuloDocumentos,
+    ModuloNotificaciones,
     PreinscripcionModule,
   ],
 })

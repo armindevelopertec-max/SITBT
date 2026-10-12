@@ -11,7 +11,7 @@ import { Estudiante } from './estudiante.entity';
 import { Usuario } from './usuario.entity';
 import { Gestion } from './gestion.entity';
 
-export enum DocumentType {
+export enum TipoDocumento {
   BOLETA_INSCRIPCION = 'boleta_inscripcion',
   RECIBO_PAGO = 'recibo_pago',
   CARNET = 'carnet',
@@ -20,7 +20,7 @@ export enum DocumentType {
   recordAcademico = 'record_academico',
 }
 
-export enum DocumentStatus {
+export enum EstadoDocumento {
   GENERADO = 'generado',
   IMPRESO = 'impreso',
   ENTREGADO = 'entregado',
@@ -39,8 +39,8 @@ export class EmittedDocument {
   @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
-  @Column({ type: 'enum', enum: DocumentType })
-  tipo: DocumentType;
+  @Column({ type: 'enum', enum: TipoDocumento })
+  tipo: TipoDocumento;
 
   @Column({ type: 'varchar', length: 50 })
   numeroDocumento: string;
@@ -67,8 +67,8 @@ export class EmittedDocument {
   @Column({ type: 'timestamp', nullable: true })
   fechaEntrega: Date;
 
-  @Column({ type: 'enum', enum: DocumentStatus, default: DocumentStatus.GENERADO })
-  estado: DocumentStatus;
+  @Column({ type: 'enum', enum: EstadoDocumento, default: EstadoDocumento.GENERADO })
+  estado: EstadoDocumento;
 
   @Column({ nullable: true })
   impreso_por: number;

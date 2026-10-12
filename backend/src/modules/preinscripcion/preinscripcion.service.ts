@@ -12,7 +12,7 @@ import { Turno } from '../../entities/turno.entity';
 import { Periodo } from '../../entities/periodo.entity';
 import { Gestion, GestionStatus } from '../../entities/gestion.entity';
 import { Calificacion } from '../../entities/calificacion.entity';
-import { EmittedDocument, DocumentType } from '../../entities/emitted-document.entity';
+import { EmittedDocument, TipoDocumento } from '../../entities/emitted-document.entity';
 import { VerifyPaymentsDto, CheckPaymentResult } from './dto/verify-payments.dto';
 import { CalculateSubjectsDto, CalculateSubjectsResult, SubjectToEnroll } from './dto/calculate-subjects.dto';
 import { CreateEnrollmentBatchDto, CreateEnrollmentResult } from './dto/create-enrollment-batch.dto';
@@ -459,7 +459,7 @@ export class PreinscripcionService {
 
     const boleta = this.documentRepository.create({
       estudiante_id: dto.studentId,
-      tipo: DocumentType.BOLETA_INSCRIPCION,
+      tipo: TipoDocumento.BOLETA_INSCRIPCION,
       numeroDocumento: numDocumento,
       gestion: dto.gestion,
       gestion_id: gestion.id,
@@ -509,7 +509,7 @@ export class PreinscripcionService {
       where: {
         estudiante_id: estudianteId,
         gestion: gestion,
-        tipo: DocumentType.BOLETA_INSCRIPCION,
+        tipo: TipoDocumento.BOLETA_INSCRIPCION,
       },
       order: { fechaEmision: 'DESC' },
     });

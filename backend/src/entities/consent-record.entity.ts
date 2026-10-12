@@ -10,7 +10,7 @@ import {
 import { Estudiante } from './estudiante.entity';
 import { Usuario } from './usuario.entity';
 
-export enum ConsentType {
+export enum TipoConsentimiento {
   ACCESS = 'access',
   RECTIFICATION = 'rectification',
   DELETION = 'deletion',
@@ -49,8 +49,8 @@ export class ConsentRecord {
   @Column({ type: 'boolean', default: false })
   consentimientoTutor: boolean;
 
-  @Column({ type: 'enum', enum: ConsentType, nullable: true })
-  derechoEjercido: ConsentType;
+  @Column({ type: 'enum', enum: TipoConsentimiento, nullable: true })
+  derechoEjercido: TipoConsentimiento;
 
   @Column({ type: 'timestamp', nullable: true })
   derechoFecha: Date;

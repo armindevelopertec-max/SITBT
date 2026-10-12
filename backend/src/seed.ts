@@ -5,7 +5,7 @@ import { Persona } from './entities/persona.entity';
 import { Usuario } from './entities/usuario.entity';
 import { Rol } from './entities/rol.entity';
 import { UsuarioRol } from './entities/usuario-rol.entity';
-import { InstitutionSettings } from './entities/institution-settings.entity';
+import { ConfiguracionInstitucional } from './entities/institution-settings.entity';
 import { Estudiante } from './entities/estudiante.entity';
 import { Carrera } from './entities/carrera.entity';
 import { PlanEstudio } from './entities/plan-estudio.entity';
@@ -17,7 +17,7 @@ const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME || 'sitbt',
   password: process.env.DB_PASSWORD || 'sitbt_password',
   database: process.env.DB_DATABASE || 'sitbt_db',
-  entities: [Persona, Usuario, Rol, UsuarioRol, InstitutionSettings, Estudiante, Carrera, PlanEstudio],
+  entities: [Persona, Usuario, Rol, UsuarioRol, ConfiguracionInstitucional, Estudiante, Carrera, PlanEstudio],
   synchronize: true,
 });
 
