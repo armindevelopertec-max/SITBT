@@ -13,11 +13,11 @@ import { MetodoPago, EstadoPago } from '../../../entities/pago.entity';
 export class CrearPagoDto {
   @ApiProperty()
   @IsInt()
-  student_id: number;
+  estudianteId: number;
 
   @ApiProperty()
   @IsInt()
-  concept_id: number;
+  conceptoId: number;
 
   @ApiProperty({ example: '2024' })
   @IsString()
@@ -26,33 +26,33 @@ export class CrearPagoDto {
 
   @ApiProperty({ example: 100.50 })
   @IsNumber()
-  amount: number;
+  monto: number;
 
   @ApiProperty({ example: '2024-06-15' })
   @IsDateString()
-  payment_date: string;
+  fechaPago: string;
 
   @ApiProperty({ enum: MetodoPago })
   @IsEnum(MetodoPago)
-  payment_method: MetodoPago;
+  metodoPago: MetodoPago;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MaxLength(30)
-  receipt_number?: string;
+  numeroRecibo?: string;
 
   @ApiProperty()
   @IsInt()
-  received_by: number;
+  recibidoPor: number;
 
   @ApiPropertyOptional({ enum: EstadoPago })
   @IsEnum(EstadoPago)
   @IsOptional()
-  status?: EstadoPago;
+  estado?: EstadoPago;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  notes?: string;
+  notas?: string;
 }

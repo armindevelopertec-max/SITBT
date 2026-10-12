@@ -20,27 +20,27 @@ export class PlanEstudio {
   id: number;
 
   @Column({ name: 'carrera_id' })
-  career_id: number;
+  carreraId: number;
 
   @ManyToOne(() => Carrera)
   @JoinColumn({ name: 'carrera_id' })
   carrera: Carrera;
 
   @Column({ type: 'varchar', length: 50, name: 'numero_rm' })
-  rm_number: string;
+  numeroRm: string;
 
   @Column({ type: 'date', name: 'fecha_rm' })
-  rm_date: Date;
+  fechaRm: Date;
 
   @Column({ type: 'enum', enum: EstadoPlanEstudio, default: EstadoPlanEstudio.VIGENTE , name: 'estado' })
-  status: EstadoPlanEstudio;
+  estado: EstadoPlanEstudio;
 
   @Column({ type: 'text', nullable: true, name: 'notas' })
-  notes: string;
+  notas: string;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

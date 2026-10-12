@@ -12,7 +12,7 @@ import { StudentStatus } from '../../../entities/estudiante.entity';
 export class CrearEstudianteDto {
   @ApiProperty()
   @IsInt()
-  person_id: number;
+  personaId: number;
 
   @ApiPropertyOptional()
   @IsString()
@@ -50,11 +50,11 @@ export class CrearEstudianteDto {
 
   @ApiProperty()
   @IsInt()
-  career_id: number;
+  carreraId: number;
 
   @ApiProperty()
   @IsInt()
-  study_plan_id: number;
+  planEstudioId: number;
 
   @ApiProperty({ example: '2024-02-01' })
   @IsDateString()
@@ -63,5 +63,5 @@ export class CrearEstudianteDto {
   @ApiPropertyOptional({ enum: StudentStatus })
   @IsEnum(StudentStatus)
   @IsOptional()
-  status?: StudentStatus;
+  estado?: StudentStatus;
 }

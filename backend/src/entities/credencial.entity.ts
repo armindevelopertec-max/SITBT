@@ -35,7 +35,7 @@ export class Credencial {
   id: number;
 
   @Column({ name: 'estudiante_id' })
-  student_id: number;
+  estudianteId: number;
 
   @ManyToOne(() => Estudiante)
   @JoinColumn({ name: 'estudiante_id' })
@@ -44,49 +44,49 @@ export class Credencial {
   @Column({ type: 'varchar', length: 10 })
   gestion: string;
 
-  @Column({ name: 'gestion_id', nullable: true })
-  gestion_id: number;
+  @Column({ name: 'gestionId', nullable: true })
+  gestionId: number;
 
   @ManyToOne(() => Gestion)
-  @JoinColumn({ name: 'gestion_id' })
+  @JoinColumn({ name: 'gestionId' })
   gestionEntity: Gestion;
 
   @Column({ type: 'integer', name: 'semestre' })
-  semester: number;
+  semestre: number;
 
-  @Column({ type: 'date', name: 'fecha_emision' })
-  issued_date: Date;
+  @Column({ type: 'fecha', name: 'fechaEmision' })
+  fechaEmision: Date;
 
-  @Column({ type: 'date', name: 'valido_hasta' })
-  valid_until: Date;
+  @Column({ type: 'fecha', name: 'validoHasta' })
+  validoHasta: Date;
 
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'foto_url' })
-  photo_url: string;
+  fotoUrl: string;
 
   @Column({ type: 'enum', enum: EstadoCredencial, default: EstadoCredencial.EMITIDA , name: 'estado' })
-  status: EstadoCredencial;
+  estado: EstadoCredencial;
 
   @Column({ name: 'emitido_por' })
-  issued_by: number;
+  emitidoPor: number;
 
   @ManyToOne(() => Usuario)
   @JoinColumn({ name: 'emitido_por' })
   emisor: Usuario;
 
   @Column({ type: 'boolean', default: false, name: 'impreso' })
-  printed: boolean;
+  impreso: boolean;
 
   @Column({ type: 'enum', enum: TipoEmisionCredencial, default: TipoEmisionCredencial.PRIMERA })
-  tipo_emision: TipoEmisionCredencial;
+  tipoEmision: TipoEmisionCredencial;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
-  vigencia_hasta: string;
+  vigenciaHasta: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  qr_verificacion: string;
+  qrVerificacion: string;
 
   @Column({ type: 'enum', enum: EstadoEntregaCredencial, default: EstadoEntregaCredencial.GENERADO })
-  estado_entrega: EstadoEntregaCredencial;
+  estadoEntrega: EstadoEntregaCredencial;
 
   @Column({ nullable: true })
   entregadoA: number;
@@ -95,11 +95,11 @@ export class Credencial {
   fechaEntrega: Date;
 
   @Column({ type: 'text', nullable: true, name: 'notas' })
-  notes: string;
+  notas: string;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

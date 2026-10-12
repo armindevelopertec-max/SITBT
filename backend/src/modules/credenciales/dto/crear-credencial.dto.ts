@@ -15,7 +15,7 @@ import { EstadoCredencial } from '../../../entities/credencial.entity';
 export class CrearCredencialDto {
   @ApiProperty()
   @IsInt()
-  student_id: number;
+  estudianteId: number;
 
   @ApiProperty({ example: '2024' })
   @IsString()
@@ -25,45 +25,45 @@ export class CrearCredencialDto {
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
-  gestion_id?: number;
+  gestionId?: number;
 
   @ApiProperty({ example: 1 })
   @IsInt()
   @Min(1)
   @Max(6)
-  semester: number;
+  semestre: number;
 
   @ApiProperty({ example: '2024-02-01' })
   @IsDateString()
-  issued_date: string;
+  fechaEmision: string;
 
   @ApiProperty({ example: '2025-02-01' })
   @IsDateString()
-  valid_until: string;
+  validoHasta: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MaxLength(255)
-  photo_url?: string;
+  fotoUrl?: string;
 
   @ApiPropertyOptional({ enum: EstadoCredencial })
   @IsEnum(EstadoCredencial)
   @IsOptional()
-  status?: EstadoCredencial;
+  estado?: EstadoCredencial;
 
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
-  issued_by?: number;
+  emitidoPor?: number;
 
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
-  printed?: boolean;
+  impreso?: boolean;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  notes?: string;
+  notas?: string;
 }

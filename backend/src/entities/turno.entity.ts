@@ -12,20 +12,20 @@ export class Turno {
   id: number;
 
   @Column({ type: 'varchar', length: 10, unique: true, name: 'codigo' })
-  code: string;
+  codigo: string;
 
-  @Column({ type: 'varchar', length: 20 , name: 'nombre' })
-  name: string;
+  @Column({ type: 'varchar', length: 20, name: 'nombre' })
+  nombre: string;
 
   @Column({ type: 'time', name: 'hora_inicio' })
-  start_time: string;
+  horaInicio: string;
 
   @Column({ type: 'time', name: 'hora_fin' })
-  end_time: string;
+  horaFin: string;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

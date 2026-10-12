@@ -43,9 +43,9 @@ export class ControladorUsuarios {
     return this.usersService.findActive();
   }
 
-  @Get('username/:username')
-  findByUsername(@Param('username') username: string) {
-    return this.usersService.findByUsername(username);
+  @Get('nombre-usuario/:nombreUsuario')
+  findByNombreUsuario(@Param('nombreUsuario') nombreUsuario: string) {
+    return this.usersService.findByNombreUsuario(nombreUsuario);
   }
 
   @Get(':id')
@@ -63,23 +63,23 @@ export class ControladorUsuarios {
     return this.usersService.remove(id);
   }
 
-  @Post(':id/change-password')
-  changePassword(@Param('id', ParseIntPipe) id: number, @Body() body: { newPassword: string }) {
-    return this.usersService.changePassword(id, body.newPassword);
+  @Post(':id/cambiar-contrasena')
+  cambiarContrasena(@Param('id', ParseIntPipe) id: number, @Body() body: { nuevaContrasena: string }) {
+    return this.usersService.cambiarContrasena(id, body.nuevaContrasena);
   }
 
-  @Post(':id/assign-role/:roleId')
-  assignRole(@Param('id', ParseIntPipe) id: number, @Param('roleId', ParseIntPipe) roleId: number) {
-    return this.usersService.assignRole(id, roleId);
+  @Post(':id/asignar-rol/:rolId')
+  asignarRol(@Param('id', ParseIntPipe) id: number, @Param('rolId', ParseIntPipe) rolId: number) {
+    return this.usersService.asignarRol(id, rolId);
   }
 
-  @Delete(':id/remove-role/:roleId')
-  removeRole(@Param('id', ParseIntPipe) id: number, @Param('roleId', ParseIntPipe) roleId: number) {
-    return this.usersService.removeRole(id, roleId);
+  @Delete(':id/remover-rol/:rolId')
+  removerRol(@Param('id', ParseIntPipe) id: number, @Param('rolId', ParseIntPipe) rolId: number) {
+    return this.usersService.removerRol(id, rolId);
   }
 
   @Get(':id/roles')
-  getUserRoles(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.getUserRoles(id);
+  obtenerRolesUsuario(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.obtenerRolesUsuario(id);
   }
 }

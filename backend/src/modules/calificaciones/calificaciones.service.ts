@@ -25,7 +25,7 @@ export class ServicioCalificaciones {
 
   async create(crearCalificacionDto: CrearCalificacionDto): Promise<Calificacion> {
     const existing = await this.calificacionRepository.findOne({
-      where: { enrollment_id: crearCalificacionDto.enrollment_id },
+      where: { inscripcionId: crearCalificacionDto.inscripcionId },
     });
 
     if (existing) {
@@ -80,7 +80,7 @@ export class ServicioCalificaciones {
 
   async findByEnrollment(enrollmentId: number): Promise<Calificacion> {
     const grade = await this.calificacionRepository.findOne({
-      where: { enrollment_id: enrollmentId },
+      where: { inscripcionId: enrollmentId },
       relations: ['enrollment', 'enrollment.student', 'enrollment.person', 'enrollment.subject'],
     });
     if (!grade) {
@@ -186,7 +186,7 @@ export class ServicioCalificaciones {
 
   async getGradeHistory(enrollmentId: number): Promise<AuditoriaCalificacion[]> {
     return this.gradeAuditRepository.find({
-      where: { grade_id: enrollmentId },
+      where: { calificacionId: enrollmentId },
       relations: ['user'],
       order: { changed_at: 'DESC' },
     });
@@ -198,7 +198,7 @@ export class ServicioCalificaciones {
       .leftJoinAndSelect('grade.enrollment', 'enrollment')
       .leftJoinAndSelect('enrollment.subject', 'subject')
       .leftJoinAndSelect('enrollment.group', 'group')
-      .where('enrollment.student_id = :studentId', { studentId });
+      .where('enrollment.estudianteId = :studentId', { studentId });
 
     if (gestion) {
       query.andWhere('enrollment.gestion = :gestion', { gestion });
@@ -214,7 +214,7 @@ export class ServicioCalificaciones {
       .leftJoinAndSelect('enrollment.student', 'student')
       .leftJoinAndSelect('enrollment.person', 'person')
       .leftJoinAndSelect('enrollment.subject', 'subject')
-      .where('enrollment.group_id = :groupId', { groupId })
+      .where('enrollment.grupoId = :groupId', { groupId })
       .andWhere('enrollment.gestion = :gestion', { gestion })
       .orderBy('student.person.lastname_paternal', 'ASC')
       .getMany();

@@ -15,7 +15,7 @@ export class ServicioPagos {
   async create(createDto: CrearPagoDto): Promise<Pago> {
     const payment = this.pagoRepository.create({
       ...createDto,
-      payment_date: new Date(createDto.payment_date),
+      payment_date: new Date(createDto.fechaPago),
     } as Partial<Pago>);
     return this.pagoRepository.save(payment);
   }
@@ -40,19 +40,19 @@ export class ServicioPagos {
     }
 
     if (status) {
-      query.andWhere('payment.status = :status', { status });
+      query.andWhere('payment.estado = :status', { status });
     }
 
     if (studentId) {
-      query.andWhere('payment.student_id = :studentId', { studentId });
+      query.andWhere('payment.estudianteId = :studentId', { studentId });
     }
 
     if (conceptId) {
-      query.andWhere('payment.concept_id = :conceptId', { conceptId });
+      query.andWhere('payment.conceptoId = :conceptId', { conceptId });
     }
 
     const [data, total] = await query
-      .orderBy('payment.payment_date', 'DESC')
+      .orderBy('payment.fechaPago', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -87,21 +87,21 @@ export class ServicioPagos {
       .createQueryBuilder('payment')
       .leftJoinAndSelect('payment.concept', 'concept')
       .leftJoinAndSelect('payment.receiver', 'receiver')
-      .where('payment.student_id = :studentId', { studentId });
+      .where('payment.estudianteId = :studentId', { studentId });
 
     if (gestion) {
       query.andWhere('payment.gestion = :gestion', { gestion });
     }
 
-    return query.orderBy('payment.payment_date', 'DESC').getMany();
+    return query.orderBy('payment.fechaPago', 'DESC').getMany();
   }
 
   async getStudentDebt(studentId: number, gestion: string): Promise<{ totalPaid: number; pending: number }> {
     const payments = await this.pagoRepository.find({
-      where: { student_id: studentId, gestion, status: EstadoPago.PAGADO },
+      where: { estudianteId: studentId, gestion, estado: EstadoPago.PAGADO },
     });
 
-    const totalPaid = payments.reduce((sum, p) => sum + Number(p.amount), 0);
+    const totalPaid = payments.reduce((sum, p) => sum + Number(p.monto), 0);
 
     return { totalPaid, pending: 0 };
   }
@@ -116,14 +116,14 @@ export class ServicioPagos {
       .leftJoinAndSelect('payment.student', 'student')
       .leftJoinAndSelect('student.person', 'person')
       .leftJoinAndSelect('payment.concept', 'concept')
-      .where('payment.payment_date BETWEEN :startDate AND :endDate', { startDate, endDate })
-      .andWhere('payment.status = :status', { status: EstadoPago.PAGADO });
+      .where('payment.fechaPago BETWEEN :startDate AND :endDate', { startDate, endDate })
+      .andWhere('payment.estado = :status', { estado: EstadoPago.PAGADO });
 
     if (gestion) {
       query.andWhere('payment.gestion = :gestion', { gestion });
     }
 
-    return query.orderBy('payment.payment_date', 'DESC').getMany();
+    return query.orderBy('payment.fechaPago', 'DESC').getMany();
   }
 
   async getDailyCollection(fecha: string, gestion: string): Promise<{ total: number; count: number }> {
@@ -133,19 +133,19 @@ export class ServicioPagos {
 
     const payments = await this.pagoRepository
       .createQueryBuilder('payment')
-      .where('payment.payment_date BETWEEN :startDate AND :endDate', { startDate, endDate })
+      .where('payment.fechaPago BETWEEN :startDate AND :endDate', { startDate, endDate })
       .andWhere('payment.gestion = :gestion', { gestion })
-      .andWhere('payment.status = :status', { status: EstadoPago.PAGADO })
+      .andWhere('payment.estado = :status', { estado: EstadoPago.PAGADO })
       .getMany();
 
-    const total = payments.reduce((sum, p) => sum + Number(p.amount), 0);
+    const total = payments.reduce((sum, p) => sum + Number(p.monto), 0);
 
     return { total, count: payments.length };
   }
 
   async annul(id: number): Promise<Pago> {
     const payment = await this.findOne(id);
-    payment.status = EstadoPago.ANULADO;
+    payment.estado = EstadoPago.ANULADO;
     return this.pagoRepository.save(payment);
   }
 
@@ -155,18 +155,18 @@ export class ServicioPagos {
     byConcept: { concept: string; total: number }[];
   }> {
     const payments = await this.pagoRepository.find({
-      where: { gestion, status: EstadoPago.PAGADO },
+      where: { gestion, estado: EstadoPago.PAGADO },
       relations: ['concept'],
     });
 
-    const total = payments.reduce((sum, p) => sum + Number(p.amount), 0);
+    const total = payments.reduce((sum, p) => sum + Number(p.monto), 0);
 
     const byMethodMap = new Map<MetodoPago, number>();
     const byConceptMap = new Map<string, number>();
 
     payments.forEach((p) => {
-      byMethodMap.set(p.payment_method, (byMethodMap.get(p.payment_method) || 0) + Number(p.amount));
-      byConceptMap.set(p.concepto?.name || 'Unknown', (byConceptMap.get(p.concepto?.name || 'Unknown') || 0) + Number(p.amount));
+      byMethodMap.set(p.metodoPago, (byMethodMap.get(p.metodoPago) || 0) + Number(p.monto));
+      byConceptMap.set(p.concepto?.nombre || 'Unknown', (byConceptMap.get(p.concepto?.nombre || 'Unknown') || 0) + Number(p.monto));
     });
 
     return {

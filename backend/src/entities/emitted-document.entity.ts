@@ -28,19 +28,19 @@ export enum EstadoDocumento {
 }
 
 @Entity('documentos_emitidos')
-export class EmittedDocument {
+export class DocumentoEmitido {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  student_id: number;
+  estudianteId: number;
 
   @ManyToOne(() => Estudiante)
   @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
   @Column({ type: 'enum', enum: TipoDocumento })
-  type: TipoDocumento;
+  tipo: TipoDocumento;
 
   @Column({ type: 'varchar', length: 50, name: 'numero_documento' })
   numeroDocumento: string;
@@ -49,26 +49,26 @@ export class EmittedDocument {
   gestion: string;
 
   @Column({ nullable: true })
-  gestion_id: number;
+  gestionId: number;
 
   @ManyToOne(() => Gestion)
-  @JoinColumn({ name: 'gestion_id' })
+  @JoinColumn({ name: 'gestionId' })
   gestionEntity: Gestion;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', name: 'fecha_emision' })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', name: 'fechaEmision' })
   fechaEmision: Date;
 
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'ruta_pdf' })
   pdfPath: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true, name: 'entregado_a' })
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'entregadoA' })
   entregadoA: string;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'fecha_entrega' })
+  @Column({ type: 'timestamp', nullable: true, name: 'fechaEntrega' })
   fechaEntrega: Date;
 
   @Column({ type: 'enum', enum: EstadoDocumento, default: EstadoDocumento.GENERADO })
-  status: EstadoDocumento;
+  estado: EstadoDocumento;
 
   @Column({ nullable: true })
   impreso_por: number;
@@ -81,14 +81,14 @@ export class EmittedDocument {
   observaciones: string;
 
   @Column({ nullable: true, name: 'pago_relacionado_id' })
-  related_payment_id: number;
+  pagoRelacionadoId: number;
 
   @Column({ nullable: true, name: 'credencial_relacionada_id' })
-  related_credential_id: number;
+  credencialRelacionadaId: number;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

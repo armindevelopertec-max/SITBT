@@ -15,30 +15,30 @@ export class DocumentoEstudiante {
   id: number;
 
   @Column({ name: 'estudiante_id' })
-  student_id: number;
+  estudianteId: number;
 
   @ManyToOne(() => Estudiante)
   @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
   @Column({ type: 'varchar', length: 50, name: 'document_type' })
-  document_type: string;
+  document_tipo: string;
 
   @Column({ type: 'boolean', default: false })
   delivered: boolean;
 
-  @Column({ type: 'date', nullable: true, name: 'delivered_date' })
-  delivered_date: Date;
+  @Column({ type: 'fecha', nullable: true, name: 'delivered_date' })
+  delivered_fecha: Date;
 
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'file_url' })
   file_url: string;
 
   @Column({ type: 'text', nullable: true, name: 'notas' })
-  notes: string;
+  notas: string;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

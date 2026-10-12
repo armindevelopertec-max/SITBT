@@ -13,7 +13,7 @@ import { ActualizarConfiguracionInstitucionalDto } from './dto/actualizar-config
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Institution Settings')
-@Controller('institution-settings')
+@Controller('configuracion-institucional')
 export class ControladorConfiguracionInstitucional {
   constructor(private readonly settingsService: ServicioConfiguracionInstitucional) {}
 

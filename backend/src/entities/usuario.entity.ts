@@ -22,31 +22,31 @@ export class Usuario {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true, name: 'persona_id' })
-  person_id: number;
+  @Column({ unique: true, name: 'personaId' })
+  personaId: number;
 
   @ManyToOne(() => Persona)
-  @JoinColumn({ name: 'persona_id' })
+  @JoinColumn({ name: 'personaId' })
   persona: Persona;
 
   @Column({ type: 'varchar', length: 50, unique: true, name: 'nombre_usuario' })
-  username: string;
+  nombreUsuario: string;
 
   @Column({ type: 'varchar', length: 255, name: 'contrasena_hash' })
-  password_hash: string;
+  contrasenaHash: string;
 
   @Column({ type: 'enum', enum: EstadoUsuario, default: EstadoUsuario.ACTIVO , name: 'estado' })
-  status: EstadoUsuario;
+  estado: EstadoUsuario;
 
   @Column({ type: 'timestamp', nullable: true, name: 'ultimo_acceso' })
-  last_login: Date;
+  ultimoAcceso: Date;
 
   @OneToMany(() => UsuarioRol, (usuarioRol) => usuarioRol.usuario)
   usuarioRoles: UsuarioRol[];
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

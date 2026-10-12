@@ -7,37 +7,37 @@ import {
   MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { GestionStatus } from '../../../entities/enums/gestion-status.enum';
+import { EstadoGestion } from '../../../entities/enums/gestion-status.enum';
 
 export class CreatePeriodoDto {
   @ApiProperty({ example: 'I' })
   @IsString()
   @MaxLength(10)
-  number: string;
+  numero: string;
 
   @ApiPropertyOptional({ example: 'Primer Semestre' })
   @IsString()
   @IsOptional()
   @MaxLength(50)
-  name?: string;
+  nombre?: string;
 
   @ApiProperty({ example: '2025-02-20' })
   @IsDateString()
-  start_date: string;
+  fechaInicio: string;
 
   @ApiProperty({ example: '2025-07-10' })
   @IsDateString()
-  end_date: string;
+  fechaFin: string;
 
-  @ApiPropertyOptional({ enum: GestionStatus, default: GestionStatus.PENDIENTE })
-  @IsEnum(GestionStatus)
+  @ApiPropertyOptional({ enum: EstadoGestion, default: EstadoGestion.PENDIENTE })
+  @IsEnum(EstadoGestion)
   @IsOptional()
-  status?: GestionStatus;
+  estado?: EstadoGestion;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  notes?: string;
+  notas?: string;
 }
 
 export class UpdatePeriodoDto {
@@ -45,31 +45,31 @@ export class UpdatePeriodoDto {
   @IsString()
   @IsOptional()
   @MaxLength(10)
-  number?: string;
+  numero?: string;
 
   @ApiPropertyOptional({ example: 'Primer Semestre' })
   @IsString()
   @IsOptional()
   @MaxLength(50)
-  name?: string;
+  nombre?: string;
 
   @ApiPropertyOptional({ example: '2025-02-20' })
   @IsDateString()
   @IsOptional()
-  start_date?: string;
+  fechaInicio?: string;
 
   @ApiPropertyOptional({ example: '2025-07-10' })
   @IsDateString()
   @IsOptional()
-  end_date?: string;
+  fechaFin?: string;
 
-  @ApiPropertyOptional({ enum: GestionStatus })
-  @IsEnum(GestionStatus)
+  @ApiPropertyOptional({ enum: EstadoGestion })
+  @IsEnum(EstadoGestion)
   @IsOptional()
-  status?: GestionStatus;
+  estado?: EstadoGestion;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  notes?: string;
+  notas?: string;
 }

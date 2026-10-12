@@ -17,29 +17,29 @@ export class Carrera {
   id: number;
 
   @Column({ type: 'varchar', length: 10, unique: true, name: 'codigo' })
-  code: string;
+  codigo: string;
 
   @Column({ type: 'varchar', length: 100 , name: 'nombre' })
-  name: string;
+  nombre: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   area: string;
 
   @Column({ type: 'varchar', length: 150, name: 'titulo' })
-  title: string;
+  titulo: string;
 
   @Column({ type: 'text', nullable: true , name: 'descripcion' })
-  description: string;
+  descripcion: string;
 
   @Column({ type: 'int', default: 3600, name: 'horas_carga' })
-  load_hours: number;
+  horasCarga: number;
 
   @Column({ type: 'enum', enum: EstadoCarrera, default: EstadoCarrera.ACTIVO, name: 'estado' })
-  status: EstadoCarrera;
+  estado: EstadoCarrera;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

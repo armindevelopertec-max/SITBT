@@ -6,20 +6,20 @@ export class CrearRolDto {
   @ApiProperty({ example: 'admin' })
   @IsString()
   @MaxLength(30)
-  code: string;
+  codigo: string;
 
   @ApiProperty({ example: 'Administrador' })
   @IsString()
   @MaxLength(50)
-  name: string;
+  nombre: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  description?: string;
+  descripcion?: string;
 
   @ApiPropertyOptional({ enum: EstadoRol })
   @IsEnum(EstadoRol)
   @IsOptional()
-  status?: EstadoRol;
+  estado?: EstadoRol;
 }

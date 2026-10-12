@@ -45,74 +45,74 @@ export class Persona {
   ci: string;
 
   @Column({ type: 'varchar', length: 100, name: 'nombres' })
-  names: string;
+  nombres: string;
 
   @Column({ type: 'varchar', length: 50, name: 'apellido_paterno' })
-  lastname_paternal: string;
+  apellidoPaterno: string;
 
   @Column({ type: 'varchar', length: 50, name: 'apellido_materno' })
-  lastname_maternal: string;
+  apellidoMaterno: string;
 
-  @Column({ type: 'date', name: 'fecha_nacimiento' })
-  birthdate: Date;
+  @Column({ type: 'fecha', name: 'fecha_nacimiento' })
+  fechaNacimiento: Date;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'lugar_nacimiento' })
-  birthplace: string;
+  lugarNacimiento: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'lugar_nacimiento_otro' })
-  birthplace_other: string;
+  lugarNacimiento_other: string;
 
   @Column({ type: 'enum', enum: Gender, name: 'genero' })
-  gender: Gender;
+  genero: Gender;
 
-  @Column({ type: 'enum', enum: MaritalStatus, nullable: true, name: 'estado_civil' })
-  marital_status: MaritalStatus;
+  @Column({ type: 'enum', enum: MaritalStatus, nullable: true, name: 'estadoCivil' })
+  marital_estado: MaritalStatus;
 
   @Column({ type: 'varchar', length: 50, default: 'Boliviana', name: 'nacionalidad' })
-  nationality: string;
+  nacionalidad: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true, name: 'nacionalidad_otra' })
-  nationality_other: string;
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'nacionalidadOtra' })
+  nacionalidad_other: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true, name: 'doble_nacionalidad' })
-  dual_nationality: string;
+  @Column({ type: 'varchar', length: 50, nullable: true, name: 'dobleNacionalidad' })
+  dual_nacionalidad: string;
 
-  @Column({ type: 'varchar', length: 30, nullable: true, name: 'numero_pasaporte' })
-  passport_number: string;
+  @Column({ type: 'varchar', length: 30, nullable: true, name: 'numeroPasaporte' })
+  passport_numero: string;
 
-  @Column({ type: 'enum', enum: BloodType, nullable: true, name: 'tipo_sangre' })
-  blood_type: BloodType;
+  @Column({ type: 'enum', enum: BloodType, nullable: true, name: 'tipoSangre' })
+  tipoSangre: BloodType;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'discapacidad' })
-  disability: string;
+  discapacidad: string;
 
-  @Column({ type: 'varchar', length: 30, nullable: true, name: 'numero_libreta_militar' })
-  military_book_number: string;
+  @Column({ type: 'varchar', length: 30, nullable: true, name: 'numeroLibretaMilitar' })
+  military_book_numero: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true, name: 'lengua_materna' })
-  mother_tongue: string;
+  @Column({ type: 'varchar', length: 50, nullable: true, name: 'lenguaMaterna' })
+  lenguaMaterna: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true, name: 'telefono' })
-  phone: string;
+  telefono: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'correo' })
-  email: string;
+  correo: string;
 
   @Column({ type: 'varchar', length: 200, nullable: true, name: 'direccion' })
-  address: string;
+  direccion: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'foto_url' })
-  photo_url: string;
+  fotoUrl: string;
 
   @Column({ type: 'enum', enum: PersonStatus, default: PersonStatus.ACTIVO, name: 'estado' })
-  status: PersonStatus;
+  estado: PersonStatus;
 
   @OneToMany(() => Estudiante, (estudiante) => estudiante.persona)
   estudiantes: Estudiante[];
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

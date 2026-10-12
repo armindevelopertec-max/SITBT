@@ -30,4 +30,4 @@ export * from './referencia.entity';
 export * from './documento-estudiante.entity';
 export { SolicitudAdmision, EstadoAdmision, OrigenAdmision } from './admission-request.entity';
 export { ConsentRecord, TipoConsentimiento } from './consent-record.entity';
-export { EmittedDocument, TipoDocumento, EstadoDocumento } from './emitted-document.entity';
+export { DocumentoEmitido, TipoDocumento, EstadoDocumento } from './emitted-document.entity';

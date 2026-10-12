@@ -7,8 +7,8 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Periodo } from './periodo.entity';
-import { GestionStatus } from './enums/gestion-status.enum';
-import { PeriodType } from './enums/period-type.enum';
+import { EstadoGestion } from './enums/gestion-estado.enum';
+import { TipoPeriodo } from './enums/period-tipo.enum';
 
 @Entity('gestiones')
 export class Gestion {
@@ -16,33 +16,33 @@ export class Gestion {
   id: number;
 
   @Column({ type: 'varchar', length: 10, unique: true, name: 'anio' })
-  year: string;
+  anio: string;
 
-  @Column({ type: 'enum', enum: PeriodType, default: PeriodType.SEMESTRAL, name: 'tipo_periodo' })
-  period_type: PeriodType;
+  @Column({ type: 'enum', enum: TipoPeriodo, default: TipoPeriodo.SEMESTRAL, name: 'tipo_periodo' })
+  tipoPeriodo: TipoPeriodo;
 
   @Column({
-    type: 'enum',
-    enum: GestionStatus,
-    default: GestionStatus.PENDIENTE,
-    name: 'estado',
+    tipo: 'enum',
+    enum: EstadoGestion,
+    default: EstadoGestion.PENDIENTE,
+    nombre: 'estado',
   })
-  status: GestionStatus;
+  estado: EstadoGestion;
 
   @Column({ type: 'boolean', default: false, name: 'es_actual' })
-  is_current: boolean;
+  esActual: boolean;
 
   @Column({ type: 'text', nullable: true, name: 'notas' })
-  notes: string;
+  notas: string;
 
   @OneToMany(() => Periodo, (periodo) => periodo.gestion)
   periodos: Periodo[];
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }
 
-export { GestionStatus, PeriodType };
+export { EstadoGestion, TipoPeriodo };

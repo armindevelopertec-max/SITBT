@@ -49,17 +49,17 @@ export class ServicioGrupos {
     }
 
     if (careerId) {
-      query.andWhere('group.career_id = :careerId', { careerId });
+      query.andWhere('group.carreraId = :careerId', { careerId });
     }
 
     if (semester) {
-      query.andWhere('group.semester = :semester', { semester });
+      query.andWhere('group.semestre = :semester', { semester });
     }
 
     const [data, total] = await query
       .orderBy('group.gestion', 'DESC')
       .addOrderBy('group.periodo', 'ASC')
-      .addOrderBy('group.semester', 'ASC')
+      .addOrderBy('group.semestre', 'ASC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -99,7 +99,7 @@ export class ServicioGrupos {
 
   async removeStudent(groupId: number, studentId: number): Promise<void> {
     const groupStudent = await this.grupoEstudianteRepository.findOne({
-      where: { group_id: groupId, student_id: studentId },
+      where: { grupoId: groupId, student_id: studentId },
     });
     if (groupStudent) {
       await this.grupoEstudianteRepository.remove(groupStudent);
@@ -108,7 +108,7 @@ export class ServicioGrupos {
 
   async getStudents(groupId: number): Promise<GrupoEstudiante[]> {
     return this.grupoEstudianteRepository.find({
-      where: { group_id: groupId },
+      where: { grupoId: groupId },
       relations: ['student', 'student.person'],
     });
   }
@@ -121,7 +121,7 @@ export class ServicioGrupos {
     periodo?: string,
   ): Promise<Grupo[]> {
     return this.grupoRepository.find({
-      where: { career_id: careerId, gestion, semester, shift_id: shiftId, periodo },
+      where: { carreraId: careerId, gestion, semester, shift_id: shiftId, periodo },
       relations: ['turno'],
     });
   }
@@ -129,9 +129,9 @@ export class ServicioGrupos {
   async getGroupStats(groupId: number): Promise<{ total: number; capacity: number }> {
     const group = await this.findOne(groupId);
     const count = await this.grupoEstudianteRepository.count({
-      where: { group_id: groupId },
+      where: { grupoId: groupId },
     });
-    return { total: count, capacity: group.capacity };
+    return { total: count, capacity: group.capacidad };
   }
 
   async generateGroups(dto: GenerarGruposDto): Promise<{ created: number; message: string }> {
@@ -151,9 +151,9 @@ export class ServicioGrupos {
       const materias = await this.materiaPlanRepository
         .createQueryBuilder('mp')
         .leftJoinAndSelect('mp.materia', 'materia')
-        .where('mp.study_plan_id = :studyPlanId', { studyPlanId: study_plan_id })
-        .orderBy('mp.semester', 'ASC')
-        .addOrderBy('materia.code', 'ASC')
+        .where('mp.planEstudioId = :studyPlanId', { studyPlanId: study_plan_id })
+        .orderBy('mp.semestre', 'ASC')
+        .addOrderBy('materia.codigo', 'ASC')
         .getMany();
 
       if (materias.length === 0) {
@@ -167,8 +167,8 @@ export class ServicioGrupos {
           for (const paralelo of parallels) {
             const existe = await this.grupoRepository.findOne({
               where: {
-                study_plan_id: materia.study_plan_id,
-                subject_id: materia.subject_id,
+                study_plan_id: materia.planEstudioId,
+                subject_id: materia.materiaId,
                 shift_id: shiftId,
                 parallel: paralelo,
                 gestion,
@@ -178,18 +178,18 @@ export class ServicioGrupos {
 
             if (!existe) {
               const shift = await this.shiftRepository.findOne({ where: { id: shiftId } });
-              const materiaCode = materia.materia?.code || materia.subject_id.toString();
-              const carreraCode = plan.carrera?.code || 'XXX';
-              const shiftCode = shift?.code || 'X';
+              const materiaCode = materia.materia?.codigo || materia.materiaId.toString();
+              const carreraCode = plan.carrera?.codigo || 'XXX';
+              const shiftCode = shift?.codigo || 'X';
 
               const code = `${materiaCode}-${carreraCode}-${shiftCode}-${paralelo}-${gestion}-${periodo}`;
 
               const grupo = this.grupoRepository.create({
                 code,
-                career_id: plan.career_id,
-                study_plan_id: materia.study_plan_id,
-                subject_id: materia.subject_id,
-                semester: materia.semester,
+                career_id: plan.carreraId,
+                study_plan_id: materia.planEstudioId,
+                subject_id: materia.materiaId,
+                semester: materia.semestre,
                 shift_id: shiftId,
                 parallel: paralelo,
                 gestion,

@@ -6,12 +6,12 @@ export class CrearCarreraDto {
   @ApiProperty({ example: 'INF' })
   @IsString()
   @MaxLength(10)
-  code: string;
+  codigo: string;
 
   @ApiProperty({ example: 'Ingeniería Informática' })
   @IsString()
   @MaxLength(100)
-  name: string;
+  nombre: string;
 
   @ApiPropertyOptional()
   @IsString()
@@ -22,20 +22,20 @@ export class CrearCarreraDto {
   @ApiProperty({ example: 'Ingeniero en Informática' })
   @IsString()
   @MaxLength(150)
-  title: string;
+  titulo: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  description?: string;
+  descripcion?: string;
 
   @ApiPropertyOptional({ example: 3600 })
   @IsInt()
   @IsOptional()
-  load_hours?: number;
+  horasCarga?: number;
 
   @ApiPropertyOptional({ enum: EstadoCarrera })
   @IsEnum(EstadoCarrera)
   @IsOptional()
-  status?: EstadoCarrera;
+  estado?: EstadoCarrera;
 }

@@ -30,8 +30,8 @@ export class ControladorRoles {
   }
 
   @Get()
-  findAll(@Query('page') page = 1, @Query('limit') limit = 20, @Query('status') status?: EstadoRol) {
-    return this.rolesService.findAll(+page, +limit, status);
+  findAll(@Query('page') page = 1, @Query('limit') limit = 20, @Query('estado') estado?: EstadoRol) {
+    return this.rolesService.findAll(+page, +limit, estado);
   }
 
   @Get('active')
@@ -39,9 +39,9 @@ export class ControladorRoles {
     return this.rolesService.findActive();
   }
 
-  @Get('code/:code')
-  findByCode(@Param('code') code: string) {
-    return this.rolesService.findByCode(code);
+  @Get('codigo/:codigo')
+  findByCodigo(@Param('codigo') codigo: string) {
+    return this.rolesService.findByCodigo(codigo);
   }
 
   @Get(':id')

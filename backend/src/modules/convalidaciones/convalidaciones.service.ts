@@ -33,15 +33,15 @@ export class ServicioConvalidaciones {
       .leftJoinAndSelect('convalidation.approver', 'approver');
 
     if (status) {
-      query.andWhere('convalidation.status = :status', { status });
+      query.andWhere('convalidation.estado = :status', { status });
     }
 
     if (type) {
-      query.andWhere('convalidation.type = :type', { type });
+      query.andWhere('convalidation.tipo = :type', { type });
     }
 
     if (studentId) {
-      query.andWhere('convalidation.student_id = :studentId', { studentId });
+      query.andWhere('convalidation.estudianteId = :studentId', { studentId });
     }
 
     const [data, total] = await query
@@ -77,32 +77,32 @@ export class ServicioConvalidaciones {
 
   async findByStudent(studentId: number): Promise<ConvalidacionEstudiante[]> {
     return this.convalidacionRepository.find({
-      where: { student_id: studentId },
+      where: { estudianteId: studentId },
       relations: ['target_subject', 'equivalence', 'approver'],
-      order: { created_at: 'DESC' },
+      order: { creadoEn: 'DESC' },
     });
   }
 
   async approve(id: number, approvedBy: number, resolutionNumber?: string, resolutionDate?: Date): Promise<ConvalidacionEstudiante> {
     const convalidation = await this.findOne(id);
-    convalidation.status = EstadoConvalidacion.APROBADA;
-    convalidation.approved_by = approvedBy;
-    if (resolutionNumber) convalidation.resolution_number = resolutionNumber;
-    if (resolutionDate) convalidation.resolution_date = resolutionDate;
+    convalidation.estado = EstadoConvalidacion.APROBADA;
+    convalidation.aprobadoPor = approvedBy;
+    if (resolutionNumber) convalidation.numeroResolucion = resolutionNumber;
+    if (resolutionDate) convalidation.fechaResolucion = resolutionDate;
     return this.convalidacionRepository.save(convalidation);
   }
 
   async reject(id: number): Promise<ConvalidacionEstudiante> {
     const convalidation = await this.findOne(id);
-    convalidation.status = EstadoConvalidacion.RECHAZADA;
+    convalidation.estado = EstadoConvalidacion.RECHAZADA;
     return this.convalidacionRepository.save(convalidation);
   }
 
   async getPending(): Promise<ConvalidacionEstudiante[]> {
     return this.convalidacionRepository.find({
-      where: { status: EstadoConvalidacion.PENDIENTE },
+      where: { estado: EstadoConvalidacion.PENDIENTE },
       relations: ['student', 'student.person', 'target_subject'],
-      order: { created_at: 'ASC' },
+      order: { creadoEn: 'ASC' },
     });
   }
 }

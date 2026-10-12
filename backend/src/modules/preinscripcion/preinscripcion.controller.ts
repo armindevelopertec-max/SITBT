@@ -8,9 +8,9 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PreinscripcionService } from './preinscripcion.service';
-import { VerifyPaymentsDto } from './dto/verify-payments.dto';
-import { CalculateSubjectsDto } from './dto/calculate-subjects.dto';
-import { CreateEnrollmentBatchDto } from './dto/create-enrollment-batch.dto';
+import { VerificarPagosDto } from './dto/verify-payments.dto';
+import { CalcularMateriasDto } from './dto/calculate-subjects.dto';
+import { CrearInscripcionLoteDto } from './dto/create-enrollment-batch.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Preinscripcion')
@@ -21,17 +21,17 @@ export class PreinscripcionController {
   constructor(private readonly service: PreinscripcionService) {}
 
   @Post('verify-payments')
-  verifyPayments(@Body() dto: VerifyPaymentsDto) {
+  verifyPayments(@Body() dto: VerificarPagosDto) {
     return this.service.verifyPayments(dto);
   }
 
   @Post('calculate-subjects')
-  calculateSubjects(@Body() dto: CalculateSubjectsDto) {
+  calculateSubjects(@Body() dto: CalcularMateriasDto) {
     return this.service.calculateSubjects(dto);
   }
 
   @Post('enroll-batch')
-  createEnrollmentBatch(@Body() dto: CreateEnrollmentBatchDto) {
+  createEnrollmentBatch(@Body() dto: CrearInscripcionLoteDto) {
     return this.service.createEnrollmentBatch(dto);
   }
 

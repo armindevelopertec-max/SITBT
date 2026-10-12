@@ -46,7 +46,7 @@ export class CrearConfiguracionInstitucionalDto {
   @IsOptional()
   @IsString()
   @MaxLength(100)
-  email?: string;
+  correo?: string;
 
   @ApiPropertyOptional({ description: 'Sitio web', maxLength: 100 })
   @IsOptional()

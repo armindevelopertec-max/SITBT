@@ -6,12 +6,12 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export enum PaymentConceptType {
+export enum TipoConceptoPago {
   UNICO = 'unico',
   SEMESTRAL = 'semestral',
 }
 
-export enum PaymentConceptStatus {
+export enum EstadoConceptoPago {
   ACTIVO = 'activo',
   INACTIVO = 'inactivo',
 }
@@ -22,26 +22,26 @@ export class ConceptoPago {
   id: number;
 
   @Column({ type: 'varchar', length: 20, unique: true, name: 'codigo' })
-  code: string;
+  codigo: string;
 
   @Column({ type: 'varchar', length: 100 , name: 'nombre' })
-  name: string;
+  nombre: string;
 
-  @Column({ type: 'enum', enum: PaymentConceptType , name: 'tipo' })
-  type: PaymentConceptType;
+  @Column({ type: 'enum', enum: TipoConceptoPago, name: 'tipo' })
+  tipo: TipoConceptoPago;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, name: 'monto_predeterminado' })
-  default_amount: number;
+  montoPredeterminado: number;
 
-  @Column({ type: 'text', nullable: true , name: 'descripcion' })
-  description: string;
+  @Column({ type: 'text', nullable: true, name: 'descripcion' })
+  descripcion: string;
 
-  @Column({ type: 'enum', enum: PaymentConceptStatus, default: PaymentConceptStatus.ACTIVO, name: 'estado' })
-  status: PaymentConceptStatus;
+  @Column({ type: 'enum', enum: EstadoConceptoPago, default: EstadoConceptoPago.ACTIVO, name: 'estado' })
+  estado: EstadoConceptoPago;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

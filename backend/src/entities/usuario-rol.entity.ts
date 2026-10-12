@@ -15,19 +15,19 @@ export class UsuarioRol {
   id: number;
 
   @Column({ name: 'usuario_id' })
-  user_id: number;
+  usuarioId: number;
 
   @ManyToOne(() => Usuario)
   @JoinColumn({ name: 'usuario_id' })
   usuario: Usuario;
 
   @Column({ name: 'rol_id' })
-  role_id: number;
+  rolId: number;
 
   @ManyToOne(() => Rol)
   @JoinColumn({ name: 'rol_id' })
   rol: Rol;
 
   @CreateDateColumn({ name: 'asignado_en' })
-  assigned_at: Date;
+  asignadoEn: Date;
 }

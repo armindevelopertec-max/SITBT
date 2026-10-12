@@ -28,8 +28,8 @@ export class ControladorCredenciales {
 
   @Post()
   create(@Body() createDto: CrearCredencialDto, @Req() req: Request) {
-    const user = req.user as { id: number };
-    createDto.issued_by = user.id;
+    const user = req.usuario as { id: number };
+    createDto.emitidoPor = user.id;
     return this.service.create(createDto);
   }
 

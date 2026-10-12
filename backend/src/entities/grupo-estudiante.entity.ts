@@ -15,14 +15,14 @@ export class GrupoEstudiante {
   id: number;
 
   @Column({ name: 'grupo_id' })
-  group_id: number;
+  grupoId: number;
 
   @ManyToOne(() => Grupo)
   @JoinColumn({ name: 'grupo_id' })
   grupo: Grupo;
 
   @Column({ })
-  student_id: number;
+  estudianteId: number;
 
   @ManyToOne(() => Estudiante)
   @JoinColumn({ })

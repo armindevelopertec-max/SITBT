@@ -9,13 +9,13 @@ import {
 } from 'typeorm';
 import { Estudiante } from './estudiante.entity';
 
-@Entity('student_references')
+@Entity('student_referencias')
 export class Referencia {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ name: 'estudiante_id' })
-  student_id: number;
+  estudianteId: number;
 
   @ManyToOne(() => Estudiante)
   @JoinColumn({ name: 'estudiante_id' })
@@ -24,18 +24,18 @@ export class Referencia {
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'contact1_name' })
   contact1_name: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true, name: 'contact1_phone' })
-  contact1_phone: string;
+  @Column({ type: 'varchar', length: 20, nullable: true, name: 'contact1_telefono' })
+  contact1_telefono: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'contact2_name' })
   contact2_name: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
-  contact2_phone: string;
+  contact2_telefono: string;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

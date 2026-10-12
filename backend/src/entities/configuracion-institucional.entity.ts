@@ -12,7 +12,7 @@ export class ConfiguracionInstitucional {
   id: number;
 
   @Column({ type: 'varchar', length: 255, name: 'nombre' })
-  name: string;
+  nombre: string;
 
   @Column({ type: 'varchar', length: 50, name: 'nombre_corto' })
   nombre_corto: string;
@@ -24,16 +24,16 @@ export class ConfiguracionInstitucional {
   logo_url: string;
 
   @Column({ type: 'varchar', length: 500, nullable: true, name: 'direccion' })
-  address: string;
+  direccion: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'telefono' })
-  phone: string;
+  telefono: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'departamento' })
   departamento: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'correo' })
-  email: string;
+  correo: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'sitio_web' })
   website: string;
@@ -45,11 +45,11 @@ export class ConfiguracionInstitucional {
   pais: string;
 
   @Column({ type: 'text', nullable: true, name: 'descripcion' })
-  description: string;
+  descripcion: string;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

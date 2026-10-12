@@ -14,10 +14,10 @@ export class ServicioCarreras {
 
   async create(createCareerDto: CrearCarreraDto): Promise<Carrera> {
     const existing = await this.careerRepository.findOne({
-      where: { code: createCareerDto.code },
+      where: { codigo: createCareerDto.codigo },
     });
     if (existing) {
-      throw new ConflictException(`Carrera con código ${createCareerDto.code} ya existe`);
+      throw new ConflictException(`Carrera con código ${createCareerDto.codigo} ya existe`);
     }
     const career = this.careerRepository.create(createCareerDto);
     return this.careerRepository.save(career);
@@ -31,11 +31,11 @@ export class ServicioCarreras {
     const query = this.careerRepository.createQueryBuilder('career');
 
     if (status) {
-      query.where('career.status = :status', { status });
+      query.where('career.estado = :status', { status });
     }
 
     const [data, total] = await query
-      .orderBy('career.name', 'ASC')
+      .orderBy('career.nombre', 'ASC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -72,15 +72,15 @@ export class ServicioCarreras {
 
   async findActive(): Promise<Carrera[]> {
     return this.careerRepository.find({
-      where: { status: EstadoCarrera.ACTIVO },
-      order: { name: 'ASC' },
+      where: { estado: EstadoCarrera.ACTIVO },
+      order: { nombre: 'ASC' },
     });
   }
 
   async findByArea(area: string): Promise<Carrera[]> {
     return this.careerRepository.find({
       where: { area, status: EstadoCarrera.ACTIVO },
-      order: { name: 'ASC' },
+      order: { nombre: 'ASC' },
     });
   }
 }

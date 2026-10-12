@@ -23,7 +23,7 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 @ApiTags('Storage')
 @Controller('storage')
 export class ControladorAlmacenamiento {
-  private readonly logger = new Logger(ControladorAlmacenamiento.name);
+  private readonly logger = new Logger(ControladorAlmacenamiento.nombre);
   constructor(private readonly service: ServicioAlmacenamiento) {}
 
   @Post('upload')

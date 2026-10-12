@@ -25,7 +25,7 @@ export class Permiso {
   id: number;
 
   @Column({ name: 'rol_id' })
-  role_id: number;
+  rolId: number;
 
   @ManyToOne(() => Rol)
   @JoinColumn({ name: 'rol_id' })
@@ -35,8 +35,8 @@ export class Permiso {
   module: string;
 
   @Column({ type: 'enum', enum: PermissionAction, name: 'accion' })
-  action: PermissionAction;
+  accion: PermissionAction;
 
   @Column({ type: 'enum', enum: PermissionStatus, default: PermissionStatus.ACTIVO })
-  status: PermissionStatus;
+  estado: PermissionStatus;
 }

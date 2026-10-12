@@ -35,7 +35,7 @@ export class ServicioAsignacionesDocentes {
     }
 
     if (status) {
-      query.andWhere('assignment.status = :status', { status });
+      query.andWhere('assignment.estado = :status', { status });
     }
 
     const [data, total] = await query
@@ -74,7 +74,7 @@ export class ServicioAsignacionesDocentes {
       .createQueryBuilder('assignment')
       .leftJoinAndSelect('assignment.subject', 'subject')
       .leftJoinAndSelect('assignment.group', 'group')
-      .where('assignment.teacher_id = :teacherId', { teacherId });
+      .where('assignment.docenteId = :teacherId', { teacherId });
 
     if (gestion) {
       query.andWhere('assignment.gestion = :gestion', { gestion });
@@ -85,14 +85,14 @@ export class ServicioAsignacionesDocentes {
 
   async findByGroup(groupId: number, gestion: string): Promise<AsignacionDocente[]> {
     return this.assignmentRepository.find({
-      where: { group_id: groupId, gestion },
+      where: { grupoId: groupId, gestion },
       relations: ['teacher', 'teacher.person', 'subject'],
     });
   }
 
   async findBySubject(subjectId: number, gestion: string): Promise<AsignacionDocente[]> {
     return this.assignmentRepository.find({
-      where: { subject_id: subjectId, gestion },
+      where: { materiaId: subjectId, gestion },
       relations: ['teacher', 'teacher.person', 'group'],
     });
   }
@@ -101,7 +101,7 @@ export class ServicioAsignacionesDocentes {
     return this.assignmentRepository.find({
       where: { gestion, status: EstadoAsignacionDocente.ACTIVO },
       relations: ['teacher', 'teacher.person', 'subject', 'group'],
-      order: { created_at: 'DESC' },
+      order: { creadoEn: 'DESC' },
     });
   }
 }

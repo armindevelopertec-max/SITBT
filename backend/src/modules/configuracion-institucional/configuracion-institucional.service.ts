@@ -54,14 +54,14 @@ export class ServicioConfiguracionInstitucional {
       }
     }
     return {
-      name: settings.name,
+      name: settings.nombre,
       nombre_corto: settings.nombre_corto,
       lema: settings.lema,
       logo_url: logoUrl,
-      address: settings.address,
-      phone: settings.phone,
+      address: settings.direccion,
+      phone: settings.telefono,
       departamento: settings.departamento,
-      email: settings.email,
+      email: settings.correo,
       website: settings.website,
       ciudad: settings.ciudad,
       pais: settings.pais,

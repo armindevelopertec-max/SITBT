@@ -12,10 +12,10 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { GestionesService } from './gestiones.service';
-import { CreateGestionDto } from './dto/create-gestion.dto';
+import { CrearGestionDto } from './dto/create-gestion.dto';
 import { UpdateGestionDto } from './dto/update-gestion.dto';
 import { CreatePeriodoDto, UpdatePeriodoDto } from './dto/periodo.dto';
-import { GestionStatus } from '../../entities/enums/gestion-status.enum';
+import { EstadoGestion } from '../../entities/enums/gestion-status.enum';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Gestiones')
@@ -26,7 +26,7 @@ export class GestionesController {
   @Post()
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  create(@Body() createGestionDto: CreateGestionDto) {
+  crear(@Body() crearGestionDto: CrearGestionDto) {
     return this.gestionesService.create(createGestionDto);
   }
 
@@ -34,7 +34,7 @@ export class GestionesController {
   findAll(
     @Query('page') page = 1,
     @Query('limit') limit = 20,
-    @Query('status') status?: GestionStatus,
+    @Query('status') status?: EstadoGestion,
   ) {
     return this.gestionesService.findAll(+page, +limit, status);
   }

@@ -22,49 +22,49 @@ export class ConsentRecord {
   id: string;
 
   @Column()
-  student_id: number;
+  estudianteId: number;
 
   @ManyToOne(() => Estudiante)
   @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
-  @Column({ type: 'varchar', length: 20, name: 'version_politica' })
+  @Column({ type: 'varchar', length: 20, name: 'versionPolitica' })
   versionPolitica: string;
 
-  @Column({ type: 'timestamp', name: 'fecha_consentimiento' })
+  @Column({ type: 'timestamp', name: 'fechaConsentimiento' })
   fechaConsentimiento: Date;
 
-  @Column({ type: 'varchar', length: 45, nullable: true, name: 'ip_consentimiento' })
+  @Column({ type: 'varchar', length: 45, nullable: true, name: 'ipConsentimiento' })
   ipConsentimiento: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true, name: 'nombre_tutor' })
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'nombreTutor' })
   nombreTutor: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true, name: 'ci_tutor' })
+  @Column({ type: 'varchar', length: 20, nullable: true, name: 'ciTutor' })
   ciTutor: string;
 
-  @Column({ type: 'text', nullable: true, name: 'firma_base64' })
+  @Column({ type: 'text', nullable: true, name: 'firmaBase64' })
   firmaBase64: string;
 
-  @Column({ type: 'boolean', default: false, name: 'consentimiento_tutor' })
+  @Column({ type: 'boolean', default: false, name: 'consentimientoTutor' })
   consentimientoTutor: boolean;
 
-  @Column({ type: 'enum', enum: TipoConsentimiento, nullable: true, name: 'derecho_ejercido' })
+  @Column({ type: 'enum', enum: TipoConsentimiento, nullable: true, name: 'derechoEjercido' })
   derechoEjercido: TipoConsentimiento;
 
-  @Column({ type: 'timestamp', nullable: true, name: 'derecho_fecha' })
+  @Column({ type: 'timestamp', nullable: true, name: 'derechoFecha' })
   derechoFecha: Date;
 
   @Column({ nullable: true })
-  registered_by: number;
+  registradoPor: number;
 
   @ManyToOne(() => Usuario)
   @JoinColumn({ })
   registrador: Usuario;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

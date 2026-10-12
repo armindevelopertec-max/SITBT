@@ -22,7 +22,7 @@ export class CrearDocumentoEmitidoDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  gestion_id?: number;
+  gestionId?: number;
 
   @ApiPropertyOptional()
   @IsOptional()

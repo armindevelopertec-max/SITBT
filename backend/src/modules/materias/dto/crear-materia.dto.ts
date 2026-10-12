@@ -5,10 +5,10 @@ export class CrearMateriaDto {
   @ApiProperty({ example: 'INF' })
   @IsString()
   @MaxLength(20)
-  code: string;
+  codigo: string;
 
   @ApiProperty({ example: 'Programación I' })
   @IsString()
   @MaxLength(150)
-  name: string;
+  nombre: string;
 }

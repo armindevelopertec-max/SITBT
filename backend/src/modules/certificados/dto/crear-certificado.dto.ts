@@ -4,23 +4,23 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CrearCertificadoDto {
   @ApiProperty()
   @IsInt()
-  student_id: number;
+  estudianteId: number;
 
   @ApiProperty({ example: 'certificate_study' })
   @IsString()
   @MaxLength(50)
-  type: string;
+  tipo: string;
 
   @ApiProperty({ example: '2024-06-15' })
   @IsDateString()
-  date: string;
+  fecha: string;
 
   @ApiProperty({ example: 'CERT-2024-0001' })
   @IsString()
   @MaxLength(30)
-  code: string;
+  codigo: string;
 
   @ApiProperty()
   @IsInt()
-  issued_by: number;
+  emitidoPor: number;
 }

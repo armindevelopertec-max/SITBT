@@ -36,5 +36,5 @@ export class EnviarNotificacionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  email?: string;
+  correo?: string;
 }

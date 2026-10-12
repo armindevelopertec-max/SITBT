@@ -8,13 +8,13 @@ import {
 } from 'typeorm';
 import { Estudiante } from './estudiante.entity';
 
-@Entity('student_payment_status')
+@Entity('student_payment_estado')
 export class EstadoPagoEstudiante {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ name: 'estudiante_id' })
-  student_id: number;
+  estudianteId: number;
 
   @ManyToOne(() => Estudiante)
   @JoinColumn({ name: 'estudiante_id' })
@@ -33,5 +33,5 @@ export class EstadoPagoEstudiante {
   inscription_enabled: boolean;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

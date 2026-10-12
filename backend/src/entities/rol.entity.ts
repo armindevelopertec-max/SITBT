@@ -17,20 +17,20 @@ export class Rol {
   id: number;
 
   @Column({ type: 'varchar', length: 30, unique: true, name: 'codigo' })
-  code: string;
+  codigo: string;
 
-  @Column({ type: 'varchar', length: 50 , name: 'nombre' })
-  name: string;
+  @Column({ type: 'varchar', length: 50, name: 'nombre' })
+  nombre: string;
 
   @Column({ type: 'text', nullable: true , name: 'descripcion' })
-  description: string;
+  descripcion: string;
 
   @Column({ type: 'enum', enum: EstadoRol, default: EstadoRol.ACTIVO, name: 'estado' })
-  status: EstadoRol;
+  estado: EstadoRol;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

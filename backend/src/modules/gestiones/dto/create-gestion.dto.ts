@@ -6,32 +6,32 @@ import {
   MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { GestionStatus } from '../../../entities/enums/gestion-status.enum';
-import { PeriodType } from '../../../entities/enums/period-type.enum';
+import { EstadoGestion } from '../../../entities/enums/gestion-status.enum';
+import { TipoPeriodo } from '../../../entities/enums/period-type.enum';
 
-export class CreateGestionDto {
+export class CrearGestionDto {
   @ApiProperty({ example: '2025' })
   @IsString()
   @MaxLength(10)
-  year: string;
+  anio: string;
 
-  @ApiPropertyOptional({ enum: PeriodType, default: PeriodType.SEMESTRAL })
-  @IsEnum(PeriodType)
+  @ApiPropertyOptional({ enum: TipoPeriodo, default: TipoPeriodo.SEMESTRAL })
+  @IsEnum(TipoPeriodo)
   @IsOptional()
-  period_type?: PeriodType;
+  tipoPeriodo?: TipoPeriodo;
 
-  @ApiPropertyOptional({ enum: GestionStatus, default: GestionStatus.PENDIENTE })
-  @IsEnum(GestionStatus)
+  @ApiPropertyOptional({ enum: EstadoGestion, default: EstadoGestion.PENDIENTE })
+  @IsEnum(EstadoGestion)
   @IsOptional()
-  status?: GestionStatus;
+  estado?: EstadoGestion;
 
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
-  is_current?: boolean;
+  esActual?: boolean;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  notes?: string;
+  notas?: string;
 }

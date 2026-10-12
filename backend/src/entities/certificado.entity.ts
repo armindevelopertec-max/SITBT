@@ -15,28 +15,28 @@ export class Certificado {
   id: number;
 
   @Column({ name: 'estudiante_id' })
-  student_id: number;
+  estudianteId: number;
 
   @ManyToOne(() => Estudiante)
   @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
   @Column({ type: 'varchar', length: 50 , name: 'tipo' })
-  type: string;
+  tipo: string;
 
-  @Column({ type: 'date', name: 'fecha' })
-  date: Date;
+  @Column({ type: 'fecha', name: 'fecha' })
+  fecha: Date;
 
   @Column({ type: 'varchar', length: 30, unique: true, name: 'codigo' })
-  code: string;
+  codigo: string;
 
   @Column({ name: 'emitido_por' })
-  issued_by: number;
+  emitidoPor: number;
 
   @ManyToOne(() => Usuario)
   @JoinColumn({ })
   emisor: Usuario;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 }

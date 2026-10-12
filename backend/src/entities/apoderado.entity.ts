@@ -15,7 +15,7 @@ export class Apoderado {
   id: number;
 
   @Column({ name: 'estudiante_id' })
-  student_id: number;
+  estudianteId: number;
 
   @ManyToOne(() => Estudiante)
   @JoinColumn({ name: 'estudiante_id' })
@@ -36,11 +36,11 @@ export class Apoderado {
   @Column({ type: 'varchar', length: 5, nullable: true, name: 'father_ci_issued' })
   father_ci_issued: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true, name: 'father_phone' })
-  father_phone: string;
+  @Column({ type: 'varchar', length: 20, nullable: true, name: 'father_telefono' })
+  father_telefono: string;
 
-  @Column({ type: 'varchar', length: 200, nullable: true, name: 'father_address' })
-  father_address: string;
+  @Column({ type: 'varchar', length: 200, nullable: true, name: 'father_direccion' })
+  father_direccion: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'mother_names' })
   mother_names: string;
@@ -57,15 +57,15 @@ export class Apoderado {
   @Column({ type: 'varchar', length: 5, nullable: true, name: 'mother_ci_issued' })
   mother_ci_issued: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true, name: 'mother_phone' })
-  mother_phone: string;
+  @Column({ type: 'varchar', length: 20, nullable: true, name: 'mother_telefono' })
+  mother_telefono: string;
 
   @Column({ type: 'varchar', length: 200, nullable: true })
-  mother_address: string;
+  mother_direccion: string;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

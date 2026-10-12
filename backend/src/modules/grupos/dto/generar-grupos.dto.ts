@@ -19,7 +19,7 @@ export class GenerarGruposDto {
 
   @IsInt()
   @IsNotEmpty()
-  study_plan_id: number;
+  planEstudioId: number;
 
   @IsOptional()
   @IsString()

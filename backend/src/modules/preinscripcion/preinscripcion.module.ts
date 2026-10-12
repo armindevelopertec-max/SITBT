@@ -13,7 +13,7 @@ import { Turno } from '../../entities/turno.entity';
 import { Periodo } from '../../entities/periodo.entity';
 import { Gestion } from '../../entities/gestion.entity';
 import { Calificacion } from '../../entities/calificacion.entity';
-import { EmittedDocument } from '../../entities/emitted-document.entity';
+import { DocumentoEmitido } from '../../entities/emitted-document.entity';
 
 @Module({
   imports: [
@@ -29,7 +29,7 @@ import { EmittedDocument } from '../../entities/emitted-document.entity';
       Periodo,
       Gestion,
       Calificacion,
-      EmittedDocument,
+      DocumentoEmitido,
     ]),
   ],
   controllers: [PreinscripcionController],

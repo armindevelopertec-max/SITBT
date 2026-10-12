@@ -1,10 +1,10 @@
 import { IsInt, IsString, IsOptional } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class VerifyPaymentsDto {
+export class VerificarPagosDto {
   @ApiProperty()
   @IsInt()
-  studentId: number;
+  estudianteId: number;
 
   @ApiProperty()
   @IsString()
@@ -16,18 +16,18 @@ export class VerifyPaymentsDto {
   periodo?: string;
 }
 
-export class CheckPaymentResult {
-  canEnroll: boolean;
-  missingPayments: {
-    type: string;
-    concept: string;
-    amount: number;
+export class ResultadoVerificarPagos {
+  puedeInscribir: boolean;
+  pagosFaltantes: {
+    tipo: string;
+    concepto: string;
+    monto: number;
   }[];
-  paidPayments: {
-    type: string;
-    concept: string;
-    amount: number;
-    paymentDate: Date;
+  pagosRealizados: {
+    tipo: string;
+    concepto: string;
+    monto: number;
+    fechaPago: Date;
   }[];
-  isNewStudent: boolean;
+  esEstudianteNuevo: boolean;
 }

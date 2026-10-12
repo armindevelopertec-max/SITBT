@@ -10,7 +10,7 @@ export class ControladorAutenticacion {
 
   @Post('login')
   async login(@Body() body: { username: string; password: string }) {
-    return this.autenticacionServicio.login(body.username, body.password);
+    return this.autenticacionServicio.login(body.nombreUsuario, body.password);
   }
 
   @Post('register')
@@ -22,6 +22,6 @@ export class ControladorAutenticacion {
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   async getProfile(@Request() req) {
-    return this.autenticacionServicio.getProfile(req.user.id);
+    return this.autenticacionServicio.getProfile(req.usuario.id);
   }
 }

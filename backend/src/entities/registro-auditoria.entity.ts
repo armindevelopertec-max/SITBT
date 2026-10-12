@@ -14,27 +14,27 @@ export class RegistroAuditoria {
   id: number;
 
   @Column({ nullable: true, name: 'usuario_id' })
-  user_id: number;
+  usuarioId: number;
 
   @ManyToOne(() => Usuario)
   @JoinColumn({ name: 'usuario_id' })
   usuario: Usuario;
 
   @Column({ type: 'varchar', length: 50, name: 'accion' })
-  action: string;
+  accion: string;
 
   @Column({ type: 'varchar', length: 50 , name: 'tabla' })
-  table: string;
+  tabla: string;
 
   @Column({ type: 'int', nullable: true, name: 'registro_id' })
-  record_id: number;
+  registroId: number;
 
   @Column({ type: 'text', nullable: true, name: 'valor_anterior' })
-  old_value: string;
+  valorAnterior: string;
 
   @Column({ type: 'text', nullable: true, name: 'valor_nuevo' })
-  new_value: string;
+  valorNuevo: string;
 
   @CreateDateColumn({ name: 'fecha' })
-  date: Date;
+  fecha: Date;
 }

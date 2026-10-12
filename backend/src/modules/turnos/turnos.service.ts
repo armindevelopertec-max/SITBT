@@ -14,13 +14,18 @@ export class ServicioTurnos {
 
   async create(crearTurnoDto: CrearTurnoDto): Promise<Turno> {
     const existing = await this.turnoRepository.findOne({
-      where: { code: crearTurnoDto.code },
+      where: { codigo: crearTurnoDto.codigo },
     });
     if (existing) {
-      throw new ConflictException(`Turno con código ${crearTurnoDto.code} ya existe`);
+      throw new ConflictException(`Turno con código ${crearTurnoDto.codigo} ya existe`);
     }
-    const shift = this.turnoRepository.create(crearTurnoDto);
-    return this.turnoRepository.save(shift);
+    const turno = this.turnoRepository.create({
+      codigo: crearTurnoDto.codigo,
+      nombre: crearTurnoDto.nombre,
+      horaInicio: crearTurnoDto.horaInicio,
+      horaFin: crearTurnoDto.horaFin,
+    });
+    return this.turnoRepository.save(turno);
   }
 
   async findAll(
@@ -28,8 +33,8 @@ export class ServicioTurnos {
     limit = 20,
   ): Promise<{ data: Turno[]; total: number; page: number; limit: number }> {
     const [data, total] = await this.turnoRepository
-      .createQueryBuilder('shift')
-      .orderBy('shift.start_time', 'ASC')
+      .createQueryBuilder('turno')
+      .orderBy('turno.horaInicio', 'ASC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -38,35 +43,35 @@ export class ServicioTurnos {
   }
 
   async findOne(id: number): Promise<Turno> {
-    const shift = await this.turnoRepository.findOne({ where: { id } });
-    if (!shift) {
+    const turno = await this.turnoRepository.findOne({ where: { id } });
+    if (!turno) {
       throw new NotFoundException(`Turno con ID ${id} no encontrado`);
     }
-    return shift;
+    return turno;
   }
 
-  async findByCode(code: string): Promise<Turno> {
-    const shift = await this.turnoRepository.findOne({ where: { code } });
-    if (!shift) {
-      throw new NotFoundException(`Turno con código ${code} no encontrado`);
+  async findByCodigo(codigo: string): Promise<Turno> {
+    const turno = await this.turnoRepository.findOne({ where: { codigo } });
+    if (!turno) {
+      throw new NotFoundException(`Turno con código ${codigo} no encontrado`);
     }
-    return shift;
+    return turno;
   }
 
   async update(id: number, actualizarTurnoDto: ActualizarTurnoDto): Promise<Turno> {
-    const shift = await this.findOne(id);
-    Object.assign(shift, actualizarTurnoDto);
-    return this.turnoRepository.save(shift);
+    const turno = await this.findOne(id);
+    Object.assign(turno, actualizarTurnoDto);
+    return this.turnoRepository.save(turno);
   }
 
   async remove(id: number): Promise<void> {
-    const shift = await this.findOne(id);
-    await this.turnoRepository.remove(shift);
+    const turno = await this.findOne(id);
+    await this.turnoRepository.remove(turno);
   }
 
-  async findAllShifts(): Promise<Turno[]> {
+  async findAllTurnos(): Promise<Turno[]> {
     return this.turnoRepository.find({
-      order: { start_time: 'ASC' },
+      order: { horaInicio: 'ASC' },
     });
   }
 }

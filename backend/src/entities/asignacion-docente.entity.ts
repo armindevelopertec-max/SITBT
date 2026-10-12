@@ -22,21 +22,21 @@ export class AsignacionDocente {
   id: number;
 
   @Column({ name: 'docente_id' })
-  teacher_id: number;
+  docenteId: number;
 
   @ManyToOne(() => Personal)
   @JoinColumn({ name: 'docente_id' })
   docente: Personal;
 
   @Column({ name: 'materia_id' })
-  subject_id: number;
+  materiaId: number;
 
   @ManyToOne(() => Materia)
   @JoinColumn({ name: 'materia_id' })
   materia: Materia;
 
   @Column({ name: 'grupo_id' })
-  group_id: number;
+  grupoId: number;
 
   @ManyToOne(() => Grupo)
   @JoinColumn({ name: 'grupo_id' })
@@ -46,11 +46,11 @@ export class AsignacionDocente {
   gestion: string;
 
   @Column({ type: 'enum', enum: EstadoAsignacionDocente, default: EstadoAsignacionDocente.ACTIVO, name: 'estado' })
-  status: EstadoAsignacionDocente;
+  estado: EstadoAsignacionDocente;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

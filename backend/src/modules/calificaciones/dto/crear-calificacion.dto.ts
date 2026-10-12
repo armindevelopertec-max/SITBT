@@ -16,7 +16,7 @@ import {
 export class CrearCalificacionDto {
   @ApiProperty()
   @IsInt()
-  enrollment_id: number;
+  inscripcionId: number;
 
   @ApiPropertyOptional()
   @IsInt()

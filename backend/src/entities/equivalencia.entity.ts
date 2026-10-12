@@ -19,25 +19,25 @@ export class Equivalencia {
   id: number;
 
   @Column({ name: 'materia_origen_id' })
-  source_subject_id: number;
+  source_materiaId: number;
 
   @ManyToOne(() => Materia)
   @JoinColumn({ name: 'materia_origen_id' })
   materia_origen: Materia;
 
   @Column({ name: 'materia_destino_id' })
-  target_subject_id: number;
+  target_materiaId: number;
 
   @ManyToOne(() => Materia)
   @JoinColumn({ name: 'materia_destino_id' })
   materia_destino: Materia;
 
   @Column({ type: 'enum', enum: EquivalenceType , name: 'tipo' })
-  type: EquivalenceType;
+  tipo: EquivalenceType;
 
   @Column({ type: 'text', nullable: true, name: 'notas' })
-  notes: string;
+  notas: string;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 }

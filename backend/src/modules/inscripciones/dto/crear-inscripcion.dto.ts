@@ -5,15 +5,15 @@ import { EstadoInscripcion } from '../../../entities/inscripcion.entity';
 export class CrearInscripcionDto {
   @ApiProperty()
   @IsInt()
-  student_id: number;
+  estudianteId: number;
 
   @ApiProperty()
   @IsInt()
-  subject_id: number;
+  materiaId: number;
 
   @ApiProperty()
   @IsInt()
-  group_id: number;
+  grupoId: number;
 
   @ApiProperty({ example: '2024' })
   @IsString()
@@ -22,12 +22,12 @@ export class CrearInscripcionDto {
 
   @ApiProperty()
   @IsInt()
-  semester: number;
+  semestre: number;
 
   @ApiPropertyOptional({ enum: EstadoInscripcion })
   @IsEnum(EstadoInscripcion)
   @IsOptional()
-  status?: EstadoInscripcion;
+  estado?: EstadoInscripcion;
 
   @ApiPropertyOptional()
   @IsInt()

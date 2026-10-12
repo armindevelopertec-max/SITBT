@@ -5,7 +5,7 @@ import { EstadoPlanEstudio } from '../../../entities/plan-estudio.entity';
 export class CrearPlanEstudioDto {
   @ApiProperty()
   @IsInt()
-  career_id: number;
+  carreraId: number;
 
   @ApiProperty({ example: 'RM-1234/2020' })
   @IsString()
@@ -19,10 +19,10 @@ export class CrearPlanEstudioDto {
   @ApiPropertyOptional({ enum: EstadoPlanEstudio })
   @IsEnum(EstadoPlanEstudio)
   @IsOptional()
-  status?: EstadoPlanEstudio;
+  estado?: EstadoPlanEstudio;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  notes?: string;
+  notas?: string;
 }

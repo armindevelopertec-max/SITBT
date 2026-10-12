@@ -15,14 +15,14 @@ export class ServicioCredenciales {
   async create(createDto: CrearCredencialDto): Promise<Credencial> {
     const existing = await this.credencialRepository.findOne({
       where: {
-        student_id: createDto.student_id,
+        student_id: createDto.estudianteId,
         gestion: createDto.gestion,
-        semester: createDto.semester,
+        semester: createDto.semestre,
       },
     });
 
     if (existing) {
-      throw new ConflictException(`Ya existe una credencial para este estudiante en la gestión ${createDto.gestion} semestre ${createDto.semester}`);
+      throw new ConflictException(`Ya existe una credencial para este estudiante en la gestión ${createDto.gestion} semestre ${createDto.semestre}`);
     }
 
     const credential = this.credencialRepository.create(createDto);
@@ -49,15 +49,15 @@ export class ServicioCredenciales {
     }
 
     if (semester) {
-      query.andWhere('credential.semester = :semester', { semester });
+      query.andWhere('credential.semestre = :semester', { semester });
     }
 
     if (status) {
-      query.andWhere('credential.status = :status', { status });
+      query.andWhere('credential.estado = :status', { status });
     }
 
     const [data, total] = await query
-      .orderBy('credential.issued_date', 'DESC')
+      .orderBy('credential.fechaEmision', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -89,7 +89,7 @@ export class ServicioCredenciales {
 
   async findByStudent(studentId: number): Promise<Credencial[]> {
     return this.credencialRepository.find({
-      where: { student_id: studentId },
+      where: { estudianteId: studentId },
       relations: ['emisor', 'estudiante'],
       order: { issued_date: 'DESC' },
     });
@@ -97,7 +97,7 @@ export class ServicioCredenciales {
 
   async findActiveByStudent(studentId: number): Promise<Credencial | null> {
     return this.credencialRepository.findOne({
-      where: { student_id: studentId, status: EstadoCredencial.EMITIDA },
+      where: { estudianteId: studentId, status: EstadoCredencial.EMITIDA },
       relations: ['emisor'],
       order: { issued_date: 'DESC' },
     });
@@ -105,21 +105,21 @@ export class ServicioCredenciales {
 
   async findByStudentAndGestion(studentId: number, gestion: string): Promise<Credencial[]> {
     return this.credencialRepository.find({
-      where: { student_id: studentId, gestion },
+      where: { estudianteId: studentId, gestion },
       relations: ['emisor', 'estudiante', 'estudiante.persona'],
-      order: { semester: 'ASC' },
+      order: { semestre: 'ASC' },
     });
   }
 
   async markAsPrinted(id: number): Promise<Credencial> {
     const credential = await this.findOne(id);
-    credential.printed = true;
+    credential.impreso = true;
     return this.credencialRepository.save(credential);
   }
 
   async annul(id: number): Promise<Credencial> {
     const credential = await this.findOne(id);
-    credential.status = EstadoCredencial.ANULADA;
+    credential.estado = EstadoCredencial.ANULADA;
     return this.credencialRepository.save(credential);
   }
 }

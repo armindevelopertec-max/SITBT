@@ -46,17 +46,17 @@ export class ActualizarAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()
-  birthdate?: string;
+  fechaNacimiento?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  birthplace?: string;
+  lugarNacimiento?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  gender?: string;
+  genero?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -66,22 +66,22 @@ export class ActualizarAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  nationality?: string;
+  nacionalidad?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  phone?: string;
+  telefono?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  email?: string;
+  correo?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  address?: string;
+  direccion?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

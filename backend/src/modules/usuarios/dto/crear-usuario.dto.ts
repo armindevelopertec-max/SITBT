@@ -13,13 +13,13 @@ import { EstadoUsuario } from '../../../entities/usuario.entity';
 export class CrearUsuarioDto {
   @ApiProperty()
   @IsInt()
-  person_id: number;
+  personaId: number;
 
   @ApiProperty({ example: 'juanperez' })
   @IsString()
   @MinLength(3)
   @MaxLength(50)
-  username: string;
+  nombreUsuario: string;
 
   @ApiProperty({ example: 'securePassword123' })
   @IsString()
@@ -30,10 +30,10 @@ export class CrearUsuarioDto {
   @ApiPropertyOptional({ enum: EstadoUsuario })
   @IsEnum(EstadoUsuario)
   @IsOptional()
-  status?: EstadoUsuario;
+  estado?: EstadoUsuario;
 
   @ApiPropertyOptional({ example: 'estudiante', description: 'Codigo del rol a asignar' })
   @IsString()
   @IsOptional()
-  role_code?: string;
+  codigoRol?: string;
 }

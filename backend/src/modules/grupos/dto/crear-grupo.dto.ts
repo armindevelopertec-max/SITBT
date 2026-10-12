@@ -4,28 +4,28 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class CrearGrupoDto {
   @ApiProperty()
   @IsInt()
-  career_id: number;
+  carreraId: number;
 
   @ApiProperty()
   @IsInt()
-  study_plan_id: number;
+  planEstudioId: number;
 
   @ApiProperty()
   @IsInt()
-  subject_id: number;
+  materiaId: number;
 
   @ApiProperty()
   @IsInt()
-  semester: number;
+  semestre: number;
 
   @ApiProperty()
   @IsInt()
-  shift_id: number;
+  turnoId: number;
 
   @ApiProperty({ example: 'A' })
   @IsString()
   @MaxLength(5)
-  parallel: string;
+  paralelo: string;
 
   @ApiProperty({ example: '2024' })
   @IsString()
@@ -40,5 +40,5 @@ export class CrearGrupoDto {
   @ApiPropertyOptional({ example: 30 })
   @IsInt()
   @IsOptional()
-  capacity?: number;
+  capacidad?: number;
 }

@@ -16,152 +16,152 @@ export class ServicioUsuarios {
     private usuarioRolRepository: Repository<UsuarioRol>,
   ) {}
 
-  async create(crearUsuarioDto: CrearUsuarioDto & { role_code?: string }): Promise<Usuario> {
-    const passwordHash = await bcrypt.hash(crearUsuarioDto.password, 10);
-    const user = this.usuarioRepository.create({
+  async create(crearUsuarioDto: CrearUsuarioDto & { codigoRol?: string }): Promise<Usuario> {
+    const contrasenaHash = await bcrypt.hash(crearUsuarioDto.password, 10);
+    const usuario = this.usuarioRepository.create({
       ...crearUsuarioDto,
-      password_hash: passwordHash,
+      contrasenaHash: contrasenaHash,
     });
-    const savedUser = await this.usuarioRepository.save(user);
+    const usuarioGuardado = await this.usuarioRepository.save(usuario);
 
-    if (crearUsuarioDto.role_code) {
-      const roleRepository = this.usuarioRolRepository.manager.getRepository('Rol');
-      const role = await roleRepository.findOne({ where: { code: crearUsuarioDto.role_code } });
-      if (role) {
-        const userRole = this.usuarioRolRepository.create({
-          user_id: savedUser.id,
-          role_id: role.id,
+    if (crearUsuarioDto.codigoRol) {
+      const rolRepository = this.usuarioRolRepository.manager.getRepository('Rol');
+      const rol = await rolRepository.findOne({ where: { codigo: crearUsuarioDto.codigoRol } });
+      if (rol) {
+        const usuarioRol = this.usuarioRolRepository.create({
+          usuarioId: usuarioGuardado.id,
+          rolId: rol.id,
         });
-        await this.usuarioRolRepository.save(userRole);
+        await this.usuarioRolRepository.save(usuarioRol);
       }
     }
 
-    return this.findOne(savedUser.id);
+    return this.findOne(usuarioGuardado.id);
   }
 
   async findAll(
     page = 1,
     limit = 20,
-    status?: EstadoUsuario,
+    estado?: EstadoUsuario,
   ): Promise<{ data: Usuario[]; total: number; page: number; limit: number }> {
     const query = this.usuarioRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.persona', 'persona')
-      .leftJoinAndSelect('user.usuarioRoles', 'usuarioRol')
+      .createQueryBuilder('usuario')
+      .leftJoinAndSelect('usuario.persona', 'persona')
+      .leftJoinAndSelect('usuario.usuarioRoles', 'usuarioRol')
       .leftJoinAndSelect('usuarioRol.rol', 'rol');
 
-    if (status) {
-      query.andWhere('user.status = :status', { status });
+    if (estado) {
+      query.andWhere('usuario.estado = :estado', { estado });
     }
 
     const [data, total] = await query
-      .orderBy('user.created_at', 'DESC')
+      .orderBy('usuario.creadoEn', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
 
-    const usersWithRoles = data.map(user => ({
-      ...user,
-      roles: user.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
+    const usuariosConRoles = data.map(usuario => ({
+      ...usuario,
+      roles: usuario.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
     }));
 
-    return { data: usersWithRoles, total, page, limit };
+    return { data: usuariosConRoles, total, page, limit };
   }
 
   async findOne(id: number): Promise<any> {
-    const user = await this.usuarioRepository.findOne({
+    const usuario = await this.usuarioRepository.findOne({
       where: { id },
       relations: ['persona', 'usuarioRoles', 'usuarioRoles.rol'],
     });
-    if (!user) {
+    if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
     return {
-      ...user,
-      roles: user.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
+      ...usuario,
+      roles: usuario.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
     };
   }
 
-  async findByUsername(username: string): Promise<any> {
-    const user = await this.usuarioRepository.findOne({
-      where: { username },
+  async findByNombreUsuario(nombreUsuario: string): Promise<any> {
+    const usuario = await this.usuarioRepository.findOne({
+      where: { nombreUsuario },
       relations: ['persona', 'usuarioRoles', 'usuarioRoles.rol'],
     });
-    if (!user) {
-      throw new NotFoundException(`Usuario ${username} no encontrado`);
+    if (!usuario) {
+      throw new NotFoundException(`Usuario ${nombreUsuario} no encontrado`);
     }
     return {
-      ...user,
-      roles: user.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
+      ...usuario,
+      roles: usuario.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
     };
   }
 
   async update(id: number, actualizarUsuarioDto: ActualizarUsuarioDto): Promise<Usuario> {
-    const user = await this.findOne(id);
+    const usuario = await this.findOne(id);
 
     if (actualizarUsuarioDto.password) {
       actualizarUsuarioDto.password = await bcrypt.hash(actualizarUsuarioDto.password, 10);
-      (user as any).password_hash = actualizarUsuarioDto.password;
+      (usuario as any).contrasenaHash = actualizarUsuarioDto.password;
       delete (actualizarUsuarioDto as any).password;
     }
 
-    Object.assign(user, actualizarUsuarioDto);
-    return this.usuarioRepository.save(user);
+    Object.assign(usuario, actualizarUsuarioDto);
+    return this.usuarioRepository.save(usuario);
   }
 
   async remove(id: number): Promise<void> {
-    const user = await this.findOne(id);
-    user.status = EstadoUsuario.INACTIVO;
-    await this.usuarioRepository.save(user);
+    const usuario = await this.findOne(id);
+    usuario.estado = EstadoUsuario.INACTIVO;
+    await this.usuarioRepository.save(usuario);
   }
 
-  async changePassword(id: number, newPassword: string): Promise<void> {
-    const user = await this.findOne(id);
-    user.password_hash = await bcrypt.hash(newPassword, 10);
-    await this.usuarioRepository.save(user);
+  async cambiarContrasena(id: number, nuevaContrasena: string): Promise<void> {
+    const usuario = await this.findOne(id);
+    usuario.contrasenaHash = await bcrypt.hash(nuevaContrasena, 10);
+    await this.usuarioRepository.save(usuario);
   }
 
-  async assignRole(userId: number, roleId: number): Promise<UsuarioRol> {
+  async asignarRol(usuarioId: number, rolId: number): Promise<UsuarioRol> {
     const existing = await this.usuarioRolRepository.findOne({
-      where: { user_id: userId, role_id: roleId },
+      where: { usuarioId: usuarioId, rolId: rolId },
     });
 
     if (existing) {
       return existing;
     }
 
-    const userRole = this.usuarioRolRepository.create({
-      user_id: userId,
-      role_id: roleId,
+    const usuarioRol = this.usuarioRolRepository.create({
+      usuarioId: usuarioId,
+      rolId: rolId,
     });
-    return this.usuarioRolRepository.save(userRole);
+    return this.usuarioRolRepository.save(usuarioRol);
   }
 
-  async removeRole(userId: number, roleId: number): Promise<void> {
-    const userRole = await this.usuarioRolRepository.findOne({
-      where: { user_id: userId, role_id: roleId },
+  async removerRol(usuarioId: number, rolId: number): Promise<void> {
+    const usuarioRol = await this.usuarioRolRepository.findOne({
+      where: { usuarioId: usuarioId, rolId: rolId },
     });
-    if (userRole) {
-      await this.usuarioRolRepository.remove(userRole);
+    if (usuarioRol) {
+      await this.usuarioRolRepository.remove(usuarioRol);
     }
   }
 
-  async getUserRoles(userId: number): Promise<UsuarioRol[]> {
+  async obtenerRolesUsuario(usuarioId: number): Promise<UsuarioRol[]> {
     return this.usuarioRolRepository.find({
-      where: { user_id: userId },
+      where: { usuarioId: usuarioId },
       relations: ['rol'],
     });
   }
 
   async findActive(): Promise<any[]> {
-    const users = await this.usuarioRepository.find({
-      where: { status: EstadoUsuario.ACTIVO },
+    const usuarios = await this.usuarioRepository.find({
+      where: { estado: EstadoUsuario.ACTIVO },
       relations: ['persona', 'usuarioRoles', 'usuarioRoles.rol'],
-      order: { username: 'ASC' },
+      order: { nombreUsuario: 'ASC' },
     });
-    return users.map(user => ({
-      ...user,
-      roles: user.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
+    return usuarios.map(usuario => ({
+      ...usuario,
+      roles: usuario.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
     }));
   }
 }

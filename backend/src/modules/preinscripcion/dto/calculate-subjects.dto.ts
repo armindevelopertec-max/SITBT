@@ -1,10 +1,10 @@
 import { IsInt, IsString, IsOptional } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class CalculateSubjectsDto {
+export class CalcularMateriasDto {
   @ApiProperty()
   @IsInt()
-  studentId: number;
+  estudianteId: number;
 
   @ApiProperty()
   @IsString()
@@ -18,36 +18,36 @@ export class CalculateSubjectsDto {
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
-  shiftId?: number;
+  turnoId?: number;
 }
 
-export class SubjectToEnroll {
+export class MateriaAInscribir {
   materiaPlanId: number;
-  subjectId: number;
-  subjectCode: string;
-  subjectName: string;
-  semester: number;
-  isFromFailed: boolean;
-  failedPreviousGrade?: number;
-  prerequisiteBlocked: boolean;
-  prerequisiteName?: string;
+  materiaId: number;
+  materiaCodigo: string;
+  materiaNombre: string;
+  semestre: number;
+  esReprobada: boolean;
+  notaAnteriorReprobada?: number;
+  prerrequisitoBloqueado: boolean;
+  nombrePrerrequisito?: string;
 }
 
-export class CalculateSubjectsResult {
-  canEnroll: boolean;
-  currentSemester: number;
-  subjects: SubjectToEnroll[];
-  failedSubjects: {
-    subjectId: number;
-    subjectName: string;
-    grade: number;
-    previousGestion: string;
+export class ResultadoCalcularMaterias {
+  puedeInscribir: boolean;
+  semestreActual: number;
+  materias: MateriaAInscribir[];
+  materiasReprobadas: {
+    materiaId: number;
+    materiaNombre: string;
+    nota: number;
+    gestionAnterior: string;
   }[];
-  blockedSubjects: {
-    subjectId: number;
-    subjectName: string;
-    reason: string;
+  materiasBloqueadas: {
+    materiaId: number;
+    materiaNombre: string;
+    razon: string;
   }[];
   totalReprobadas: number;
-  message: string;
+  mensaje: string;
 }

@@ -12,7 +12,7 @@ import { TipoConvalidacion, EstadoConvalidacion } from '../../../entities/conval
 export class CrearConvalidacionDto {
   @ApiProperty()
   @IsInt()
-  student_id: number;
+  estudianteId: number;
 
   @ApiPropertyOptional()
   @IsInt()
@@ -25,7 +25,7 @@ export class CrearConvalidacionDto {
 
   @ApiProperty({ enum: TipoConvalidacion })
   @IsEnum(TipoConvalidacion)
-  type: TipoConvalidacion;
+  tipo: TipoConvalidacion;
 
   @ApiPropertyOptional()
   @IsString()
@@ -41,7 +41,7 @@ export class CrearConvalidacionDto {
   @ApiPropertyOptional({ enum: EstadoConvalidacion })
   @IsEnum(EstadoConvalidacion)
   @IsOptional()
-  status?: EstadoConvalidacion;
+  estado?: EstadoConvalidacion;
 
   @ApiPropertyOptional()
   @IsInt()

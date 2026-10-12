@@ -14,21 +14,21 @@ export class MateriaPlan {
   id: number;
 
   @Column({ name: 'plan_estudio_id' })
-  study_plan_id: number;
+  planEstudioId: number;
 
   @ManyToOne(() => PlanEstudio)
   @JoinColumn({ name: 'plan_estudio_id' })
   plan_estudio: PlanEstudio;
 
   @Column({ name: 'materia_id' })
-  subject_id: number;
+  materiaId: number;
 
   @ManyToOne(() => Materia)
   @JoinColumn({ name: 'materia_id' })
   materia: Materia;
 
   @Column({ type: 'int', name: 'semestre' })
-  semester: number;
+  semestre: number;
 
   @Column({ type: 'int', name: 'horas_semanales' })
   weekly_hours: number;

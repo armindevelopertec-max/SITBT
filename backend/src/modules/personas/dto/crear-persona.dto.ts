@@ -33,13 +33,13 @@ export class CrearPersonaDto {
 
   @ApiProperty({ example: '1995-03-15' })
   @IsDateString()
-  birthdate: string;
+  fechaNacimiento: string;
 
   @ApiPropertyOptional({ example: 'La Paz' })
   @IsString()
   @IsOptional()
   @MaxLength(100)
-  birthplace?: string;
+  lugarNacimiento?: string;
 
   @ApiPropertyOptional()
   @IsString()
@@ -49,7 +49,7 @@ export class CrearPersonaDto {
 
   @ApiProperty({ enum: Gender })
   @IsEnum(Gender)
-  gender: Gender;
+  genero: Gender;
 
   @ApiPropertyOptional({ enum: MaritalStatus })
   @IsEnum(MaritalStatus)
@@ -60,7 +60,7 @@ export class CrearPersonaDto {
   @IsString()
   @IsOptional()
   @MaxLength(50)
-  nationality?: string;
+  nacionalidad?: string;
 
   @ApiPropertyOptional()
   @IsString()
@@ -107,28 +107,28 @@ export class CrearPersonaDto {
   @IsString()
   @IsOptional()
   @MaxLength(20)
-  phone?: string;
+  telefono?: string;
 
   @ApiPropertyOptional({ example: 'juan@email.com' })
   @IsString()
   @IsOptional()
   @MaxLength(100)
-  email?: string;
+  correo?: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MaxLength(200)
-  address?: string;
+  direccion?: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MaxLength(255)
-  photo_url?: string;
+  fotoUrl?: string;
 
   @ApiPropertyOptional({ enum: PersonStatus })
   @IsEnum(PersonStatus)
   @IsOptional()
-  status?: PersonStatus;
+  estado?: PersonStatus;
 }

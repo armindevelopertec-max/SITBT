@@ -14,10 +14,10 @@ export class ServicioMaterias {
 
   async create(crearMateriaDto: CrearMateriaDto): Promise<Materia> {
     const existing = await this.materiaRepository.findOne({
-      where: { code: crearMateriaDto.code },
+      where: { codigo: crearMateriaDto.codigo },
     });
     if (existing) {
-      throw new ConflictException(`Materia con código ${crearMateriaDto.code} ya existe`);
+      throw new ConflictException(`Materia con código ${crearMateriaDto.codigo} ya existe`);
     }
     const subject = this.materiaRepository.create(crearMateriaDto);
     return this.materiaRepository.save(subject);
@@ -29,7 +29,7 @@ export class ServicioMaterias {
   ): Promise<{ data: Materia[]; total: number; page: number; limit: number }> {
     const [data, total] = await this.materiaRepository
       .createQueryBuilder('subject')
-      .orderBy('subject.name', 'ASC')
+      .orderBy('subject.nombre', 'ASC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -39,7 +39,7 @@ export class ServicioMaterias {
 
   async findAllSubjects(): Promise<Materia[]> {
     return this.materiaRepository.find({
-      order: { name: 'ASC' },
+      order: { nombre: 'ASC' },
     });
   }
 
@@ -51,12 +51,12 @@ export class ServicioMaterias {
     return subject;
   }
 
-  async findByCode(code: string): Promise<Materia> {
-    const subject = await this.materiaRepository.findOne({ where: { code } });
-    if (!subject) {
-      throw new NotFoundException(`Materia con código ${code} no encontrada`);
+  async findByCodigo(codigo: string): Promise<Materia> {
+    const materia = await this.materiaRepository.findOne({ where: { codigo } });
+    if (!materia) {
+      throw new NotFoundException(`Materia con código ${codigo} no encontrada`);
     }
-    return subject;
+    return materia;
   }
 
   async update(id: number, actualizarMateriaDto: ActualizarMateriaDto): Promise<Materia> {
@@ -73,9 +73,9 @@ export class ServicioMaterias {
   async search(query: string): Promise<Materia[]> {
     return this.materiaRepository
       .createQueryBuilder('subject')
-      .where('subject.name ILIKE :query', { query: `%${query}%` })
-      .orWhere('subject.code ILIKE :query', { query: `%${query}%` })
-      .orderBy('subject.name', 'ASC')
+      .where('subject.nombre ILIKE :query', { query: `%${query}%` })
+      .orWhere('subject.codigo ILIKE :query', { query: `%${query}%` })
+      .orderBy('subject.nombre', 'ASC')
       .getMany();
   }
 }

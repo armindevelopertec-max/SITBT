@@ -31,19 +31,19 @@ export class ServicioCertificados {
       .leftJoinAndSelect('certificate.issuer', 'issuer');
 
     if (gestion) {
-      query.andWhere('EXTRACT(YEAR FROM certificate.date) = :gestion', { gestion });
+      query.andWhere('EXTRACT(YEAR FROM certificate.fecha) = :gestion', { gestion });
     }
 
     if (type) {
-      query.andWhere('certificate.type = :type', { type });
+      query.andWhere('certificate.tipo = :type', { type });
     }
 
     if (studentId) {
-      query.andWhere('certificate.student_id = :studentId', { studentId });
+      query.andWhere('certificate.estudianteId = :studentId', { studentId });
     }
 
     const [data, total] = await query
-      .orderBy('certificate.date', 'DESC')
+      .orderBy('certificate.fecha', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -86,7 +86,7 @@ export class ServicioCertificados {
 
   async findByStudent(studentId: number): Promise<Certificado[]> {
     return this.certificadoRepository.find({
-      where: { student_id: studentId },
+      where: { estudianteId: studentId },
       relations: ['issuer'],
       order: { date: 'DESC' },
     });

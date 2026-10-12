@@ -34,13 +34,13 @@ export class ControladorTurnos {
   }
 
   @Get('all')
-  findAllShifts() {
-    return this.shiftsService.findAllShifts();
+  findAllTurnos() {
+    return this.shiftsService.findAllTurnos();
   }
 
-  @Get('code/:code')
-  findByCode(@Param('code') code: string) {
-    return this.shiftsService.findByCode(code);
+  @Get('codigo/:codigo')
+  findByCodigo(@Param('codigo') codigo: string) {
+    return this.shiftsService.findByCodigo(codigo);
   }
 
   @Get(':id')

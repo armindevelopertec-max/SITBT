@@ -29,14 +29,14 @@ export class Pago {
   id: number;
 
   @Column({ name: 'estudiante_id' })
-  student_id: number;
+  estudianteId: number;
 
   @ManyToOne(() => Estudiante)
   @JoinColumn({ name: 'estudiante_id' })
   estudiante: Estudiante;
 
   @Column({ name: 'concepto_id' })
-  concept_id: number;
+  conceptoId: number;
 
   @ManyToOne(() => ConceptoPago)
   @JoinColumn({ name: 'concepto_id' })
@@ -46,33 +46,33 @@ export class Pago {
   gestion: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, name: 'monto' })
-  amount: number;
+  monto: number;
 
   @Column({ type: 'timestamp', name: 'fecha_pago' })
-  payment_date: Date;
+  fechaPago: Date;
 
   @Column({ type: 'enum', enum: MetodoPago, name: 'metodo_pago' })
-  payment_method: MetodoPago;
+  metodoPago: MetodoPago;
 
   @Column({ type: 'varchar', length: 30, nullable: true, name: 'numero_recibo' })
-  receipt_number: string;
+  numeroRecibo: string;
 
   @Column({ name: 'recibido_por' })
-  received_by: number;
+  recibidoPor: number;
 
   @ManyToOne(() => Usuario)
   @JoinColumn({ name: 'recibido_por' })
   receptor: Usuario;
 
   @Column({ type: 'enum', enum: EstadoPago, default: EstadoPago.PAGADO , name: 'estado' })
-  status: EstadoPago;
+  estado: EstadoPago;
 
   @Column({ type: 'text', nullable: true, name: 'notas' })
-  notes: string;
+  notas: string;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

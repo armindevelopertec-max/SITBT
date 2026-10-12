@@ -34,15 +34,15 @@ export class ServicioPlanesEstudio {
       .leftJoinAndSelect('study_plan.carrera', 'career');
 
     if (status) {
-      query.andWhere('study_plan.status = :status', { status });
+      query.andWhere('study_plan.estado = :status', { status });
     }
 
     if (careerId) {
-      query.andWhere('study_plan.career_id = :careerId', { careerId });
+      query.andWhere('study_plan.carreraId = :careerId', { careerId });
     }
 
     const [data, total] = await query
-      .orderBy('study_plan.rm_date', 'DESC')
+      .orderBy('study_plan.fechaRm', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -85,39 +85,39 @@ export class ServicioPlanesEstudio {
 
   async findByCareer(careerId: number): Promise<PlanEstudio[]> {
     return this.planEstudioRepository.find({
-      where: { career_id: careerId },
+      where: { carreraId: careerId },
       relations: ['carrera'],
-      order: { rm_date: 'DESC' },
+      order: { fechaRm: 'DESC' },
     });
   }
 
   async findActive(): Promise<PlanEstudio[]> {
     return this.planEstudioRepository.find({
-      where: { status: EstadoPlanEstudio.VIGENTE },
+      where: { estado: EstadoPlanEstudio.VIGENTE },
       relations: ['carrera'],
-      order: { rm_date: 'DESC' },
+      order: { fechaRm: 'DESC' },
     });
   }
 
   async findCurrentByCareer(careerId: number): Promise<PlanEstudio[]> {
     return this.planEstudioRepository.find({
-      where: { career_id: careerId, status: EstadoPlanEstudio.VIGENTE },
+      where: { carreraId: careerId, estado: EstadoPlanEstudio.VIGENTE },
       relations: ['carrera'],
-      order: { rm_date: 'DESC' },
+      order: { fechaRm: 'DESC' },
     });
   }
 
-  async addMateria(planId: number, subjectId: number, semester: number, weeklyHours: number, prerequisiteId?: number): Promise<MateriaPlan> {
+  async addMateria(planId: number, subjectId: number, semestre: number, weeklyHours: number, prerequisiteId?: number): Promise<MateriaPlan> {
     const existing = await this.materiaPlanRepository.findOne({
-      where: { study_plan_id: planId, subject_id: subjectId },
+      where: { planEstudioId: planId, materiaId: subjectId },
     });
     if (existing) {
       throw new NotFoundException('Esta materia ya existe en el plan de estudio');
     }
     const materiaPlan = this.materiaPlanRepository.create({
-      study_plan_id: planId,
-      subject_id: subjectId,
-      semester,
+      planEstudioId: planId,
+      materiaId: subjectId,
+      semestre,
       weekly_hours: weeklyHours,
       prerequisite_id: prerequisiteId ?? null,
     });
@@ -134,14 +134,14 @@ export class ServicioPlanesEstudio {
     await this.materiaPlanRepository.remove(materiaPlan);
   }
 
-  async updateMateria(materiaPlanId: number, semester: number, weeklyHours: number, prerequisiteId?: number): Promise<MateriaPlan> {
+  async updateMateria(materiaPlanId: number, semestre: number, weeklyHours: number, prerequisiteId?: number): Promise<MateriaPlan> {
     const materiaPlan = await this.materiaPlanRepository.findOne({
       where: { id: materiaPlanId },
     });
     if (!materiaPlan) {
       throw new NotFoundException(`MateriaPlan con ID ${materiaPlanId} no encontrado`);
     }
-    materiaPlan.semester = semester;
+    materiaPlan.semestre = semestre;
     materiaPlan.weekly_hours = weeklyHours;
     materiaPlan.prerequisite_id = prerequisiteId ?? null;
     return this.materiaPlanRepository.save(materiaPlan);
@@ -151,29 +151,29 @@ export class ServicioPlanesEstudio {
     const results = await this.materiaPlanRepository.query(`
       SELECT 
         ps.id,
-        ps.study_plan_id,
-        ps.subject_id,
-        ps.semester,
+        ps.planEstudioId,
+        ps.materiaId,
+        ps.semestre,
         ps.weekly_hours,
         ps.prerequisite_id,
         s.id as materia_id,
-        s.code as materia_code,
-        s.name as materia_name,
+        s.codigo as materia_code,
+        s.nombre as materia_name,
         prereq.id as prerequisite_id,
-        prereq.code as prerequisite_code,
-        prereq.name as prerequisite_name
+        prereq.codigo as prerequisite_code,
+        prereq.nombre as prerequisite_name
       FROM plan_subjects ps
-      JOIN subjects s ON s.id = ps.subject_id
+      JOIN subjects s ON s.id = ps.materiaId
       LEFT JOIN subjects prereq ON prereq.id = ps.prerequisite_id
-      WHERE ps.study_plan_id = $1
-      ORDER BY ps.semester, s.code
+      WHERE ps.planEstudioId = $1
+      ORDER BY ps.semestre, s.codigo
     `, [planId]);
     return results;
   }
 
   async getMateriasDisponibles(): Promise<Materia[]> {
     return this.materiaRepository.find({
-      order: { name: 'ASC' },
+      order: { nombre: 'ASC' },
     });
   }
 }

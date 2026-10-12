@@ -28,7 +28,7 @@ export class AutenticacionServicio {
     person_id: number;
   }) {
     const existingUser = await this.userRepository.findOne({
-      where: { username: data.username },
+      where: { username: data.nombreUsuario },
     });
 
     if (existingUser) {
@@ -38,15 +38,15 @@ export class AutenticacionServicio {
     const passwordHash = await bcrypt.hash(data.password, 10);
 
     const user = this.userRepository.create({
-      username: data.username,
+      username: data.nombreUsuario,
       password_hash: passwordHash,
-      person_id: data.person_id,
+      person_id: data.personaId,
     });
 
     await this.userRepository.save(user);
 
     const defaultRole = await this.roleRepository.findOne({
-      where: { code: 'estudiante' },
+      where: { codigo: 'estudiante' },
     });
 
     if (defaultRole) {
@@ -70,37 +70,37 @@ export class AutenticacionServicio {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+    const isPasswordValid = await bcrypt.compare(password, user.contrasenaHash);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    if (user.status !== 'activo') {
+    if (user.estado !== 'activo') {
       throw new UnauthorizedException('Usuario inactivo o bloqueado');
     }
 
-    user.last_login = new Date();
+    user.ultimoAcceso = new Date();
     await this.userRepository.save(user);
 
     const roles = await this.userRoleRepository.find({
-      where: { user_id: user.id },
+      where: { usuarioId: user.id },
       relations: ['rol'],
     });
 
     const payload = {
       sub: user.id,
-      username: user.username,
-      person_id: user.person_id,
-      roles: roles.map((ur) => ur.rol.code),
+      username: user.nombreUsuario,
+      person_id: user.personaId,
+      roles: roles.map((ur) => ur.rol.codigo),
     };
 
     return {
       access_token: this.jwtService.sign(payload),
       user: {
         id: user.id,
-        username: user.username,
-        person_id: user.person_id,
+        username: user.nombreUsuario,
+        person_id: user.personaId,
         persona: user.persona,
         roles: roles.map((ur) => ur.rol),
       },
@@ -118,14 +118,14 @@ export class AutenticacionServicio {
     }
 
     const roles = await this.userRoleRepository.find({
-      where: { user_id: user.id },
+      where: { usuarioId: user.id },
       relations: ['rol'],
     });
 
     return {
       id: user.id,
-      username: user.username,
-      person_id: user.person_id,
+      username: user.nombreUsuario,
+      person_id: user.personaId,
       persona: user.persona,
       roles: roles.map((ur) => ur.rol),
     };
@@ -135,7 +135,7 @@ export class AutenticacionServicio {
     const user = await this.userRepository.findOne({
       where: { id: userId },
     });
-    if (!user || user.status !== 'activo') {
+    if (!user || user.estado !== 'activo') {
       throw new UnauthorizedException('Usuario no válido');
     }
     return user;

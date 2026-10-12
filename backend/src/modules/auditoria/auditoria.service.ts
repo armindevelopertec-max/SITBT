@@ -26,26 +26,26 @@ export class ServicioAuditoria {
   ): Promise<{ data: RegistroAuditoria[]; total: number; page: number; limit: number }> {
     const query = this.auditoriaRepository
       .createQueryBuilder('audit')
-      .leftJoinAndSelect('audit.user', 'user');
+      .leftJoinAndSelect('audit.usuario', 'user');
 
     if (userId) {
-      query.andWhere('audit.user_id = :userId', { userId });
+      query.andWhere('audit.usuarioId = :userId', { userId });
     }
 
     if (action) {
-      query.andWhere('audit.action = :action', { action });
+      query.andWhere('audit.accion = :action', { action });
     }
 
     if (table) {
-      query.andWhere('audit.table = :table', { table });
+      query.andWhere('audit.tabla = :table', { table });
     }
 
     if (startDate && endDate) {
-      query.andWhere('audit.date BETWEEN :startDate AND :endDate', { startDate, endDate });
+      query.andWhere('audit.fecha BETWEEN :startDate AND :endDate', { startDate, endDate });
     }
 
     const [data, total] = await query
-      .orderBy('audit.date', 'DESC')
+      .orderBy('audit.fecha', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -55,7 +55,7 @@ export class ServicioAuditoria {
 
   async findByUser(userId: number, limit = 50): Promise<RegistroAuditoria[]> {
     return this.auditoriaRepository.find({
-      where: { user_id: userId },
+      where: { usuarioId: userId },
       order: { date: 'DESC' },
       take: limit,
     });
@@ -87,12 +87,12 @@ export class ServicioAuditoria {
   async getActionStats(startDate?: Date, endDate?: Date): Promise<{ action: string; count: number }[]> {
     const query = this.auditoriaRepository
       .createQueryBuilder('audit')
-      .select('audit.action', 'action')
+      .select('audit.accion', 'action')
       .addSelect('COUNT(*)', 'count')
-      .groupBy('audit.action');
+      .groupBy('audit.accion');
 
     if (startDate && endDate) {
-      query.where('audit.date BETWEEN :startDate AND :endDate', { startDate, endDate });
+      query.where('audit.fecha BETWEEN :startDate AND :endDate', { startDate, endDate });
     }
 
     return query.getRawMany();

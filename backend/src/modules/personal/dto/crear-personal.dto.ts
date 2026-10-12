@@ -12,7 +12,7 @@ import { CargoPersonal, EstadoPersonal } from '../../../entities/personal.entity
 export class CrearPersonalDto {
   @ApiProperty()
   @IsInt()
-  person_id: number;
+  personaId: number;
 
   @ApiPropertyOptional()
   @IsString()
@@ -31,5 +31,5 @@ export class CrearPersonalDto {
   @ApiPropertyOptional({ enum: EstadoPersonal })
   @IsEnum(EstadoPersonal)
   @IsOptional()
-  status?: EstadoPersonal;
+  estado?: EstadoPersonal;
 }

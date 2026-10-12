@@ -5,18 +5,18 @@ export class CrearTurnoDto {
   @ApiProperty({ example: 'M' })
   @IsString()
   @MaxLength(10)
-  code: string;
+  codigo: string;
 
   @ApiProperty({ example: 'Mañana' })
   @IsString()
   @MaxLength(20)
-  name: string;
+  nombre: string;
 
   @ApiProperty({ example: '07:30' })
   @IsString()
-  start_time: string;
+  horaInicio: string;
 
   @ApiProperty({ example: '12:30' })
   @IsString()
-  end_time: string;
+  horaFin: string;
 }

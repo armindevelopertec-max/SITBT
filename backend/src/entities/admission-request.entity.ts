@@ -33,7 +33,7 @@ export class SolicitudAdmision {
   id: string;
 
   @Column({ name: 'nombre', type: 'varchar', length: 100 })
-  name: string;
+  nombre: string;
 
   @Column({ name: 'apellido_paterno', type: 'varchar', length: 100, nullable: true })
   lastname_paternal: string;
@@ -46,54 +46,54 @@ export class SolicitudAdmision {
   @Column({ type: 'varchar', length: 20 })
   ci: string;
 
-  @Column({ type: 'date', name: 'fecha_nacimiento' })
-  birthdate: Date;
+  @Column({ type: 'fecha', name: 'fecha_nacimiento' })
+  fechaNacimiento: Date;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'lugar_nacimiento' })
-  birthplace: string;
+  lugarNacimiento: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'lugar_nacimiento_otro' })
-  birthplace_other: string;
+  lugarNacimiento_other: string;
 
   @Column({ type: 'enum', enum: Genero, nullable: true, name: 'genero' })
-  gender: string;
+  genero: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true, name: 'estado_civil' })
-  marital_status: string;
+  @Column({ type: 'varchar', length: 50, nullable: true, name: 'estadoCivil' })
+  marital_estado: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'nacionalidad' })
-  nationality: string;
+  nacionalidad: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true, name: 'nacionalidad_otra' })
-  nationality_other: string;
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'nacionalidadOtra' })
+  nacionalidad_other: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true, name: 'telefono' })
-  phone: string;
+  telefono: string;
 
   @Column({ type: 'varchar', length: 100, name: 'correo' })
-  email: string;
+  correo: string;
 
   @Column({ type: 'varchar', length: 200, nullable: true, name: 'direccion' })
-  address: string;
+  direccion: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true, name: 'nombre_tutor' })
+  @Column({ type: 'varchar', length: 100, nullable: true, name: 'nombreTutor' })
   nombreTutor: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true, name: 'ci_tutor' })
+  @Column({ type: 'varchar', length: 20, nullable: true, name: 'ciTutor' })
   ciTutor: string;
 
   @Column({ name: 'telefono_tutor', type: 'varchar', length: 20, nullable: true })
   telefonoTutor: string;
 
   @Column({ nullable: true })
-  career_id: number;
+  carreraId: number;
 
   @ManyToOne(() => Carrera)
   @JoinColumn({ name: 'carrera_id' })
   carrera: Carrera;
 
   @Column({ type: 'varchar', length: 20, default: 'pendiente' })
-  status: string;
+  estado: string;
 
   @Column({ type: 'text', nullable: true })
   observaciones: string;
@@ -117,13 +117,13 @@ export class SolicitudAdmision {
   fotoPath: string;
 
   @Column({ nullable: true })
-  converted_student_id: number;
+  converted_estudianteId: number;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 
   @AfterLoad()
   setVirtualFields() {

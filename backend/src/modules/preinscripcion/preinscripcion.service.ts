@@ -1,33 +1,33 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { Estudiante, StudentStatus } from '../../entities/estudiante.entity';
+import { Estudiante, EstadoEstudiante } from '../../entities/estudiante.entity';
 import { Pago, EstadoPago } from '../../entities/pago.entity';
-import { ConceptoPago, PaymentConceptType } from '../../entities/concepto-pago.entity';
+import { ConceptoPago, TipoConceptoPago } from '../../entities/concepto-pago.entity';
 import { Inscripcion, EstadoInscripcion } from '../../entities/inscripcion.entity';
 import { MateriaPlan } from '../../entities/materia-plan.entity';
 import { Materia } from '../../entities/materia.entity';
 import { Grupo } from '../../entities/grupo.entity';
 import { Turno } from '../../entities/turno.entity';
 import { Periodo } from '../../entities/periodo.entity';
-import { Gestion, GestionStatus } from '../../entities/gestion.entity';
+import { Gestion, EstadoGestion } from '../../entities/gestion.entity';
 import { Calificacion } from '../../entities/calificacion.entity';
-import { EmittedDocument, TipoDocumento } from '../../entities/emitted-document.entity';
-import { VerifyPaymentsDto, CheckPaymentResult } from './dto/verify-payments.dto';
-import { CalculateSubjectsDto, CalculateSubjectsResult, SubjectToEnroll } from './dto/calculate-subjects.dto';
-import { CreateEnrollmentBatchDto, CreateEnrollmentResult } from './dto/create-enrollment-batch.dto';
+import { DocumentoEmitido, TipoDocumento } from '../../entities/emitted-document.entity';
+import { VerificarPagosDto, ResultadoVerificarPagos } from './dto/verify-payments.dto';
+import { CalcularMateriasDto, ResultadoCalcularMaterias, MateriaAInscribir } from './dto/calculate-subjects.dto';
+import { CrearInscripcionLoteDto, ResultadoCrearInscripcion } from './dto/create-enrollment-batch.dto';
 
 @Injectable()
 export class PreinscripcionService {
   constructor(
     @InjectRepository(Estudiante)
-    private studentRepository: Repository<Estudiante>,
+    private estudianteRepository: Repository<Estudiante>,
     @InjectRepository(Pago)
     private paymentRepository: Repository<Pago>,
     @InjectRepository(ConceptoPago)
     private conceptRepository: Repository<ConceptoPago>,
     @InjectRepository(Inscripcion)
-    private enrollmentRepository: Repository<Inscripcion>,
+    private inscripcionRepository: Repository<Inscripcion>,
     @InjectRepository(MateriaPlan)
     private materiaPlanRepository: Repository<MateriaPlan>,
     @InjectRepository(Materia)
@@ -42,22 +42,22 @@ export class PreinscripcionService {
     private gestionRepository: Repository<Gestion>,
     @InjectRepository(Calificacion)
     private calificacionRepository: Repository<Calificacion>,
-    @InjectRepository(EmittedDocument)
-    private documentRepository: Repository<EmittedDocument>,
+    @InjectRepository(DocumentoEmitido)
+    private documentRepository: Repository<DocumentoEmitido>,
   ) {}
 
-  async verifyPayments(dto: VerifyPaymentsDto): Promise<CheckPaymentResult> {
-    const student = await this.studentRepository.findOne({
-      where: { id: dto.studentId },
+  async verifyPayments(dto: VerificarPagosDto): Promise<ResultadoVerificarPagos> {
+    const estudiante = await this.estudianteRepository.findOne({
+      where: { id: dto.estudianteId },
       relations: ['persona'],
     });
 
-    if (!student) {
+    if (!estudiante) {
       throw new NotFoundException('Estudiante no encontrado');
     }
 
     const gestion = await this.gestionRepository.findOne({
-      where: { year: dto.gestion },
+      where: { anio: dto.gestion },
       relations: ['periodos'],
     });
 
@@ -66,88 +66,88 @@ export class PreinscripcionService {
     }
 
     const periodoNumero = dto.periodo || this.getCurrentPeriodoNumero(gestion);
-    const periodo = gestion.periodos?.find(p => p.number === periodoNumero);
+    const periodo = gestion.periodos?.find(p => p.numero === periodoNumero);
 
     if (!periodo) {
       throw new NotFoundException(`Período ${periodoNumero} no encontrado`);
     }
 
-    const isNewStudent = student.admission_gestion === dto.gestion;
+    const esEstudianteNuevo = estudiante.gestionAdmision === dto.gestion;
     const payments = await this.paymentRepository.find({
       where: {
-        student_id: dto.studentId,
+        estudianteId: dto.estudianteId,
         gestion: dto.gestion,
-        status: EstadoPago.PAGADO,
+        estado: EstadoPago.PAGADO,
       },
       relations: ['concepto'],
     });
 
     const concepts = await this.conceptRepository.find({
-      where: { status: 'activo' as any },
+      where: { estado: 'activo' as any },
     });
 
-    const paidPayments: CheckPaymentResult['paidPayments'] = [];
-    const missingPayments: CheckPaymentResult['missingPayments'] = [];
+    const pagosRealizados: ResultadoVerificarPagos['pagosRealizados'] = [];
+    const pagosFaltantes: ResultadoVerificarPagos['pagosFaltantes'] = [];
 
     for (const payment of payments) {
-      paidPayments.push({
-        type: payment.concepto?.type || 'unknown',
-        concept: payment.concepto?.name || 'Desconocido',
-        amount: Number(payment.amount),
-        paymentDate: payment.payment_date,
+      pagosRealizados.push({
+        tipo: payment.concepto?.tipo || 'unknown',
+        concepto: payment.concepto?.nombre || 'Desconocido',
+        monto: Number(payment.monto),
+        fechaPago: payment.fechaPago,
       });
     }
 
-    if (isNewStudent) {
-      const hasUnico = payments.some(p => p.concepto?.type === PaymentConceptType.UNICO);
+    if (esEstudianteNuevo) {
+      const hasUnico = payments.some(p => p.concepto?.tipo === TipoConceptoPago.UNICO);
       if (!hasUnico) {
-        const unicoConcept = concepts.find(c => c.type === PaymentConceptType.UNICO);
+        const unicoConcept = concepts.find(c => c.tipo === TipoConceptoPago.UNICO);
         if (unicoConcept) {
-          missingPayments.push({
-            type: PaymentConceptType.UNICO,
-            concept: unicoConcept.name,
-            amount: Number(unicoConcept.default_amount),
+          pagosFaltantes.push({
+            tipo: TipoConceptoPago.UNICO,
+            concepto: unicoConcept.nombre,
+            monto: Number(unicoConcept.montoPredeterminado),
           });
         }
       }
     }
 
     const hasSemestral = payments.some(p =>
-      p.concepto?.type === PaymentConceptType.SEMESTRAL &&
-      p.concepto?.name?.toLowerCase().includes(periodoNumero.toLowerCase())
+      p.concepto?.tipo === TipoConceptoPago.SEMESTRAL &&
+      p.concepto?.nombre?.toLowerCase().includes(periodoNumero.toLowerCase())
     );
 
     if (!hasSemestral) {
-      const semestralConcept = concepts.find(c => c.type === PaymentConceptType.SEMESTRAL);
+      const semestralConcept = concepts.find(c => c.tipo === TipoConceptoPago.SEMESTRAL);
       if (semestralConcept) {
-        missingPayments.push({
-          type: PaymentConceptType.SEMESTRAL,
-          concept: `${semestralConcept.name} - ${periodoNumero}/${dto.gestion}`,
-          amount: Number(semestralConcept.default_amount),
+        pagosFaltantes.push({
+          tipo: TipoConceptoPago.SEMESTRAL,
+          concepto: `${semestralConcept.nombre} - ${periodoNumero}/${dto.gestion}`,
+          monto: Number(semestralConcept.montoPredeterminado),
         });
       }
     }
 
     return {
-      canEnroll: missingPayments.length === 0,
-      missingPayments,
-      paidPayments,
-      isNewStudent,
+      puedeInscribir: pagosFaltantes.length === 0,
+      pagosFaltantes,
+      pagosRealizados,
+      esEstudianteNuevo,
     };
   }
 
-  async calculateSubjects(dto: CalculateSubjectsDto): Promise<CalculateSubjectsResult> {
-    const student = await this.studentRepository.findOne({
-      where: { id: dto.studentId },
+  async calculateSubjects(dto: CalcularMateriasDto): Promise<ResultadoCalcularMaterias> {
+    const estudiante = await this.estudianteRepository.findOne({
+      where: { id: dto.estudianteId },
       relations: ['plan_estudio', 'carrera'],
     });
 
-    if (!student) {
+    if (!estudiante) {
       throw new NotFoundException('Estudiante no encontrado');
     }
 
     const gestion = await this.gestionRepository.findOne({
-      where: { year: dto.gestion },
+      where: { anio: dto.gestion },
       relations: ['periodos'],
     });
 
@@ -156,165 +156,165 @@ export class PreinscripcionService {
     }
 
     const periodoNumero = dto.periodo || this.getCurrentPeriodoNumero(gestion);
-    const periodo = gestion.periodos?.find(p => p.number === periodoNumero);
+    const periodo = gestion.periodos?.find(p => p.numero === periodoNumero);
 
     if (!periodo) {
       throw new NotFoundException(`Período ${periodoNumero} no encontrado`);
     }
 
-    const isNewStudent = student.admission_gestion === dto.gestion;
+    const esEstudianteNuevo = estudiante.gestionAdmision === dto.gestion;
 
-    if (isNewStudent) {
-      return this.calculateNewStudentSubjects(student, dto, periodoNumero);
+    if (esEstudianteNuevo) {
+      return this.calculateNewStudentSubjects(estudiante, dto, periodoNumero);
     }
 
-    return this.calculateOldStudentSubjects(student, dto, gestion, periodoNumero);
+    return this.calculateOldStudentSubjects(estudiante, dto, gestion, periodoNumero);
   }
 
   private async calculateNewStudentSubjects(
-    student: Estudiante,
-    dto: CalculateSubjectsDto,
+    estudiante: Estudiante,
+    dto: CalcularMateriasDto,
     periodoNumero: string,
-  ): Promise<CalculateSubjectsResult> {
+  ): Promise<ResultadoCalcularMaterias> {
     const materiasPlan = await this.materiaPlanRepository.find({
-      where: { study_plan_id: student.study_plan_id },
+      where: { planEstudioId: estudiante.planEstudioId },
       relations: ['materia', 'prerequisite'],
-      order: { semester: 'ASC' },
+      order: { semestre: 'ASC' },
     });
 
-    const firstSemesterMaterias = materiasPlan.filter(m => m.semester === 1);
+    const firstSemesterMaterias = materiasPlan.filter(m => m.semestre === 1);
 
-    const subjects: SubjectToEnroll[] = firstSemesterMaterias.map(m => ({
+    const materias: MateriaAInscribir[] = firstSemesterMaterias.map(m => ({
       materiaPlanId: m.id,
-      subjectId: m.subject_id,
-      subjectCode: m.materia?.code || '',
-      subjectName: m.materia?.name || '',
-      semester: m.semester,
-      isFromFailed: false,
-      prerequisiteBlocked: false,
+      materiaId: m.materiaId,
+      materiaCodigo: m.materia?.codigo || '',
+      materiaNombre: m.materia?.nombre || '',
+      semestre: m.semestre,
+      esReprobada: false,
+      prerrequisitoBloqueado: false,
     }));
 
     return {
-      canEnroll: true,
-      currentSemester: 1,
-      subjects,
-      failedSubjects: [],
-      blockedSubjects: [],
+      puedeInscribir: true,
+      semestreActual: 1,
+      materias,
+      materiasReprobadas: [],
+      materiasBloqueadas: [],
       totalReprobadas: 0,
-      message: 'Estudiante nuevo - Primer semestre',
+      mensaje: 'Estudiante nuevo - Primer semestre',
     };
   }
 
   private async calculateOldStudentSubjects(
-    student: Estudiante,
-    dto: CalculateSubjectsDto,
+    estudiante: Estudiante,
+    dto: CalcularMateriasDto,
     gestion: Gestion,
     periodoNumero: string,
-  ): Promise<CalculateSubjectsResult> {
+  ): Promise<ResultadoCalcularMaterias> {
     const previousPeriodoNumero = periodoNumero === 'II' ? 'I' : null;
-    const previousGestion = previousPeriodoNumero ? gestion.year : String(parseInt(gestion.year) - 1);
+    const gestionAnterior = previousPeriodoNumero ? gestion.anio : String(parseInt(gestion.anio) - 1);
 
-    const failedSubjects: CalculateSubjectsResult['failedSubjects'] = [];
+    const materiasReprobadas: ResultadoCalcularMaterias['materiasReprobadas'] = [];
     let totalReprobadas = 0;
-    let currentSemester = 1;
+    let semestreActual = 1;
 
     if (previousPeriodoNumero) {
-      const previousEnrollments = await this.enrollmentRepository.find({
+      const previousEnrollments = await this.inscripcionRepository.find({
         where: {
-          student_id: student.id,
-          gestion: previousGestion,
+          estudianteId: estudiante.id,
+          gestion: gestionAnterior,
         },
         relations: ['materia', 'materiaPlan'],
       });
 
-      for (const enrollment of previousEnrollments) {
-        if (enrollment.status === EstadoInscripcion.REPROBADO) {
-          failedSubjects.push({
-            subjectId: enrollment.subject_id,
-            subjectName: enrollment.materia?.name || 'Desconocida',
-            grade: enrollment.final_grade || 0,
-            previousGestion: previousGestion,
+      for (const inscripcion of previousEnrollments) {
+        if (inscripcion.estado === EstadoInscripcion.REPROBADO) {
+          materiasReprobadas.push({
+            materiaId: inscripcion.materiaId,
+            materiaNombre: inscripcion.materia?.nombre || 'Desconocida',
+            nota: inscripcion.final_grade || 0,
+            gestionAnterior: gestionAnterior,
           });
           totalReprobadas++;
         }
-        if (enrollment.materiaPlan?.semester) {
-          currentSemester = Math.max(currentSemester, enrollment.materiaPlan.semester + 1);
+        if (inscripcion.materiaPlan?.semestre) {
+          semestreActual = Math.max(semestreActual, inscripcion.materiaPlan.semestre + 1);
         }
       }
     }
 
     const materiasPlan = await this.materiaPlanRepository.find({
-      where: { study_plan_id: student.study_plan_id },
+      where: { planEstudioId: estudiante.planEstudioId },
       relations: ['materia', 'prerequisite'],
-      order: { semester: 'ASC' },
+      order: { semestre: 'ASC' },
     });
 
-    const subjects: SubjectToEnroll[] = [];
-    const blockedSubjects: CalculateSubjectsResult['blockedSubjects'] = [];
+    const materias: MateriaAInscribir[] = [];
+    const materiasBloqueadas: ResultadoCalcularMaterias['materiasBloqueadas'] = [];
 
-    const failedSubjectIds = failedSubjects.map(f => f.subjectId);
+    const failedSubjectIds = materiasReprobadas.map(f => f.materiaId);
 
     if (totalReprobadas >= 3) {
-      for (const failed of failedSubjects) {
-        const materiaPlan = materiasPlan.find(m => m.subject_id === failed.subjectId);
+      for (const failed of materiasReprobadas) {
+        const materiaPlan = materiasPlan.find(m => m.materiaId === failed.materiaId);
         if (materiaPlan) {
-          subjects.push({
+          materias.push({
             materiaPlanId: materiaPlan.id,
-            subjectId: failed.subjectId,
-            subjectCode: materiaPlan.materia?.code || '',
-            subjectName: materiaPlan.materia?.name || '',
-            semester: materiaPlan.semester,
-            isFromFailed: true,
-            failedPreviousGrade: failed.grade,
-            prerequisiteBlocked: false,
+            materiaId: failed.materiaId,
+            materiaCodigo: materiaPlan.materia?.codigo || '',
+            materiaNombre: materiaPlan.materia?.nombre || '',
+            semestre: materiaPlan.semestre,
+            esReprobada: true,
+            notaAnteriorReprobada: failed.nota,
+            prerrequisitoBloqueado: false,
           });
         }
       }
 
       return {
-        canEnroll: true,
-        currentSemester,
-        subjects,
-        failedSubjects,
-        blockedSubjects,
+        puedeInscribir: true,
+        semestreActual,
+        materias,
+        materiasReprobadas,
+        materiasBloqueadas,
         totalReprobadas,
-        message: `Tienes ${totalReprobadas} materias reprobadas. Solo puedes inscribir las materias reprobadas.`,
+        mensaje: `Tienes ${totalReprobadas} materias reprobadas. Solo puedes inscribir las materias reprobadas.`,
       };
     }
 
     const approvedSubjectIds: number[] = [];
     if (previousPeriodoNumero) {
-      const previousEnrollments = await this.enrollmentRepository.find({
+      const previousEnrollments = await this.inscripcionRepository.find({
         where: {
-          student_id: student.id,
-          gestion: previousGestion,
+          estudianteId: estudiante.id,
+          gestion: gestionAnterior,
         },
       });
 
-      for (const enrollment of previousEnrollments) {
-        if (enrollment.status === EstadoInscripcion.APROBADO) {
-          approvedSubjectIds.push(enrollment.subject_id);
+      for (const inscripcion of previousEnrollments) {
+        if (inscripcion.estado === EstadoInscripcion.APROBADO) {
+          approvedSubjectIds.push(inscripcion.materiaId);
         }
       }
     }
 
-    const semestresCursados = await this.enrollmentRepository
-      .createQueryBuilder('enrollment')
-      .select('DISTINCT enrollment.semester', 'semester')
-      .where('enrollment.student_id = :studentId', { studentId: student.id })
+    const semestresCursados = await this.inscripcionRepository
+      .createQueryBuilder('inscripcion')
+      .select('DISTINCT inscripcion.semestre', 'semester')
+      .where('inscripcion.estudianteId = :estudianteId', { estudianteId: estudiante.id })
       .getRawOne();
 
-    const semesterToEnroll = failedSubjects.length > 0 ? currentSemester - 1 : currentSemester;
+    const semesterToEnroll = materiasReprobadas.length > 0 ? semestreActual - 1 : semestreActual;
 
-    const materiasSemestre = materiasPlan.filter(m => m.semester === semesterToEnroll);
+    const materiasSemestre = materiasPlan.filter(m => m.semestre === semesterToEnroll);
 
     for (const materia of materiasSemestre) {
-      if (failedSubjectIds.includes(materia.subject_id)) {
+      if (failedSubjectIds.includes(materia.materiaId)) {
         continue;
       }
 
-      let prerequisiteBlocked = false;
-      let prerequisiteName: string | undefined;
+      let prerrequisitoBloqueado = false;
+      let nombrePrerrequisito: string | undefined;
 
       if (materia.prerequisite_id) {
         const prerequisiteApproved = approvedSubjectIds.includes(materia.prerequisite_id);
@@ -324,13 +324,13 @@ export class PreinscripcionService {
           const prerequisite = await this.materiaRepository.findOne({
             where: { id: materia.prerequisite_id },
           });
-          prerequisiteBlocked = true;
-          prerequisiteName = prerequisite?.name || 'Prerrequisito';
+          prerrequisitoBloqueado = true;
+          nombrePrerrequisito = prerequisite?.nombre || 'Prerrequisito';
 
-          blockedSubjects.push({
-            subjectId: materia.subject_id,
-            subjectName: materia.materia?.name || '',
-            reason: `Prerrequisito no aprobado: ${prerequisite?.name}`,
+          materiasBloqueadas.push({
+            materiaId: materia.materiaId,
+            materiaNombre: materia.materia?.nombre || '',
+            razon: `Prerrequisito no aprobado: ${prerequisite?.nombre}`,
           });
 
           continue;
@@ -340,66 +340,66 @@ export class PreinscripcionService {
           const prerequisite = await this.materiaRepository.findOne({
             where: { id: materia.prerequisite_id },
           });
-          prerequisiteBlocked = true;
-          prerequisiteName = prerequisite?.name || 'Prerrequisito';
+          prerrequisitoBloqueado = true;
+          nombrePrerrequisito = prerequisite?.nombre || 'Prerrequisito';
         }
       }
 
-      subjects.push({
+      materias.push({
         materiaPlanId: materia.id,
-        subjectId: materia.subject_id,
-        subjectCode: materia.materia?.code || '',
-        subjectName: materia.materia?.name || '',
-        semester: materia.semester,
-        isFromFailed: false,
-        prerequisiteBlocked,
-        prerequisiteName,
+        materiaId: materia.materiaId,
+        materiaCodigo: materia.materia?.codigo || '',
+        materiaNombre: materia.materia?.nombre || '',
+        semestre: materia.semestre,
+        esReprobada: false,
+        prerrequisitoBloqueado,
+        nombrePrerrequisito,
       });
     }
 
-    for (const failed of failedSubjects) {
-      const materiaPlan = materiasPlan.find(m => m.subject_id === failed.subjectId);
+    for (const failed of materiasReprobadas) {
+      const materiaPlan = materiasPlan.find(m => m.materiaId === failed.materiaId);
       if (materiaPlan) {
-        subjects.push({
+        materias.push({
           materiaPlanId: materiaPlan.id,
-          subjectId: failed.subjectId,
-          subjectCode: materiaPlan.materia?.code || '',
-          subjectName: materiaPlan.materia?.name || '',
-          semester: materiaPlan.semester,
-          isFromFailed: true,
-          failedPreviousGrade: failed.grade,
-          prerequisiteBlocked: false,
+          materiaId: failed.materiaId,
+          materiaCodigo: materiaPlan.materia?.codigo || '',
+          materiaNombre: materiaPlan.materia?.nombre || '',
+          semestre: materiaPlan.semestre,
+          esReprobada: true,
+          notaAnteriorReprobada: failed.nota,
+          prerrequisitoBloqueado: false,
         });
       }
     }
 
-    subjects.sort((a, b) => a.semester - b.semester);
+    materias.sort((a, b) => a.semestre - b.semestre);
 
     return {
-      canEnroll: true,
-      currentSemester: semesterToEnroll,
-      subjects,
-      failedSubjects,
-      blockedSubjects,
+      puedeInscribir: true,
+      semestreActual: semesterToEnroll,
+      materias,
+      materiasReprobadas,
+      materiasBloqueadas,
       totalReprobadas,
-      message: failedSubjects.length > 0
-        ? `Tienes ${totalReprobadas} materias reprobadas. Cursarás ${subjects.length} materias (${materiasSemestre.length - blockedSubjects.length} del semestre + ${failedSubjects.length} reprobadas en paralelo).`
+      mensaje: materiasReprobadas.length > 0
+        ? `Tienes ${totalReprobadas} materias reprobadas. Cursarás ${materias.length} materias (${materiasSemestre.length - materiasBloqueadas.length} del semestre + ${materiasReprobadas.length} reprobadas en paralelo).`
         : 'Cursarás las materias correspondientes al semestre actual.',
     };
   }
 
-  async createEnrollmentBatch(dto: CreateEnrollmentBatchDto): Promise<CreateEnrollmentResult> {
-    const student = await this.studentRepository.findOne({
-      where: { id: dto.studentId },
+  async createEnrollmentBatch(dto: CrearInscripcionLoteDto): Promise<ResultadoCrearInscripcion> {
+    const estudiante = await this.estudianteRepository.findOne({
+      where: { id: dto.estudianteId },
       relations: ['persona', 'carrera', 'plan_estudio'],
     });
 
-    if (!student) {
+    if (!estudiante) {
       throw new NotFoundException('Estudiante no encontrado');
     }
 
     const gestion = await this.gestionRepository.findOne({
-      where: { year: dto.gestion },
+      where: { anio: dto.gestion },
       relations: ['periodos'],
     });
 
@@ -408,28 +408,28 @@ export class PreinscripcionService {
     }
 
     const periodoNumero = dto.periodo || this.getCurrentPeriodoNumero(gestion);
-    const periodo = gestion.periodos?.find(p => p.number === periodoNumero);
+    const periodo = gestion.periodos?.find(p => p.numero === periodoNumero);
 
     if (!periodo) {
       throw new NotFoundException(`Período ${periodoNumero} no encontrado`);
     }
 
-    const group = await this.groupRepository.findOne({
-      where: { id: dto.groupId },
+    const grupo = await this.groupRepository.findOne({
+      where: { id: dto.grupoId },
       relations: ['turno', 'carrera'],
     });
 
-    if (!group) {
+    if (!grupo) {
       throw new NotFoundException('Grupo no encontrado');
     }
 
-    const enrollments: { id: number; subjectName: string; groupName: string }[] = [];
+    const inscripciones: { id: number; materiaNombre: string; nombreGrupo: string }[] = [];
 
-    for (const subject of dto.subjects) {
-      const existing = await this.enrollmentRepository.findOne({
+    for (const materia of dto.materias) {
+      const existing = await this.inscripcionRepository.findOne({
         where: {
-          student_id: dto.studentId,
-          subject_id: subject.subjectId,
+          estudianteId: dto.estudianteId,
+          materiaId: materia.materiaId,
           gestion: dto.gestion,
         },
       });
@@ -438,55 +438,55 @@ export class PreinscripcionService {
         continue;
       }
 
-      const enrollment = this.enrollmentRepository.create({
-        student_id: dto.studentId,
-        subject_id: subject.subjectId,
-        group_id: dto.groupId,
+      const inscripcion = this.inscripcionRepository.create({
+        estudianteId: dto.estudianteId,
+        materiaId: materia.materiaId,
+        grupoId: dto.grupoId,
         gestion: dto.gestion,
-        semester: subject.semester,
-        status: EstadoInscripcion.CURSANDO,
+        semestre: materia.semestre,
+        estado: EstadoInscripcion.CURSANDO,
       });
 
-      const saved = await this.enrollmentRepository.save(enrollment);
-      enrollments.push({
-        id: saved.id,
-        subjectName: subject.subjectName,
-        groupName: `${group.parallel}-${dto.gestion}`,
+      const guardada = await this.inscripcionRepository.save(inscripcion);
+      inscripciones.push({
+        id: guardada.id,
+        materiaNombre: materia.materiaNombre,
+        nombreGrupo: `${grupo.paralelo}-${dto.gestion}`,
       });
     }
 
-    const numDocumento = `BOL-INS-${dto.gestion}-${periodoNumero}-${student.inscription_code}-${Date.now()}`;
+    const numDocumento = `BOL-INS-${dto.gestion}-${periodoNumero}-${estudiante.codigoInscripcion}-${Date.now()}`;
 
     const boleta = this.documentRepository.create({
-      student_id: dto.studentId,
-      type: TipoDocumento.BOLETA_INSCRIPCION,
+      estudianteId: dto.estudianteId,
+      tipo: TipoDocumento.BOLETA_INSCRIPCION,
       numeroDocumento: numDocumento,
       gestion: dto.gestion,
-      gestion_id: gestion.id,
+      gestionId: gestion.id,
     });
 
     const savedBoleta = await this.documentRepository.save(boleta);
 
     return {
-      success: true,
-      enrollments,
+      exito: true,
+      inscripciones,
       boletaId: savedBoleta.id,
-      message: `Se crearon ${enrollments.length} inscripciones para ${periodoNumero}/${dto.gestion}`,
+      mensaje: `Se crearon ${inscripciones.length} inscripciones para ${periodoNumero}/${dto.gestion}`,
     };
   }
 
   async getEnrollmentBoleta(estudianteId: number, gestion: string, periodo?: string): Promise<any> {
-    const student = await this.studentRepository.findOne({
+    const estudiante = await this.estudianteRepository.findOne({
       where: { id: estudianteId },
       relations: ['persona', 'carrera', 'plan_estudio'],
     });
 
-    if (!student) {
+    if (!estudiante) {
       throw new NotFoundException('Estudiante no encontrado');
     }
 
     const gestionEntity = await this.gestionRepository.findOne({
-      where: { year: gestion },
+      where: { anio: gestion },
       relations: ['periodos'],
     });
 
@@ -495,11 +495,11 @@ export class PreinscripcionService {
     }
 
     const periodoNumero = periodo || this.getCurrentPeriodoNumero(gestionEntity);
-    const periodoEntity = gestionEntity.periodos?.find(p => p.number === periodoNumero);
+    const periodoEntity = gestionEntity.periodos?.find(p => p.numero === periodoNumero);
 
-      const enrollments = await this.enrollmentRepository.find({
+      const inscripciones = await this.inscripcionRepository.find({
       where: {
-        student_id: estudianteId,
+        estudianteId: estudianteId,
         gestion: gestion,
       },
       relations: ['materia', 'grupo', 'grupo.turno'],
@@ -507,80 +507,80 @@ export class PreinscripcionService {
 
     const boleta = await this.documentRepository.findOne({
       where: {
-        student_id: estudianteId,
+        estudianteId: estudianteId,
         gestion: gestion,
-        type: TipoDocumento.BOLETA_INSCRIPCION,
+        tipo: TipoDocumento.BOLETA_INSCRIPCION,
       },
       order: { fechaEmision: 'DESC' },
     });
 
     return {
       estudiante: {
-        id: student.id,
-        nombre: `${student.persona?.lastname_paternal || ''} ${student.persona?.lastname_maternal || ''} ${student.persona?.names || ''}`,
-        ci: student.persona?.ci,
-        codigo: student.inscription_code,
-        carrera: student.carrera?.name,
-        plan: student.plan_estudio?.rm_number,
+        id: estudiante.id,
+        nombre: `${estudiante.persona?.apellidoPaterno || ''} ${estudiante.persona?.apellidoMaterno || ''} ${estudiante.persona?.nombres || ''}`,
+        ci: estudiante.persona?.ci,
+        codigo: estudiante.codigoInscripcion,
+        carrera: estudiante.carrera?.nombre,
+        plan: estudiante.plan_estudio?.numeroRm,
       },
       gestion: {
-        year: gestion,
+        anio: gestion,
         periodo: periodoNumero,
-        periodoNombre: periodoEntity?.name,
+        periodoNombre: periodoEntity?.nombre,
       },
       boleta: boleta ? {
         numero: boleta.numeroDocumento,
         fechaEmision: boleta.fechaEmision,
-        estado: boleta.status,
+        estado: boleta.estado,
       } : null,
-      materias: enrollments.map(e => ({
+      materias: inscripciones.map(e => ({
         id: e.id,
-        codigo: e.materia?.code,
-        nombre: e.materia?.name,
-        turno: e.grupo?.turno?.code,
-        turnoNombre: e.grupo?.turno?.name,
-        paralelo: e.grupo?.parallel,
-        grupo: `${e.grupo?.parallel}-${gestion}`,
-        estado: e.status,
+        codigo: e.materia?.codigo,
+        nombre: e.materia?.nombre,
+        turno: e.grupo?.turno?.codigo,
+        turnoNombre: e.grupo?.turno?.nombre,
+        paralelo: e.grupo?.paralelo,
+        grupo: `${e.grupo?.paralelo}-${gestion}`,
+        estado: e.estado,
       })),
-      totalMaterias: enrollments.length,
+      totalMaterias: inscripciones.length,
     };
   }
 
   private getCurrentPeriodoNumero(gestion: Gestion): string {
     const now = new Date();
     const periodo = gestion.periodos?.find(p => {
-      const start = new Date(p.start_date);
-      const end = new Date(p.end_date);
+      const start = new Date(p.fechaInicio);
+      const end = new Date(p.fechaFin);
       return now >= start && now <= end;
     });
-    return periodo?.number || 'I';
+    return periodo?.numero || 'I';
   }
 
   async getGroupsByCareerAndSemester(
-    careerId: number,
+    carreraId: number,
     gestion: string,
-    semester: number,
-    shiftId?: number,
+    semestre: number,
+    turnoId?: number,
   ): Promise<Grupo[]> {
     const query = this.groupRepository
-      .createQueryBuilder('group')
-      .leftJoinAndSelect('group.turno', 'turno')
-      .leftJoinAndSelect('group.carrera', 'career')
-      .where('group.career_id = :careerId', { careerId })
-      .andWhere('group.gestion = :gestion', { gestion })
-      .andWhere('group.semester = :semester', { semester });
+      .createQueryBuilder('grupo')
+      .leftJoinAndSelect('grupo.turno', 'turno')
+      .leftJoinAndSelect('grupo.carrera', 'carrera')
+      .where('grupo.carreraId = :carreraId', { carreraId })
+      .andWhere('grupo.gestion = :gestion', { gestion })
+      .andWhere('grupo.semestre = :semestre', { semestre });
 
-    if (shiftId) {
-      query.andWhere('group.shift_id = :shiftId', { shiftId });
+    if (turnoId) {
+      query.andWhere('grupo.turnoId = :turnoId', { turnoId });
     }
 
     return query.getMany();
   }
 
-  async getOpenPeriodo(gestionYear: string): Promise<Periodo | null> {
+  async getOpenPeriodo(anioGestion: string): Promise<Periodo | null> {
     const gestion = await this.gestionRepository.findOne({
-      where: { year: gestionYear },
+      where: { anio: anioGestion },
       relations: ['periodos'],
     });
 
@@ -588,6 +588,6 @@ export class PreinscripcionService {
       return null;
     }
 
-    return gestion.periodos?.find(p => p.status === GestionStatus.ABIERTA) || null;
+    return gestion.periodos?.find(p => p.estado === EstadoGestion.ABIERTA) || null;
   }
 }

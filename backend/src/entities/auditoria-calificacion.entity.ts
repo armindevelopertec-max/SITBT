@@ -15,28 +15,28 @@ export class AuditoriaCalificacion {
   id: number;
 
   @Column({ name: 'calificacion_id' })
-  grade_id: number;
+  calificacionId: number;
 
   @ManyToOne(() => Calificacion)
   @JoinColumn({ name: 'calificacion_id' })
   calificacion: Calificacion;
 
   @Column({ type: 'varchar', length: 30, name: 'campo_cambiado' })
-  field_changed: string;
+  campoCambiado: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'valor_anterior' })
-  old_value: string;
+  valorAnterior: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'valor_nuevo' })
-  new_value: string;
+  valorNuevo: string;
 
   @Column({ })
-  user_id: number;
+  usuarioId: number;
 
   @ManyToOne(() => Usuario)
   @JoinColumn({ })
   usuario: Usuario;
 
   @CreateDateColumn({ name: 'cambiado_en' })
-  changed_at: Date;
+  cambiadoEn: Date;
 }

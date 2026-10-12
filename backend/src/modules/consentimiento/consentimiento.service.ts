@@ -56,14 +56,14 @@ export class ServicioConsentimiento {
 
   async findByStudent(estudianteId: number): Promise<ConsentRecord[]> {
     return this.consentimientoRepository.find({
-      where: { student_id: estudianteId },
+      where: { estudianteId: estudianteId },
       order: { fechaConsentimiento: 'DESC' },
     });
   }
 
   async getLatestConsent(estudianteId: number): Promise<ConsentRecord | null> {
     return this.consentimientoRepository.findOne({
-      where: { student_id: estudianteId },
+      where: { estudianteId: estudianteId },
       order: { fechaConsentimiento: 'DESC' },
     });
   }

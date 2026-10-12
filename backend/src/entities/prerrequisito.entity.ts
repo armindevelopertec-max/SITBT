@@ -13,16 +13,16 @@ export class Prerrequisito {
   id: number;
 
   @Column({ name: 'materia_id' })
-  subject_id: number;
+  materiaId: number;
 
   @ManyToOne(() => Materia)
   @JoinColumn({ name: 'materia_id' })
   materia: Materia;
 
-  @Column({ name: 'prerequisite_subject_id' })
-  prerequisite_subject_id: number;
+  @Column({ name: 'prerequisite_materiaId' })
+  prerequisite_materiaId: number;
 
   @ManyToOne(() => Materia)
-  @JoinColumn({ name: 'prerequisite_subject_id' })
+  @JoinColumn({ name: 'prerequisite_materiaId' })
   materia_prerrequisito: Materia;
 }

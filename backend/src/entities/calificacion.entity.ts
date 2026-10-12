@@ -35,55 +35,55 @@ export class Calificacion {
   id: number;
 
   @Column({ name: 'inscripcion_id' })
-  enrollment_id: number;
+  inscripcionId: number;
 
   @ManyToOne(() => Inscripcion)
   @JoinColumn({ name: 'inscripcion_id' })
   inscripcion: Inscripcion;
 
   @Column({ type: 'int', nullable: true, name: 'parcial_1' })
-  partial_1: number;
+  parcial1: number;
 
   @Column({ type: 'int', nullable: true, name: 'parcial_2' })
-  partial_2: number;
+  parcial2: number;
 
   @Column({ type: 'int', nullable: true, name: 'promedio_final' })
-  final_average: number;
+  promedioFinal: number;
 
   @Column({ type: 'varchar', length: 30, nullable: true, name: 'observacion' })
-  observation: string;
+  observacion: string;
 
   @Column({ type: 'enum', enum: EstadoCalificacionRegular, nullable: true, name: 'estado_regular' })
-  status_regular: EstadoCalificacionRegular;
+  estado_regular: EstadoCalificacionRegular;
 
   @Column({ type: 'boolean', default: false, name: 'apto_segunda_turno' })
-  second_turn_eligible: boolean;
+  aptoSegundaTurno: boolean;
 
   @Column({ type: 'int', nullable: true, name: 'nota_segunda_turno' })
-  second_turn_score: number;
+  notaSegundaTurno: number;
 
   @Column({ type: 'boolean', default: false, name: 'segunda_turno_aplicado' })
-  second_turn_applied: boolean;
+  segundaTurnoAplicado: boolean;
 
   @Column({ type: 'enum', enum: EstadoCalificacion2T, default: EstadoCalificacion2T.NO_APLICA, name: 'estado_2t' })
-  status_2t: EstadoCalificacion2T;
+  estado_2t: EstadoCalificacion2T;
 
   @Column({ type: 'int', nullable: true, name: 'nota_definitiva' })
-  definitive_grade: number;
+  notaDefinitiva: number;
 
   @Column({ type: 'enum', enum: EstadoCalificacionDefinitivo, nullable: true, name: 'estado_definitivo' })
-  status_definitivo: EstadoCalificacionDefinitivo;
+  estado_definitivo: EstadoCalificacionDefinitivo;
 
   @Column({ nullable: true })
-  registered_by: number;
+  registradoPor: number;
 
   @ManyToOne(() => Personal)
   @JoinColumn({ })
   docente: Personal;
 
   @CreateDateColumn({ name: 'registrado_en' })
-  registered_at: Date;
+  registradoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

@@ -23,12 +23,12 @@ export class CrearAdmisionDto {
 
   @ApiProperty()
   @IsDateString()
-  birthdate: string;
+  fechaNacimiento: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  birthplace?: string;
+  lugarNacimiento?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -38,7 +38,7 @@ export class CrearAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  gender?: string;
+  genero?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -48,7 +48,7 @@ export class CrearAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  nationality?: string;
+  nacionalidad?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -58,16 +58,16 @@ export class CrearAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  phone?: string;
+  telefono?: string;
 
   @ApiProperty()
   @IsEmail()
-  email: string;
+  correo: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  address?: string;
+  direccion?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

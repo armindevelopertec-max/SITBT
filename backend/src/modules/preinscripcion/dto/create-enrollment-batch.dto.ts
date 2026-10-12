@@ -1,12 +1,12 @@
 import { IsInt, IsString, IsArray, IsOptional, ValidateNested } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { SubjectToEnroll } from './calculate-subjects.dto';
+import { MateriaAInscribir } from './calculate-subjects.dto';
 
-export class CreateEnrollmentBatchDto {
+export class CrearInscripcionLoteDto {
   @ApiProperty()
   @IsInt()
-  studentId: number;
+  estudianteId: number;
 
   @ApiProperty()
   @IsString()
@@ -19,22 +19,22 @@ export class CreateEnrollmentBatchDto {
 
   @ApiProperty()
   @IsInt()
-  groupId: number;
+  grupoId: number;
 
-  @ApiProperty({ type: [SubjectToEnroll] })
+  @ApiProperty({ type: [MateriaAInscribir] })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => SubjectToEnroll)
-  subjects: SubjectToEnroll[];
+  @Type(() => MateriaAInscribir)
+  materias: MateriaAInscribir[];
 }
 
-export class CreateEnrollmentResult {
-  success: boolean;
-  enrollments: {
+export class ResultadoCrearInscripcion {
+  exito: boolean;
+  inscripciones: {
     id: number;
-    subjectName: string;
-    groupName: string;
+    materiaNombre: string;
+    nombreGrupo: string;
   }[];
   boletaId?: string;
-  message: string;
+  mensaje: string;
 }

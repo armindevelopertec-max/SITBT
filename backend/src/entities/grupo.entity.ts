@@ -18,41 +18,41 @@ export class Grupo {
   id: number;
 
   @Column({ unique: true, nullable: true, name: 'codigo' })
-  code: string;
+  codigo: string;
 
   @Column({ name: 'carrera_id' })
-  career_id: number;
+  carreraId: number;
 
   @ManyToOne(() => Carrera)
   @JoinColumn({ name: 'carrera_id' })
   carrera: Carrera;
 
   @Column({ name: 'plan_estudio_id' })
-  study_plan_id: number;
+  planEstudioId: number;
 
   @ManyToOne(() => PlanEstudio)
   @JoinColumn({ name: 'plan_estudio_id' })
   plan_estudio: PlanEstudio;
 
   @Column({ nullable: true, name: 'materia_id' })
-  subject_id: number;
+  materiaId: number;
 
   @ManyToOne(() => Materia)
   @JoinColumn({ name: 'materia_id' })
   materia: Materia;
 
   @Column({ type: 'int', name: 'semestre' })
-  semester: number;
+  semestre: number;
 
   @Column({ name: 'turno_id' })
-  shift_id: number;
+  turnoId: number;
 
   @ManyToOne(() => Turno)
   @JoinColumn({ name: 'turno_id' })
   turno: Turno;
 
   @Column({ type: 'varchar', length: 5, name: 'paralelo' })
-  parallel: string;
+  paralelo: string;
 
   @Column({ type: 'varchar', length: 10 })
   gestion: string;
@@ -61,11 +61,11 @@ export class Grupo {
   periodo: string;
 
   @Column({ type: 'int', default: 30, name: 'capacidad' })
-  capacity: number;
+  capacidad: number;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

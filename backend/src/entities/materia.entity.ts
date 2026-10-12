@@ -12,14 +12,14 @@ export class Materia {
   id: number;
 
   @Column({ type: 'varchar', length: 20, name: 'codigo' })
-  code: string;
+  codigo: string;
 
   @Column({ type: 'varchar', length: 150, name: 'nombre' })
-  name: string;
+  nombre: string;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

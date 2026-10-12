@@ -32,11 +32,11 @@ export class ServicioPersonas {
     const query = this.personaRepository.createQueryBuilder('person');
 
     if (status) {
-      query.where('person.status = :status', { status });
+      query.where('person.estado = :status', { status });
     }
 
     const [data, total] = await query
-      .orderBy('person.lastname_paternal', 'ASC')
+      .orderBy('person.apellidoPaterno', 'ASC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -75,10 +75,10 @@ export class ServicioPersonas {
     const [data, total] = await this.personaRepository
       .createQueryBuilder('person')
       .where('person.names ILIKE :query', { query: `%${query}%` })
-      .orWhere('person.lastname_paternal ILIKE :query', { query: `%${query}%` })
-      .orWhere('person.lastname_maternal ILIKE :query', { query: `%${query}%` })
+      .orWhere('person.apellidoPaterno ILIKE :query', { query: `%${query}%` })
+      .orWhere('person.apellidoMaterno ILIKE :query', { query: `%${query}%` })
       .orWhere('person.ci ILIKE :query', { query: `%${query}%` })
-      .orderBy('person.lastname_paternal', 'ASC')
+      .orderBy('person.apellidoPaterno', 'ASC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -88,8 +88,8 @@ export class ServicioPersonas {
 
   async findActive(): Promise<Persona[]> {
     return this.personaRepository.find({
-      where: { status: PersonStatus.ACTIVO },
-      order: { lastname_paternal: 'ASC' },
+      where: { estado: PersonStatus.ACTIVO },
+      order: { apellidoPaterno: 'ASC' },
     });
   }
 }

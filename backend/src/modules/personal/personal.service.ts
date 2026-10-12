@@ -13,7 +13,7 @@ import { ActualizarPersonalDto } from './dto/actualizar-personal.dto';
 export interface PersonalCreadoConUsuario {
   staff: Personal;
   user: {
-    username: string;
+    nombreUsuario: string;
     password: string;
   };
 }
@@ -37,7 +37,7 @@ export class ServicioPersonal {
     const staff = this.staffRepository.create(createStaffDto);
     const savedStaff = await this.staffRepository.save(staff);
 
-    const persona = await this.personaRepository.findOne({ where: { id: createStaffDto.person_id } });
+    const persona = await this.personaRepository.findOne({ where: { id: createStaffDto.personaId } });
     if (!persona) {
       throw new NotFoundException('Persona no encontrada');
     }
@@ -48,19 +48,19 @@ export class ServicioPersonal {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const usuario = this.usuarioRepository.create({
-      person_id: savedStaff.person_id,
-      username,
-      password_hash: passwordHash,
-      status: 'activo' as any,
+      personaId: savedStaff.personaId,
+      nombreUsuario: username,
+      contrasenaHash: passwordHash,
+      estado: 'activo' as any,
     });
     const savedUsuario = await this.usuarioRepository.save(usuario);
 
     const roleCode = this.mapPositionToRole(savedStaff.position);
-    const rol = await this.rolRepository.findOne({ where: { code: roleCode } });
+    const rol = await this.rolRepository.findOne({ where: { codigo: roleCode } });
     if (rol) {
       const usuarioRol = this.usuarioRolRepository.create({
-        user_id: savedUsuario.id,
-        role_id: rol.id,
+        usuarioId: savedUsuario.id,
+        rolId: rol.id,
       });
       await this.usuarioRolRepository.save(usuarioRol);
     }
@@ -68,7 +68,7 @@ export class ServicioPersonal {
     return {
       staff: savedStaff,
       user: {
-        username,
+        nombreUsuario: username,
         password,
       },
     };
@@ -97,7 +97,7 @@ export class ServicioPersonal {
       .leftJoinAndSelect('staff.persona', 'persona');
 
     if (status) {
-      query.andWhere('staff.status = :status', { status });
+      query.andWhere('staff.estado = :status', { status });
     }
 
     if (position) {
@@ -105,7 +105,7 @@ export class ServicioPersonal {
     }
 
     const [data, total] = await query
-      .orderBy('staff.hire_date', 'DESC')
+      .orderBy('staff.fechaContrato', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -134,13 +134,13 @@ export class ServicioPersonal {
     const staff = await this.findOne(id);
 
     const usuario = await this.usuarioRepository.findOne({
-      where: { person_id: staff.person_id },
+      where: { personaId: staff.personaId },
     });
     if (usuario) {
       await this.usuarioRepository.remove(usuario);
     }
 
-    const personaId = staff.person_id;
+    const personaId = staff.personaId;
     await this.staffRepository.remove(staff);
 
     const persona = await this.personaRepository.findOne({ where: { id: personaId } });
@@ -151,17 +151,17 @@ export class ServicioPersonal {
 
   async findByPosition(position: CargoPersonal): Promise<Personal[]> {
     return this.staffRepository.find({
-      where: { position, status: EstadoPersonal.ACTIVO },
+      where: { position, estado: EstadoPersonal.ACTIVO },
       relations: ['persona'],
-      order: { hire_date: 'ASC' },
+      order: { fechaContrato: 'ASC' },
     });
   }
 
   async findActive(): Promise<Personal[]> {
     return this.staffRepository.find({
-      where: { status: EstadoPersonal.ACTIVO },
+      where: { estado: EstadoPersonal.ACTIVO },
       relations: ['persona'],
-      order: { hire_date: 'ASC' },
+      order: { fechaContrato: 'ASC' },
     });
   }
 

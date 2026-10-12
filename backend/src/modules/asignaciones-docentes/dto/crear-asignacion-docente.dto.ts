@@ -9,11 +9,11 @@ export class CrearAsignacionDocenteDto {
 
   @ApiProperty()
   @IsInt()
-  subject_id: number;
+  materiaId: number;
 
   @ApiProperty()
   @IsInt()
-  group_id: number;
+  grupoId: number;
 
   @ApiProperty({ example: '2024' })
   @IsString()
@@ -23,5 +23,5 @@ export class CrearAsignacionDocenteDto {
   @ApiPropertyOptional({ enum: EstadoAsignacionDocente })
   @IsEnum(EstadoAsignacionDocente)
   @IsOptional()
-  status?: EstadoAsignacionDocente;
+  estado?: EstadoAsignacionDocente;
 }

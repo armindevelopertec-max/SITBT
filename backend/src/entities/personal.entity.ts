@@ -29,11 +29,11 @@ export class Personal {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'persona_id' })
-  person_id: number;
+  @Column({ name: 'personaId' })
+  personaId: number;
 
   @ManyToOne(() => Persona)
-  @JoinColumn({ name: 'persona_id' })
+  @JoinColumn({ name: 'personaId' })
   persona: Persona;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'profesion' })
@@ -43,14 +43,14 @@ export class Personal {
   position: CargoPersonal;
 
   @Column({ type: 'date', name: 'fecha_contrato' })
-  hire_date: Date;
+  fechaContrato: Date;
 
   @Column({ type: 'varchar', length: 20, name: 'estado' })
-  status: string;
+  estado: string;
 
   @CreateDateColumn({ name: 'creado_en' })
-  created_at: Date;
+  creadoEn: Date;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
-  updated_at: Date;
+  actualizadoEn: Date;
 }

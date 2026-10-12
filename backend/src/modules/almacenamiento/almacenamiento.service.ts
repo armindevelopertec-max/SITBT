@@ -148,7 +148,7 @@ export class ServicioAlmacenamiento {
 
       return new Promise((resolve, reject) => {
         stream.on('data', (obj) => {
-          if (obj.name) files.push(obj.name);
+          if (obj.nombre) files.push(obj.nombre);
         });
         stream.on('end', () => resolve(files));
         stream.on('error', reject);

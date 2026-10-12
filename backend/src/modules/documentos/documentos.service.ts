@@ -1,19 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { EmittedDocument, TipoDocumento, EstadoDocumento } from '../../entities/emitted-document.entity';
+import { DocumentoEmitido, TipoDocumento, EstadoDocumento } from '../../entities/emitted-document.entity';
 import { CrearDocumentoEmitidoDto } from './dto/crear-documento-emitido.dto';
 import { ActualizarDocumentoEmitidoDto } from './dto/actualizar-documento-emitido.dto';
 
 @Injectable()
 export class ServicioDocumentos {
   constructor(
-    @InjectRepository(EmittedDocument)
-    private documentoRepository: Repository<EmittedDocument>,
+    @InjectRepository(DocumentoEmitido)
+    private documentoRepository: Repository<DocumentoEmitido>,
   ) {}
 
-  async create(createDto: CrearDocumentoEmitidoDto): Promise<EmittedDocument> {
-    const document = this.documentoRepository.create(createDto as Partial<EmittedDocument>);
+  async create(createDto: CrearDocumentoEmitidoDto): Promise<DocumentoEmitido> {
+    const document = this.documentoRepository.create(createDto as Partial<DocumentoEmitido>);
     return this.documentoRepository.save(document);
   }
 
@@ -24,7 +24,7 @@ export class ServicioDocumentos {
     gestion?: string,
     estudianteId?: number,
     estado?: EstadoDocumento,
-  ): Promise<{ data: EmittedDocument[]; total: number; page: number; limit: number }> {
+  ): Promise<{ data: DocumentoEmitido[]; total: number; page: number; limit: number }> {
     const query = this.documentoRepository
       .createQueryBuilder('document')
       .leftJoinAndSelect('document.estudiante', 'estudiante')
@@ -44,7 +44,7 @@ export class ServicioDocumentos {
     }
 
     if (estado) {
-      query.andWhere('document.status = :estado', { estado });
+      query.andWhere('document.estado = :estado', { estado });
     }
 
     const [data, total] = await query
@@ -56,7 +56,7 @@ export class ServicioDocumentos {
     return { data, total, page, limit };
   }
 
-  async findOne(id: string): Promise<EmittedDocument> {
+  async findOne(id: string): Promise<DocumentoEmitido> {
     const document = await this.documentoRepository.findOne({
       where: { id },
       relations: ['estudiante', 'estudiante.person', 'gestionEntity', 'impresor'],
@@ -67,7 +67,7 @@ export class ServicioDocumentos {
     return document;
   }
 
-  async findByStudent(estudianteId: number, tipo?: TipoDocumento): Promise<EmittedDocument[]> {
+  async findByStudent(estudianteId: number, tipo?: TipoDocumento): Promise<DocumentoEmitido[]> {
     const query = this.documentoRepository
       .createQueryBuilder('document')
       .where('document.estudiante_id = :estudianteId', { estudianteId });
@@ -79,7 +79,7 @@ export class ServicioDocumentos {
     return query.orderBy('document.fechaEmision', 'DESC').getMany();
   }
 
-  async update(id: string, updateDto: ActualizarDocumentoEmitidoDto): Promise<EmittedDocument> {
+  async update(id: string, updateDto: ActualizarDocumentoEmitidoDto): Promise<DocumentoEmitido> {
     const document = await this.findOne(id);
 
     if (updateDto.estado === EstadoDocumento.ENTREGADO && !document.fechaEntrega) {
@@ -90,22 +90,22 @@ export class ServicioDocumentos {
     return this.documentoRepository.save(document);
   }
 
-  async markAsPrinted(id: string, impresoPor: number): Promise<EmittedDocument> {
+  async markAsPrinted(id: string, impresoPor: number): Promise<DocumentoEmitido> {
     return this.update(id, {
       estado: EstadoDocumento.IMPRESO,
       impreso_por: impresoPor,
     });
   }
 
-  async markAsDelivered(id: string, entregadoA: string): Promise<EmittedDocument> {
+  async markAsDelivered(id: string, entregadoA: string): Promise<DocumentoEmitido> {
     const document = await this.findOne(id);
-    document.status = EstadoDocumento.ENTREGADO;
+    document.estado = EstadoDocumento.ENTREGADO;
     document.entregadoA = entregadoA;
     document.fechaEntrega = new Date();
     return this.documentoRepository.save(document);
   }
 
-  async annul(id: string, observaciones?: string): Promise<EmittedDocument> {
+  async annul(id: string, observaciones?: string): Promise<DocumentoEmitido> {
     return this.update(id, {
       estado: EstadoDocumento.ANULADO,
       observaciones,
@@ -116,7 +116,7 @@ export class ServicioDocumentos {
     estudianteId: number,
     gestion: string,
     gestionId?: number,
-  ): Promise<EmittedDocument> {
+  ): Promise<DocumentoEmitido> {
     const numeroDocumento = `BOL-INS-${gestion}-${Date.now()}`;
 
     return this.create({
@@ -133,7 +133,7 @@ export class ServicioDocumentos {
     gestion: string,
     paymentId: number,
     gestionId?: number,
-  ): Promise<EmittedDocument> {
+  ): Promise<DocumentoEmitido> {
     const numeroDocumento = `REC-PAG-${gestion}-${Date.now()}`;
 
     return this.create({
@@ -163,8 +163,8 @@ export class ServicioDocumentos {
     const byStatusMap = new Map<EstadoDocumento, number>();
 
     documents.forEach((doc) => {
-      byTypeMap.set(doc.type, (byTypeMap.get(doc.type) || 0) + 1);
-      byStatusMap.set(doc.status, (byStatusMap.get(doc.status) || 0) + 1);
+      byTypeMap.set(doc.tipo, (byTypeMap.get(doc.tipo) || 0) + 1);
+      byStatusMap.set(doc.estado, (byStatusMap.get(doc.estado) || 0) + 1);
     });
 
     return {
