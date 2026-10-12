@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Carrera } from './carrera.entity';
 
-export enum StudyPlanStatus {
+export enum EstadoPlanEstudio {
   VIGENTE = 'vigente',
   HISTORICO = 'historico',
 }
@@ -32,8 +32,8 @@ export class PlanEstudio {
   @Column({ type: 'date' })
   rm_date: Date;
 
-  @Column({ type: 'enum', enum: StudyPlanStatus, default: StudyPlanStatus.VIGENTE })
-  status: StudyPlanStatus;
+  @Column({ type: 'enum', enum: EstadoPlanEstudio, default: EstadoPlanEstudio.VIGENTE })
+  status: EstadoPlanEstudio;
 
   @Column({ type: 'text', nullable: true })
   notes: string;

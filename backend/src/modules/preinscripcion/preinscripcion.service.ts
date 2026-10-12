@@ -4,7 +4,7 @@ import { Repository, In } from 'typeorm';
 import { Estudiante, StudentStatus } from '../../entities/estudiante.entity';
 import { Pago, PaymentStatus } from '../../entities/pago.entity';
 import { ConceptoPago, PaymentConceptType } from '../../entities/concepto-pago.entity';
-import { Inscripcion, EnrollmentStatus } from '../../entities/inscripcion.entity';
+import { Inscripcion, EstadoInscripcion } from '../../entities/inscripcion.entity';
 import { MateriaPlan } from '../../entities/materia-plan.entity';
 import { Materia } from '../../entities/materia.entity';
 import { Grupo } from '../../entities/grupo.entity';
@@ -228,7 +228,7 @@ export class PreinscripcionService {
       });
 
       for (const enrollment of previousEnrollments) {
-        if (enrollment.status === EnrollmentStatus.REPROBADO) {
+        if (enrollment.status === EstadoInscripcion.REPROBADO) {
           failedSubjects.push({
             subjectId: enrollment.subject_id,
             subjectName: enrollment.materia?.name || 'Desconocida',
@@ -292,7 +292,7 @@ export class PreinscripcionService {
       });
 
       for (const enrollment of previousEnrollments) {
-        if (enrollment.status === EnrollmentStatus.APROBADO) {
+        if (enrollment.status === EstadoInscripcion.APROBADO) {
           approvedSubjectIds.push(enrollment.subject_id);
         }
       }
@@ -444,7 +444,7 @@ export class PreinscripcionService {
         group_id: dto.groupId,
         gestion: dto.gestion,
         semester: subject.semester,
-        status: EnrollmentStatus.CURSANDO,
+        status: EstadoInscripcion.CURSANDO,
       });
 
       const saved = await this.enrollmentRepository.save(enrollment);

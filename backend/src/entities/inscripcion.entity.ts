@@ -12,7 +12,7 @@ import { Materia } from './materia.entity';
 import { Grupo } from './grupo.entity';
 import { MateriaPlan } from './materia-plan.entity';
 
-export enum EnrollmentStatus {
+export enum EstadoInscripcion {
   CURSANDO = 'cursando',
   APROBADO = 'aprobado',
   REPROBADO = 'reprobado',
@@ -58,8 +58,8 @@ export class Inscripcion {
   @Column({ type: 'int' })
   semester: number;
 
-  @Column({ type: 'enum', enum: EnrollmentStatus, default: EnrollmentStatus.CURSANDO })
-  status: EnrollmentStatus;
+  @Column({ type: 'enum', enum: EstadoInscripcion, default: EstadoInscripcion.CURSANDO })
+  status: EstadoInscripcion;
 
   @Column({ type: 'int', nullable: true })
   final_grade: number;

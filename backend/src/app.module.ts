@@ -8,11 +8,11 @@ import { ModuloPersonal } from './modules/personal/personal.module';
 import { ModuloUsuarios } from './modules/usuarios/usuarios.module';
 import { ModuloRoles } from './modules/roles/roles.module';
 import { ModuloCarreras } from './modules/carreras/carreras.module';
-import { StudyPlansModule } from './modules/study-plans/study-plans.module';
-import { SubjectsModule } from './modules/subjects/subjects.module';
-import { ShiftsModule } from './modules/shifts/shifts.module';
-import { GroupsModule } from './modules/groups/groups.module';
-import { EnrollmentsModule } from './modules/enrollments/enrollments.module';
+import { ModuloPlanesEstudio } from './modules/planes-estudio/planes-estudio.module';
+import { ModuloMaterias } from './modules/materias/materias.module';
+import { ModuloTurnos } from './modules/turnos/turnos.module';
+import { ModuloGrupos } from './modules/grupos/grupos.module';
+import { ModuloInscripciones } from './modules/inscripciones/inscripciones.module';
 import { GradesModule } from './modules/grades/grades.module';
 import { TeachingAssignmentsModule } from './modules/teaching-assignments/teaching-assignments.module';
 import { CertificatesModule } from './modules/certificates/certificates.module';
@@ -58,11 +58,11 @@ import { PreinscripcionModule } from './modules/preinscripcion/preinscripcion.mo
     ModuloUsuarios,
     ModuloRoles,
     ModuloCarreras,
-    StudyPlansModule,
-    SubjectsModule,
-    ShiftsModule,
-    GroupsModule,
-    EnrollmentsModule,
+    ModuloPlanesEstudio,
+    ModuloMaterias,
+    ModuloTurnos,
+    ModuloGrupos,
+    ModuloInscripciones,
     GradesModule,
     TeachingAssignmentsModule,
     CertificatesModule,
