@@ -14,11 +14,11 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ShiftsService } from './shifts.service';
 import { CreateShiftDto } from './dto/create-shift.dto';
 import { UpdateShiftDto } from './dto/update-shift.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Turnos')
 @Controller('turnos')
-@UseGuards(JwtAuthGuard)
+@UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ShiftsController {
   constructor(private readonly shiftsService: ShiftsService) {}

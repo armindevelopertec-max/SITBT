@@ -16,12 +16,12 @@ import { Request } from 'express';
 import { CredentialsService } from './credentials.service';
 import { CreateCredentialDto } from './dto/create-credential.dto';
 import { UpdateCredentialDto } from './dto/update-credential.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 import { CredentialStatus } from '../../entities/credencial.entity';
 
 @ApiTags('Credenciales')
 @Controller('credenciales')
-@UseGuards(JwtAuthGuard)
+@UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class CredentialsController {
   constructor(private readonly service: CredentialsService) {}

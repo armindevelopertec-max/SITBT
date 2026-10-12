@@ -14,12 +14,12 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 import { PaymentStatus } from '../../entities/pago.entity';
 
 @ApiTags('Pagos')
 @Controller('pagos')
-@UseGuards(JwtAuthGuard)
+@UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class PaymentsController {
   constructor(private readonly service: PaymentsService) {}

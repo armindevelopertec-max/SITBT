@@ -14,7 +14,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PersonsService } from './persons.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 import { PersonStatus } from '../../entities/persona.entity';
 
 @ApiTags('Personas')
@@ -57,14 +57,14 @@ export class PersonsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   update(@Param('id', ParseIntPipe) id: number, @Body() updatePersonDto: UpdatePersonDto) {
     return this.personsService.update(id, updatePersonDto);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.personsService.remove(id);

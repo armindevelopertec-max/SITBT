@@ -11,7 +11,7 @@ import {
 import { Persona } from './persona.entity';
 import { UsuarioRol } from './usuario-rol.entity';
 
-export enum UserStatus {
+export enum EstadoUsuario {
   ACTIVO = 'activo',
   INACTIVO = 'inactivo',
   BLOQUEADO = 'bloqueado',
@@ -35,8 +35,8 @@ export class Usuario {
   @Column({ type: 'varchar', length: 255 })
   password_hash: string;
 
-  @Column({ type: 'enum', enum: UserStatus, default: UserStatus.ACTIVO })
-  status: UserStatus;
+  @Column({ type: 'enum', enum: EstadoUsuario, default: EstadoUsuario.ACTIVO })
+  status: EstadoUsuario;
 
   @Column({ type: 'timestamp', nullable: true })
   last_login: Date;

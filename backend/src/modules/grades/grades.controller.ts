@@ -14,12 +14,12 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { GradesService } from './grades.service';
 import { CreateGradeDto } from './dto/create-grade.dto';
 import { UpdateGradeDto } from './dto/update-grade.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 import { GradeStatusDefinitivo } from '../../entities/calificacion.entity';
 
 @ApiTags('Calificaciones')
 @Controller('calificaciones')
-@UseGuards(JwtAuthGuard)
+@UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class GradesController {
   constructor(private readonly gradesService: GradesService) {}

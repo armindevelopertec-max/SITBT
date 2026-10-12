@@ -10,7 +10,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { InstitutionSettingsService } from './institution-settings.service';
 import { CreateInstitutionSettingsDto } from './dto/create-institution-settings.dto';
 import { UpdateInstitutionSettingsDto } from './dto/update-institution-settings.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Institution Settings')
 @Controller('institution-settings')
@@ -36,7 +36,7 @@ export class InstitutionSettingsController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Crear configuración institucional' })
   create(@Body() createDto: CreateInstitutionSettingsDto) {
@@ -44,7 +44,7 @@ export class InstitutionSettingsController {
   }
 
   @Put()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Actualizar configuración institucional' })
   update(@Body() updateDto: UpdateInstitutionSettingsDto) {

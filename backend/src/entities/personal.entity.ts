@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Persona } from './persona.entity';
 
-export enum StaffPosition {
+export enum CargoPersonal {
   DOCENTE = 'docente',
   SECRETARIA = 'secretaria',
   DIRECTOR_ACADEMICO = 'director_academico',
@@ -18,7 +18,7 @@ export enum StaffPosition {
   BIBLIOTECARIO = 'bibliotecario',
 }
 
-export enum StaffStatus {
+export enum EstadoPersonal {
   ACTIVO = 'activo',
   INACTIVO = 'inactivo',
   LICENCIA = 'licencia',
@@ -40,13 +40,13 @@ export class Personal {
   profession: string;
 
   @Column({ type: 'varchar', length: 50, name: 'cargo' })
-  position: StaffPosition;
+  position: CargoPersonal;
 
   @Column({ type: 'date', name: 'fecha_contrato' })
   hire_date: Date;
 
   @Column({ type: 'varchar', length: 20, name: 'estado' })
-  status: StaffStatus;
+  status: EstadoPersonal;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

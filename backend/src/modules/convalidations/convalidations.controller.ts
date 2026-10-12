@@ -14,12 +14,12 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ConvalidationsService } from './convalidations.service';
 import { CreateConvalidationDto } from './dto/create-convalidation.dto';
 import { UpdateConvalidationDto } from './dto/update-convalidation.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 import { ConvalidationStatus, ConvalidationType } from '../../entities/convalidacion-estudiante.entity';
 
 @ApiTags('Convalidaciones')
 @Controller('convalidaciones')
-@UseGuards(JwtAuthGuard)
+@UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ConvalidationsController {
   constructor(private readonly service: ConvalidationsService) {}

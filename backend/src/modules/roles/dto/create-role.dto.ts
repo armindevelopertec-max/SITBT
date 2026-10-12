@@ -1,8 +1,8 @@
 import { IsString, IsOptional, IsEnum, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { RoleStatus } from '../../../entities/rol.entity';
+import { EstadoRol } from '../../../entities/rol.entity';
 
-export class CreateRoleDto {
+export class CrearRolDto {
   @ApiProperty({ example: 'admin' })
   @IsString()
   @MaxLength(30)
@@ -18,8 +18,8 @@ export class CreateRoleDto {
   @IsOptional()
   description?: string;
 
-  @ApiPropertyOptional({ enum: RoleStatus })
-  @IsEnum(RoleStatus)
+  @ApiPropertyOptional({ enum: EstadoRol })
+  @IsEnum(EstadoRol)
   @IsOptional()
-  status?: RoleStatus;
+  status?: EstadoRol;
 }

@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export enum CareerStatus {
+export enum EstadoCarrera {
   ACTIVO = 'activo',
   INACTIVO = 'inactivo',
 }
@@ -34,8 +34,8 @@ export class Carrera {
   @Column({ type: 'int', default: 3600 })
   load_hours: number;
 
-  @Column({ type: 'enum', enum: CareerStatus, default: CareerStatus.ACTIVO })
-  status: CareerStatus;
+  @Column({ type: 'enum', enum: EstadoCarrera, default: EstadoCarrera.ACTIVO })
+  status: EstadoCarrera;
 
   @CreateDateColumn()
   created_at: Date;

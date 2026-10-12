@@ -13,12 +13,12 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ConsentService } from './consent.service';
 import { CreateConsentDto } from './dto/create-consent.dto';
 import { UpdateConsentDto } from './dto/update-consent.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 import { ConsentType } from '../../entities/consent-record.entity';
 
 @ApiTags('Consentimiento')
 @Controller('consent')
-@UseGuards(JwtAuthGuard)
+@UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ConsentController {
   constructor(private readonly service: ConsentService) {}

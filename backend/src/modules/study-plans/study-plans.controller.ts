@@ -14,12 +14,12 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { StudyPlansService } from './study-plans.service';
 import { CreateStudyPlanDto } from './dto/create-study-plan.dto';
 import { UpdateStudyPlanDto } from './dto/update-study-plan.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 import { StudyPlanStatus } from '../../entities/plan-estudio.entity';
 
 @ApiTags('PlanesEstudio')
 @Controller('planes-estudio')
-@UseGuards(JwtAuthGuard)
+@UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class StudyPlansController {
   constructor(private readonly studyPlansService: StudyPlansService) {}

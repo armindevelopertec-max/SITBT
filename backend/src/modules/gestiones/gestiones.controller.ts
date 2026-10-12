@@ -16,7 +16,7 @@ import { CreateGestionDto } from './dto/create-gestion.dto';
 import { UpdateGestionDto } from './dto/update-gestion.dto';
 import { CreatePeriodoDto, UpdatePeriodoDto } from './dto/periodo.dto';
 import { GestionStatus } from '../../entities/enums/gestion-status.enum';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Gestiones')
 @Controller('gestiones')
@@ -24,7 +24,7 @@ export class GestionesController {
   constructor(private readonly gestionesService: GestionesService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   create(@Body() createGestionDto: CreateGestionDto) {
     return this.gestionesService.create(createGestionDto);
@@ -60,7 +60,7 @@ export class GestionesController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -70,35 +70,35 @@ export class GestionesController {
   }
 
   @Post(':id/open')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   open(@Param('id', ParseIntPipe) id: number) {
     return this.gestionesService.open(id);
   }
 
   @Post(':id/close')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   close(@Param('id', ParseIntPipe) id: number) {
     return this.gestionesService.close(id);
   }
 
   @Post(':id/set-current')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   setCurrent(@Param('id', ParseIntPipe) id: number) {
     return this.gestionesService.setCurrent(id);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.gestionesService.remove(id);
   }
 
   @Post(':gestionId/periodos')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   createPeriodo(
     @Param('gestionId', ParseIntPipe) gestionId: number,
@@ -108,7 +108,7 @@ export class GestionesController {
   }
 
   @Patch('periodos/:periodoId')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   updatePeriodo(
     @Param('periodoId', ParseIntPipe) periodoId: number,
@@ -118,21 +118,21 @@ export class GestionesController {
   }
 
   @Delete('periodos/:periodoId')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   deletePeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
     return this.gestionesService.deletePeriodo(periodoId);
   }
 
   @Post('periodos/:periodoId/open')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   openPeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
     return this.gestionesService.openPeriodo(periodoId);
   }
 
   @Post('periodos/:periodoId/close')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   closePeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
     return this.gestionesService.closePeriodo(periodoId);

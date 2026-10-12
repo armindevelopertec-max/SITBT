@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export enum RoleStatus {
+export enum EstadoRol {
   ACTIVO = 'activo',
   INACTIVO = 'inactivo',
 }
@@ -25,8 +25,8 @@ export class Rol {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'enum', enum: RoleStatus, default: RoleStatus.ACTIVO })
-  status: RoleStatus;
+  @Column({ type: 'enum', enum: EstadoRol, default: EstadoRol.ACTIVO })
+  status: EstadoRol;
 
   @CreateDateColumn()
   created_at: Date;

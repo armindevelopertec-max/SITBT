@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './modules/auth/auth.module';
+import { ModuloAutenticacion } from './modules/autenticacion/autenticacion.module';
 import { PersonsModule } from './modules/persons/persons.module';
 import { StudentsModule } from './modules/students/students.module';
-import { StaffModule } from './modules/staff/staff.module';
-import { UsersModule } from './modules/users/users.module';
-import { RolesModule } from './modules/roles/roles.module';
-import { CareersModule } from './modules/careers/careers.module';
+import { ModuloPersonal } from './modules/personal/personal.module';
+import { ModuloUsuarios } from './modules/usuarios/usuarios.module';
+import { ModuloRoles } from './modules/roles/roles.module';
+import { ModuloCarreras } from './modules/carreras/carreras.module';
 import { StudyPlansModule } from './modules/study-plans/study-plans.module';
 import { SubjectsModule } from './modules/subjects/subjects.module';
 import { ShiftsModule } from './modules/shifts/shifts.module';
@@ -23,7 +23,7 @@ import { AuditModule } from './modules/audit/audit.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { InstitutionSettingsModule } from './modules/institution-settings/institution-settings.module';
 import { GestionesModule } from './modules/gestiones/gestiones.module';
-import { AdmissionModule } from './modules/admission/admission.module';
+import { ModuloAdmision } from './modules/admision/admision.module';
 import { ConsentModule } from './modules/consent/consent.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
@@ -51,13 +51,13 @@ import { PreinscripcionModule } from './modules/preinscripcion/preinscripcion.mo
       }),
       inject: [ConfigService],
     }),
-    AuthModule,
+    ModuloAutenticacion,
     PersonsModule,
     StudentsModule,
-    StaffModule,
-    UsersModule,
-    RolesModule,
-    CareersModule,
+    ModuloPersonal,
+    ModuloUsuarios,
+    ModuloRoles,
+    ModuloCarreras,
     StudyPlansModule,
     SubjectsModule,
     ShiftsModule,
@@ -73,7 +73,7 @@ import { PreinscripcionModule } from './modules/preinscripcion/preinscripcion.mo
     StorageModule,
     InstitutionSettingsModule,
     GestionesModule,
-    AdmissionModule,
+    ModuloAdmision,
     ConsentModule,
     DocumentsModule,
     NotificationsModule,

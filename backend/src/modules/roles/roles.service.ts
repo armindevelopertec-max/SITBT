@@ -1,34 +1,34 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Rol, RoleStatus } from '../../entities/rol.entity';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+import { Rol, EstadoRol } from '../../entities/rol.entity';
+import { CrearRolDto } from './dto/create-role.dto';
+import { ActualizarRolDto } from './dto/update-role.dto';
 
 @Injectable()
-export class RolesService {
+export class ServicioRoles {
   constructor(
     @InjectRepository(Rol)
-    private roleRepository: Repository<Rol>,
+    private rolRepository: Repository<Rol>,
   ) {}
 
-  async create(createRoleDto: CreateRoleDto): Promise<Rol> {
-    const existing = await this.roleRepository.findOne({
-      where: { code: createRoleDto.code },
+  async create(crearRolDto: CrearRolDto): Promise<Rol> {
+    const existing = await this.rolRepository.findOne({
+      where: { code: crearRolDto.code },
     });
     if (existing) {
-      throw new ConflictException(`Role with code ${createRoleDto.code} already exists`);
+      throw new ConflictException(`Rol con código ${crearRolDto.code} ya existe`);
     }
-    const role = this.roleRepository.create(createRoleDto);
-    return this.roleRepository.save(role);
+    const role = this.rolRepository.create(crearRolDto);
+    return this.rolRepository.save(role);
   }
 
   async findAll(
     page = 1,
     limit = 20,
-    status?: RoleStatus,
+    status?: EstadoRol,
   ): Promise<{ data: Rol[]; total: number; page: number; limit: number }> {
-    const query = this.roleRepository.createQueryBuilder('role');
+    const query = this.rolRepository.createQueryBuilder('role');
 
     if (status) {
       query.where('role.status = :status', { status });
@@ -44,35 +44,35 @@ export class RolesService {
   }
 
   async findOne(id: number): Promise<Rol> {
-    const role = await this.roleRepository.findOne({ where: { id } });
+    const role = await this.rolRepository.findOne({ where: { id } });
     if (!role) {
-      throw new NotFoundException(`Role with ID ${id} not found`);
+      throw new NotFoundException(`Rol con ID ${id} no encontrado`);
     }
     return role;
   }
 
   async findByCode(code: string): Promise<Rol> {
-    const role = await this.roleRepository.findOne({ where: { code } });
+    const role = await this.rolRepository.findOne({ where: { code } });
     if (!role) {
-      throw new NotFoundException(`Role with code ${code} not found`);
+      throw new NotFoundException(`Rol con código ${code} no encontrado`);
     }
     return role;
   }
 
-  async update(id: number, updateRoleDto: UpdateRoleDto): Promise<Rol> {
+  async update(id: number, actualizarRolDto: ActualizarRolDto): Promise<Rol> {
     const role = await this.findOne(id);
-    Object.assign(role, updateRoleDto);
-    return this.roleRepository.save(role);
+    Object.assign(role, actualizarRolDto);
+    return this.rolRepository.save(role);
   }
 
   async remove(id: number): Promise<void> {
     const role = await this.findOne(id);
-    await this.roleRepository.remove(role);
+    await this.rolRepository.remove(role);
   }
 
   async findActive(): Promise<Rol[]> {
-    return this.roleRepository.find({
-      where: { status: RoleStatus.ACTIVO },
+    return this.rolRepository.find({
+      where: { status: EstadoRol.ACTIVO },
       order: { name: 'ASC' },
     });
   }

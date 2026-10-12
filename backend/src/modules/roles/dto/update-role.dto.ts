@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateRoleDto } from './create-role.dto';
+import { CrearRolDto } from './create-role.dto';
 
-export class UpdateRoleDto extends PartialType(CreateRoleDto) {}
+export class ActualizarRolDto extends PartialType(CrearRolDto) {}

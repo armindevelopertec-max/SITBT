@@ -10,25 +10,25 @@ import {
 } from 'typeorm';
 import { Carrera } from './carrera.entity';
 
-export enum Gender {
+export enum Genero {
   M = 'M',
   F = 'F',
 }
 
-export enum AdmissionStatus {
+export enum EstadoAdmision {
   PENDIENTE = 'pendiente',
   VERIFICADO = 'verificado',
   RECHAZADO = 'rechazado',
   CONVERTIDO = 'convertido',
 }
 
-export enum AdmissionOrigin {
+export enum OrigenAdmision {
   WEB = 'web',
   SECRETARIA = 'secretaria',
 }
 
 @Entity('admission_requests')
-export class AdmissionRequest {
+export class SolicitudAdmision {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -57,7 +57,7 @@ export class AdmissionRequest {
   @Column({ name: 'birthplace_other', type: 'varchar', length: 100, nullable: true })
   birthplace_other: string;
 
-  @Column({ type: 'enum', enum: Gender, nullable: true })
+  @Column({ type: 'enum', enum: Genero, nullable: true })
   gender: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
@@ -106,8 +106,8 @@ export class AdmissionRequest {
   @Column({ name: 'fecha_verificacion', type: 'timestamp', nullable: true })
   fechaVerificacion: Date;
 
-  @Column({ type: 'enum', enum: AdmissionOrigin, default: AdmissionOrigin.WEB })
-  origen: AdmissionOrigin;
+  @Column({ type: 'enum', enum: OrigenAdmision, default: OrigenAdmision.WEB })
+  origen: OrigenAdmision;
 
   @Column({ name: 'documento_ci_path', type: 'varchar', length: 255, nullable: true })
   documentoCiPath: string;

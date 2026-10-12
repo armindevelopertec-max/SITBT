@@ -13,12 +13,12 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { DocumentsService } from './documents.service';
 import { CreateEmittedDocumentDto } from './dto/create-emitted-document.dto';
 import { UpdateEmittedDocumentDto } from './dto/update-emitted-document.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 import { DocumentType, DocumentStatus } from '../../entities/emitted-document.entity';
 
 @ApiTags('Documentos')
 @Controller('documents')
-@UseGuards(JwtAuthGuard)
+@UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class DocumentsController {
   constructor(private readonly service: DocumentsService) {}

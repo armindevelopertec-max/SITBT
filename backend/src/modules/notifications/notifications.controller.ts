@@ -8,11 +8,11 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { SendEmailDto, SendNotificationDto } from './dto/send-notification.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Notificaciones')
 @Controller('notifications')
-@UseGuards(JwtAuthGuard)
+@UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class NotificationsController {
   constructor(private readonly service: NotificationsService) {}

@@ -14,7 +14,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CertificatesService } from './certificates.service';
 import { CreateCertificateDto } from './dto/create-certificate.dto';
 import { UpdateCertificateDto } from './dto/update-certificate.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Certificados')
 @Controller('certificados')
@@ -22,7 +22,7 @@ export class CertificatesController {
   constructor(private readonly service: CertificatesService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   create(@Body() createDto: CreateCertificateDto) {
     return this.service.create(createDto);
@@ -60,14 +60,14 @@ export class CertificatesController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateCertificateDto) {
     return this.service.update(id, updateDto);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.service.remove(id);

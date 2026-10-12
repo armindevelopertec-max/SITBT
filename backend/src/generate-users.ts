@@ -12,7 +12,7 @@ const AppDataSource = new DataSource({
   synchronize: false,
 });
 
-enum UserStatus {
+enum EstadoUsuario {
   ACTIVO = 'activo',
   INACTIVO = 'inactivo',
   BLOQUEADO = 'bloqueado',
@@ -70,7 +70,7 @@ async function generateUsersForExistingData() {
         await queryRunner.query(
           `INSERT INTO users (person_id, username, password_hash, status)
            VALUES ($1, $2, $3, $4)`,
-          [estudiante.person_id, username, passwordHash, UserStatus.ACTIVO]
+          [estudiante.person_id, username, passwordHash, EstadoUsuario.ACTIVO]
         );
 
         const estudianteUser: any[] = await queryRunner.query(
@@ -120,7 +120,7 @@ async function generateUsersForExistingData() {
         await queryRunner.query(
           `INSERT INTO users (person_id, username, password_hash, status)
            VALUES ($1, $2, $3, $4)`,
-          [staff.person_id, username, passwordHash, UserStatus.ACTIVO]
+          [staff.person_id, username, passwordHash, EstadoUsuario.ACTIVO]
         );
 
         const staffUser: any[] = await queryRunner.query(

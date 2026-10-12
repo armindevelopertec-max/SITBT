@@ -18,7 +18,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
 import { StorageService, UploadedFile as UploadedFileType } from './storage.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Storage')
 @Controller('storage')
@@ -27,7 +27,7 @@ export class StorageController {
   constructor(private readonly service: StorageService) {}
 
   @Post('upload')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
@@ -67,7 +67,7 @@ export class StorageController {
   }
 
   @Get(':filename/url')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   async getFileUrl(@Param('filename') filename: string) {
     const url = await this.service.getFileUrl(filename);
@@ -75,7 +75,7 @@ export class StorageController {
   }
 
   @Delete(':filename')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   async deleteFile(@Param('filename') filename: string) {
     await this.service.deleteFile(filename);
@@ -83,7 +83,7 @@ export class StorageController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   async listFiles(@Query('prefix') prefix: string = '') {
     const files = await this.service.listFiles(prefix);

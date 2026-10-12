@@ -11,11 +11,11 @@ import { PreinscripcionService } from './preinscripcion.service';
 import { VerifyPaymentsDto } from './dto/verify-payments.dto';
 import { CalculateSubjectsDto } from './dto/calculate-subjects.dto';
 import { CreateEnrollmentBatchDto } from './dto/create-enrollment-batch.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Preinscripcion')
 @Controller('preinscripcion')
-@UseGuards(JwtAuthGuard)
+@UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class PreinscripcionController {
   constructor(private readonly service: PreinscripcionService) {}
