@@ -8,19 +8,19 @@ import {
 } from 'typeorm';
 import { Estudiante } from './estudiante.entity';
 
-export enum Gender {
+export enum Genero {
   M = 'M',
   F = 'F',
 }
 
-export enum MaritalStatus {
+export enum EstadoCivil {
   SOLTERO = 'Soltera(o)',
   CASADO = 'Casada(o)',
   VIUDO = 'Viuda(o)',
   DIVORCIADO = 'Divorciada(o)',
 }
 
-export enum BloodType {
+export enum TipoSangre {
   A_POSITIVE = 'A+',
   A_NEGATIVE = 'A-',
   B_POSITIVE = 'B+',
@@ -31,7 +31,7 @@ export enum BloodType {
   O_NEGATIVE = 'O-',
 }
 
-export enum PersonStatus {
+export enum EstadoPersona {
   ACTIVO = 'activo',
   INACTIVO = 'inactivo',
 }
@@ -62,11 +62,11 @@ export class Persona {
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'lugar_nacimiento_otro' })
   lugarNacimientoOtro: string;
 
-  @Column({ type: 'enum', enum: Gender, name: 'genero' })
-  genero: Gender;
+  @Column({ type: 'enum', enum: Genero, name: 'genero' })
+  genero: Genero;
 
-  @Column({ type: 'enum', enum: MaritalStatus, nullable: true, name: 'estadoCivil' })
-  marital_estado: MaritalStatus;
+  @Column({ type: 'enum', enum: EstadoCivil, nullable: true, name: 'estadoCivil' })
+  marital_estado: EstadoCivil;
 
   @Column({ type: 'varchar', length: 50, default: 'Boliviana', name: 'nacionalidad' })
   nacionalidad: string;
@@ -80,8 +80,8 @@ export class Persona {
   @Column({ type: 'varchar', length: 30, nullable: true, name: 'numeroPasaporte' })
   passport_numero: string;
 
-  @Column({ type: 'enum', enum: BloodType, nullable: true, name: 'tipoSangre' })
-  tipoSangre: BloodType;
+  @Column({ type: 'enum', enum: TipoSangre, nullable: true, name: 'tipoSangre' })
+  tipoSangre: TipoSangre;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'discapacidad' })
   discapacidad: string;
@@ -104,8 +104,8 @@ export class Persona {
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'foto_url' })
   fotoUrl: string;
 
-  @Column({ type: 'enum', enum: PersonStatus, default: PersonStatus.ACTIVO, name: 'estado' })
-  estado: PersonStatus;
+  @Column({ type: 'enum', enum: EstadoPersona, default: EstadoPersona.ACTIVO, name: 'estado' })
+  estado: EstadoPersona;
 
   @OneToMany(() => Estudiante, (estudiante) => estudiante.persona)
   estudiantes: Estudiante[];

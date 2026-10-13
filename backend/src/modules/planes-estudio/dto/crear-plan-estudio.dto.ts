@@ -10,11 +10,11 @@ export class CrearPlanEstudioDto {
   @ApiProperty({ example: 'RM-1234/2020' })
   @IsString()
   @MaxLength(50)
-  rm_number: string;
+  numeroRm: string;
 
   @ApiProperty({ example: '2020-01-15' })
   @IsDateString()
-  rm_date: string;
+  fechaRm: string;
 
   @ApiPropertyOptional({ enum: EstadoPlanEstudio })
   @IsEnum(EstadoPlanEstudio)

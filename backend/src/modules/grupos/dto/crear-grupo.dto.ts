@@ -34,7 +34,7 @@ export class CrearGrupoDto {
 
   @ApiProperty({ example: 'I' })
   @IsString()
-  @MaxLength(2)
+  @MaxLength(10)
   periodo: string;
 
   @ApiPropertyOptional({ example: 30 })

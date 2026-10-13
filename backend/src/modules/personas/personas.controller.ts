@@ -15,7 +15,7 @@ import { ServicioPersonas } from './personas.service';
 import { CrearPersonaDto } from './dto/crear-persona.dto';
 import { ActualizarPersonaDto } from './dto/actualizar-persona.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
-import { PersonStatus } from '../../entities/persona.entity';
+import { EstadoPersona } from '../../entities/persona.entity';
 
 @ApiTags('Personas')
 @Controller('personas')
@@ -31,7 +31,7 @@ export class ControladorPersonas {
   findAll(
     @Query('page') page = 1,
     @Query('limit') limit = 20,
-    @Query('status') status?: PersonStatus,
+    @Query('status') status?: EstadoPersona,
   ) {
     return this.personsService.findAll(+page, +limit, status);
   }

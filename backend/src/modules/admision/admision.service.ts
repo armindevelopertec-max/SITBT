@@ -8,7 +8,7 @@ import { Repository, DeepPartial } from 'typeorm';
 import { SolicitudAdmision, EstadoAdmision } from '../../entities/admission-request.entity';
 import { CrearAdmisionDto } from './dto/crear-admision.dto';
 import { ActualizarAdmisionDto } from './dto/actualizar-admision.dto';
-import { Persona, Gender } from '../../entities/persona.entity';
+import { Persona, Genero } from '../../entities/persona.entity';
 import { Estudiante, EstadoMatriculaEstudiante, OrigenEstudiante } from '../../entities/estudiante.entity';
 import { Inscripcion } from '../../entities/inscripcion.entity';
 import { PlanEstudio } from '../../entities/plan-estudio.entity';

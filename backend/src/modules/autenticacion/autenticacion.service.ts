@@ -62,7 +62,7 @@ export class AutenticacionServicio {
 
   async login(username: string, password: string) {
     const user = await (this.userRepository.findOne as any)({
-      where: { username },
+      where: { nombreUsuario: username },
       relations: ['persona'],
     });
 
@@ -90,7 +90,7 @@ export class AutenticacionServicio {
 
     const payload = {
       sub: user.id,
-      username: user.nombreUsuario,
+      username: user.nombreUsuario as any,
       person_id: user.personaId,
       roles: roles.map((ur) => ur.rol.codigo),
     };
@@ -99,7 +99,7 @@ export class AutenticacionServicio {
       access_token: this.jwtService.sign(payload),
       user: {
         id: user.id,
-        username: user.nombreUsuario,
+        username: user.nombreUsuario as any,
         person_id: user.personaId,
         persona: user.persona,
         roles: roles.map((ur) => ur.rol),
@@ -124,7 +124,7 @@ export class AutenticacionServicio {
 
     return {
       id: user.id,
-      username: user.nombreUsuario,
+      username: user.nombreUsuario as any,
       person_id: user.personaId,
       persona: user.persona,
       roles: roles.map((ur) => ur.rol),

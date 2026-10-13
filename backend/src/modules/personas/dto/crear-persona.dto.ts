@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Gender, MaritalStatus, BloodType, PersonStatus } from '../../../entities/persona.entity';
+import { Genero, EstadoCivil, TipoSangre, EstadoPersona } from '../../../entities/persona.entity';
 
 export class CrearPersonaDto {
   @ApiProperty({ example: '12345678' })
@@ -19,17 +19,17 @@ export class CrearPersonaDto {
   @ApiProperty({ example: 'Juan Carlos' })
   @IsString()
   @MaxLength(100)
-  names: string;
+  nombres: string;
 
   @ApiProperty({ example: 'Perez' })
   @IsString()
   @MaxLength(50)
-  lastname_paternal: string;
+  apellidoPaterno: string;
 
   @ApiProperty({ example: 'Gomez' })
   @IsString()
   @MaxLength(50)
-  lastname_maternal: string;
+  apellidoMaterno: string;
 
   @ApiProperty({ example: '1995-03-15' })
   @IsDateString()
@@ -45,16 +45,16 @@ export class CrearPersonaDto {
   @IsString()
   @IsOptional()
   @MaxLength(100)
-  birthplace_other?: string;
+  lugarNacimientoOtro?: string;
 
-  @ApiProperty({ enum: Gender })
-  @IsEnum(Gender)
-  genero: Gender;
+  @ApiProperty({ enum: Genero })
+  @IsEnum(Genero)
+  genero: Genero;
 
-  @ApiPropertyOptional({ enum: MaritalStatus })
-  @IsEnum(MaritalStatus)
+  @ApiPropertyOptional({ enum: EstadoCivil })
+  @IsEnum(EstadoCivil)
   @IsOptional()
-  marital_status?: MaritalStatus;
+  estadoCivil?: EstadoCivil;
 
   @ApiPropertyOptional({ example: 'Boliviana' })
   @IsString()
@@ -66,42 +66,42 @@ export class CrearPersonaDto {
   @IsString()
   @IsOptional()
   @MaxLength(100)
-  nationality_other?: string;
+  nacionalidadOtra?: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MaxLength(50)
-  dual_nationality?: string;
+  dobleNacionalidad?: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MaxLength(30)
-  passport_number?: string;
+  numeroPasaporte?: string;
 
-  @ApiPropertyOptional({ enum: BloodType })
-  @IsEnum(BloodType)
+  @ApiPropertyOptional({ enum: TipoSangre })
+  @IsEnum(TipoSangre)
   @IsOptional()
-  blood_type?: BloodType;
+  tipoSangre?: TipoSangre;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MaxLength(100)
-  disability?: string;
+  discapacidad?: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MaxLength(30)
-  military_book_number?: string;
+  numeroLibretaMilitar?: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MaxLength(50)
-  mother_tongue?: string;
+  lenguaMaterna?: string;
 
   @ApiPropertyOptional({ example: '71234567' })
   @IsString()
@@ -127,8 +127,8 @@ export class CrearPersonaDto {
   @MaxLength(255)
   fotoUrl?: string;
 
-  @ApiPropertyOptional({ enum: PersonStatus })
-  @IsEnum(PersonStatus)
+  @ApiPropertyOptional({ enum: EstadoPersona })
+  @IsEnum(EstadoPersona)
   @IsOptional()
-  estado?: PersonStatus;
+  estado?: EstadoPersona;
 }

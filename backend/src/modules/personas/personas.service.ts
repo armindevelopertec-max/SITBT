@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Persona, PersonStatus } from '../../entities/persona.entity';
+import { Persona, EstadoPersona } from '../../entities/persona.entity';
 import { CrearPersonaDto } from './dto/crear-persona.dto';
 import { ActualizarPersonaDto } from './dto/actualizar-persona.dto';
 
@@ -27,7 +27,7 @@ export class ServicioPersonas {
   async findAll(
     page = 1,
     limit = 20,
-    status?: PersonStatus,
+    status?: EstadoPersona,
   ): Promise<{ data: Persona[]; total: number; page: number; limit: number }> {
     const query = this.personaRepository.createQueryBuilder('person');
 
@@ -88,7 +88,7 @@ export class ServicioPersonas {
 
   async findActive(): Promise<Persona[]> {
     return this.personaRepository.find({
-      where: { estado: PersonStatus.ACTIVO },
+      where: { estado: EstadoPersona.ACTIVO },
       order: { apellidoPaterno: 'ASC' },
     });
   }

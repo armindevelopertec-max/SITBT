@@ -50,7 +50,8 @@ export class GestionesService {
       await this.createPeriodosForGestion(queryRunner.manager, savedGestion, crearGestionDto.tipoPeriodo || TipoPeriodo.SEMESTRAL);
 
       await queryRunner.commitTransaction();
-      return this.findOne(savedGestion[0].id);
+      const gestionGuardada = Array.isArray(savedGestion) ? savedGestion[0] : savedGestion;
+      return this.findOne(gestionGuardada.id);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
