@@ -7,11 +7,11 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${backendUrl}/:path*`,
+        destination: `${backendUrl}/api/:path*`,
       },
       {
         source: '/auth/:path*',
-        destination: `${backendUrl}/:path*`,
+        destination: `${backendUrl}/api/:path*`,
       },
       {
         source: '/storage/files/:path*',
