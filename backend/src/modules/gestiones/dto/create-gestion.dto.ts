@@ -6,8 +6,8 @@ import {
   MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { EstadoGestion } from '../../../entities/enums/gestion-status.enum';
-import { TipoPeriodo } from '../../../entities/enums/period-type.enum';
+import { EstadoGestion } from '../../../entities/enums/estado-gestion.enum';
+import { TipoPeriodo } from '../../../entities/enums/tipo-periodo.enum';
 
 export class CrearGestionDto {
   @ApiProperty({ example: '2025' })

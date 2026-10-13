@@ -2,11 +2,11 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Gestion } from '../../entities/gestion.entity';
-import { EstadoGestion } from '../../entities/enums/gestion-status.enum';
-import { TipoPeriodo } from '../../entities/enums/period-type.enum';
+import { EstadoGestion } from '../../entities/enums/estado-gestion.enum';
+import { TipoPeriodo } from '../../entities/enums/tipo-periodo.enum';
 import { Periodo } from '../../entities/periodo.entity';
 import { CrearGestionDto } from './dto/create-gestion.dto';
-import { UpdateGestionDto } from './dto/update-gestion.dto';
+import { ActualizarGestionDto } from './dto/update-gestion.dto';
 import { CreatePeriodoDto, UpdatePeriodoDto } from './dto/periodo.dto';
 
 @Injectable()
@@ -26,31 +26,31 @@ export class GestionesService {
 
     try {
       const existing = await this.gestionRepository.findOne({
-        where: { anio: createGestionDto.anio },
+        where: { anio: crearGestionDto.anio },
       });
 
       if (existing) {
-        throw new BadRequestException(`La gestión ${createGestionDto.anio} ya existe`);
+        throw new BadRequestException(`La gestión ${crearGestionDto.anio} ya existe`);
       }
 
-      if (createGestionDto.esActual) {
+      if (crearGestionDto.esActual) {
         await this.clearCurrentGestion();
       }
 
       const gestion = this.gestionRepository.create({
-        year: createGestionDto.anio,
-        period_type: createGestionDto.tipoPeriodo || TipoPeriodo.SEMESTRAL,
-        status: createGestionDto.estado || EstadoGestion.PENDIENTE,
-        is_current: createGestionDto.esActual || false,
-        notes: createGestionDto.notas,
+        anio: crearGestionDto.anio,
+        tipoPeriodo: crearGestionDto.tipoPeriodo || TipoPeriodo.SEMESTRAL,
+        estado: crearGestionDto.estado || EstadoGestion.PENDIENTE,
+        esActual: crearGestionDto.esActual || false,
+        notas: crearGestionDto.notas,
       });
 
       const savedGestion = await queryRunner.manager.save(gestion);
 
-      await this.createPeriodosForGestion(queryRunner.manager, savedGestion, createGestionDto.tipoPeriodo || TipoPeriodo.SEMESTRAL);
+      await this.createPeriodosForGestion(queryRunner.manager, savedGestion, crearGestionDto.tipoPeriodo || TipoPeriodo.SEMESTRAL);
 
       await queryRunner.commitTransaction();
-      return this.findOne(savedGestion.id);
+      return this.findOne(savedGestion[0].id);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -71,20 +71,20 @@ export class GestionesService {
       case TipoPeriodo.SEMESTRAL:
         periodos.push(
           {
-            gestion_id: gestion.id,
-            number: 'I',
-            name: 'Primer Semestre',
-            start_date: new Date(year, 1, 20),
-            end_date: new Date(year, 6, 10),
-            status: EstadoGestion.PENDIENTE,
+            gestionId: gestion.id,
+            numero: 'I',
+            nombre: 'Primer Semestre',
+            fechaInicio: new Date(year, 1, 20),
+            fechaFin: new Date(year, 6, 10),
+            estado: EstadoGestion.PENDIENTE,
           },
           {
-            gestion_id: gestion.id,
-            number: 'II',
-            name: 'Segundo Semestre',
-            start_date: new Date(year, 6, 20),
-            end_date: new Date(year, 11, 11),
-            status: EstadoGestion.PENDIENTE,
+            gestionId: gestion.id,
+            numero: 'II',
+            nombre: 'Segundo Semestre',
+            fechaInicio: new Date(year, 6, 20),
+            fechaFin: new Date(year, 11, 11),
+            estado: EstadoGestion.PENDIENTE,
           },
         );
         break;
@@ -103,7 +103,7 @@ export class GestionesService {
     const query = this.gestionRepository.createQueryBuilder('gestion');
 
     if (status) {
-      query.andWhere('gestion.estado = :status', { status });
+      query.andWhere('gestion.estado = :status', { estado: status });
     }
 
     query.orderBy('gestion.anio', 'DESC');
@@ -126,13 +126,13 @@ export class GestionesService {
     return gestion;
   }
 
-  async findByYear(year: string): Promise<Gestion> {
+  async findByAnio(anio: string): Promise<Gestion> {
     const gestion = await this.gestionRepository.findOne({
-      where: { year },
+      where: { anio },
       relations: ['periodos'],
     });
     if (!gestion) {
-      throw new NotFoundException(`Gestión ${year} no encontrada`);
+      throw new NotFoundException(`Gestión ${anio} no encontrada`);
     }
     return gestion;
   }
@@ -141,7 +141,7 @@ export class GestionesService {
     return this.gestionRepository.find({
       where: { estado: EstadoGestion.ABIERTA },
       relations: ['periodos'],
-      order: { year: 'DESC' },
+      order: { anio: 'DESC' },
     });
   }
 
@@ -153,7 +153,7 @@ export class GestionesService {
     return gestion;
   }
 
-  async update(id: number, updateGestionDto: UpdateGestionDto): Promise<Gestion> {
+  async update(id: number, updateGestionDto: ActualizarGestionDto): Promise<Gestion> {
     const gestion = await this.findOne(id);
 
     if (updateGestionDto.anio && updateGestionDto.anio !== gestion.anio) {
@@ -175,7 +175,7 @@ export class GestionesService {
 
   async remove(id: number): Promise<void> {
     const gestion = await this.findOne(id);
-    await this.periodoRepository.delete({ gestion_id: id });
+    await this.periodoRepository.delete({ gestionId: id });
     await this.gestionRepository.remove(gestion);
   }
 
@@ -206,8 +206,8 @@ export class GestionesService {
 
   private async clearCurrentGestion(): Promise<void> {
     await this.gestionRepository.update(
-      { is_current: true },
-      { is_current: false },
+      { esActual: true },
+      { esActual: false },
     );
   }
 
@@ -215,7 +215,7 @@ export class GestionesService {
     const gestion = await this.findOne(gestionId);
     const periodo = this.periodoRepository.create({
       ...createPeriodoDto,
-      gestion_id: gestion.id,
+      gestionId: gestion.id,
     });
     return this.periodoRepository.save(periodo);
   }
@@ -247,8 +247,8 @@ export class GestionesService {
     }
 
     await this.periodoRepository.update(
-      { gestion_id: periodo.gestionId, status: EstadoGestion.ABIERTA },
-      { status: EstadoGestion.CERRADA },
+      { gestionId: periodo.gestionId, estado: EstadoGestion.ABIERTA },
+      { estado: EstadoGestion.CERRADA },
     );
 
     periodo.estado = EstadoGestion.ABIERTA;

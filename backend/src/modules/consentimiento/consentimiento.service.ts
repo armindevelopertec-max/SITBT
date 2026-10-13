@@ -31,7 +31,7 @@ export class ServicioConsentimiento {
       .leftJoinAndSelect('estudiante.person', 'person');
 
     if (estudianteId) {
-      query.andWhere('consent.estudiante_id = :estudianteId', { estudianteId });
+      query.andWhere('consent.estudiante_id = :estudianteId', { estudianteId: undefined });
     }
 
     const [data, total] = await query
@@ -79,7 +79,7 @@ export class ServicioConsentimiento {
     consent.derechoEjercido = derecho;
     consent.derechoFecha = new Date();
     if (registradoPor) {
-      consent.registered_by = registradoPor;
+      consent.registradoPor = registradoPor;
     }
     return this.consentimientoRepository.save(consent);
   }
@@ -87,7 +87,7 @@ export class ServicioConsentimiento {
   async hasValidConsent(estudianteId: number, versionPolitica: string): Promise<boolean> {
     const consent = await this.consentimientoRepository.findOne({
       where: {
-        student_id: estudianteId,
+        estudianteId: estudianteId,
         versionPolitica,
       },
     });

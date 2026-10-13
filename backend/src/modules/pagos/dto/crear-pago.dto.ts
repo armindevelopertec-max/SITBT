@@ -30,7 +30,7 @@ export class CrearPagoDto {
 
   @ApiProperty({ example: '2024-06-15' })
   @IsDateString()
-  fechaPago: string;
+  fechaPago: Date;
 
   @ApiProperty({ enum: MetodoPago })
   @IsEnum(MetodoPago)

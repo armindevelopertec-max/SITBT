@@ -53,14 +53,14 @@ export class Persona {
   @Column({ type: 'varchar', length: 50, name: 'apellido_materno' })
   apellidoMaterno: string;
 
-  @Column({ type: 'fecha', name: 'fecha_nacimiento' })
+  @Column({ type: 'date', name: 'fecha_nacimiento' })
   fechaNacimiento: Date;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'lugar_nacimiento' })
   lugarNacimiento: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'lugar_nacimiento_otro' })
-  lugarNacimiento_other: string;
+  lugarNacimientoOtro: string;
 
   @Column({ type: 'enum', enum: Gender, name: 'genero' })
   genero: Gender;
@@ -72,7 +72,7 @@ export class Persona {
   nacionalidad: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'nacionalidadOtra' })
-  nacionalidad_other: string;
+  nacionalidadOtra: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'dobleNacionalidad' })
   dual_nacionalidad: string;

@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Gestion } from './gestion.entity';
-import { EstadoGestion } from './enums/gestion-estado.enum';
+import { EstadoGestion } from './enums/estado-gestion.enum';
 
 @Entity('periodos')
 export class Periodo {
@@ -28,17 +28,16 @@ export class Periodo {
   @Column({ type: 'varchar', length: 50, nullable: true , name: 'nombre' })
   nombre: string;
 
-  @Column({ type: 'fecha', name: 'fecha_inicio' })
+  @Column({ type: 'date', name: 'fecha_inicio' })
   fechaInicio: Date;
 
-  @Column({ type: 'fecha', name: 'fecha_fin' })
+  @Column({ type: 'date', name: 'fecha_fin' })
   fechaFin: Date;
 
-  @Column({
-    tipo: 'enum',
+  @Column('enum', {
     enum: EstadoGestion,
     default: EstadoGestion.PENDIENTE,
-    nombre: 'estado',
+    name: 'estado',
   })
   estado: EstadoGestion;
 

@@ -23,12 +23,12 @@ export class AutenticacionServicio {
   ) {}
 
   async register(data: {
-    username: string;
+    nombreUsuario: string;
     password: string;
-    person_id: number;
+    personaId: number;
   }) {
-    const existingUser = await this.userRepository.findOne({
-      where: { username: data.nombreUsuario },
+    const existingUser = await (this.userRepository.findOne as any)({
+      where: { nombreUsuario: data.nombreUsuario } as any,
     });
 
     if (existingUser) {
@@ -38,10 +38,10 @@ export class AutenticacionServicio {
     const passwordHash = await bcrypt.hash(data.password, 10);
 
     const user = this.userRepository.create({
-      username: data.nombreUsuario,
-      password_hash: passwordHash,
-      person_id: data.personaId,
-    });
+      nombreUsuario: data.nombreUsuario,
+      contrasenaHash: passwordHash,
+      personaId: data.personaId,
+    } as any);
 
     await this.userRepository.save(user);
 
@@ -51,17 +51,17 @@ export class AutenticacionServicio {
 
     if (defaultRole) {
       const userRole = this.userRoleRepository.create({
-        user_id: user.id,
-        role_id: defaultRole.id,
+        usuarioId: (user as any).id,
+        rolId: defaultRole.id,
       });
       await this.userRoleRepository.save(userRole);
     }
 
-    return { message: 'Usuario registrado exitosamente', user_id: user.id };
+    return { message: 'Usuario registrado exitosamente', usuarioId: (user as any).id };
   }
 
   async login(username: string, password: string) {
-    const user = await this.userRepository.findOne({
+    const user = await (this.userRepository.findOne as any)({
       where: { username },
       relations: ['persona'],
     });
@@ -108,7 +108,7 @@ export class AutenticacionServicio {
   }
 
   async getProfile(userId: number) {
-    const user = await this.userRepository.findOne({
+    const user = await (this.userRepository.findOne as any)({
       where: { id: userId },
       relations: ['persona'],
     });
@@ -132,7 +132,7 @@ export class AutenticacionServicio {
   }
 
   async validateUser(userId: number): Promise<Usuario> {
-    const user = await this.userRepository.findOne({
+    const user = await (this.userRepository.findOne as any)({
       where: { id: userId },
     });
     if (!user || user.estado !== 'activo') {

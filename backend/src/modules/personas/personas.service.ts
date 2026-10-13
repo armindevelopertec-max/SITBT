@@ -32,7 +32,7 @@ export class ServicioPersonas {
     const query = this.personaRepository.createQueryBuilder('person');
 
     if (status) {
-      query.where('person.estado = :status', { status });
+      query.where('person.estado = :status', { estado: status });
     }
 
     const [data, total] = await query

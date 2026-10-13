@@ -27,7 +27,7 @@ export class DocumentoEstudiante {
   @Column({ type: 'boolean', default: false })
   delivered: boolean;
 
-  @Column({ type: 'fecha', nullable: true, name: 'delivered_date' })
+  @Column({ type: 'date', nullable: true, name: 'delivered_date' })
   delivered_fecha: Date;
 
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'file_url' })

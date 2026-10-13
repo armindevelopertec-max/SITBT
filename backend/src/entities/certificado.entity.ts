@@ -24,7 +24,7 @@ export class Certificado {
   @Column({ type: 'varchar', length: 50 , name: 'tipo' })
   tipo: string;
 
-  @Column({ type: 'fecha', name: 'fecha' })
+  @Column({ type: 'date', name: 'fecha' })
   fecha: Date;
 
   @Column({ type: 'varchar', length: 30, unique: true, name: 'codigo' })

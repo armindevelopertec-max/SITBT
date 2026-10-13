@@ -9,7 +9,7 @@ import { SolicitudAdmision, EstadoAdmision } from '../../entities/admission-requ
 import { CrearAdmisionDto } from './dto/crear-admision.dto';
 import { ActualizarAdmisionDto } from './dto/actualizar-admision.dto';
 import { Persona, Gender } from '../../entities/persona.entity';
-import { Estudiante, StudentMatriculaStatus, StudentOrigin } from '../../entities/estudiante.entity';
+import { Estudiante, EstadoMatriculaEstudiante, OrigenEstudiante } from '../../entities/estudiante.entity';
 import { Inscripcion } from '../../entities/inscripcion.entity';
 import { PlanEstudio } from '../../entities/plan-estudio.entity';
 import { Carrera } from '../../entities/carrera.entity';
@@ -29,13 +29,13 @@ export class ServicioAdmision {
   ) {}
 
   async create(createDto: CrearAdmisionDto): Promise<SolicitudAdmision> {
-    const { names, lastname_paternal, lastname_maternal, ...rest } = createDto as any;
+    const { names, apellidoPaterno, apellidoMaterno, ...rest } = createDto as any;
 
     const existingStudent = await this.estudianteRepository
       .createQueryBuilder('student')
       .innerJoin('student.persona', 'person')
       .where('person.ci = :ci', { ci: createDto.ci })
-      .andWhere('student.estado = :status', { status: 'activo' })
+      .andWhere('student.estado = :status', { estado: 'activo' })
       .getOne();
 
     if (existingStudent) {
@@ -47,7 +47,7 @@ export class ServicioAdmision {
         .createQueryBuilder('person')
         .innerJoin('person.estudiantes', 'student')
         .where('person.correo = :email', { email: createDto.correo })
-        .andWhere('student.estado = :status', { status: 'activo' })
+        .andWhere('student.estado = :status', { estado: 'activo' })
         .getOne();
       if (existingEmail) {
         throw new BadRequestException('Ya existe un estudiante activo con este correo electrónico');
@@ -59,7 +59,7 @@ export class ServicioAdmision {
         .createQueryBuilder('person')
         .innerJoin('person.estudiantes', 'student')
         .where('person.telefono = :phone', { phone: createDto.telefono })
-        .andWhere('student.estado = :status', { status: 'activo' })
+        .andWhere('student.estado = :status', { estado: 'activo' })
         .getOne();
       if (existingPhone) {
         throw new BadRequestException('Ya existe un estudiante activo con este número de celular');
@@ -69,11 +69,11 @@ export class ServicioAdmision {
     const request = this.admissionRepository.create({
       ...rest,
       nombre: names,
-      apellido_paterno: lastname_paternal,
-      apellido_materno: lastname_maternal,
-      birthdate: new Date(createDto.fechaNacimiento),
+      apellido_paterno: apellidoPaterno,
+      apellido_materno: apellidoMaterno,
+      fechaNacimiento: new Date(createDto.fechaNacimiento),
     } as Partial<SolicitudAdmision>);
-    return this.admissionRepository.save(request);
+    return this.admissionRepository.save(request as any) as any;
   }
 
   async findAll(
@@ -87,7 +87,7 @@ export class ServicioAdmision {
       .leftJoinAndSelect('request.carrera', 'carrera');
 
     if (estado) {
-      query.andWhere('request.estado = :estado', { estado });
+      query.andWhere('request.estado = :estado', { estado: status });
     }
 
     if (origen) {
@@ -95,7 +95,7 @@ export class ServicioAdmision {
     }
 
     const [data, total] = await query
-      .orderBy('request.created_at', 'DESC')
+      .orderBy('request.creadoEn', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -124,13 +124,13 @@ export class ServicioAdmision {
     }
 
     Object.assign(request, updateDto);
-    return this.admissionRepository.save(request);
+    return this.admissionRepository.save(request as any) as any;
   }
 
   async verify(id: string, verificadoPor: number, observaciones?: string): Promise<SolicitudAdmision> {
     return this.update(id, {
       estado: EstadoAdmision.VERIFICADO,
-      verificado_por: verificadoPor,
+      verificadoPor: verificadoPor,
       observaciones,
     } as ActualizarAdmisionDto);
   }
@@ -141,7 +141,7 @@ export class ServicioAdmision {
     }
     return this.update(id, {
       estado: EstadoAdmision.RECHAZADO,
-      verificado_por: verificadoPor,
+      verificadoPor: verificadoPor,
       observaciones,
     } as ActualizarAdmisionDto);
   }
@@ -162,7 +162,7 @@ export class ServicioAdmision {
     }
 
     const existingStudent = await this.estudianteRepository.findOne({
-      where: { admission_request_id: id }
+      where: { solicitudAdmisionId: id }
     });
     if (existingStudent) {
       throw new BadRequestException('Ya existe un estudiante creado para esta solicitud');
@@ -173,7 +173,7 @@ export class ServicioAdmision {
         .createQueryBuilder('person')
         .innerJoin('person.estudiantes', 'student')
         .where('person.correo = :email', { email: request.correo })
-        .andWhere('student.estado = :status', { status: 'activo' })
+        .andWhere('student.estado = :status', { estado: 'activo' })
         .getOne();
       if (existingEmail) {
         throw new BadRequestException('Ya existe un estudiante activo con este correo electrónico');
@@ -185,7 +185,7 @@ export class ServicioAdmision {
         .createQueryBuilder('person')
         .innerJoin('person.estudiantes', 'student')
         .where('person.telefono = :phone', { phone: request.telefono })
-        .andWhere('student.estado = :status', { status: 'activo' })
+        .andWhere('student.estado = :status', { estado: 'activo' })
         .getOne();
       if (existingPhone) {
         throw new BadRequestException('Ya existe un estudiante activo con este número de celular');
@@ -199,7 +199,7 @@ export class ServicioAdmision {
       .innerJoin('student.persona', 'person')
       .where('person.ci = :ci', { ci: request.ci })
       .andWhere('student.carreraId = :careerId', { careerId: request.carreraId })
-      .andWhere('student.estado = :status', { status: 'activo' })
+      .andWhere('student.estado = :status', { estado: 'activo' })
       .getOne();
 
     if (existingStudentInCareer) {
@@ -207,29 +207,30 @@ export class ServicioAdmision {
     }
 
     if (!persona) {
-      const finalBirthplace = request.lugarNacimiento === 'Otra' && request.birthplace_other ? request.birthplace_other : request.lugarNacimiento;
-      const finalNationality = request.nacionalidad === 'Otra' && request.nationality_other ? request.nationality_other : request.nacionalidad;
+      const finalBirthplace = request.lugarNacimiento === 'Otra' && request.lugarNacimientoOther ? request.lugarNacimientoOther : request.lugarNacimiento;
+      const finalNationality = request.nacionalidad === 'Otra' && request.nacionalidadOther ? request.nacionalidadOther : request.nacionalidad;
 
-      persona = this.personaRepository.create({
+      persona = (this.personaRepository.create as any)({
         ci: request.ci,
-        names: request.nombre,
-        lastname_paternal: request.lastname_paternal || request.nombre.split(' ')[0] || request.nombre,
-        lastname_maternal: request.lastname_maternal || request.nombre.split(' ').slice(1).join(' ') || '',
-        birthdate: new Date(request.fechaNacimiento),
-        birthplace: finalBirthplace,
-        gender: request.genero as Gender,
-        marital_status: request.estadoCivil as any,
+        nombres: request.nombre,
+        apellidoPaterno: (request as any).apellidoPaterno || request.nombre.split(' ')[0] || request.nombre,
+        apellidoMaterno: request.apellidoMaterno || request.nombre.split(' ').slice(1).join(' ') || '',
+        fechaNacimiento: new Date(request.fechaNacimiento),
+        lugarNacimiento: finalBirthplace,
+        genero: request.genero as any,
+        estadoCivil: request.marital_status as any,
         nationality: finalNationality,
         phone: request.telefono,
         email: request.correo,
         address: request.direccion,
-      });
-      persona = (await this.personaRepository.save(persona)) as Persona;
+      } as any);
+      const saved = await (this.personaRepository.save as any)(persona as any);
+      persona = (Array.isArray(saved) ? saved[0] : saved) as Persona;
     }
 
     const studyPlan = await this.estudianteRepository.manager.findOne(
       PlanEstudio,
-      { where: { carreraId: request.carreraId, status: 'vigente' as any } }
+      { where: { carreraId: request.carreraId, estado: 'vigente' as any } }
     );
 
     if (!studyPlan) {
@@ -239,23 +240,23 @@ export class ServicioAdmision {
     const inscriptionCode = await this.generateInscriptionCode(request);
 
     const estudianteData: DeepPartial<Estudiante> = {
-      person_id: persona.id,
-      bachelor_title_number: undefined,
-      bachelor_title_date: undefined,
-      admission_gestion: admissionGestion,
-      folder_number: undefined,
-      inscription_code: inscriptionCode,
-      form01_code: undefined,
-      career_id: request.carreraId,
-      study_plan_id: studyPlan.id,
-      admission_date: new Date(),
-      status: 'activo' as any,
-      estado_matricula: StudentMatriculaStatus.MATRICULADO,
-      origen: request.origen === 'web' ? StudentOrigin.WEB : StudentOrigin.SECRETARIA,
-      admission_request_id: request.id,
-      verificado_por: request.verificado_por || undefined,
-      fecha_verificacion: new Date(),
-      fecha_pre_registro: request.created_at,
+      personaId: persona.id,
+      numeroTituloBachiller: undefined,
+      fechaTituloBachiller: undefined,
+      gestionAdmision: admissionGestion,
+      numeroFolder: undefined,
+      codigoInscripcion: inscriptionCode,
+      codigoFormulario01: undefined,
+      carreraId: request.carreraId,
+      planEstudioId: studyPlan.id,
+      fechaAdmision: new Date(),
+      estado: 'activo' as any,
+      estadoMatricula: EstadoMatriculaEstudiante.MATRICULADO,
+      origen: request.origen === 'web' ? OrigenEstudiante.WEB : OrigenEstudiante.SECRETARIA,
+      solicitudAdmisionId: request.id,
+      verificadoPor: request.verificado_por || undefined,
+      fechaVerificacion: new Date(),
+      fechaPreRegistro: request.creadoEn,
     };
 
     const estudiante = this.estudianteRepository.create(estudianteData);
@@ -263,7 +264,7 @@ export class ServicioAdmision {
     const savedStudent = (await this.estudianteRepository.save(estudiante)) as Estudiante;
 
     request.estado = EstadoAdmision.CONVERTIDO;
-    request.estudianteConvertidoId = savedStudent.id;
+    request.converted_estudianteId = savedStudent.id;
     await this.admissionRepository.save(request);
 
     return { student: savedStudent, persona };
@@ -283,8 +284,8 @@ export class ServicioAdmision {
     const yearSuffix = gestion.slice(-2);
 
     const initials = (
-      (request.lastname_paternal?.[0] || '') +
-      (request.lastname_maternal?.[0] || '') +
+      (request.apellidoPaterno?.[0] || '') +
+      (request.apellidoMaterno?.[0] || '') +
       (request.nombre?.[0] || '')
     ).toUpperCase();
 
@@ -295,7 +296,7 @@ export class ServicioAdmision {
     let code = `${initials}-${careerCode}${yearSuffix}${ciLast2}`;
 
     let counter = 1;
-    while (await this.estudianteRepository.findOne({ where: { inscription_code: code } })) {
+    while (await this.estudianteRepository.findOne({ where: { codigoInscripcion: code } })) {
       code = `${initials}-${careerCode}${yearSuffix}${ciLast2}-${counter}`;
       counter++;
     }

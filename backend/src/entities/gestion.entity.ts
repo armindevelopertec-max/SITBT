@@ -7,8 +7,8 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Periodo } from './periodo.entity';
-import { EstadoGestion } from './enums/gestion-estado.enum';
-import { TipoPeriodo } from './enums/period-tipo.enum';
+import { EstadoGestion } from './enums/estado-gestion.enum';
+import { TipoPeriodo } from './enums/tipo-periodo.enum';
 
 @Entity('gestiones')
 export class Gestion {
@@ -21,11 +21,10 @@ export class Gestion {
   @Column({ type: 'enum', enum: TipoPeriodo, default: TipoPeriodo.SEMESTRAL, name: 'tipo_periodo' })
   tipoPeriodo: TipoPeriodo;
 
-  @Column({
-    tipo: 'enum',
+  @Column('enum', {
     enum: EstadoGestion,
     default: EstadoGestion.PENDIENTE,
-    nombre: 'estado',
+    name: 'estado',
   })
   estado: EstadoGestion;
 

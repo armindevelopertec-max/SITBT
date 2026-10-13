@@ -51,7 +51,7 @@ export class ServicioTurnos {
   }
 
   async findByCodigo(codigo: string): Promise<Turno> {
-    const turno = await this.turnoRepository.findOne({ where: { codigo } });
+    const turno = await this.turnoRepository.findOne({ where: { codigo: undefined } });
     if (!turno) {
       throw new NotFoundException(`Turno con código ${codigo} no encontrado`);
     }

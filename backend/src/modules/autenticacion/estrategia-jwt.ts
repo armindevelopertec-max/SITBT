@@ -26,14 +26,14 @@ export class EstrategiaJwt extends PassportStrategy(Strategy) {
       relations: ['persona'],
     });
 
-    if (!user || user.status !== 'activo') {
+    if (!user || user.estado !== 'activo') {
       throw new UnauthorizedException('Usuario no válido');
     }
 
     return {
       id: user.id,
-      username: user.username,
-      person_id: user.person_id,
+      username: user.nombreUsuario,
+      person_id: user.personaId,
     };
   }
 }

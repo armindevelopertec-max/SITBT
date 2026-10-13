@@ -54,10 +54,10 @@ export class Credencial {
   @Column({ type: 'integer', name: 'semestre' })
   semestre: number;
 
-  @Column({ type: 'fecha', name: 'fechaEmision' })
+  @Column({ type: 'date', name: 'fechaEmision' })
   fechaEmision: Date;
 
-  @Column({ type: 'fecha', name: 'validoHasta' })
+  @Column({ type: 'date', name: 'validoHasta' })
   validoHasta: Date;
 
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'foto_url' })

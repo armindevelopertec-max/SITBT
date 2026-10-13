@@ -15,7 +15,7 @@ import { ServicioEstudiantes } from './estudiantes.service';
 import { CrearEstudianteDto } from './dto/crear-estudiante.dto';
 import { ActualizarEstudianteDto } from './dto/actualizar-estudiante.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
-import { StudentStatus } from '../../entities/estudiante.entity';
+import { EstadoEstudiante } from '../../entities/estudiante.entity';
 
 @ApiTags('Estudiantes')
 @Controller('estudiantes')
@@ -33,7 +33,7 @@ export class ControladorEstudiantes {
   findAll(
     @Query('page') page = 1,
     @Query('limit') limit = 20,
-    @Query('status') status?: StudentStatus,
+    @Query('status') status?: EstadoEstudiante,
     @Query('careerId') careerId?: number,
   ) {
     return this.studentsService.findAll(+page, +limit, status, careerId ? +careerId : undefined);

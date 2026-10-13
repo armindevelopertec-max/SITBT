@@ -35,7 +35,7 @@ export class ServicioGrupos {
     limit = 20,
     gestion?: string,
     careerId?: number,
-    semester?: number,
+    semestre?: number,
   ): Promise<{ data: Grupo[]; total: number; page: number; limit: number }> {
     const query = this.grupoRepository
       .createQueryBuilder('group')
@@ -52,8 +52,8 @@ export class ServicioGrupos {
       query.andWhere('group.carreraId = :careerId', { careerId });
     }
 
-    if (semester) {
-      query.andWhere('group.semestre = :semester', { semester });
+    if (semestre) {
+      query.andWhere('group.semestre = :semestre', { semestre: semestre });
     }
 
     const [data, total] = await query
@@ -91,15 +91,15 @@ export class ServicioGrupos {
 
   async addStudent(groupId: number, studentId: number): Promise<GrupoEstudiante> {
     const groupStudent = this.grupoEstudianteRepository.create({
-      group_id: groupId,
-      student_id: studentId,
+      grupoId: groupId,
+      estudianteId: studentId,
     });
     return this.grupoEstudianteRepository.save(groupStudent);
   }
 
   async removeStudent(groupId: number, studentId: number): Promise<void> {
     const groupStudent = await this.grupoEstudianteRepository.findOne({
-      where: { grupoId: groupId, student_id: studentId },
+      where: { grupoId: groupId, estudianteId: studentId },
     });
     if (groupStudent) {
       await this.grupoEstudianteRepository.remove(groupStudent);
@@ -116,12 +116,12 @@ export class ServicioGrupos {
   async findByCareerAndShift(
     careerId: number,
     gestion: string,
-    semester: number,
+    semestre: number,
     shiftId: number,
     periodo?: string,
   ): Promise<Grupo[]> {
     return this.grupoRepository.find({
-      where: { carreraId: careerId, gestion, semester, shift_id: shiftId, periodo },
+      where: { carreraId: careerId, gestion, semestre, turnoId: shiftId, periodo },
       relations: ['turno'],
     });
   }
@@ -136,11 +136,11 @@ export class ServicioGrupos {
 
   async generateGroups(dto: GenerarGruposDto): Promise<{ created: number; message: string }> {
     try {
-      const { gestion, periodo, shift_ids, parallels, study_plan_id } = dto;
+      const { gestion, periodo, turnoIds, paralelos, planEstudioId } = dto;
       const capacidad = parseInt(dto.capacidad || '30');
 
       const plan = await this.planEstudioRepository.findOne({
-        where: { id: study_plan_id },
+        where: { id: planEstudioId },
         relations: ['carrera'],
       });
 
@@ -151,7 +151,7 @@ export class ServicioGrupos {
       const materias = await this.materiaPlanRepository
         .createQueryBuilder('mp')
         .leftJoinAndSelect('mp.materia', 'materia')
-        .where('mp.planEstudioId = :studyPlanId', { studyPlanId: study_plan_id })
+        .where('mp.planEstudioId = :studyPlanId', { studyPlanId: planEstudioId })
         .orderBy('mp.semestre', 'ASC')
         .addOrderBy('materia.codigo', 'ASC')
         .getMany();
@@ -163,14 +163,14 @@ export class ServicioGrupos {
       const gruposCreados: Grupo[] = [];
 
       for (const materia of materias) {
-        for (const shiftId of shift_ids) {
-          for (const paralelo of parallels) {
+        for (const shiftId of turnoIds) {
+          for (const paralelo of paralelos) {
             const existe = await this.grupoRepository.findOne({
               where: {
-                study_plan_id: materia.planEstudioId,
-                subject_id: materia.materiaId,
-                shift_id: shiftId,
-                parallel: paralelo,
+                planEstudioId: materia.planEstudioId,
+                materiaId: materia.materiaId,
+                turnoId: shiftId,
+                paralelo: paralelo,
                 gestion,
                 periodo,
               },
@@ -185,18 +185,18 @@ export class ServicioGrupos {
               const code = `${materiaCode}-${carreraCode}-${shiftCode}-${paralelo}-${gestion}-${periodo}`;
 
               const grupo = this.grupoRepository.create({
-                code,
-                career_id: plan.carreraId,
-                study_plan_id: materia.planEstudioId,
-                subject_id: materia.materiaId,
-                semester: materia.semestre,
-                shift_id: shiftId,
-                parallel: paralelo,
+                codigo: code,
+                carreraId: plan.carreraId,
+                planEstudioId: materia.planEstudioId,
+                materiaId: materia.materiaId,
+                semestre: materia.semestre,
+                turnoId: shiftId,
+                paralelo: paralelo,
                 gestion,
                 periodo,
-                capacity: capacidad,
-              });
-              const saved = await this.grupoRepository.save(grupo);
+                capacidad: capacidad,
+              } as any);
+              const saved = await this.grupoRepository.save(grupo as any);
               gruposCreados.push(saved);
             }
           }

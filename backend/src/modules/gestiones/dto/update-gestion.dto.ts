@@ -1,4 +1,10 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateGestionDto } from './create-gestion.dto';
+import { CrearGestionDto } from './create-gestion.dto';
 
-export class UpdateGestionDto extends PartialType(CreateGestionDto) {}
+export class ActualizarGestionDto extends PartialType(CrearGestionDto) {
+  anio?: string;
+  tipoPeriodo?: any;
+  estado?: any;
+  esActual?: boolean;
+  notas?: string;
+}

@@ -9,12 +9,12 @@ export class ControladorAutenticacion {
   constructor(private autenticacionServicio: AutenticacionServicio) {}
 
   @Post('login')
-  async login(@Body() body: { username: string; password: string }) {
+  async login(@Body() body: { nombreUsuario: string; password: string }) {
     return this.autenticacionServicio.login(body.nombreUsuario, body.password);
   }
 
   @Post('register')
-  async register(@Body() body: { username: string; password: string; person_id: number }) {
+  async register(@Body() body: { nombreUsuario: string; password: string; personaId: number }) {
     return this.autenticacionServicio.register(body);
   }
 

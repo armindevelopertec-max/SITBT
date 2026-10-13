@@ -62,7 +62,7 @@ export class Inscripcion {
   estado: EstadoInscripcion;
 
   @Column({ type: 'int', nullable: true, name: 'nota_final' })
-  final_grade: number;
+  notaFinal: number;
 
   @CreateDateColumn({ name: 'creado_en' })
   creadoEn: Date;

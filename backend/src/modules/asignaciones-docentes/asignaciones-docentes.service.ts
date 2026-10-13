@@ -14,7 +14,7 @@ export class ServicioAsignacionesDocentes {
 
   async create(createDto: CrearAsignacionDocenteDto): Promise<AsignacionDocente> {
     const assignment = this.assignmentRepository.create(createDto);
-    return this.assignmentRepository.save(assignment);
+    return this.assignmentRepository.save(assignment as any) as any;
   }
 
   async findAll(
@@ -35,7 +35,7 @@ export class ServicioAsignacionesDocentes {
     }
 
     if (status) {
-      query.andWhere('assignment.estado = :status', { status });
+      query.andWhere('assignment.estado = :status', { estado: status });
     }
 
     const [data, total] = await query
@@ -61,7 +61,7 @@ export class ServicioAsignacionesDocentes {
   async update(id: number, updateDto: ActualizarAsignacionDocenteDto): Promise<AsignacionDocente> {
     const assignment = await this.findOne(id);
     Object.assign(assignment, updateDto);
-    return this.assignmentRepository.save(assignment);
+    return this.assignmentRepository.save(assignment as any) as any;
   }
 
   async remove(id: number): Promise<void> {
@@ -99,7 +99,7 @@ export class ServicioAsignacionesDocentes {
 
   async findActive(gestion: string): Promise<AsignacionDocente[]> {
     return this.assignmentRepository.find({
-      where: { gestion, status: EstadoAsignacionDocente.ACTIVO },
+      where: { gestion, estado: EstadoAsignacionDocente.ACTIVO },
       relations: ['teacher', 'teacher.person', 'subject', 'group'],
       order: { creadoEn: 'DESC' },
     });

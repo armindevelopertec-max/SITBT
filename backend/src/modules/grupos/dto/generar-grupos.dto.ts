@@ -11,11 +11,11 @@ export class GenerarGruposDto {
 
   @IsArray()
   @IsNotEmpty()
-  shift_ids: number[];
+  turnoIds: number[];
 
   @IsArray()
   @IsNotEmpty()
-  parallels: string[];
+  paralelos: string[];
 
   @IsInt()
   @IsNotEmpty()

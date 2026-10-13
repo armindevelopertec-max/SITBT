@@ -32,7 +32,7 @@ export class ServicioDocumentos {
       .leftJoinAndSelect('document.gestionEntity', 'gestion');
 
     if (tipo) {
-      query.andWhere('document.tipo = :tipo', { tipo });
+      query.andWhere('document.tipo = :tipo', { tipo: tipo });
     }
 
     if (gestion) {
@@ -40,11 +40,11 @@ export class ServicioDocumentos {
     }
 
     if (estudianteId) {
-      query.andWhere('document.estudiante_id = :estudianteId', { estudianteId });
+      query.andWhere('document.estudiante_id = :estudianteId', { estudianteId: undefined });
     }
 
     if (estado) {
-      query.andWhere('document.estado = :estado', { estado });
+      query.andWhere('document.estado = :estado', { estado: estado });
     }
 
     const [data, total] = await query
@@ -70,10 +70,10 @@ export class ServicioDocumentos {
   async findByStudent(estudianteId: number, tipo?: TipoDocumento): Promise<DocumentoEmitido[]> {
     const query = this.documentoRepository
       .createQueryBuilder('document')
-      .where('document.estudiante_id = :estudianteId', { estudianteId });
+      .where('document.estudiante_id = :estudianteId', { estudianteId: undefined });
 
     if (tipo) {
-      query.andWhere('document.tipo = :tipo', { tipo });
+      query.andWhere('document.tipo = :tipo', { tipo: tipo });
     }
 
     return query.orderBy('document.fechaEmision', 'DESC').getMany();
@@ -124,7 +124,7 @@ export class ServicioDocumentos {
       tipo: TipoDocumento.BOLETA_INSCRIPCION,
       numeroDocumento,
       gestion,
-      gestion_id: gestionId,
+      gestionId: gestionId,
     });
   }
 
@@ -141,7 +141,7 @@ export class ServicioDocumentos {
       tipo: TipoDocumento.RECIBO_PAGO,
       numeroDocumento,
       gestion,
-      gestion_id: gestionId,
+      gestionId: gestionId,
       related_payment_id: paymentId,
     });
   }

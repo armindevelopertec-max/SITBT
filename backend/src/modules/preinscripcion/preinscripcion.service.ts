@@ -232,7 +232,7 @@ export class PreinscripcionService {
           materiasReprobadas.push({
             materiaId: inscripcion.materiaId,
             materiaNombre: inscripcion.materia?.nombre || 'Desconocida',
-            nota: inscripcion.final_grade || 0,
+            nota: inscripcion.notaFinal || 0,
             gestionAnterior: gestionAnterior,
           });
           totalReprobadas++;
@@ -569,10 +569,10 @@ export class PreinscripcionService {
       .leftJoinAndSelect('grupo.carrera', 'carrera')
       .where('grupo.carreraId = :carreraId', { carreraId })
       .andWhere('grupo.gestion = :gestion', { gestion })
-      .andWhere('grupo.semestre = :semestre', { semestre });
+      .andWhere('grupo.semestre = :semestre', { semestre: semestre });
 
     if (turnoId) {
-      query.andWhere('grupo.turnoId = :turnoId', { turnoId });
+      query.andWhere('grupo.turnoId = :turnoId', { turnoId: undefined });
     }
 
     return query.getMany();

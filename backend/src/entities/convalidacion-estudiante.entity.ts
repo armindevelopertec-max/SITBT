@@ -54,9 +54,9 @@ export class ConvalidacionEstudiante {
   tipo: TipoConvalidacion;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'numero_resolucion' })
-  resolution_numero: string;
+  numeroResolucion: string;
 
-  @Column({ type: 'fecha', nullable: true, name: 'fecha_resolucion' })
+  @Column({ type: 'date', nullable: true, name: 'fecha_resolucion' })
   fechaResolucion: Date;
 
   @Column({ type: 'enum', enum: EstadoConvalidacion, default: EstadoConvalidacion.PENDIENTE , name: 'estado' })

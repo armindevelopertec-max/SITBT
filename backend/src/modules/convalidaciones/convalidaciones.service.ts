@@ -33,11 +33,11 @@ export class ServicioConvalidaciones {
       .leftJoinAndSelect('convalidation.approver', 'approver');
 
     if (status) {
-      query.andWhere('convalidation.estado = :status', { status });
+      query.andWhere('convalidation.estado = :status', { estado: status });
     }
 
     if (type) {
-      query.andWhere('convalidation.tipo = :type', { type });
+      query.andWhere('convalidation.tipo = :type', { tipo: type });
     }
 
     if (studentId) {

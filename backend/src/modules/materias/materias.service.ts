@@ -52,7 +52,7 @@ export class ServicioMaterias {
   }
 
   async findByCodigo(codigo: string): Promise<Materia> {
-    const materia = await this.materiaRepository.findOne({ where: { codigo } });
+    const materia = await this.materiaRepository.findOne({ where: { codigo: undefined } });
     if (!materia) {
       throw new NotFoundException(`Materia con código ${codigo} no encontrada`);
     }

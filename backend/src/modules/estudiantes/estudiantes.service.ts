@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, ConflictException, BadRequestException }
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Estudiante, StudentStatus } from '../../entities/estudiante.entity';
+import { Estudiante, EstadoEstudiante } from '../../entities/estudiante.entity';
 import { Persona } from '../../entities/persona.entity';
 import { Usuario } from '../../entities/usuario.entity';
 import { UsuarioRol } from '../../entities/usuario-rol.entity';
@@ -54,7 +54,7 @@ export class ServicioEstudiantes {
 
     if (crearEstudianteDto.numeroTituloBachiller) {
       const existingTitle = await this.estudianteRepository.findOne({
-        where: { bachelor_title_number: crearEstudianteDto.numeroTituloBachiller },
+        where: { numeroTituloBachiller: crearEstudianteDto.numeroTituloBachiller },
       });
       if (existingTitle) {
         throw new ConflictException('Ya existe un estudiante con este número de título de bachiller');
@@ -63,7 +63,7 @@ export class ServicioEstudiantes {
 
     if (crearEstudianteDto.numeroFolder) {
       const existingFolder = await this.estudianteRepository.findOne({
-        where: { folder_number: crearEstudianteDto.numeroFolder },
+        where: { numeroFolder: crearEstudianteDto.numeroFolder },
       });
       if (existingFolder) {
         throw new ConflictException('Ya existe un estudiante con este número de folder');
@@ -78,7 +78,7 @@ export class ServicioEstudiantes {
       );
     } else {
       const existingCode = await this.estudianteRepository.findOne({
-        where: { inscription_code: inscriptionCode },
+        where: { codigoInscripcion: inscriptionCode },
       });
       if (existingCode) {
         throw new ConflictException('El código de inscripción ya existe');
@@ -96,18 +96,18 @@ export class ServicioEstudiantes {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const usuario = this.usuarioRepository.create({
-      person_id: savedStudent.personaId,
-      username,
-      password_hash: passwordHash,
-      status: 'activo' as any,
+      personaId: savedStudent.personaId,
+      nombreUsuario: username,
+      contrasenaHash: passwordHash,
+      estado: 'activo' as any,
     });
     const savedUsuario = await this.usuarioRepository.save(usuario);
 
     const rolEstudiante = await this.rolRepository.findOne({ where: { codigo: 'estudiante' } });
     if (rolEstudiante) {
       const usuarioRol = this.usuarioRolRepository.create({
-        user_id: savedUsuario.id,
-        role_id: rolEstudiante.id,
+        usuarioId: savedUsuario.id,
+        rolId: rolEstudiante.id,
       });
       await this.usuarioRolRepository.save(usuarioRol);
     }
@@ -115,18 +115,18 @@ export class ServicioEstudiantes {
     return {
       student: savedStudent,
       user: {
-        username,
-        password,
+        nombreUsuario: username,
+        password: password,
       },
-    };
+    } as any;
   }
 
   async findAll(
     page = 1,
     limit = 20,
-    status?: StudentStatus,
+    status?: EstadoEstudiante,
     careerId?: number,
-  ): Promise<{ data: Estudiante[]; total: number; page: number; limit: number }> {
+  ): Promise<any> {
     const query = this.estudianteRepository
       .createQueryBuilder('student')
       .leftJoinAndSelect('student.persona', 'persona')
@@ -163,7 +163,7 @@ export class ServicioEstudiantes {
 
   async findByInscriptionCode(code: string): Promise<Estudiante> {
     const student = await this.estudianteRepository.findOne({
-      where: { inscription_code: code },
+      where: { codigoInscripcion: code },
       relations: ['persona', 'carrera', 'plan_estudio'],
     });
     if (!student) {
@@ -177,7 +177,7 @@ export class ServicioEstudiantes {
 
     if (actualizarEstudianteDto.numeroTituloBachiller) {
       const existingTitle = await this.estudianteRepository.findOne({
-        where: { bachelor_title_number: actualizarEstudianteDto.numeroTituloBachiller },
+        where: { numeroTituloBachiller: actualizarEstudianteDto.numeroTituloBachiller },
       });
       if (existingTitle && existingTitle.id !== id) {
         throw new ConflictException('Ya existe otro estudiante con este número de título de bachiller');
@@ -186,7 +186,7 @@ export class ServicioEstudiantes {
 
     if (actualizarEstudianteDto.numeroFolder) {
       const existingFolder = await this.estudianteRepository.findOne({
-        where: { folder_number: actualizarEstudianteDto.numeroFolder },
+        where: { numeroFolder: actualizarEstudianteDto.numeroFolder },
       });
       if (existingFolder && existingFolder.id !== id) {
         throw new ConflictException('Ya existe otro estudiante con este número de folder');
@@ -194,19 +194,19 @@ export class ServicioEstudiantes {
     }
 
     Object.assign(student, actualizarEstudianteDto);
-    return this.estudianteRepository.save(student);
+    return this.estudianteRepository.save(student as any) as any;
   }
 
   async remove(id: number): Promise<void> {
     const student = await this.findOne(id);
 
-    await this.credencialRepository.delete({ student_id: id });
+    await this.credencialRepository.delete({ estudianteId: id });
 
     const usuario = await this.usuarioRepository.findOne({
       where: { personaId: student.personaId },
     });
     if (usuario) {
-      await this.usuarioRolRepository.delete({ user_id: usuario.id });
+      await this.usuarioRolRepository.delete({ usuarioId: usuario.id });
       await this.usuarioRepository.remove(usuario);
     }
 
@@ -234,9 +234,9 @@ export class ServicioEstudiantes {
 
   async findActive(): Promise<Estudiante[]> {
     return this.estudianteRepository.find({
-      where: { estado: StudentStatus.ACTIVO },
+      where: { estado: EstadoEstudiante.ACTIVO },
       relations: ['persona', 'carrera'],
-      order: { inscription_code: 'ASC' },
+      order: { codigoInscripcion: 'ASC' },
     });
   }
 
@@ -254,12 +254,7 @@ export class ServicioEstudiantes {
     return query.getRawMany();
   }
 
-  async getStudentStats(): Promise<{
-    total: number;
-    active: number;
-    graduated: number;
-    frozen: number;
-  }> {
+  async getStudentStats(): Promise<any> {
     const stats = await this.estudianteRepository
       .createQueryBuilder('student')
       .select('student.estado', 'status')
@@ -270,9 +265,9 @@ export class ServicioEstudiantes {
     const result = { total: 0, active: 0, graduated: 0, frozen: 0 };
     stats.forEach((s) => {
       result.total += parseInt(s.count);
-      if (s.estado === StudentStatus.ACTIVO) result.active = parseInt(s.count);
-      if (s.estado === StudentStatus.EGRESADO || s.estado === StudentStatus.TITULADO) result.graduated += parseInt(s.count);
-      if (s.estado === StudentStatus.CONGELADO) result.frozen = parseInt(s.count);
+      if (s.estado === EstadoEstudiante.ACTIVO) result.active = parseInt(s.count);
+      if (s.estado === EstadoEstudiante.EGRESADO || s.estado === EstadoEstudiante.TITULADO) result.graduated += parseInt(s.count);
+      if (s.estado === EstadoEstudiante.CONGELADO) result.frozen = parseInt(s.count);
     });
 
     return result;
@@ -292,9 +287,9 @@ export class ServicioEstudiantes {
     const yearSuffix = gestion.slice(-2);
 
     const initials = (
-      (persona.lastname_paternal?.[0] || '') +
-      (persona.lastname_maternal?.[0] || '') +
-      (persona.names?.[0] || '')
+      (persona.apellidoPaterno?.[0] || '') +
+      (persona.apellidoMaterno?.[0] || '') +
+      (persona.nombres?.[0] || '')
     ).toUpperCase();
 
     const careerCode = carrera.nombre.substring(0, 2).toUpperCase();
@@ -304,7 +299,7 @@ export class ServicioEstudiantes {
     let code = `${initials}-${careerCode}${yearSuffix}${ciLast2}`;
 
     let counter = 1;
-    while (await this.estudianteRepository.findOne({ where: { inscription_code: code } })) {
+    while (await this.estudianteRepository.findOne({ where: { codigoInscripcion: code } })) {
       code = `${initials}-${careerCode}${yearSuffix}${ciLast2}-${counter}`;
       counter++;
     }

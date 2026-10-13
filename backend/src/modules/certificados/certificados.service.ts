@@ -35,7 +35,7 @@ export class ServicioCertificados {
     }
 
     if (type) {
-      query.andWhere('certificate.tipo = :type', { type });
+      query.andWhere('certificate.tipo = :type', { tipo: type });
     }
 
     if (studentId) {
@@ -64,7 +64,7 @@ export class ServicioCertificados {
 
   async findByCode(code: string): Promise<Certificado> {
     const certificate = await this.certificadoRepository.findOne({
-      where: { code },
+      where: { codigo: undefined },
       relations: ['student', 'student.person', 'issuer'],
     });
     if (!certificate) {
@@ -88,7 +88,7 @@ export class ServicioCertificados {
     return this.certificadoRepository.find({
       where: { estudianteId: studentId },
       relations: ['issuer'],
-      order: { date: 'DESC' },
+      order: { fecha: 'DESC' },
     });
   }
 

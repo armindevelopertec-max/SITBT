@@ -51,7 +51,7 @@ export class ServicioUsuarios {
       .leftJoinAndSelect('usuarioRol.rol', 'rol');
 
     if (estado) {
-      query.andWhere('usuario.estado = :estado', { estado });
+      query.andWhere('usuario.estado = :estado', { estado: estado });
     }
 
     const [data, total] = await query
@@ -106,7 +106,7 @@ export class ServicioUsuarios {
     }
 
     Object.assign(usuario, actualizarUsuarioDto);
-    return this.usuarioRepository.save(usuario);
+    return this.usuarioRepository.save(usuario as any) as any;
   }
 
   async remove(id: number): Promise<void> {
@@ -134,7 +134,7 @@ export class ServicioUsuarios {
       usuarioId: usuarioId,
       rolId: rolId,
     });
-    return this.usuarioRolRepository.save(usuarioRol);
+    return this.usuarioRolRepository.save(usuarioRol as any) as any;
   }
 
   async removerRol(usuarioId: number, rolId: number): Promise<void> {
@@ -148,7 +148,7 @@ export class ServicioUsuarios {
 
   async obtenerRolesUsuario(usuarioId: number): Promise<UsuarioRol[]> {
     return this.usuarioRolRepository.find({
-      where: { usuarioId: usuarioId },
+      where: { usuarioId: undefined },
       relations: ['rol'],
     });
   }

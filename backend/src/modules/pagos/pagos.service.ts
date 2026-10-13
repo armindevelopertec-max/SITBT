@@ -16,8 +16,8 @@ export class ServicioPagos {
     const payment = this.pagoRepository.create({
       ...createDto,
       payment_date: new Date(createDto.fechaPago),
-    } as Partial<Pago>);
-    return this.pagoRepository.save(payment);
+    } as any);
+    return this.pagoRepository.save(payment as any);
   }
 
   async findAll(
@@ -40,7 +40,7 @@ export class ServicioPagos {
     }
 
     if (status) {
-      query.andWhere('payment.estado = :status', { status });
+      query.andWhere('payment.estado = :status', { estado: status });
     }
 
     if (studentId) {
@@ -74,7 +74,7 @@ export class ServicioPagos {
   async update(id: number, updateDto: ActualizarPagoDto): Promise<Pago> {
     const payment = await this.findOne(id);
     Object.assign(payment, updateDto);
-    return this.pagoRepository.save(payment);
+    return this.pagoRepository.save(payment as any);
   }
 
   async remove(id: number): Promise<void> {
@@ -146,7 +146,7 @@ export class ServicioPagos {
   async annul(id: number): Promise<Pago> {
     const payment = await this.findOne(id);
     payment.estado = EstadoPago.ANULADO;
-    return this.pagoRepository.save(payment);
+    return this.pagoRepository.save(payment as any);
   }
 
   async getCollectionSummary(gestion: string): Promise<{

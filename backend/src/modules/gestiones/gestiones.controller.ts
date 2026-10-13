@@ -13,9 +13,9 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { GestionesService } from './gestiones.service';
 import { CrearGestionDto } from './dto/create-gestion.dto';
-import { UpdateGestionDto } from './dto/update-gestion.dto';
+import { ActualizarGestionDto } from './dto/update-gestion.dto';
 import { CreatePeriodoDto, UpdatePeriodoDto } from './dto/periodo.dto';
-import { EstadoGestion } from '../../entities/enums/gestion-status.enum';
+import { EstadoGestion } from '../../entities/enums/estado-gestion.enum';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Gestiones')
@@ -27,7 +27,7 @@ export class GestionesController {
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   crear(@Body() crearGestionDto: CrearGestionDto) {
-    return this.gestionesService.create(createGestionDto);
+    return this.gestionesService.create(crearGestionDto);
   }
 
   @Get()
@@ -50,8 +50,8 @@ export class GestionesController {
   }
 
   @Get('year/:year')
-  findByYear(@Param('year') year: string) {
-    return this.gestionesService.findByYear(year);
+  findByAnio(@Param('year') year: string) {
+    return this.gestionesService.findByAnio(year);
   }
 
   @Get(':id')
@@ -64,7 +64,7 @@ export class GestionesController {
   @ApiBearerAuth()
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateGestionDto: UpdateGestionDto,
+    @Body() updateGestionDto: ActualizarGestionDto,
   ) {
     return this.gestionesService.update(id, updateGestionDto);
   }

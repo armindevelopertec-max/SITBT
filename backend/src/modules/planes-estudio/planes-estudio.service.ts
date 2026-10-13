@@ -34,7 +34,7 @@ export class ServicioPlanesEstudio {
       .leftJoinAndSelect('study_plan.carrera', 'career');
 
     if (status) {
-      query.andWhere('study_plan.estado = :status', { status });
+      query.andWhere('study_plan.estado = :status', { estado: status });
     }
 
     if (careerId) {

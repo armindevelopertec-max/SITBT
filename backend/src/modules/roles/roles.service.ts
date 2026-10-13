@@ -36,7 +36,7 @@ export class ServicioRoles {
     const query = this.rolRepository.createQueryBuilder('rol');
 
     if (estado) {
-      query.where('rol.estado = :estado', { estado });
+      query.where('rol.estado = :estado', { estado: estado });
     }
 
     const [data, total] = await query
@@ -57,7 +57,7 @@ export class ServicioRoles {
   }
 
   async findByCodigo(codigo: string): Promise<Rol> {
-    const rol = await this.rolRepository.findOne({ where: { codigo } });
+    const rol = await this.rolRepository.findOne({ where: { codigo: undefined } });
     if (!rol) {
       throw new NotFoundException(`Rol con código ${codigo} no encontrado`);
     }

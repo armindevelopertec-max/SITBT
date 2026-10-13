@@ -44,8 +44,8 @@ export class ControladorMaterias {
   }
 
   @Get('code/:code')
-  findByCode(@Param('code') code: string) {
-    return this.subjectsService.findByCode(code);
+  findByCodigo(@Param('code') code: string) {
+    return this.subjectsService.findByCodigo(code);
   }
 
   @Get(':id')

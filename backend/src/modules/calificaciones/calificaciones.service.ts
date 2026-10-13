@@ -55,7 +55,7 @@ export class ServicioCalificaciones {
     }
 
     if (statusDefinitivo) {
-      query.andWhere('grade.status_definitivo = :statusDefinitivo', { statusDefinitivo });
+      query.andWhere('grade.estadoDefinitivo = :statusDefinitivo', { statusDefinitivo });
     }
 
     const [data, total] = await query
@@ -101,7 +101,7 @@ export class ServicioCalificaciones {
     const savedGrade = await this.calificacionRepository.save(grade);
 
     await this.gradeAuditRepository.save({
-      grade_id: id,
+      calificacionId: id,
       field_changed: 'multiple',
       old_value: oldValue,
       new_value: JSON.stringify(actualizarCalificacionDto),
@@ -124,21 +124,21 @@ export class ServicioCalificaciones {
   ): Promise<Calificacion> {
     const grade = await this.findOne(id);
 
-    if (partial1 !== undefined) grade.partial_1 = partial1;
-    if (partial2 !== undefined) grade.partial_2 = partial2;
+    if (partial1 !== undefined) grade.parcial1 = partial1;
+    if (partial2 !== undefined) grade.parcial2 = partial2;
 
-    if (grade.partial_1 !== null && grade.partial_2 !== null) {
-      grade.final_average = Math.round((grade.partial_1 + grade.partial_2) / 2);
-      grade.status_regular = grade.final_average >= 51 ? EstadoCalificacionRegular.APROBADO : EstadoCalificacionRegular.REPROBADO;
+    if (grade.parcial1 !== null && grade.parcial2 !== null) {
+      grade.promedioFinal = Math.round((grade.parcial1 + grade.parcial2) / 2);
+      grade.estadoRegular = grade.promedioFinal >= 51 ? EstadoCalificacionRegular.APROBADO : EstadoCalificacionRegular.REPROBADO;
     }
 
     const savedGrade = await this.calificacionRepository.save(grade);
 
     if (registeredBy) {
       await this.gradeAuditRepository.save({
-        grade_id: id,
+        calificacionId: id,
         field_changed: 'partials',
-        old_value: JSON.stringify({ partial1: grade.partial_1, partial2: grade.partial_2 }),
+        old_value: JSON.stringify({ partial1: grade.parcial1, partial2: grade.parcial2 }),
         new_value: JSON.stringify({ partial1, partial2 }),
         changed_by: registeredBy,
       });
@@ -150,30 +150,30 @@ export class ServicioCalificaciones {
   async applySecondTurn(id: number, score: number, registeredBy?: number): Promise<Calificacion> {
     const grade = await this.findOne(id);
 
-    if (!grade.second_turn_eligible) {
+    if (!grade.aptoSegundaTurno) {
       throw new BadRequestException('Student is not eligible for second turn');
     }
 
-    grade.second_turn_score = score;
-    grade.second_turn_applied = true;
-    grade.status_2t = score >= 51 ? EstadoCalificacion2T.APROBADO : EstadoCalificacion2T.REPROBADO;
+    grade.notaSegundaTurno = score;
+    grade.segundaTurnoAplicado = true;
+    grade.estado2T = score >= 51 ? EstadoCalificacion2T.APROBADO : EstadoCalificacion2T.REPROBADO;
 
-    if (grade.status_regular === EstadoCalificacionRegular.REPROBADO && grade.status_2t === EstadoCalificacion2T.APROBADO) {
-      grade.definitive_grade = score;
-      grade.status_definitivo = EstadoCalificacionDefinitivo.APROBADO;
-    } else if (grade.status_2t === EstadoCalificacion2T.REPROBADO) {
-      grade.definitive_grade = grade.status_regular === EstadoCalificacionRegular.APROBADO ? grade.final_average : score;
-      grade.status_definitivo = EstadoCalificacionDefinitivo.REPROBADO;
+    if (grade.estadoRegular === EstadoCalificacionRegular.REPROBADO && grade.estado2T === EstadoCalificacion2T.APROBADO) {
+      grade.notaDefinitiva = score;
+      grade.estadoDefinitivo = EstadoCalificacionDefinitivo.APROBADO;
+    } else if (grade.estado2T === EstadoCalificacion2T.REPROBADO) {
+      grade.notaDefinitiva = grade.estadoRegular === EstadoCalificacionRegular.APROBADO ? grade.promedioFinal : score;
+      grade.estadoDefinitivo = EstadoCalificacionDefinitivo.REPROBADO;
     } else {
-      grade.definitive_grade = score;
-      grade.status_definitivo = EstadoCalificacionDefinitivo.APROBADO;
+      grade.notaDefinitiva = score;
+      grade.estadoDefinitivo = EstadoCalificacionDefinitivo.APROBADO;
     }
 
     const savedGrade = await this.calificacionRepository.save(grade);
 
     if (registeredBy) {
       await this.gradeAuditRepository.save({
-        grade_id: id,
+        calificacionId: id,
         field_changed: 'second_turn',
         old_value: JSON.stringify({ second_turn_applied: false }),
         new_value: JSON.stringify({ second_turn_score: score, second_turn_applied: true }),
@@ -188,7 +188,7 @@ export class ServicioCalificaciones {
     return this.gradeAuditRepository.find({
       where: { calificacionId: enrollmentId },
       relations: ['user'],
-      order: { changed_at: 'DESC' },
+      order: { cambiadoEn: 'DESC' },
     });
   }
 

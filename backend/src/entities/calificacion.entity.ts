@@ -54,7 +54,7 @@ export class Calificacion {
   observacion: string;
 
   @Column({ type: 'enum', enum: EstadoCalificacionRegular, nullable: true, name: 'estado_regular' })
-  estado_regular: EstadoCalificacionRegular;
+  estadoRegular: EstadoCalificacionRegular;
 
   @Column({ type: 'boolean', default: false, name: 'apto_segunda_turno' })
   aptoSegundaTurno: boolean;
@@ -66,13 +66,13 @@ export class Calificacion {
   segundaTurnoAplicado: boolean;
 
   @Column({ type: 'enum', enum: EstadoCalificacion2T, default: EstadoCalificacion2T.NO_APLICA, name: 'estado_2t' })
-  estado_2t: EstadoCalificacion2T;
+  estado2T: EstadoCalificacion2T;
 
   @Column({ type: 'int', nullable: true, name: 'nota_definitiva' })
   notaDefinitiva: number;
 
   @Column({ type: 'enum', enum: EstadoCalificacionDefinitivo, nullable: true, name: 'estado_definitivo' })
-  estado_definitivo: EstadoCalificacionDefinitivo;
+  estadoDefinitivo: EstadoCalificacionDefinitivo;
 
   @Column({ nullable: true })
   registradoPor: number;

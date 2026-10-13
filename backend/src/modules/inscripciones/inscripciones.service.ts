@@ -37,18 +37,18 @@ export class ServicioInscripciones {
     studentId?: number,
   ): Promise<{ data: Inscripcion[]; total: number; page: number; limit: number }> {
     const query = this.inscripcionRepository
-      .createQueryBuilder('enrollment')
+      .createQueryBuilder('inscripcion')
       .leftJoinAndSelect('enrollment.student', 'student')
       .leftJoinAndSelect('student.person', 'person')
-      .leftJoinAndSelect('enrollment.subject', 'subject')
-      .leftJoinAndSelect('enrollment.group', 'group');
+      .leftJoinAndSelect('enrollment.subject', 'materia')
+      .leftJoinAndSelect('enrollment.group', 'grupo');
 
     if (gestion) {
       query.andWhere('enrollment.gestion = :gestion', { gestion });
     }
 
     if (status) {
-      query.andWhere('enrollment.estado = :status', { status });
+      query.andWhere('enrollment.estado = :status', { estado: status });
     }
 
     if (studentId) {
@@ -67,7 +67,7 @@ export class ServicioInscripciones {
   async findOne(id: number): Promise<Inscripcion> {
     const enrollment = await this.inscripcionRepository.findOne({
       where: { id },
-      relations: ['student', 'student.person', 'subject', 'group'],
+      relations: ['student', 'student.person', 'materia', 'grupo'],
     });
     if (!enrollment) {
       throw new NotFoundException(`Inscripción con ID ${id} no encontrada`);
@@ -88,9 +88,9 @@ export class ServicioInscripciones {
 
   async findByStudent(studentId: number, gestion?: string): Promise<Inscripcion[]> {
     const query = this.inscripcionRepository
-      .createQueryBuilder('enrollment')
-      .leftJoinAndSelect('enrollment.subject', 'subject')
-      .leftJoinAndSelect('enrollment.group', 'group')
+      .createQueryBuilder('inscripcion')
+      .leftJoinAndSelect('enrollment.subject', 'materia')
+      .leftJoinAndSelect('enrollment.group', 'grupo')
       .where('enrollment.estudianteId = :studentId', { studentId });
 
     if (gestion) {
@@ -103,7 +103,7 @@ export class ServicioInscripciones {
   async findBySubject(subjectId: number, gestion: string): Promise<Inscripcion[]> {
     return this.inscripcionRepository.find({
       where: { materiaId: subjectId, gestion },
-      relations: ['student', 'student.person', 'group'],
+      relations: ['student', 'student.person', 'grupo'],
       order: { creadoEn: 'ASC' },
     });
   }
@@ -111,7 +111,7 @@ export class ServicioInscripciones {
   async findByGroup(groupId: number, gestion: string): Promise<Inscripcion[]> {
     return this.inscripcionRepository.find({
       where: { grupoId: groupId, gestion },
-      relations: ['student', 'student.person', 'subject'],
+      relations: ['student', 'student.person', 'materia'],
       order: { creadoEn: 'ASC' },
     });
   }
@@ -131,7 +131,7 @@ export class ServicioInscripciones {
   }> {
     const enrollments = await this.inscripcionRepository.find({
       where: { estudianteId: studentId },
-      relations: ['subject', 'group'],
+      relations: ['materia', 'grupo'],
       order: { gestion: 'ASC', semestre: 'ASC' },
     });
 
@@ -148,8 +148,8 @@ export class ServicioInscripciones {
     enrollments.forEach((e) => {
       if (e.estado === EstadoInscripcion.APROBADO) {
         stats.approved++;
-        if (e.final_grade) {
-          totalGrade += e.final_grade;
+        if (e.notaFinal) {
+          totalGrade += e.notaFinal;
           countWithGrade++;
         }
       } else if (e.estado === EstadoInscripcion.REPROBADO) {

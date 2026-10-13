@@ -31,7 +31,7 @@ export class ServicioCarreras {
     const query = this.careerRepository.createQueryBuilder('career');
 
     if (status) {
-      query.where('career.estado = :status', { status });
+      query.where('career.estado = :status', { estado: status });
     }
 
     const [data, total] = await query
@@ -52,7 +52,7 @@ export class ServicioCarreras {
   }
 
   async findByCode(code: string): Promise<Carrera> {
-    const career = await this.careerRepository.findOne({ where: { code } });
+    const career = await this.careerRepository.findOne({ where: { codigo: undefined } });
     if (!career) {
       throw new NotFoundException(`Carrera con código ${code} no encontrada`);
     }
@@ -79,7 +79,7 @@ export class ServicioCarreras {
 
   async findByArea(area: string): Promise<Carrera[]> {
     return this.careerRepository.find({
-      where: { area, status: EstadoCarrera.ACTIVO },
+      where: { area, estado: EstadoCarrera.ACTIVO },
       order: { nombre: 'ASC' },
     });
   }

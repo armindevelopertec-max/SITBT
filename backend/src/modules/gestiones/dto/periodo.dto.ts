@@ -7,7 +7,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { EstadoGestion } from '../../../entities/enums/gestion-status.enum';
+import { EstadoGestion } from '../../../entities/enums/estado-gestion.enum';
 
 export class CreatePeriodoDto {
   @ApiProperty({ example: 'I' })

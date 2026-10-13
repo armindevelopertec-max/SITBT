@@ -56,30 +56,30 @@ export class ServicioAuditoria {
   async findByUser(userId: number, limit = 50): Promise<RegistroAuditoria[]> {
     return this.auditoriaRepository.find({
       where: { usuarioId: userId },
-      order: { date: 'DESC' },
+      order: { fecha: 'DESC' },
       take: limit,
     });
   }
 
   async findByTable(tableName: string, limit = 50): Promise<RegistroAuditoria[]> {
     return this.auditoriaRepository.find({
-      where: { table: tableName },
-      order: { date: 'DESC' },
+      where: { tabla: tableName },
+      order: { fecha: 'DESC' },
       take: limit,
     });
   }
 
   async findByRecord(tableName: string, recordId: number): Promise<RegistroAuditoria[]> {
     return this.auditoriaRepository.find({
-      where: { table: tableName, record_id: recordId },
-      order: { date: 'DESC' },
+      where: { tabla: tableName, registroId: recordId },
+      order: { fecha: 'DESC' },
     });
   }
 
   async getRecentActions(limit = 20): Promise<RegistroAuditoria[]> {
     return this.auditoriaRepository.find({
       relations: ['user'],
-      order: { date: 'DESC' },
+      order: { fecha: 'DESC' },
       take: limit,
     });
   }

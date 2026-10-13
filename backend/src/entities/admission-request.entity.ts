@@ -36,36 +36,36 @@ export class SolicitudAdmision {
   nombre: string;
 
   @Column({ name: 'apellido_paterno', type: 'varchar', length: 100, nullable: true })
-  lastname_paternal: string;
+  apellidoPaterno: string;
 
   @Column({ name: 'apellido_materno', type: 'varchar', length: 100, nullable: true })
-  lastname_maternal: string;
+  apellidoMaterno: string;
 
   nombres: string;
 
   @Column({ type: 'varchar', length: 20 })
   ci: string;
 
-  @Column({ type: 'fecha', name: 'fecha_nacimiento' })
+  @Column({ type: 'date', name: 'fecha_nacimiento' })
   fechaNacimiento: Date;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'lugar_nacimiento' })
   lugarNacimiento: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'lugar_nacimiento_otro' })
-  lugarNacimiento_other: string;
+  lugarNacimientoOther: string;
 
   @Column({ type: 'enum', enum: Genero, nullable: true, name: 'genero' })
   genero: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'estadoCivil' })
-  marital_estado: string;
+  marital_status: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'nacionalidad' })
   nacionalidad: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'nacionalidadOtra' })
-  nacionalidad_other: string;
+  nacionalidadOther: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true, name: 'telefono' })
   telefono: string;
@@ -127,8 +127,8 @@ export class SolicitudAdmision {
 
   @AfterLoad()
   setVirtualFields() {
-    if (this.name) this.nombres = this.name;
-    if (this.lastname_paternal) this.lastname_paternal = this.lastname_paternal;
-    if (this.lastname_maternal) this.lastname_maternal = this.lastname_maternal;
+    if (this.nombre) this.nombres = this.nombre;
+    if (this.apellidoPaterno) this.apellidoPaterno = this.apellidoPaterno;
+    if (this.apellidoMaterno) this.apellidoMaterno = this.apellidoMaterno;
   }
 }

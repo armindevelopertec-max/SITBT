@@ -86,7 +86,7 @@ export class ControladorInscripciones {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: { status: EstadoInscripcion; finalGrade?: number },
   ) {
-    return this.enrollmentsService.updateStatus(id, body.estado, body.finalGrade);
+    return this.enrollmentsService.updateStatus(id, body.status, body.finalGrade);
   }
 
   @Delete(':id')
