@@ -69,7 +69,7 @@ export default function EditarPlanPage() {
         career_id: plan.career_id.toString(),
         rm_number: plan.rm_number,
         rm_date: plan.rm_date.split('T')[0],
-        status: plan.status,
+        estado: plan.estado,
         notes: plan.notes || '',
       });
     } catch (error) {
@@ -102,7 +102,7 @@ export default function EditarPlanPage() {
         career_id: parseInt(formData.career_id),
         rm_number: formData.rm_number.trim().toUpperCase(),
         rm_date: formData.rm_date,
-        status: formData.status,
+        estado: formData.estado,
         notes: formData.notes.trim() || null,
       });
 
@@ -206,8 +206,8 @@ export default function EditarPlanPage() {
               <div>
                 <Selector
                   label="Estado"
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  value={formData.estado}
+                  onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
                   options={[
                     { value: 'vigente', label: 'Vigente' },
                     { value: 'historico', label: 'Histórico' },

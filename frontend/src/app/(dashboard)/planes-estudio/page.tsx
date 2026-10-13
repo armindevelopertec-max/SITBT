@@ -182,8 +182,8 @@ export default function PlanesEstudioPage() {
                     <CeldaTabla>{new Date(plan.rm_date).toLocaleDateString()}</CeldaTabla>
                     <CeldaTabla>{plan.carrera?.name || '-'}</CeldaTabla>
                     <CeldaTabla>
-                      <Insignia variant={plan.status === 'vigente' ? 'exito' : 'secondary'}>
-                        {plan.status}
+                      <Insignia variant={plan.estado === 'vigente' ? 'exito' : 'secondary'}>
+                        {plan.estado}
                       </Insignia>
                     </CeldaTabla>
                     <CeldaTabla>

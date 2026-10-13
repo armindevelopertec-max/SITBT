@@ -80,7 +80,7 @@ export default function NewStaffPage() {
         birthdate: personData.birthdate,
         birthplace: finalBirthplace,
         gender: personData.gender,
-        marital_status: personData.marital_status || undefined,
+        marital_estado: personData.marital_estado || undefined,
         nationality: finalNationality,
         phone: personData.phone || undefined,
         email: personData.email || undefined,
@@ -251,10 +251,10 @@ export default function NewStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_status"
+                      name="marital_estado"
                       value="Soltera(o)"
-                      checked={personData.marital_status === 'Soltera(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      checked={personData.marital_estado === 'Soltera(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Soltero(a)</span>
@@ -262,10 +262,10 @@ export default function NewStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_status"
+                      name="marital_estado"
                       value="Casada(o)"
-                      checked={personData.marital_status === 'Casada(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      checked={personData.marital_estado === 'Casada(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Casado(a)</span>
@@ -273,10 +273,10 @@ export default function NewStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_status"
+                      name="marital_estado"
                       value="Viuda(o)"
-                      checked={personData.marital_status === 'Viuda(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      checked={personData.marital_estado === 'Viuda(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Viudo(a)</span>
@@ -284,10 +284,10 @@ export default function NewStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_status"
+                      name="marital_estado"
                       value="Divorciada(o)"
-                      checked={personData.marital_status === 'Divorciada(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      checked={personData.marital_estado === 'Divorciada(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Divorciado(a)</span>

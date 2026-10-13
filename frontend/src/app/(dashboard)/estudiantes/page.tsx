@@ -96,7 +96,7 @@ export default function StudentsPage() {
       if (users && users.length > 0 && persona) {
         const user = users[0];
         const newPassword = `${persona.ci}-${new Date().getFullYear()}`;
-        setCredentialsModal({ username: user.username, password: newPassword, nombre, studentId: student.id, personId: student.person_id });
+        setCredentialsModal({ username: user.nombreUsuario, password: newPassword, nombre, studentId: student.id, personId: student.person_id });
       } else {
         setCredentialsModal({ username: 'No tiene usuario', password: '', nombre, studentId: student.id, personId: student.person_id });
       }

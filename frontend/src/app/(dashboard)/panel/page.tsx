@@ -29,9 +29,9 @@ export default function DashboardPage() {
       <Migas items={[{ label: 'Dashboard' }]} />
 
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Bienvenido, {user?.username}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Bienvenido, {user?.nombreUsuario}</h1>
         <p className="text-gray-500 mt-1">
-          Rol: <span className="font-medium capitalize">{user?.role.replace('_', ' ')}</span>
+          Rol: <span className="font-medium capitalize">{user?.rol?.replace('_', ' ')}</span>
         </p>
       </div>
 

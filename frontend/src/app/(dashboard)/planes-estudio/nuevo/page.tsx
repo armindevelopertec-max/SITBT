@@ -68,7 +68,7 @@ export default function NuevoPlanPage() {
         career_id: parseInt(formData.career_id),
         rm_number: formData.rm_number.trim().toUpperCase(),
         rm_date: formData.rm_date,
-        status: formData.status,
+        estado: formData.estado,
         notes: formData.notes.trim() || null,
       });
 
@@ -144,8 +144,8 @@ export default function NuevoPlanPage() {
               <div>
                 <Selector
                   label="Estado"
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  value={formData.estado}
+                  onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
                   options={[
                     { value: 'vigente', label: 'Vigente' },
                     { value: 'historico', label: 'Histórico' },

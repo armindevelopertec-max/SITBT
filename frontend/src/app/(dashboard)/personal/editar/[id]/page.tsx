@@ -10,13 +10,13 @@ import { Selector } from '@/components/ui/selector';
 import { api } from '@/lib/api';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
-interface StaffData {
+interface DatosStaff {
   id: number;
   person_id: number;
   profession: string;
   position: string;
   hire_date: string;
-  status: string;
+  estado: string;
   persona?: {
     id: number;
     ci: string;
@@ -26,7 +26,7 @@ interface StaffData {
     birthdate: string;
     birthplace: string;
     gender: string;
-    marital_status: string;
+    marital_estado: string;
     nationality: string;
     phone: string;
     email: string;
@@ -86,7 +86,7 @@ export default function EditStaffPage() {
     try {
       setInitialLoading(true);
       const response = await api.get(`/personal/${staffId}`);
-      const staff: StaffData = response.data;
+      const staff: DatosStaff = response.data;
 
       if (staff.persona) {
         setPersonData({
@@ -97,7 +97,7 @@ export default function EditStaffPage() {
           birthdate: staff.persona.birthdate || '',
           birthplace: staff.persona.birthplace || '',
           gender: staff.persona.gender || '',
-          marital_status: staff.persona.marital_status || '',
+          marital_estado: staff.persona.marital_estado || '',
           nationality: staff.persona.nationality || 'Boliviana',
           phone: staff.persona.phone || '',
           email: staff.persona.email || '',
@@ -109,7 +109,7 @@ export default function EditStaffPage() {
         profession: staff.profession || '',
         position: staff.position || '',
         hire_date: staff.hire_date || '',
-        status: staff.status || 'activo',
+        estado: staff.estado || 'activo',
       });
     } catch (error) {
       console.error('Error fetching staff:', error);
@@ -142,7 +142,7 @@ export default function EditStaffPage() {
     setLoading(true);
     try {
       const staffResponse = await api.get(`/personal/${staffId}`);
-      const staff: StaffData = staffResponse.data;
+      const staff: DatosStaff = staffResponse.data;
 
       const finalBirthplace = isOtherDepartment ? personData.birthplace : personData.birthplace;
       const finalNationality = isOtherNationality ? personData.nationality : personData.nationality;
@@ -155,7 +155,7 @@ export default function EditStaffPage() {
         birthdate: personData.birthdate,
         birthplace: finalBirthplace,
         gender: personData.gender,
-        marital_status: personData.marital_status || undefined,
+        marital_estado: personData.marital_estado || undefined,
         nationality: finalNationality,
         phone: personData.phone || undefined,
         email: personData.email || undefined,
@@ -167,7 +167,7 @@ export default function EditStaffPage() {
         profession: staffData.profession || undefined,
         position: staffData.position,
         hire_date: staffData.hire_date,
-        status: staffData.status,
+        estado: staffData.estado,
       });
 
       router.push('/personal');
@@ -319,10 +319,10 @@ export default function EditStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_status"
+                      name="marital_estado"
                       value="Soltera(o)"
-                      checked={personData.marital_status === 'Soltera(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      checked={personData.marital_estado === 'Soltera(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Soltero(a)</span>
@@ -330,10 +330,10 @@ export default function EditStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_status"
+                      name="marital_estado"
                       value="Casada(o)"
-                      checked={personData.marital_status === 'Casada(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      checked={personData.marital_estado === 'Casada(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Casado(a)</span>
@@ -341,10 +341,10 @@ export default function EditStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_status"
+                      name="marital_estado"
                       value="Viuda(o)"
-                      checked={personData.marital_status === 'Viuda(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      checked={personData.marital_estado === 'Viuda(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Viudo(a)</span>
@@ -352,10 +352,10 @@ export default function EditStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_status"
+                      name="marital_estado"
                       value="Divorciada(o)"
-                      checked={personData.marital_status === 'Divorciada(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      checked={personData.marital_estado === 'Divorciada(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Divorciado(a)</span>
@@ -457,8 +457,8 @@ export default function EditStaffPage() {
               <div>
                 <Selector
                   label="Estado"
-                  value={staffData.status}
-                  onChange={(e) => setStaffData({ ...staffData, status: e.target.value })}
+                  value={staffData.estado}
+                  onChange={(e) => setStaffData({ ...staffData, estado: e.target.value })}
                   options={[
                     { value: 'activo', label: 'Activo' },
                     { value: 'inactivo', label: 'Inactivo' },

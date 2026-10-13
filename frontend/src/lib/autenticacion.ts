@@ -19,5 +19,5 @@ export const colorRol = (rol: Rol): string => {
 };
 
 export const formatearNombreRol = (usuario: Usuario): string => {
-  return etiquetaRol(usuario.role);
+  return etiquetaRol(usuario.rol);
 };

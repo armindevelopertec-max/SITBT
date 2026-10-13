@@ -249,7 +249,7 @@ export default function GestionesPage() {
                     <p className="text-sm text-gray-500">{gestion.period_type}</p>
                   </div>
                 </div>
-                {getStatusBadge(gestion.status)}
+                {getStatusBadge(gestion.estado)}
               </div>
             </EncabezadoTarjeta>
             <ContenidoTarjeta>
@@ -266,8 +266,8 @@ export default function GestionesPage() {
                         <span className="text-gray-500">({periodo.name || 'Sin nombre'})</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        {getStatusBadge(periodo.status)}
-                        {periodo.status === 'pendiente' && (
+                        {getStatusBadge(periodo.estado)}
+                        {periodo.estado === 'pendiente' && (
                           <Boton
                             size="sm"
                             variant="ghost"
@@ -277,7 +277,7 @@ export default function GestionesPage() {
                             <Unlock className="w-3 h-3" />
                           </Boton>
                         )}
-                        {periodo.status === 'abierta' && (
+                        {periodo.estado === 'abierta' && (
                           <Boton
                             size="sm"
                             variant="ghost"
@@ -287,7 +287,7 @@ export default function GestionesPage() {
                             <Lock className="w-3 h-3" />
                           </Boton>
                         )}
-                        {periodo.status === 'cerrada' && (
+                        {periodo.estado === 'cerrada' && (
                           <Boton
                             size="sm"
                             variant="ghost"
@@ -308,19 +308,19 @@ export default function GestionesPage() {
               )}
 
               <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
-                {gestion.status === 'pendiente' && (
+                {gestion.estado === 'pendiente' && (
                   <Boton size="sm" variant="outline" className="flex-1" onClick={() => handleOpen(gestion)}>
                     <Unlock className="w-4 h-4 mr-1" />
                     Abrir
                   </Boton>
                 )}
-                {gestion.status === 'abierta' && (
+                {gestion.estado === 'abierta' && (
                   <Boton size="sm" variant="outline" className="flex-1" onClick={() => handleClose(gestion)}>
                     <Lock className="w-4 h-4 mr-1" />
                     Cerrar
                   </Boton>
                 )}
-                {gestion.status === 'cerrada' && (
+                {gestion.estado === 'cerrada' && (
                   <Boton size="sm" variant="outline" className="flex-1" onClick={() => handleOpen(gestion)}>
                     <Unlock className="w-4 h-4 mr-1" />
                     Reabrir

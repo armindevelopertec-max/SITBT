@@ -9,11 +9,11 @@ export type Rol =
 
 export interface Usuario {
   id: number;
-  username: string;
+  nombreUsuario: string;
   email?: string;
-  role: Rol;
-  person_id?: number;
-  is_active: boolean;
+  rol: Rol;
+  personaId?: number;
+  estado: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -211,7 +211,7 @@ export interface Periodo {
   name?: string;
   start_date: string;
   end_date: string;
-  status: 'abierta' | 'cerrada' | 'pendiente';
+  estado: 'abierta' | 'cerrada' | 'pendiente';
   notes?: string;
   created_at?: string;
   updated_at?: string;
@@ -221,7 +221,7 @@ export interface Gestion {
   id: number;
   year: string;
   period_type: 'semestral';
-  status: 'abierta' | 'cerrada' | 'pendiente';
+  estado: 'abierta' | 'cerrada' | 'pendiente';
   is_current: boolean;
   notes?: string;
   periodos?: Periodo[];

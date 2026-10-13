@@ -27,16 +27,16 @@ interface Gestion {
   id: number;
   year: string;
   period_type: string;
-  status: string;
+  estado: string;
   is_current: boolean;
-  periodos?: { id: number; number: string; name: string; status: string }[];
+  periodos?: { id: number; number: string; name: string; estado: string }[];
 }
 
 interface Periodo {
   id: number;
   number: string;
   name: string;
-  status: string;
+  estado: string;
 }
 
 interface StudentData {
@@ -51,7 +51,7 @@ interface StudentData {
   form01_code: string;
   bachelor_title_number: string;
   bachelor_title_date: string;
-  status: string;
+  estado: string;
   persona?: {
     id: number;
     ci: string;
@@ -62,7 +62,7 @@ interface StudentData {
     birthdate: string;
     birthplace: string;
     gender: string;
-    marital_status: string;
+    marital_estado: string;
     nationality: string;
     phone: string;
     email: string;
@@ -145,7 +145,7 @@ export default function EditStudentPage() {
           birthdate: student.persona.birthdate || '',
           birthplace: student.persona.birthplace || '',
           gender: student.persona.gender || '',
-          marital_status: student.persona.marital_status || '',
+          marital_estado: student.persona.marital_estado || '',
           nationality: student.persona.nationality || 'Boliviana',
           phone: student.persona.phone || '',
           email: student.persona.email || '',
@@ -163,7 +163,7 @@ export default function EditStudentPage() {
         form01_code: student.form01_code || '',
         bachelor_title_number: student.bachelor_title_number || '',
         bachelor_title_date: student.bachelor_title_date || '',
-        status: student.status || 'activo',
+        estado: student.estado || 'activo',
       });
     } catch (error) {
       console.error('Error fetching student:', error);
@@ -264,7 +264,7 @@ export default function EditStudentPage() {
         form01_code: studentData.form01_code || undefined,
         bachelor_title_number: studentData.bachelor_title_number || undefined,
         bachelor_title_date: studentData.bachelor_title_date || undefined,
-        status: studentData.status,
+        estado: studentData.estado,
       });
 
       router.push('/estudiantes');
@@ -388,8 +388,8 @@ export default function EditStudentPage() {
               <div>
                 <Selector
                   label="Estado Civil"
-                  value={personData.marital_status}
-                  onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                  value={personData.marital_estado}
+                  onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
                   options={[
                     { value: 'Soltera(o)', label: 'Soltero(a)' },
                     { value: 'Casada(o)', label: 'Casado(a)' },
@@ -459,7 +459,7 @@ export default function EditStudentPage() {
                   error={errors.admission_gestion}
                   options={periodos.map(p => ({
                     value: `${p.gestion.year}-${p.periodo.number}`,
-                    label: `${p.periodo.number}/${p.gestion.year}${p.periodo.status === 'abierta' ? ' ★' : ''}`,
+                    label: `${p.periodo.number}/${p.gestion.year}${p.periodo.estado === 'abierta' ? ' ★' : ''}`,
                   }))}
                   placeholder="Seleccionar período..."
                 />
@@ -498,8 +498,8 @@ export default function EditStudentPage() {
               <div>
                 <Selector
                   label="Estado"
-                  value={studentData.status}
-                  onChange={(e) => setStudentData({ ...studentData, status: e.target.value })}
+                  value={studentData.estado}
+                  onChange={(e) => setStudentData({ ...studentData, estado: e.target.value })}
                   options={[
                     { value: 'activo', label: 'Activo' },
                     { value: 'inactivo', label: 'Inactivo' },

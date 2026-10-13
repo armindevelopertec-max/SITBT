@@ -103,7 +103,7 @@ export default function StaffPage() {
       if (users && users.length > 0 && persona) {
         const user = users[0];
         const newPassword = `${persona.ci}-${new Date().getFullYear()}`;
-        setCredentialsModal({ username: user.username, password: newPassword, nombre, staffId: s.id, personId: s.person_id });
+        setCredentialsModal({ username: user.nombreUsuario, password: newPassword, nombre, staffId: s.id, personId: s.person_id });
       } else {
         setCredentialsModal({ username: 'No tiene usuario', password: '', nombre, staffId: s.id, personId: s.person_id });
       }

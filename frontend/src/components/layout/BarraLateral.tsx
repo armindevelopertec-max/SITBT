@@ -166,7 +166,7 @@ export default function BarraLateral({ colapsada, abierta = true, onCerrar, onCo
   const filteredSections = seccionesMenu
     .map((section) => ({
       ...section,
-      items: section.items.filter((item) => user && item.roles.includes(user.role)),
+      items: section.items.filter((item) => user && item.roles.includes(user.rol)),
     }))
     .filter((section) => section.items.length > 0);
 
@@ -279,10 +279,10 @@ export default function BarraLateral({ colapsada, abierta = true, onCerrar, onCo
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.username}
+                  {user?.nombreUsuario}
                 </p>
                 <p className="text-xs text-gray-500 truncate capitalize">
-                  {user?.role?.replace('_', ' ') || 'Usuario'}
+                  {user?.rol?.replace('_', ' ') || 'Usuario'}
                 </p>
               </div>
             </div>

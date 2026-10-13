@@ -37,7 +37,7 @@ interface Periodo {
   id: number;
   number: string;
   name: string;
-  status: string;
+  estado: string;
 }
 
 export default function NewStudentPage() {
@@ -342,10 +342,10 @@ export default function NewStudentPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_status"
+                      name="marital_estado"
                       value="Soltera(o)"
-                      checked={personData.marital_status === 'Soltera(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      checked={personData.marital_estado === 'Soltera(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Soltero(a)</span>
@@ -353,10 +353,10 @@ export default function NewStudentPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_status"
+                      name="marital_estado"
                       value="Casada(o)"
-                      checked={personData.marital_status === 'Casada(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_status: e.target.value })}
+                      checked={personData.marital_estado === 'Casada(o)'}
+                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Casado(a)</span>
@@ -437,7 +437,7 @@ export default function NewStudentPage() {
                   error={errors.admission_gestion}
                   options={periodos.map(p => ({
                     value: `${p.gestion.year}-${p.periodo.number}`,
-                    label: `${p.periodo.number}/${p.gestion.year}${p.periodo.status === 'abierta' ? ' ★' : ''}`,
+                    label: `${p.periodo.number}/${p.gestion.year}${p.periodo.estado === 'abierta' ? ' ★' : ''}`,
                   }))}
                   placeholder="Seleccionar período..."
                 />

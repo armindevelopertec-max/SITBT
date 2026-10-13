@@ -4,152 +4,152 @@ import { Rol } from '@/types';
 
 export interface UsuarioRespuesta {
   id: number;
-  username: string;
-  status: 'activo' | 'inactivo' | 'bloqueado';
-  person_id: number;
+  nombreUsuario: string;
+  estado: 'activo' | 'inactivo' | 'bloqueado';
+  personaId: number;
   persona?: {
     id: number;
     ci: string;
-    names: string;
-    lastname_paternal: string;
-    lastname_maternal: string;
-    email?: string;
+    nombres: string;
+    apellidoPaterno: string;
+    apellidoMaterno: string;
+    correo?: string;
   };
   roles?: Array<{
     id: number;
-    code: string;
-    name: string;
+    codigo: string;
+    nombre: string;
   }>;
-  created_at?: string;
-  updated_at?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
-export interface CreateUsuarioData {
-  person_id: number;
-  username: string;
-  password: string;
-  role_code?: Rol;
+export interface CrearUsuarioDatos {
+  personaId: number;
+  nombreUsuario: string;
+  contrasena: string;
+  codigoRol?: Rol;
 }
 
-export interface UpdateUsuarioData {
-  username?: string;
-  status?: 'activo' | 'inactivo' | 'bloqueado';
-  password?: string;
+export interface ActualizarUsuarioDatos {
+  nombreUsuario?: string;
+  estado?: 'activo' | 'inactivo' | 'bloqueado';
+  contrasena?: string;
 }
 
 export interface DatosResetearContrasena {
-  newPassword: string;
+  nuevaContrasena: string;
 }
 
 export function usarUsuarios() {
-  const [users, setUsuarios] = useState<UsuarioRespuesta[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [usuarios, setUsuarios] = useState<UsuarioRespuesta[]>([]);
+  const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
+  const [paginacion, setPaginacion] = useState({ pagina: 1, limite: 20, total: 0 });
 
-  const fetchUsuarios = useCallback(async (page = 1, limit = 20) => {
+  const obtenerUsuarios = useCallback(async (pagina = 1, limite = 20) => {
     try {
-      setLoading(true);
+      setCargando(true);
       setError(null);
-      const response = await api.get(`/usuarios?page=${page}&limit=${limit}`);
-      const { data, total, page: currentPage, limit: currentLimit } = response.data;
+      const respuesta = await api.get(`/usuarios?pagina=${pagina}&limite=${limite}`);
+      const { data, total, pagina: paginaActual, limite: limiteActual } = respuesta.data;
       setUsuarios(data);
-      setPagination({ page: currentPage, limit: currentLimit, total });
+      setPaginacion({ pagina: paginaActual, limite: limiteActual, total });
     } catch (err: any) {
       console.error('Error al obtener usuarios:', err);
       setError(err.response?.data?.message || 'Error al cargar usuarios');
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   }, []);
 
-  const fetchActiveUsuarios = useCallback(async () => {
+  const obtenerUsuariosActivos = useCallback(async () => {
     try {
-      setLoading(true);
+      setCargando(true);
       setError(null);
-      const response = await api.get('/usuarios/active');
-      setUsuarios(response.data);
+      const respuesta = await api.get('/usuarios/activos');
+      setUsuarios(respuesta.data);
     } catch (err: any) {
       console.error('Error al obtener usuarios activos:', err);
       setError(err.response?.data?.message || 'Error al cargar usuarios activos');
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   }, []);
 
-  const getUsuarioById = useCallback(async (id: number): Promise<UsuarioRespuesta | null> => {
+  const obtenerUsuarioPorId = useCallback(async (id: number): Promise<UsuarioRespuesta | null> => {
     try {
-      const response = await api.get(`/usuarios/${id}`);
-      return response.data;
+      const respuesta = await api.get(`/usuarios/${id}`);
+      return respuesta.data;
     } catch (err: any) {
       console.error('Error al obtener usuario:', err);
       return null;
     }
   }, []);
 
-  const getUsuarioRoles = useCallback(async (userId: number) => {
+  const obtenerRolesUsuario = useCallback(async (usuarioId: number) => {
     try {
-      const response = await api.get(`/usuarios/${userId}/roles`);
-      return response.data;
+      const respuesta = await api.get(`/usuarios/${usuarioId}/roles`);
+      return respuesta.data;
     } catch (err: any) {
-      console.error('Error fetching user roles:', err);
+      console.error('Error al obtener roles del usuario:', err);
       return [];
     }
   }, []);
 
-  const crearUsuario = useCallback(async (userData: CreateUsuarioData) => {
+  const crearUsuario = useCallback(async (datosUsuario: CrearUsuarioDatos) => {
     try {
-      setLoading(true);
-      const response = await api.post('/usuarios', userData);
-      await fetchUsuarios(pagination.page, pagination.limit);
-      return response.data;
+      setCargando(true);
+      const respuesta = await api.post('/usuarios', datosUsuario);
+      await obtenerUsuarios(paginacion.pagina, paginacion.limite);
+      return respuesta.data;
     } catch (err: any) {
-      console.error('Error creating user:', err);
+      console.error('Error al crear usuario:', err);
       throw err;
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
-  }, [fetchUsuarios, pagination.page, pagination.limit]);
+  }, [obtenerUsuarios, paginacion.pagina, paginacion.limite]);
 
-  const actualizarUsuario = useCallback(async (id: number, userData: UpdateUsuarioData) => {
+  const actualizarUsuario = useCallback(async (id: number, datosUsuario: ActualizarUsuarioDatos) => {
     try {
-      setLoading(true);
-      const response = await api.patch(`/usuarios/${id}`, userData);
-      await fetchUsuarios(pagination.page, pagination.limit);
-      return response.data;
+      setCargando(true);
+      const respuesta = await api.patch(`/usuarios/${id}`, datosUsuario);
+      await obtenerUsuarios(paginacion.pagina, paginacion.limite);
+      return respuesta.data;
     } catch (err: any) {
-      console.error('Error updating user:', err);
+      console.error('Error al actualizar usuario:', err);
       throw err;
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
-  }, [fetchUsuarios, pagination.page, pagination.limit]);
+  }, [obtenerUsuarios, paginacion.pagina, paginacion.limite]);
 
   const eliminarUsuario = useCallback(async (id: number) => {
     try {
-      setLoading(true);
+      setCargando(true);
       await api.delete(`/usuarios/${id}`);
-      await fetchUsuarios(pagination.page, pagination.limit);
+      await obtenerUsuarios(paginacion.pagina, paginacion.limite);
     } catch (err: any) {
-      console.error('Error deleting user:', err);
+      console.error('Error al eliminar usuario:', err);
       throw err;
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
-  }, [fetchUsuarios, pagination.page, pagination.limit]);
+  }, [obtenerUsuarios, paginacion.pagina, paginacion.limite]);
 
-  const cambiarContrasena = useCallback(async (id: number, newPassword: string) => {
+  const cambiarContrasena = useCallback(async (id: number, nuevaContrasena: string) => {
     try {
-      await api.post(`/usuarios/${id}/change-password`, { newPassword });
+      await api.post(`/usuarios/${id}/cambiar-contrasena`, { nuevaContrasena });
     } catch (err: any) {
       console.error('Error al cambiar contraseña:', err);
       throw err;
     }
   }, []);
 
-  const asignarRol = useCallback(async (userId: number, roleId: number) => {
+  const asignarRol = useCallback(async (usuarioId: number, rolId: number) => {
     try {
-      await api.post(`/usuarios/${userId}/assign-role/${roleId}`);
+      await api.post(`/usuarios/${usuarioId}/asignar-rol/${rolId}`);
     } catch (err: any) {
       console.error('Error al asignar rol:', err);
       throw err;
@@ -157,19 +157,19 @@ export function usarUsuarios() {
   }, []);
 
   useEffect(() => {
-    fetchUsuarios();
-  }, [fetchUsuarios]);
+    obtenerUsuarios();
+  }, [obtenerUsuarios]);
 
   return {
-    users,
-    loading,
+    usuarios,
+    cargando,
     error,
-    pagination,
-    refetch: () => fetchUsuarios(pagination.page, pagination.limit),
-    fetchUsuarios,
-    fetchActiveUsuarios,
-    getUsuarioById,
-    getUsuarioRoles,
+    paginacion,
+    recargar: () => obtenerUsuarios(paginacion.pagina, paginacion.limite),
+    obtenerUsuarios,
+    obtenerUsuariosActivos,
+    obtenerUsuarioPorId,
+    obtenerRolesUsuario,
     crearUsuario,
     actualizarUsuario,
     eliminarUsuario,

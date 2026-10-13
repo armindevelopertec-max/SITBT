@@ -23,17 +23,17 @@ const rolColors: Record<string, 'default' | 'primary' | 'secondary' | 'exito' | 
 };
 
 const ROLES = [
-  { code: 'administrador', name: 'Administrador' },
-  { code: 'secretaria', name: 'Secretaría' },
-  { code: 'director_academico', name: 'Director Académico' },
-  { code: 'rector', name: 'Rector' },
-  { code: 'docente', name: 'Docente' },
-  { code: 'estudiante', name: 'Estudiante' },
-  { code: 'apoyo', name: 'Apoyo' },
+  { codigo: 'administrador', nombre: 'Administrador' },
+  { codigo: 'secretaria', nombre: 'Secretaría' },
+  { codigo: 'director_academico', nombre: 'Director Académico' },
+  { codigo: 'rector', nombre: 'Rector' },
+  { codigo: 'docente', nombre: 'Docente' },
+  { codigo: 'estudiante', nombre: 'Estudiante' },
+  { codigo: 'apoyo', nombre: 'Apoyo' },
 ];
 
 export default function UsersPage() {
-  const { users, loading, error, pagination, refetch, crearUsuario, actualizarUsuario, eliminarUsuario, cambiarContrasena } = usarUsuarios();
+  const { usuarios, cargando, error, paginacion, recargar, crearUsuario, actualizarUsuario, eliminarUsuario, cambiarContrasena } = usarUsuarios();
   const [searchTerm, setSearchTerm] = useState('');
 
   const [resetModal, setResetModal] = useState({ open: false, user: null as UsuarioRespuesta | null });
@@ -41,25 +41,25 @@ export default function UsersPage() {
   const [createModal, setCreateModal] = useState(false);
   const [editModal, setEditModal] = useState<UsuarioRespuesta | null>(null);
 
-  const [formData, setFormData] = useState({ username: '', password: '', person_id: 1, role_code: 'estudiante' });
+  const [formData, setFormData] = useState({ nombreUsuario: '', contrasena: '', personaId: 1, codigoRol: 'estudiante' });
   const [formLoading, setFormLoading] = useState(false);
 
   const [newPassword, setNewPassword] = useState('');
   const [resetPasswordModal, setResetPasswordModal] = useState({ open: false, user: null as UsuarioRespuesta | null });
   const [resetLoading, setResetLoading] = useState(false);
 
-  const filteredUsers = users.filter(user =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.persona?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.persona?.names?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = usuarios.filter(user =>
+    user.nombreUsuario.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.persona?.correo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.persona?.nombres?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getRoleBadge = (roles: UsuarioRespuesta['roles']) => {
     if (!roles || roles.length === 0) return <Insignia variant="default">Sin rol</Insignia>;
     const primaryRole = roles[0];
     return (
-      <Insignia variant={rolColors[primaryRole.code] || 'default'} className="capitalize">
-        {primaryRole.name}
+      <Insignia variant={rolColors[primaryRole.codigo] || 'default'} className="capitalize">
+        {primaryRole.nombre}
       </Insignia>
     );
   };
@@ -67,9 +67,9 @@ export default function UsersPage() {
   const handleCreate = async () => {
     try {
       setFormLoading(true);
-      await crearUsuario({ ...formData, role_code: formData.role_code as Rol });
+      await crearUsuario({ ...formData, codigoRol: formData.codigoRol as Rol });
       setCreateModal(false);
-      setFormData({ username: '', password: '', person_id: 1, role_code: 'estudiante' });
+      setFormData({ nombreUsuario: '', contrasena: '', personaId: 1, codigoRol: 'estudiante' });
     } catch (err) {
       console.error('Error creating user:', err);
     } finally {
@@ -81,7 +81,7 @@ export default function UsersPage() {
     if (!editModal) return;
     try {
       setFormLoading(true);
-      await actualizarUsuario(editModal.id, { username: formData.username });
+      await actualizarUsuario(editModal.id, { nombreUsuario: formData.nombreUsuario });
       setEditModal(null);
     } catch (err) {
       console.error('Error updating user:', err);
@@ -118,7 +118,7 @@ export default function UsersPage() {
   };
 
   const openEditModal = (user: UsuarioRespuesta) => {
-    setFormData({ ...formData, username: user.username });
+    setFormData({ ...formData, nombreUsuario: user.nombreUsuario });
     setEditModal(user);
   };
 
@@ -127,7 +127,7 @@ export default function UsersPage() {
       <div className="space-y-6">
         <Migas items={[{ label: 'Usuarios' }]} />
         <div className="p-4 text-red-500">Error: {error}</div>
-        <Boton onClick={refetch}>Reintentar</Boton>
+        <Boton onClick={recargar}>Reintentar</Boton>
       </div>
     );
   }
@@ -160,7 +160,7 @@ export default function UsersPage() {
           </div>
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
-          {loading && users.length === 0 ? (
+          {cargando && usuarios.length === 0 ? (
             <div className="flex justify-center p-8">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
@@ -183,14 +183,14 @@ export default function UsersPage() {
                         <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
                           <Shield className="w-4 h-4 text-primary-600" />
                         </div>
-                        <span className="font-medium">{user.username}</span>
+                        <span className="font-medium">{user.nombreUsuario}</span>
                       </div>
                     </CeldaTabla>
-                    <CeldaTabla>{user.persona?.email || '-'}</CeldaTabla>
+                    <CeldaTabla>{user.persona?.correo || '-'}</CeldaTabla>
                     <CeldaTabla>{getRoleBadge(user.roles)}</CeldaTabla>
                     <CeldaTabla>
-                      <Insignia variant={user.status === 'activo' ? 'exito' : 'error'} className="capitalize">
-                        {user.status}
+                      <Insignia variant={user.estado === 'activo' ? 'exito' : 'error'} className="capitalize">
+                        {user.estado}
                       </Insignia>
                     </CeldaTabla>
                     <CeldaTabla>
@@ -226,8 +226,8 @@ export default function UsersPage() {
           <div>
             <label className="block text-sm font-medium mb-1">Nombre de usuario</label>
             <Entrada
-              value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              value={formData.nombreUsuario}
+              onChange={(e) => setFormData({ ...formData, nombreUsuario: e.target.value })}
               placeholder="juan.perez"
             />
           </div>
@@ -235,8 +235,8 @@ export default function UsersPage() {
             <label className="block text-sm font-medium mb-1">Contraseña</label>
             <Entrada
               type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              value={formData.contrasena}
+              onChange={(e) => setFormData({ ...formData, contrasena: e.target.value })}
               placeholder="Contraseña segura"
             />
           </div>
@@ -244,11 +244,11 @@ export default function UsersPage() {
             <label className="block text-sm font-medium mb-1">Rol</label>
             <select
               className="w-full p-2 border rounded-md"
-              value={formData.role_code}
-              onChange={(e) => setFormData({ ...formData, role_code: e.target.value })}
+              value={formData.codigoRol}
+              onChange={(e) => setFormData({ ...formData, codigoRol: e.target.value })}
             >
               {ROLES.map((role) => (
-                <option key={role.code} value={role.code}>{role.name}</option>
+                <option key={role.codigo} value={role.codigo}>{role.nombre}</option>
               ))}
             </select>
           </div>
@@ -264,8 +264,8 @@ export default function UsersPage() {
           <div>
             <label className="block text-sm font-medium mb-1">Nombre de usuario</label>
             <Entrada
-              value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              value={formData.nombreUsuario}
+              onChange={(e) => setFormData({ ...formData, nombreUsuario: e.target.value })}
               placeholder="juan.perez"
             />
           </div>
@@ -281,7 +281,7 @@ export default function UsersPage() {
         onClose={() => setDeleteModal({ open: false, user: null })}
         onConfirm={handleDelete}
         title="Eliminar Usuario"
-        message={`¿Está seguro de eliminar el usuario "${deleteModal.user?.username}"? Esta acción no se puede deshacer.`}
+        message={`¿Está seguro de eliminar el usuario "${deleteModal.user?.nombreUsuario}"? Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
         variant="destructive"
         loading={formLoading}
@@ -290,7 +290,7 @@ export default function UsersPage() {
       <Modal open={resetPasswordModal.open} onClose={() => setResetPasswordModal({ open: false, user: null })} title="Restablecer Contraseña" size="sm">
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            Ingrese la nueva contraseña para el usuario &quot;{resetPasswordModal.user?.username}&quot;:
+            Ingrese la nueva contraseña para el usuario &quot;{resetPasswordModal.user?.nombreUsuario}&quot;:
           </p>
           <div>
             <label className="block text-sm font-medium mb-1">Nueva contraseña</label>
