@@ -20,8 +20,8 @@ import { Response } from 'express';
 import { ServicioAlmacenamiento, UploadedFile as UploadedFileType } from './almacenamiento.service';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
-@ApiTags('Storage')
-@Controller('storage')
+@ApiTags('Almacenamiento')
+@Controller('almacenamiento')
 export class ControladorAlmacenamiento {
   private readonly logger = new Logger(ControladorAlmacenamiento.name);
   constructor(private readonly service: ServicioAlmacenamiento) {}
