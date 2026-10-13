@@ -10,12 +10,13 @@ export type Rol =
 export interface Usuario {
   id: number;
   nombreUsuario: string;
-  email?: string;
+  correo?: string;
   rol: Rol;
+  roles?: Array<{ id: number; codigo: string; nombre: string }>;
   personaId?: number;
   estado: string;
-  created_at?: string;
-  updated_at?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 export interface Persona {
@@ -36,12 +37,12 @@ export interface Persona {
   military_book_number?: string;
   mother_tongue?: string;
   phone?: string;
-  email?: string;
+  correo?: string;
   address?: string;
   photo_url?: string;
   status?: 'activo' | 'inactivo';
-  created_at?: string;
-  updated_at?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 export interface Estudiante {
@@ -51,8 +52,8 @@ export interface Estudiante {
   admission_date: string;
   status: 'activo' | 'inactivo' | 'egresado' | 'suspendido';
   persona?: Persona;
-  created_at?: string;
-  updated_at?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
   estado_matricula?: 'pre_registro' | 'verificado' | 'matriculado' | 'egresado' | 'retirado';
   origen?: 'web' | 'secretaria';
   admission_request_id?: string;
@@ -69,8 +70,8 @@ export interface Personal {
   hire_date: string;
   status: 'activo' | 'inactivo' | 'licencia';
   persona?: Persona;
-  created_at?: string;
-  updated_at?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 export interface Carrera {
@@ -82,8 +83,8 @@ export interface Carrera {
   description?: string;
   load_hours?: number;
   status: 'activo' | 'inactivo';
-  created_at?: string;
-  updated_at?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 export interface Materia {
@@ -213,8 +214,8 @@ export interface Periodo {
   end_date: string;
   estado: 'abierta' | 'cerrada' | 'pendiente';
   notes?: string;
-  created_at?: string;
-  updated_at?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 export interface Gestion {
@@ -225,8 +226,8 @@ export interface Gestion {
   is_current: boolean;
   notes?: string;
   periodos?: Periodo[];
-  created_at?: string;
-  updated_at?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 export type EstadoAdmision = 'pendiente' | 'verificado' | 'rechazado' | 'convertido';
@@ -256,8 +257,8 @@ export interface SolicitudAdmision {
   certificadoBachillerPath?: string;
   fotoPath?: string;
   converted_student_id?: number;
-  created_at?: string;
-  updated_at?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
   birthplace?: string;
   birthplace_other?: string;
   nationality?: string;
@@ -299,7 +300,7 @@ export interface RegistroConsentimiento {
   consentimientoTutor: boolean;
   derechoEjercido?: 'access' | 'rectification' | 'deletion';
   derechoFecha?: string;
-  created_at?: string;
+  creadoEn?: string;
 }
 
 export interface EstudianteExtendido extends Estudiante {
@@ -331,5 +332,5 @@ export interface CredencialExtendida {
   estado_entrega: EstadoEntregaCredencial;
   entregado_a?: number;
   fecha_entrega?: string;
-  created_at?: string;
+  creadoEn?: string;
 }

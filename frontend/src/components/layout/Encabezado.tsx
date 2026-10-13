@@ -65,7 +65,7 @@ export default function Encabezado({ title, onMenuClick }: PropsEncabezado) {
               </div>
               <div className="hidden sm:block text-left">
                 <p className="text-sm font-medium text-gray-900">{user?.nombreUsuario}</p>
-                <p className="text-xs text-gray-500">{user?.email}</p>
+                <p className="text-xs text-gray-500">{user?.correo}</p>
               </div>
               <ChevronDown
                 className={cn(
@@ -79,7 +79,7 @@ export default function Encabezado({ title, onMenuClick }: PropsEncabezado) {
               <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="px-4 py-3 border-b border-gray-100">
                   <p className="text-sm font-medium text-gray-900">{user?.nombreUsuario}</p>
-                  <p className="text-xs text-gray-500">{user?.email}</p>
+                  <p className="text-xs text-gray-500">{user?.correo}</p>
                   <span
                     className={cn(
                       'inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full capitalize',

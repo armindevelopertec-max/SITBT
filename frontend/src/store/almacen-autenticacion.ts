@@ -28,7 +28,7 @@ export const usarAlmacenAutenticacion = create<EstadoAutenticacion>()(
           const transformedUser: Usuario = {
             id: user.id,
             nombreUsuario: user.nombreUsuario ?? user.nombreUsuario,
-            email: user.person?.email || '',
+            correo: user.person?.email || '',
             rol: firstRole,
             personaId: user.personaId ?? user.personaId,
             estado: 'activo',

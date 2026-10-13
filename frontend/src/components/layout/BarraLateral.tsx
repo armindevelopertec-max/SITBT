@@ -161,12 +161,17 @@ const seccionesMenu: SeccionMenu[] = [
 export default function BarraLateral({ colapsada, abierta = true, onCerrar, onColapsar }: PropsBarraLateral) {
   const pathname = usePathname();
   const { user } = usarAlmacenAutenticacion();
+  const userRoles = user?.roles?.map((r: any) => r.codigo || r.code || r) || [];
   const { settings } = usarConfiguracionInstitucional();
 
   const filteredSections = seccionesMenu
     .map((section) => ({
       ...section,
-      items: section.items.filter((item) => user && item.roles.includes(user.rol)),
+      items: section.items.filter((item) => {
+        if (!user) return false;
+        const userRoles = user.roles?.map((r: any) => r.codigo || r.code || r) || [];
+        return item.roles.some((r) => userRoles.includes(r));
+      }),
     }))
     .filter((section) => section.items.length > 0);
 
@@ -282,7 +287,7 @@ export default function BarraLateral({ colapsada, abierta = true, onCerrar, onCo
                   {user?.nombreUsuario}
                 </p>
                 <p className="text-xs text-gray-500 truncate capitalize">
-                  {user?.rol?.replace('_', ' ') || 'Usuario'}
+                  {userRoles[0]?.replace('_', ' ') || 'Usuario'}
                 </p>
               </div>
             </div>
