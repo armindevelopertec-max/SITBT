@@ -200,7 +200,7 @@ export default function PaymentsPage() {
         receipt_number: formData.receipt_number || undefined,
         notes: formData.notes || undefined,
         received_by: 1,
-        status: 'PAGADO',
+        estado: 'PAGADO',
       });
       setModalOpen(false);
       fetchPagos();

@@ -26,7 +26,7 @@ export default function NewStaffPage() {
     birthplace: '',
     birthplace_other: '',
     gender: '',
-    marital_status: '',
+    marital_estado: '',
     nationality: 'Boliviana',
     nationality_other: '',
     phone: '',
@@ -85,7 +85,7 @@ export default function NewStaffPage() {
         phone: personData.phone || undefined,
         email: personData.email || undefined,
         address: personData.address || undefined,
-        status: 'activo',
+        estado: 'activo',
       };
 
       const personResponse = await api.post('/personas', personPayload);
@@ -96,7 +96,7 @@ export default function NewStaffPage() {
         profession: staffData.profession || undefined,
         position: staffData.position,
         hire_date: staffData.hire_date,
-        status: 'activo',
+        estado: 'activo',
       };
 
       const response = await api.post('/personal', staffPayload);

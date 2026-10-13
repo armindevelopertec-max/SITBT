@@ -18,7 +18,7 @@ interface PlanEstudio {
   career_id: number;
   rm_number: string;
   rm_date: string;
-  status: 'vigente' | 'historico';
+  estado: 'vigente' | 'historico';
   notes: string | null;
   carrera?: { id: number; code: string; name: string };
   created_at: string;

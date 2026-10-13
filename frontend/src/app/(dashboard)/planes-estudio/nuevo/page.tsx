@@ -27,7 +27,7 @@ export default function NuevoPlanPage() {
     career_id: '',
     rm_number: '',
     rm_date: '',
-    status: 'vigente',
+    estado: 'vigente',
     notes: '',
   });
 

@@ -57,7 +57,7 @@ export default function EditStaffPage() {
     birthdate: '',
     birthplace: '',
     gender: '',
-    marital_status: '',
+    marital_estado: '',
     nationality: 'Boliviana',
     phone: '',
     email: '',
@@ -68,7 +68,7 @@ export default function EditStaffPage() {
     profession: '',
     position: '',
     hire_date: '',
-    status: 'activo',
+    estado: 'activo',
   });
 
   const toUpper = (value: string) => value.toUpperCase();
@@ -160,7 +160,7 @@ export default function EditStaffPage() {
         phone: personData.phone || undefined,
         email: personData.email || undefined,
         address: personData.address || undefined,
-        status: 'activo',
+        estado: 'activo',
       });
 
       await api.patch(`/personal/${staffId}`, {

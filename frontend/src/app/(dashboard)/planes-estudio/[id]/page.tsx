@@ -21,7 +21,7 @@ interface PlanEstudio {
   career_id: number;
   rm_number: string;
   rm_date: string;
-  status: 'vigente' | 'historico';
+  estado: 'vigente' | 'historico';
   notes: string | null;
 }
 
@@ -41,7 +41,7 @@ export default function EditarPlanPage() {
     career_id: '',
     rm_number: '',
     rm_date: '',
-    status: 'vigente',
+    estado: 'vigente',
     notes: '',
   });
 

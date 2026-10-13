@@ -173,7 +173,7 @@ export default function CareerDetailPage() {
     const fetchCareer = async () => {
       try {
         const response = await publicApi.get<{ data: Carrera[] }>('/carreras', {
-          params: { status: 'activo' },
+          params: { estado: 'activo' },
         });
         const found = response.data.data.find((c) => c.id === careerId);
         setCareer(found || null);

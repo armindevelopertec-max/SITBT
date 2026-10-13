@@ -93,7 +93,7 @@ export default function EditStudentPage() {
     birthdate: '',
     birthplace: '',
     gender: '',
-    marital_status: '',
+    marital_estado: '',
     nationality: 'Boliviana',
     phone: '',
     email: '',
@@ -110,7 +110,7 @@ export default function EditStudentPage() {
     form01_code: '',
     bachelor_title_number: '',
     bachelor_title_date: '',
-    status: 'activo',
+    estado: 'activo',
   });
 
   useEffect(() => {
@@ -251,7 +251,7 @@ export default function EditStudentPage() {
       await api.patch(`/personas/${student.person_id}`, {
         ...personData,
         gender: personData.gender,
-        status: 'activo',
+        estado: 'activo',
       });
 
       await api.patch(`/estudiantes/${studentId}`, {

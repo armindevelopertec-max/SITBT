@@ -46,7 +46,7 @@ export default function CareersPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await publicApi.get<{ data: Carrera[] }>('/carreras', { params: { status: 'activo' } });
+        const response = await publicApi.get<{ data: Carrera[] }>('/carreras', { params: { estado: 'activo' } });
         const careersWithPlans: CareerWithPlan[] = response.data.data.map((career) => ({
           ...career,
           studyPlan: getStudyPlanForCareer(career.id),

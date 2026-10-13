@@ -98,7 +98,7 @@ export default function GestionesPage() {
       if (editingGestion) {
         await api.patch(`/gestiones/${editingGestion.id}`, formData);
       } else {
-        await api.post('/gestiones', { ...formData, status: 'pendiente' });
+        await api.post('/gestiones', { ...formData, estado: 'pendiente' });
       }
       fetchGestiones();
       handleCloseModal();

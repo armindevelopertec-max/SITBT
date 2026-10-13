@@ -146,7 +146,7 @@ export default function NewCredentialPage() {
         issued_date: formData.issued_date,
         valid_until: formData.valid_until,
         photo_url: formData.photo_url || undefined,
-        status: 'emitida',
+        estado: 'emitida',
         issued_by: 1,
         printed: false,
         notes: formData.notes || undefined,

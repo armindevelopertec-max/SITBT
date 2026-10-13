@@ -42,7 +42,7 @@ function PreRegistroForm() {
     const fetchCareers = async () => {
       try {
         const response = await publicApi.get<{ data: Carrera[] }>('/carreras', {
-          params: { status: 'activo' },
+          params: { estado: 'activo' },
         });
         setCareers(response.data.data);
       } catch (error) {

@@ -60,7 +60,7 @@ export default function NewStudentPage() {
     birthplace: '',
     birthplace_other: '',
     gender: '',
-    marital_status: '',
+    marital_estado: '',
     nationality: 'Boliviana',
     nationality_other: '',
     phone: '',
@@ -169,7 +169,7 @@ export default function NewStudentPage() {
       const personPayload = {
         ...personData,
         gender: personData.gender,
-        status: 'activo',
+        estado: 'activo',
       };
 
       const personResponse = await api.post('/personas', personPayload);
@@ -185,7 +185,7 @@ export default function NewStudentPage() {
         form01_code: studentData.form01_code || undefined,
         bachelor_title_number: studentData.bachelor_title_number || undefined,
         bachelor_title_date: studentData.bachelor_title_date || undefined,
-        status: 'activo',
+        estado: 'activo',
       };
 
       const response = await api.post('/estudiantes', studentPayload);
