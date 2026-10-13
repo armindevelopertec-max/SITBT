@@ -22,15 +22,16 @@ export const usarAlmacenAutenticacion = create<EstadoAutenticacion>()(
           const response = await api.post('/autenticacion/login', { username, password });
           const { access_token, user } = response.data;
 
-          const roles = user.rols as any[];
-          const firstRole = roles && roles.length > 0 ? roles[0].code : 'administrador';
+          const roles = (user.roles || []) as Array<{ id: number; codigo: string; nombre: string }>;
+          const firstRole = roles.length > 0 ? roles[0].codigo : 'administrador';
 
           const transformedUser: Usuario = {
             id: user.id,
             nombreUsuario: user.nombreUsuario ?? user.nombreUsuario,
-            correo: user.person?.email || '',
-            rol: firstRole,
-            personaId: user.personaId ?? user.personaId,
+            correo: user.person?.correo || '',
+            rol: firstRole as any,
+            roles: roles,
+            personaId: user.personaId ?? user.persona_id,
             estado: 'activo',
           };
 
