@@ -55,7 +55,7 @@ export class ServicioPersonal {
     });
     const savedUsuario = await this.usuarioRepository.save(usuario);
 
-    const roleCode = this.mapPositionToRole(savedStaff.position);
+    const roleCode = this.mapPositionToRole(savedStaff.cargo);
     const rol = await this.rolRepository.findOne({ where: { codigo: roleCode } });
     if (rol) {
       const usuarioRol = this.usuarioRolRepository.create({
@@ -90,7 +90,7 @@ export class ServicioPersonal {
     page = 1,
     limit = 20,
     status?: EstadoPersonal,
-    position?: CargoPersonal,
+    cargo?: CargoPersonal,
   ): Promise<{ data: Personal[]; total: number; page: number; limit: number }> {
     const query = this.staffRepository
       .createQueryBuilder('staff')
@@ -100,8 +100,8 @@ export class ServicioPersonal {
       query.andWhere('staff.estado = :status', { status });
     }
 
-    if (position) {
-      query.andWhere('staff.position = :position', { position });
+    if (cargo) {
+      query.andWhere('staff.cargo = :cargo', { cargo });
     }
 
     const [data, total] = await query
@@ -151,7 +151,7 @@ export class ServicioPersonal {
 
   async findByPosition(position: CargoPersonal): Promise<Personal[]> {
     return this.staffRepository.find({
-      where: { position, estado: EstadoPersonal.ACTIVO },
+      where: { cargo: position, estado: EstadoPersonal.ACTIVO },
       relations: ['persona'],
       order: { fechaContrato: 'ASC' },
     });

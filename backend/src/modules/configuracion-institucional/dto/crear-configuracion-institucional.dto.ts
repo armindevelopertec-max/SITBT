@@ -10,7 +10,7 @@ export class CrearConfiguracionInstitucionalDto {
   @ApiProperty({ description: 'Nombre corto o sigla', maxLength: 50 })
   @IsString()
   @MaxLength(50)
-  nombre_corto: string;
+  nombreCorto: string;
 
   @ApiPropertyOptional({ description: 'Lema de la institución', maxLength: 255 })
   @IsOptional()
@@ -22,7 +22,7 @@ export class CrearConfiguracionInstitucionalDto {
   @IsOptional()
   @IsString()
   @MaxLength(500)
-  logo_url?: string;
+  logoUrl?: string;
 
   @ApiPropertyOptional({ description: 'Dirección de la institución', maxLength: 500 })
   @IsOptional()
@@ -52,7 +52,7 @@ export class CrearConfiguracionInstitucionalDto {
   @IsOptional()
   @IsString()
   @MaxLength(100)
-  website?: string;
+  sitioWeb?: string;
 
   @ApiPropertyOptional({ description: 'Ciudad', maxLength: 100 })
   @IsOptional()

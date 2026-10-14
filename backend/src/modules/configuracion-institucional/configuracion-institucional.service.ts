@@ -46,23 +46,23 @@ export class ServicioConfiguracionInstitucional {
 
   async getPublicSettings(): Promise<Partial<ConfiguracionInstitucional>> {
     const settings = await this.findOne();
-    let logoUrl = settings.logo_url;
+    let logoUrl = settings.logoUrl;
     if (logoUrl && logoUrl.startsWith('http')) {
       const match = logoUrl.match(/\/sitbt-files\/(.+)$/);
       if (match) {
-        logoUrl = `/storage/files/${match[1]}`;
+        logoUrl = `/api/almacenamiento/files/${match[1]}`;
       }
     }
     return {
       nombre: settings.nombre,
-      nombre_corto: settings.nombre_corto,
+      nombreCorto: settings.nombreCorto,
       lema: settings.lema,
-      logo_url: logoUrl,
+      logoUrl: logoUrl,
       direccion: settings.direccion,
       telefono: settings.telefono,
       departamento: settings.departamento,
       correo: settings.correo,
-      website: settings.website,
+      sitioWeb: settings.sitioWeb,
       ciudad: settings.ciudad,
       pais: settings.pais,
     };

@@ -7,14 +7,14 @@ import {
 } from 'typeorm';
 import { Rol } from './rol.entity';
 
-export enum PermissionAction {
+export enum AccionPermiso {
   CREAR = 'crear',
   LEER = 'leer',
   ACTUALIZAR = 'actualizar',
   ELIMINAR = 'eliminar',
 }
 
-export enum PermissionStatus {
+export enum EstadoPermiso {
   ACTIVO = 'activo',
   INACTIVO = 'inactivo',
 }
@@ -31,12 +31,12 @@ export class Permiso {
   @JoinColumn({ name: 'rol_id' })
   rol: Rol;
 
-  @Column({ type: 'varchar', length: 50 })
-  module: string;
+  @Column({ type: 'varchar', length: 50, name: 'module' })
+  modulo: string;
 
-  @Column({ type: 'enum', enum: PermissionAction, name: 'accion' })
-  accion: PermissionAction;
+  @Column({ type: 'enum', enum: AccionPermiso, name: 'accion' })
+  accion: AccionPermiso;
 
-  @Column({ type: 'enum', enum: PermissionStatus, default: PermissionStatus.ACTIVO })
-  estado: PermissionStatus;
+  @Column({ type: 'enum', enum: EstadoPermiso, default: EstadoPermiso.ACTIVO })
+  estado: EstadoPermiso;
 }

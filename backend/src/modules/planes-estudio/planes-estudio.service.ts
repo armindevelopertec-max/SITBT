@@ -118,8 +118,8 @@ export class ServicioPlanesEstudio {
       planEstudioId: planId,
       materiaId: subjectId,
       semestre,
-      weekly_hours: weeklyHours,
-      prerequisite_id: prerequisiteId ?? null,
+      horasSemanales: weeklyHours,
+      prerrequisitoId: prerequisiteId ?? null,
     });
     return this.materiaPlanRepository.save(materiaPlan);
   }
@@ -142,33 +142,27 @@ export class ServicioPlanesEstudio {
       throw new NotFoundException(`MateriaPlan con ID ${materiaPlanId} no encontrado`);
     }
     materiaPlan.semestre = semestre;
-    materiaPlan.weekly_hours = weeklyHours;
-    materiaPlan.prerequisite_id = prerequisiteId ?? null;
+    materiaPlan.horasSemanales = weeklyHours;
+    materiaPlan.prerrequisitoId = prerequisiteId ?? null;
     return this.materiaPlanRepository.save(materiaPlan);
   }
 
   async getMaterias(planId: number): Promise<any[]> {
-    const results = await this.materiaPlanRepository.query(`
-      SELECT 
-        ps.id,
-        ps.planEstudioId,
-        ps.materiaId,
-        ps.semestre,
-        ps.weekly_hours,
-        ps.prerequisite_id,
-        s.id as materia_id,
-        s.codigo as materia_code,
-        s.nombre as materia_name,
-        prereq.id as prerequisite_id,
-        prereq.codigo as prerequisite_code,
-        prereq.nombre as prerequisite_name
-      FROM plan_subjects ps
-      JOIN subjects s ON s.id = ps.materiaId
-      LEFT JOIN subjects prereq ON prereq.id = ps.prerequisite_id
-      WHERE ps.planEstudioId = $1
-      ORDER BY ps.semestre, s.codigo
-    `, [planId]);
-    return results;
+    const registros = await this.materiaPlanRepository.find({
+      where: { planEstudioId: planId },
+      relations: ['materia', 'prerrequisito'],
+      order: { semestre: 'ASC' },
+    });
+    return registros.map((mp) => ({
+      id: mp.id,
+      planEstudioId: mp.planEstudioId,
+      materiaId: mp.materiaId,
+      semestre: mp.semestre,
+      horasSemanales: mp.horasSemanales,
+      prerrequisitoId: mp.prerrequisitoId,
+      materia: mp.materia,
+      prerrequisito: mp.prerrequisito,
+    }));
   }
 
   async getMateriasDisponibles(): Promise<Materia[]> {

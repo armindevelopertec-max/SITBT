@@ -24,7 +24,7 @@ export class AutenticacionServicio {
 
   async register(data: {
     nombreUsuario: string;
-    password: string;
+    contrasena: string;
     personaId: number;
   }) {
     const existingUser = await (this.userRepository.findOne as any)({
@@ -35,7 +35,7 @@ export class AutenticacionServicio {
       throw new ConflictException('El nombre de usuario ya existe');
     }
 
-    const passwordHash = await bcrypt.hash(data.password, 10);
+    const passwordHash = await bcrypt.hash(data.contrasena, 10);
 
     const user = this.userRepository.create({
       nombreUsuario: data.nombreUsuario,
@@ -60,9 +60,9 @@ export class AutenticacionServicio {
     return { message: 'Usuario registrado exitosamente', usuarioId: (user as any).id };
   }
 
-  async login(username: string, password: string) {
+  async login(nombreUsuario: string, contrasena: string) {
     const user = await (this.userRepository.findOne as any)({
-      where: { nombreUsuario: username },
+      where: { nombreUsuario: nombreUsuario },
       relations: ['persona'],
     });
 
@@ -70,7 +70,7 @@ export class AutenticacionServicio {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.contrasenaHash);
+    const isPasswordValid = await bcrypt.compare(contrasena, user.contrasenaHash);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credenciales inválidas');
@@ -90,8 +90,8 @@ export class AutenticacionServicio {
 
     const payload = {
       sub: user.id,
-      username: user.nombreUsuario as any,
-      person_id: user.personaId,
+      nombreUsuario: user.nombreUsuario as any,
+      personaId: user.personaId,
       roles: roles.map((ur) => ur.rol.codigo),
     };
 
@@ -99,8 +99,8 @@ export class AutenticacionServicio {
       access_token: this.jwtService.sign(payload),
       user: {
         id: user.id,
-        username: user.nombreUsuario as any,
-        person_id: user.personaId,
+        nombreUsuario: user.nombreUsuario as any,
+        personaId: user.personaId,
         persona: user.persona,
         roles: roles.map((ur) => ur.rol),
       },
@@ -124,8 +124,8 @@ export class AutenticacionServicio {
 
     return {
       id: user.id,
-      username: user.nombreUsuario as any,
-      person_id: user.personaId,
+      nombreUsuario: user.nombreUsuario as any,
+      personaId: user.personaId,
       persona: user.persona,
       roles: roles.map((ur) => ur.rol),
     };

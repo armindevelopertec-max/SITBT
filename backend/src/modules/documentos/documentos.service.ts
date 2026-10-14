@@ -93,7 +93,7 @@ export class ServicioDocumentos {
   async markAsPrinted(id: string, impresoPor: number): Promise<DocumentoEmitido> {
     return this.update(id, {
       estado: EstadoDocumento.IMPRESO,
-      impreso_por: impresoPor,
+      impresoPor: impresoPor,
     });
   }
 

@@ -20,9 +20,9 @@ export class Prerrequisito {
   materia: Materia;
 
   @Column({ name: 'prerequisite_materiaId' })
-  prerequisite_materiaId: number;
+  materiaPrerrequisitoId: number;
 
   @ManyToOne(() => Materia)
   @JoinColumn({ name: 'prerequisite_materiaId' })
-  materia_prerrequisito: Materia;
+  materiaPrerrequisito: Materia;
 }

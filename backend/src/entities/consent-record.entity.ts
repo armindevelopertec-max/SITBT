@@ -11,13 +11,13 @@ import { Estudiante } from './estudiante.entity';
 import { Usuario } from './usuario.entity';
 
 export enum TipoConsentimiento {
-  ACCESS = 'access',
-  RECTIFICATION = 'rectification',
-  DELETION = 'deletion',
+  ACCESO = 'acceso',
+  RECTIFICACION = 'rectificacion',
+  ELIMINACION = 'eliminacion',
 }
 
 @Entity('registros_consentimiento')
-export class ConsentRecord {
+export class RegistroConsentimiento {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

@@ -29,5 +29,5 @@ export class GrupoEstudiante {
   estudiante: Estudiante;
 
   @CreateDateColumn({ name: 'inscrito_en' })
-  enrolled_at: Date;
+  inscritoEn: Date;
 }

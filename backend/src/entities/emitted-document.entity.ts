@@ -17,7 +17,7 @@ export enum TipoDocumento {
   CARNET = 'carnet',
   CERTIFICADO = 'certificado',
   CONSTANCIA = 'constancia',
-  recordAcademico = 'record_academico',
+  RECORD_ACADEMICO = 'record_academico',
 }
 
 export enum EstadoDocumento {
@@ -71,7 +71,7 @@ export class DocumentoEmitido {
   estado: EstadoDocumento;
 
   @Column({ nullable: true })
-  impreso_por: number;
+  impresoPor: number;
 
   @ManyToOne(() => Usuario)
   @JoinColumn({ name: 'impreso_por' })

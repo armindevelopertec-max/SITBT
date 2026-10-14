@@ -37,10 +37,10 @@ export class Personal {
   persona: Persona;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'profesion' })
-  profession: string;
+  profesion: string;
 
   @Column({ type: 'varchar', length: 50, name: 'cargo' })
-  position: CargoPersonal;
+  cargo: CargoPersonal;
 
   @Column({ type: 'date', name: 'fecha_contrato' })
   fechaContrato: Date;

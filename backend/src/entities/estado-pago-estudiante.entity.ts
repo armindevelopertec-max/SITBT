@@ -24,13 +24,13 @@ export class EstadoPagoEstudiante {
   gestion: string;
 
   @Column({ type: 'boolean', default: false, name: 'form_registration_paid' })
-  form_registration_paid: boolean;
+  pagoFormularioInscripcion: boolean;
 
   @Column({ type: 'boolean', default: false, name: 'credential_paid' })
-  credential_paid: boolean;
+  pagoCredencial: boolean;
 
-  @Column({ type: 'boolean', default: false })
-  inscription_enabled: boolean;
+  @Column({ type: 'boolean', default: false, name: 'inscription_enabled' })
+  inscripcionHabilitada: boolean;
 
   @UpdateDateColumn({ name: 'actualizado_en' })
   actualizadoEn: Date;

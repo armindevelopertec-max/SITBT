@@ -72,9 +72,9 @@ export class ControladorPlanesEstudio {
   @Post(':id/materias')
   addMateria(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { materiaId: number; semestre: number; weekly_hours: number; prerequisite_id?: number },
+    @Body() body: { materiaId: number; semestre: number; horasSemanales: number; prerrequisitoId?: number },
   ) {
-    return this.studyPlansService.addMateria(id, body.materiaId, body.semestre, body.weekly_hours, body.prerequisite_id);
+    return this.studyPlansService.addMateria(id, body.materiaId, body.semestre, body.horasSemanales, body.prerrequisitoId);
   }
 
   @Delete(':id/materias/:materiaPlanId')
@@ -89,9 +89,9 @@ export class ControladorPlanesEstudio {
   updateMateria(
     @Param('id', ParseIntPipe) id: number,
     @Param('materiaPlanId', ParseIntPipe) materiaPlanId: number,
-    @Body() body: { semestre: number; weekly_hours: number; prerequisite_id?: number },
+    @Body() body: { semestre: number; horasSemanales: number; prerrequisitoId?: number },
   ) {
-    return this.studyPlansService.updateMateria(materiaPlanId, body.semestre, body.weekly_hours, body.prerequisite_id);
+    return this.studyPlansService.updateMateria(materiaPlanId, body.semestre, body.horasSemanales, body.prerrequisitoId);
   }
 
   @Get(':id/materias')

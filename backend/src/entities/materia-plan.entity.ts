@@ -31,12 +31,12 @@ export class MateriaPlan {
   semestre: number;
 
   @Column({ type: 'int', name: 'horas_semanales' })
-  weekly_hours: number;
+  horasSemanales: number;
 
   @Column({ nullable: true, type: 'int', name: 'prerrequisito_id' })
-  prerequisite_id: number | null;
+  prerrequisitoId: number | null;
 
   @ManyToOne(() => Materia, { nullable: true, eager: false })
   @JoinColumn({ name: 'prerrequisito_id' })
-  prerequisite: Materia;
+  prerrequisito: Materia;
 }

@@ -207,8 +207,8 @@ export class ServicioAdmision {
     }
 
     if (!persona) {
-      const finalBirthplace = request.lugarNacimiento === 'Otra' && request.lugarNacimientoOther ? request.lugarNacimientoOther : request.lugarNacimiento;
-      const finalNationality = request.nacionalidad === 'Otra' && request.nacionalidadOther ? request.nacionalidadOther : request.nacionalidad;
+      const finalBirthplace = request.lugarNacimiento === 'Otra' && request.lugarNacimientoOtro ? request.lugarNacimientoOtro : request.lugarNacimiento;
+      const finalNationality = request.nacionalidad === 'Otra' && request.nacionalidadOtra ? request.nacionalidadOtra : request.nacionalidad;
 
       persona = (this.personaRepository.create as any)({
         ci: request.ci,
@@ -218,7 +218,7 @@ export class ServicioAdmision {
         fechaNacimiento: new Date(request.fechaNacimiento),
         lugarNacimiento: finalBirthplace,
         genero: request.genero as any,
-        estadoCivil: request.marital_status as any,
+        estadoCivil: request.estadoCivil as any,
         nationality: finalNationality,
         phone: request.telefono,
         email: request.correo,
@@ -254,7 +254,7 @@ export class ServicioAdmision {
       estadoMatricula: EstadoMatriculaEstudiante.MATRICULADO,
       origen: request.origen === 'web' ? OrigenEstudiante.WEB : OrigenEstudiante.SECRETARIA,
       solicitudAdmisionId: request.id,
-      verificadoPor: request.verificado_por || undefined,
+      verificadoPor: request.verificadoPor || undefined,
       fechaVerificacion: new Date(),
       fechaPreRegistro: request.creadoEn,
     };
@@ -264,7 +264,7 @@ export class ServicioAdmision {
     const savedStudent = (await this.estudianteRepository.save(estudiante)) as Estudiante;
 
     request.estado = EstadoAdmision.CONVERTIDO;
-    request.converted_estudianteId = savedStudent.id;
+    request.estudianteConvertidoId = savedStudent.id;
     await this.admissionRepository.save(request);
 
     return { student: savedStudent, persona };

@@ -16,7 +16,7 @@ export class ActualizarAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  verificado_por?: number;
+  verificadoPor?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -61,7 +61,7 @@ export class ActualizarAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  marital_status?: string;
+  estadoCivil?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

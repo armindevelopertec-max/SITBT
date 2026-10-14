@@ -13,8 +13,8 @@ import { Materia } from './materia.entity';
 import { Usuario } from './usuario.entity';
 
 export enum TipoConvalidacion {
-  PLAN_MIGRATION = 'plan_migration',
-  EXTERNAL_TRANSFER = 'external_transfer',
+  MIGRACION_PLAN = 'migracion_plan',
+  TRANSFERENCIA_EXTERNA = 'transferencia_externa',
   TRANSITABILIDAD = 'transitabilidad',
 }
 
@@ -44,7 +44,7 @@ export class ConvalidacionEstudiante {
   equivalencia: Equivalencia;
 
   @Column({ name: 'materia_destino_id' })
-  target_materiaId: number;
+  materiaDestinoId: number;
 
   @ManyToOne(() => Materia)
   @JoinColumn({ name: 'materia_destino_id' })

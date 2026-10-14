@@ -22,46 +22,46 @@ export class Apoderado {
   estudiante: Estudiante;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'father_names' })
-  father_names: string;
+  nombresPadre: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'father_lastname_paternal' })
-  father_lastname_paternal: string;
+  apellidoPaternoPadre: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'father_lastname_maternal' })
-  father_lastname_maternal: string;
+  apellidoMaternoPadre: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true, name: 'father_ci' })
-  father_ci: string;
+  ciPadre: string;
 
   @Column({ type: 'varchar', length: 5, nullable: true, name: 'father_ci_issued' })
-  father_ci_issued: string;
+  ciExpedidoPadre: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true, name: 'father_telefono' })
-  father_telefono: string;
+  telefonoPadre: string;
 
   @Column({ type: 'varchar', length: 200, nullable: true, name: 'father_direccion' })
-  father_direccion: string;
+  direccionPadre: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'mother_names' })
-  mother_names: string;
+  nombresMadre: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'mother_lastname_paternal' })
-  mother_lastname_paternal: string;
+  apellidoPaternoMadre: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'mother_lastname_maternal' })
-  mother_lastname_maternal: string;
+  apellidoMaternoMadre: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true, name: 'mother_ci' })
-  mother_ci: string;
+  ciMadre: string;
 
   @Column({ type: 'varchar', length: 5, nullable: true, name: 'mother_ci_issued' })
-  mother_ci_issued: string;
+  ciExpedidoMadre: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true, name: 'mother_telefono' })
-  mother_telefono: string;
+  telefonoMadre: string;
 
-  @Column({ type: 'varchar', length: 200, nullable: true })
-  mother_direccion: string;
+  @Column({ type: 'varchar', length: 200, nullable: true, name: 'mother_direccion' })
+  direccionMadre: string;
 
   @CreateDateColumn({ name: 'creado_en' })
   creadoEn: Date;

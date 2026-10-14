@@ -7,14 +7,12 @@ export type Rol =
   | 'estudiante'
   | 'apoyo';
 
-export interface Usuario {
+export interface RolSistema {
   id: number;
-  nombreUsuario: string;
-  correo?: string;
-  rol: Rol;
-  roles?: Array<{ id: number; codigo: string; nombre: string }>;
-  personaId?: number;
-  estado: string;
+  codigo: string;
+  nombre: string;
+  descripcion?: string;
+  estado?: string;
   creadoEn?: string;
   actualizadoEn?: string;
 }
@@ -22,162 +20,236 @@ export interface Usuario {
 export interface Persona {
   id: number;
   ci: string;
-  names: string;
-  lastname_paternal: string;
-  lastname_maternal: string;
-  birthdate: string;
-  birthplace?: string;
-  gender: 'M' | 'F';
-  marital_status?: string;
-  nationality?: string;
-  dual_nationality?: string;
-  passport_number?: string;
-  blood_type?: string;
-  disability?: string;
-  military_book_number?: string;
-  mother_tongue?: string;
-  phone?: string;
+  nombres: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  fechaNacimiento: string;
+  lugarNacimiento?: string | null;
+  lugarNacimientoOtro?: string | null;
+  genero: 'M' | 'F';
+  estadoCivil?: string | null;
+  nacionalidad?: string | null;
+  nacionalidadOtra?: string | null;
+  dobleNacionalidad?: string | null;
+  numeroPasaporte?: string | null;
+  tipoSangre?: string | null;
+  discapacidad?: string | null;
+  numeroLibretaMilitar?: string | null;
+  lenguaMaterna?: string | null;
+  telefono?: string | null;
+  correo?: string | null;
+  direccion?: string | null;
+  fotoUrl?: string | null;
+  estado?: 'activo' | 'inactivo';
+  creadoEn?: string;
+  actualizadoEn?: string;
+}
+
+export interface Usuario {
+  id: number;
+  nombreUsuario: string;
   correo?: string;
-  address?: string;
-  photo_url?: string;
-  status?: 'activo' | 'inactivo';
-  creadoEn?: string;
-  actualizadoEn?: string;
-}
-
-export interface Estudiante {
-  id: number;
-  person_id: number;
-  inscription_code: string;
-  admission_date: string;
-  status: 'activo' | 'inactivo' | 'egresado' | 'suspendido';
+  rol: Rol;
+  roles?: RolSistema[];
+  personaId?: number;
   persona?: Persona;
-  creadoEn?: string;
-  actualizadoEn?: string;
-  estado_matricula?: 'pre_registro' | 'verificado' | 'matriculado' | 'egresado' | 'retirado';
-  origen?: 'web' | 'secretaria';
-  admission_request_id?: string;
-  verificado_por?: number;
-  fecha_verificacion?: string;
-  fecha_pre_registro?: string;
-}
-
-export interface Personal {
-  id: number;
-  person_id: number;
-  profession?: string;
-  position: string;
-  hire_date: string;
-  status: 'activo' | 'inactivo' | 'licencia';
-  persona?: Persona;
+  estado: string;
   creadoEn?: string;
   actualizadoEn?: string;
 }
 
 export interface Carrera {
   id: number;
-  code: string;
-  name: string;
-  area?: string;
-  title?: string;
-  description?: string;
-  load_hours?: number;
-  status: 'activo' | 'inactivo';
+  codigo: string;
+  nombre: string;
+  area?: string | null;
+  titulo: string;
+  descripcion?: string | null;
+  horasCarga: number;
+  estado: 'activo' | 'inactivo';
   creadoEn?: string;
   actualizadoEn?: string;
 }
 
 export interface Materia {
   id: number;
-  nombre: string;
   codigo: string;
-  descripcion?: string;
-  creditos: number;
-  horasSemanales: number;
-  semester: number;
-  careerId: number;
+  nombre: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
+}
+
+export interface PlanEstudio {
+  id: number;
+  carreraId: number;
+  numeroRm: string;
+  fechaRm: string;
+  estado: string;
+  notas?: string | null;
   carrera?: Carrera;
-  createdAt?: string;
-  updatedAt?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
+}
+
+export interface Turno {
+  id: number;
+  codigo: string;
+  nombre: string;
+  horaInicio: string;
+  horaFin: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
+}
+
+export interface Estudiante {
+  id: number;
+  personaId: number;
+  persona?: Persona;
+  numeroTituloBachiller?: string | null;
+  fechaTituloBachiller?: string | null;
+  gestionAdmision?: string | null;
+  numeroFolder?: string | null;
+  codigoInscripcion: string;
+  codigoFormulario01?: string | null;
+  carreraId: number;
+  carrera?: Carrera;
+  planEstudioId?: number;
+  fechaAdmision: string;
+  estado: 'activo' | 'egresado' | 'titulado' | 'congelado' | 'baja';
+  estadoMatricula?: 'pre_registro' | 'verificado' | 'matriculado' | 'egresado' | 'retirado';
+  origen?: 'web' | 'secretaria';
+  solicitudAdmisionId?: string | null;
+  verificadoPor?: number | null;
+  fechaVerificacion?: string | null;
+  fechaPreRegistro?: string | null;
+  creadoEn?: string;
+  actualizadoEn?: string;
+}
+
+export interface Personal {
+  id: number;
+  personaId: number;
+  persona?: Persona;
+  profesion?: string | null;
+  cargo: string;
+  fechaContrato: string;
+  estado: 'activo' | 'inactivo' | 'licencia';
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 export interface Grupo {
   id: number;
-  nombre: string;
   codigo: string;
-  anoAcademico: number;
-  periodo: number;
-  careerId: number;
-  docenteId?: number;
+  carreraId: number;
+  planEstudioId?: number | null;
+  materiaId: number;
+  semestre: number;
+  turnoId?: number | null;
+  paralelo?: string | null;
+  gestion: string;
+  periodo?: string | null;
   capacidad: number;
-  estado: 'activo' | 'inactivo';
-  carrera?: Carrera;
-  createdAt?: string;
-  updatedAt?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 export interface Inscripcion {
   id: number;
-  studentId: number;
-  groupId: number;
-  fechaInscripcion: string;
-  estado: 'confirmado' | 'pendiente' | 'cancelado';
-  estudiante?: Estudiante;
-  grupo?: Grupo;
-  createdAt?: string;
-  updatedAt?: string;
+  estudianteId: number;
+  materiaId: number;
+  materiaPlanId?: number | null;
+  grupoId?: number | null;
+  gestion: string;
+  semestre: number;
+  estado: string;
+  notaFinal?: number | null;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 export interface Calificacion {
   id: number;
-  enrollmentId: number;
-  tipoEvaluacion: 'examen_parcial' | 'examen_final' | 'practica' | 'trabajo' | 'participacion';
-  nota: number;
-  observacion?: string;
-  fechaEvaluacion: string;
-  inscripcion?: Inscripcion;
-  createdAt?: string;
-  updatedAt?: string;
+  inscripcionId: number;
+  parcial1?: number | null;
+  parcial2?: number | null;
+  promedioFinal?: number | null;
+  observacion?: string | null;
+  estadoRegular?: string | null;
+  aptoSegundaTurno?: boolean | null;
+  notaSegundaTurno?: number | null;
+  segundaTurnoAplicado?: boolean | null;
+  estado2T?: string | null;
+  notaDefinitiva?: number | null;
+  estadoDefinitivo?: string | null;
+  registradoPor?: number | null;
+  registradoEn?: string;
+  actualizadoEn?: string;
 }
 
 export interface Pago {
   id: number;
-  studentId: number;
-  concepto: string;
+  estudianteId: number;
+  conceptoId?: number | null;
+  gestion: string;
   monto: number;
-  fechaVencimiento: string;
-  fechaPago?: string;
-  estado: 'pendiente' | 'pagado' | 'vencido' | 'anulado';
-  metodoPago?: 'efectivo' | 'transferencia' | 'cheque' | 'tarjeta';
-  estudiante?: Estudiante;
-  createdAt?: string;
-  updatedAt?: string;
+  fechaPago?: string | null;
+  metodoPago?: string | null;
+  numeroRecibo?: string | null;
+  recibidoPor?: number | null;
+  estado: string;
+  notas?: string | null;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 export interface Certificado {
   id: number;
-  studentId: number;
-  tipo: 'certificado_inscripcion' | 'certificado_estudios' | 'certificado_graduacion' | 'otro';
-  fechaEmision: string;
-  estado: 'pendiente' | 'emitido' | 'entregado' | 'anulado';
-  observaciones?: string;
-  estudiante?: Estudiante;
-  createdAt?: string;
-  updatedAt?: string;
+  estudianteId: number;
+  tipo: string;
+  fecha: string;
+  codigo: string;
+  emitidoPor?: number | null;
+  creadoEn?: string;
 }
 
 export interface Convalidacion {
   id: number;
-  studentId: number;
-  materiaOrigen: string;
-  materiaConvalidada: string;
-  institucionOrigen?: string;
-  fechaConvalidation: string;
-  estado: 'pendiente' | 'aprobado' | 'rechazado';
-  observaciones?: string;
-  estudiante?: Estudiante;
-  createdAt?: string;
-  updatedAt?: string;
+  estudianteId: number;
+  equivalenciaId?: number | null;
+  materiaDestinoId: number;
+  tipo?: string | null;
+  numeroResolucion?: string | null;
+  fechaResolucion?: string | null;
+  estado: string;
+  aprobadoPor?: number | null;
+  creadoEn?: string;
+  actualizadoEn?: string;
+}
+
+export interface Gestion {
+  id: number;
+  anio: string;
+  tipoPeriodo: string;
+  estado: 'abierta' | 'cerrada' | 'pendiente';
+  esActual: boolean;
+  notas?: string | null;
+  periodos?: Periodo[];
+  creadoEn?: string;
+  actualizadoEn?: string;
+}
+
+export interface Periodo {
+  id: number;
+  gestionId: number;
+  numero: string;
+  nombre?: string | null;
+  fechaInicio: string;
+  fechaFin: string;
+  estado: 'abierta' | 'cerrada' | 'pendiente';
+  notas?: string | null;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 export interface EstadoAutenticacion {
@@ -186,48 +258,23 @@ export interface EstadoAutenticacion {
   isAuthenticated: boolean;
   isLoading: boolean;
   _hasHydrated: boolean;
-  setHasHydrated: (state: boolean) => void;
-  login: (username: string, password: string) => Promise<void>;
+  setHasHydrated: (estado: boolean) => void;
+  login: (nombreUsuario: string, contrasena: string) => Promise<void>;
   logout: () => void;
-  setUser: (user: Usuario) => void;
+  setUser: (usuario: Usuario) => void;
 }
 
 export interface ElementoMenu {
-  title: string;
+  titulo: string;
   href: string;
-  icon: string;
+  icono: string;
   roles: Rol[];
-  children?: ElementoMenu[];
+  hijos?: ElementoMenu[];
 }
 
 export interface ElementoMigas {
-  label: string;
+  etiqueta: string;
   href?: string;
-}
-
-export interface Periodo {
-  id: number;
-  gestion_id: number;
-  number: string;
-  name?: string;
-  start_date: string;
-  end_date: string;
-  estado: 'abierta' | 'cerrada' | 'pendiente';
-  notes?: string;
-  creadoEn?: string;
-  actualizadoEn?: string;
-}
-
-export interface Gestion {
-  id: number;
-  year: string;
-  period_type: 'semestral';
-  estado: 'abierta' | 'cerrada' | 'pendiente';
-  is_current: boolean;
-  notes?: string;
-  periodos?: Periodo[];
-  creadoEn?: string;
-  actualizadoEn?: string;
 }
 
 export type EstadoAdmision = 'pendiente' | 'verificado' | 'rechazado' | 'convertido';
@@ -236,60 +283,63 @@ export type OrigenAdmision = 'web' | 'secretaria';
 export interface SolicitudAdmision {
   id: string;
   nombre: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
   ci: string;
   fechaNacimiento: string;
+  lugarNacimiento?: string;
+  lugarNacimientoOtro?: string;
+  genero?: 'M' | 'F';
+  estadoCivil?: string;
+  nacionalidad?: string;
+  nacionalidadOtra?: string;
   telefono?: string;
-  email: string;
+  correo: string;
   direccion?: string;
   nombreTutor?: string;
   ciTutor?: string;
   telefonoTutor?: string;
-  genero?: 'M' | 'F';
-  carrera_id?: number;
+  carreraId?: number;
   carrera?: Carrera;
   estado: EstadoAdmision;
   observaciones?: string;
-  verificado_por?: number;
+  verificadoPor?: number;
   verificador?: Usuario;
   fechaVerificacion?: string;
   origen: OrigenAdmision;
   documentoCiPath?: string;
   certificadoBachillerPath?: string;
   fotoPath?: string;
-  converted_student_id?: number;
+  estudianteConvertidoId?: number;
   creadoEn?: string;
   actualizadoEn?: string;
-  birthplace?: string;
-  birthplace_other?: string;
-  nationality?: string;
-  nationality_other?: string;
 }
 
 export interface CrearAdmisionDto {
-  names: string;
-  lastname_paternal?: string;
-  lastname_maternal?: string;
+  nombre: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
   ci: string;
-  nationality?: string;
-  nationality_other?: string;
-  birthdate: string;
-  birthplace?: string;
-  birthplace_other?: string;
-  gender?: 'M' | 'F';
-  marital_status?: string;
-  phone?: string;
-  email: string;
-  address?: string;
+  nacionalidad?: string;
+  nacionalidadOtra?: string;
+  fechaNacimiento: string;
+  lugarNacimiento?: string;
+  lugarNacimientoOtro?: string;
+  genero?: 'M' | 'F';
+  estadoCivil?: string;
+  telefono?: string;
+  correo: string;
+  direccion?: string;
   nombreTutor?: string;
   ciTutor?: string;
   telefonoTutor?: string;
-  carrera_id?: number;
+  carreraId?: number;
   origen?: OrigenAdmision;
 }
 
 export interface RegistroConsentimiento {
   id: string;
-  estudiante_id: number;
+  estudianteId: number;
   estudiante?: Estudiante;
   versionPolitica: string;
   fechaConsentimiento: string;
@@ -298,18 +348,9 @@ export interface RegistroConsentimiento {
   ciTutor?: string;
   firmaBase64?: string;
   consentimientoTutor: boolean;
-  derechoEjercido?: 'access' | 'rectification' | 'deletion';
+  derechoEjercido?: 'acceso' | 'rectificacion' | 'eliminacion';
   derechoFecha?: string;
   creadoEn?: string;
-}
-
-export interface EstudianteExtendido extends Estudiante {
-  estado_matricula: 'pre_registro' | 'verificado' | 'matriculado' | 'egresado' | 'retirado';
-  origen: 'web' | 'secretaria';
-  admission_request_id?: string;
-  verificado_por?: number;
-  fecha_verificacion?: string;
-  fecha_pre_registro?: string;
 }
 
 export type TipoEmisionCredencial = 'primera' | 'renovacion' | 'reimpresion';
@@ -317,20 +358,20 @@ export type EstadoEntregaCredencial = 'generado' | 'impreso' | 'entregado';
 
 export interface CredencialExtendida {
   id: number;
-  student_id: number;
+  estudianteId: number;
   estudiante?: Estudiante;
   gestion: string;
-  gestion_id?: number;
-  semester: number;
-  issued_date: string;
-  valid_until: string;
-  photo_url?: string;
-  status: 'emitida' | 'anulada' | 'reemplazada';
-  tipo_emision: TipoEmisionCredencial;
-  vigencia_hasta?: string;
-  qr_verificacion?: string;
-  estado_entrega: EstadoEntregaCredencial;
-  entregado_a?: number;
-  fecha_entrega?: string;
+  gestionId?: number;
+  semestre: number;
+  fechaEmision: string;
+  validoHasta: string;
+  fotoUrl?: string;
+  estado: string;
+  tipoEmision: TipoEmisionCredencial;
+  vigenciaHasta?: string;
+  qrVerificacion?: string;
+  estadoEntrega: EstadoEntregaCredencial;
+  entregadoA?: number;
+  fechaEntrega?: string;
   creadoEn?: string;
 }

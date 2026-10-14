@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Materia } from './materia.entity';
 
-export enum EquivalenceType {
+export enum TipoEquivalencia {
   AUTOMATICA = 'automatica',
   MANUAL = 'manual',
 }
@@ -19,21 +19,21 @@ export class Equivalencia {
   id: number;
 
   @Column({ name: 'materia_origen_id' })
-  source_materiaId: number;
+  materiaOrigenId: number;
 
   @ManyToOne(() => Materia)
   @JoinColumn({ name: 'materia_origen_id' })
   materia_origen: Materia;
 
   @Column({ name: 'materia_destino_id' })
-  target_materiaId: number;
+  materiaDestinoId: number;
 
   @ManyToOne(() => Materia)
   @JoinColumn({ name: 'materia_destino_id' })
   materia_destino: Materia;
 
-  @Column({ type: 'enum', enum: EquivalenceType , name: 'tipo' })
-  tipo: EquivalenceType;
+  @Column({ type: 'enum', enum: TipoEquivalencia , name: 'tipo' })
+  tipo: TipoEquivalencia;
 
   @Column({ type: 'text', nullable: true, name: 'notas' })
   notas: string;

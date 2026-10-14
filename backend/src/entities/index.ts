@@ -29,5 +29,5 @@ export * from './apoderado.entity';
 export * from './referencia.entity';
 export * from './documento-estudiante.entity';
 export { SolicitudAdmision, EstadoAdmision, OrigenAdmision } from './admission-request.entity';
-export { ConsentRecord, TipoConsentimiento } from './consent-record.entity';
+export { RegistroConsentimiento, TipoConsentimiento } from './consent-record.entity';
 export { DocumentoEmitido, TipoDocumento, EstadoDocumento } from './emitted-document.entity';

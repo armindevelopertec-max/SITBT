@@ -58,7 +58,7 @@ export class ServicioAlmacenamiento {
         { 'Content-Type': file.mimetype },
       );
 
-      const url = `/storage/files/${filename}`;
+      const url = `/api/almacenamiento/files/${filename}`;
 
       return {
         filename,
@@ -88,7 +88,7 @@ export class ServicioAlmacenamiento {
         { 'Content-Type': mimetype },
       );
 
-      const url = `/storage/files/${fullPath}`;
+      const url = `/api/almacenamiento/files/${fullPath}`;
 
       return {
         filename: fullPath,

@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { Image, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utilidades';
+import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
 
 interface ImageUploadProps {
   label?: string;
@@ -28,6 +29,7 @@ export function CargarImagen({
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { token } = usarAlmacenAutenticacion();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,17 +53,7 @@ export function CargarImagen({
       const formData = new FormData();
       formData.append('file', file);
 
-      const token = localStorage.getItem('auth-storage');
-      let tokenValue = '';
-      if (token) {
-        try {
-          const parsed = JSON.parse(token);
-          tokenValue = parsed.state?.token || '';
-        } catch (e) {
-          console.error('Error parsing token:', e);
-        }
-      }
-
+      const tokenValue = token || '';
       const response = await fetch(`${getUploadUrl()}?folder=logos`, {
         method: 'POST',
         headers: {

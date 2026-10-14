@@ -178,7 +178,7 @@ export class PreinscripcionService {
   ): Promise<ResultadoCalcularMaterias> {
     const materiasPlan = await this.materiaPlanRepository.find({
       where: { planEstudioId: estudiante.planEstudioId },
-      relations: ['materia', 'prerequisite'],
+      relations: ['materia', 'prerrequisito'],
       order: { semestre: 'ASC' },
     });
 
@@ -245,7 +245,7 @@ export class PreinscripcionService {
 
     const materiasPlan = await this.materiaPlanRepository.find({
       where: { planEstudioId: estudiante.planEstudioId },
-      relations: ['materia', 'prerequisite'],
+      relations: ['materia', 'prerrequisito'],
       order: { semestre: 'ASC' },
     });
 
@@ -316,13 +316,13 @@ export class PreinscripcionService {
       let prerrequisitoBloqueado = false;
       let nombrePrerrequisito: string | undefined;
 
-      if (materia.prerequisite_id) {
-        const prerequisiteApproved = approvedSubjectIds.includes(materia.prerequisite_id);
-        const prerequisiteFailed = failedSubjectIds.includes(materia.prerequisite_id);
+      if (materia.prerrequisitoId) {
+        const prerequisiteApproved = approvedSubjectIds.includes(materia.prerrequisitoId);
+        const prerequisiteFailed = failedSubjectIds.includes(materia.prerrequisitoId);
 
         if (!prerequisiteApproved && !prerequisiteFailed) {
           const prerequisite = await this.materiaRepository.findOne({
-            where: { id: materia.prerequisite_id },
+            where: { id: materia.prerrequisitoId },
           });
           prerrequisitoBloqueado = true;
           nombrePrerrequisito = prerequisite?.nombre || 'Prerrequisito';
@@ -338,7 +338,7 @@ export class PreinscripcionService {
 
         if (prerequisiteFailed) {
           const prerequisite = await this.materiaRepository.findOne({
-            where: { id: materia.prerequisite_id },
+            where: { id: materia.prerrequisitoId },
           });
           prerrequisitoBloqueado = true;
           nombrePrerrequisito = prerequisite?.nombre || 'Prerrequisito';

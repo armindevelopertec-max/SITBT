@@ -21,7 +21,7 @@ export class ActualizarDocumentoEmitidoDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  impreso_por?: number;
+  impresoPor?: number;
 
   @ApiPropertyOptional()
   @IsOptional()

@@ -22,16 +22,16 @@ export class Referencia {
   estudiante: Estudiante;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'contact1_name' })
-  contact1_name: string;
+  contacto1Nombre: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true, name: 'contact1_telefono' })
-  contact1_telefono: string;
+  contacto1Telefono: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'contact2_name' })
-  contact2_name: string;
+  contacto2Nombre: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
-  contact2_telefono: string;
+  @Column({ type: 'varchar', length: 20, nullable: true, name: 'contact2_telefono' })
+  contacto2Telefono: string;
 
   @CreateDateColumn({ name: 'creado_en' })
   creadoEn: Date;

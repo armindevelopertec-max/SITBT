@@ -43,7 +43,7 @@ export class CrearAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  marital_status?: string;
+  estadoCivil?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

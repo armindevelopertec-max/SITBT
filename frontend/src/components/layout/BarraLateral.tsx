@@ -161,7 +161,12 @@ const seccionesMenu: SeccionMenu[] = [
 export default function BarraLateral({ colapsada, abierta = true, onCerrar, onColapsar }: PropsBarraLateral) {
   const pathname = usePathname();
   const { user } = usarAlmacenAutenticacion();
-  const userRoles = user?.roles?.map((r: any) => r.codigo || r.code || r) || [];
+  const userRoles: string[] =
+    user?.roles && user.roles.length > 0
+      ? user.roles.map((r: any) => r.codigo || r.code || r)
+      : user?.rol
+        ? [user.rol]
+        : [];
   const { settings } = usarConfiguracionInstitucional();
 
   const filteredSections = seccionesMenu
@@ -169,7 +174,6 @@ export default function BarraLateral({ colapsada, abierta = true, onCerrar, onCo
       ...section,
       items: section.items.filter((item) => {
         if (!user) return false;
-        const userRoles = user.roles?.map((r: any) => r.codigo || r.code || r) || [];
         return item.roles.some((r) => userRoles.includes(r));
       }),
     }))

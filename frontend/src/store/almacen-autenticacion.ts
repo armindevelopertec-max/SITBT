@@ -3,40 +3,47 @@ import { persist } from 'zustand/middleware';
 import { Usuario, EstadoAutenticacion } from '@/types';
 import api from '@/lib/api';
 
+// Normaliza el objeto de usuario que devuelve la API (campos en español)
+function normalizarUsuario(usuarioApi: any): Usuario {
+  const roles = (usuarioApi?.roles || []) as Array<{ id: number; codigo: string; nombre: string }>;
+  const rolPrincipal = roles.length > 0 ? roles[0].codigo : 'administrador';
+
+  return {
+    id: usuarioApi.id,
+    nombreUsuario: usuarioApi.nombreUsuario ?? usuarioApi.username ?? '',
+    correo: usuarioApi.persona?.correo || usuarioApi.correo || '',
+    rol: rolPrincipal as any,
+    roles,
+    personaId: usuarioApi.personaId ?? usuarioApi.person_id,
+    estado: usuarioApi.estado || 'activo',
+    persona: usuarioApi.persona,
+  } as Usuario;
+}
+
 export const usarAlmacenAutenticacion = create<EstadoAutenticacion>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       token: null,
       isAuthenticated: false,
       isLoading: false,
       _hasHydrated: false,
 
-      setHasHydrated: (state: boolean) => {
-        set({ _hasHydrated: state });
+      setHasHydrated: (estado: boolean) => {
+        set({ _hasHydrated: estado });
       },
 
-      login: async (username: string, password: string) => {
+      login: async (nombreUsuario: string, contrasena: string) => {
         set({ isLoading: true });
         try {
-          const response = await api.post('/autenticacion/login', { username, password });
-          const { access_token, user } = response.data;
-
-          const roles = (user.roles || []) as Array<{ id: number; codigo: string; nombre: string }>;
-          const firstRole = roles.length > 0 ? roles[0].codigo : 'administrador';
-
-          const transformedUser: Usuario = {
-            id: user.id,
-            nombreUsuario: user.nombreUsuario ?? user.nombreUsuario,
-            correo: user.person?.correo || '',
-            rol: firstRole as any,
-            roles: roles,
-            personaId: user.personaId ?? user.persona_id,
-            estado: 'activo',
-          };
+          const respuesta = await api.post('/autenticacion/login', {
+            nombreUsuario,
+            contrasena,
+          });
+          const { access_token, user } = respuesta.data;
 
           set({
-            user: transformedUser,
+            user: normalizarUsuario(user),
             token: access_token,
             isAuthenticated: true,
             isLoading: false,
@@ -56,14 +63,23 @@ export const usarAlmacenAutenticacion = create<EstadoAutenticacion>()(
         });
       },
 
-      setUser: (user: Usuario) => {
-        set({ user });
+      setUser: (usuario: Usuario) => {
+        set({ user: usuario });
       },
     }),
     {
       name: 'almacen-autenticacion',
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
+      version: 2,
+      migrate: (estadoPersistido: any) => estadoPersistido,
+      merge: (estadoPersistido: any, estadoActual) => {
+        const estado = { ...estadoActual, ...estadoPersistido };
+        if (estado.user) {
+          estado.user = normalizarUsuario(estado.user);
+        }
+        return estado;
+      },
+      onRehydrateStorage: () => (estado) => {
+        estado?.setHasHydrated(true);
       },
     }
   )

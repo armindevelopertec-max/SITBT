@@ -15,13 +15,13 @@ export class ConfiguracionInstitucional {
   nombre: string;
 
   @Column({ type: 'varchar', length: 50, name: 'nombre_corto' })
-  nombre_corto: string;
+  nombreCorto: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'lema' })
   lema: string;
 
   @Column({ type: 'varchar', length: 500, nullable: true, name: 'logo_url' })
-  logo_url: string;
+  logoUrl: string;
 
   @Column({ type: 'varchar', length: 500, nullable: true, name: 'direccion' })
   direccion: string;
@@ -36,7 +36,7 @@ export class ConfiguracionInstitucional {
   correo: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'sitio_web' })
-  website: string;
+  sitioWeb: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'ciudad' })
   ciudad: string;

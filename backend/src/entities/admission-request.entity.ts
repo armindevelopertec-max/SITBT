@@ -53,19 +53,19 @@ export class SolicitudAdmision {
   lugarNacimiento: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'lugar_nacimiento_otro' })
-  lugarNacimientoOther: string;
+  lugarNacimientoOtro: string;
 
   @Column({ type: 'enum', enum: Genero, nullable: true, name: 'genero' })
   genero: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'estadoCivil' })
-  marital_status: string;
+  estadoCivil: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'nacionalidad' })
   nacionalidad: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'nacionalidadOtra' })
-  nacionalidadOther: string;
+  nacionalidadOtra: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true, name: 'telefono' })
   telefono: string;
@@ -99,7 +99,7 @@ export class SolicitudAdmision {
   observaciones: string;
 
   @Column({ name: 'verificado_por', type: 'int', nullable: true })
-  verificado_por: number | null;
+  verificadoPor: number | null;
 
   @Column({ name: 'fecha_verificacion', type: 'timestamp', nullable: true })
   fechaVerificacion: Date;
@@ -116,8 +116,8 @@ export class SolicitudAdmision {
   @Column({ name: 'foto_ruta', type: 'varchar', length: 255, nullable: true })
   fotoPath: string;
 
-  @Column({ nullable: true })
-  converted_estudianteId: number;
+  @Column({ nullable: true, name: 'converted_estudianteId' })
+  estudianteConvertidoId: number;
 
   @CreateDateColumn({ name: 'creado_en' })
   creadoEn: Date;

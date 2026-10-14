@@ -66,7 +66,7 @@ export class Persona {
   genero: Genero;
 
   @Column({ type: 'enum', enum: EstadoCivil, nullable: true, name: 'estadoCivil' })
-  marital_estado: EstadoCivil;
+  estadoCivil: EstadoCivil;
 
   @Column({ type: 'varchar', length: 50, default: 'Boliviana', name: 'nacionalidad' })
   nacionalidad: string;
@@ -75,10 +75,10 @@ export class Persona {
   nacionalidadOtra: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'dobleNacionalidad' })
-  dual_nacionalidad: string;
+  dobleNacionalidad: string;
 
   @Column({ type: 'varchar', length: 30, nullable: true, name: 'numeroPasaporte' })
-  passport_numero: string;
+  numeroPasaporte: string;
 
   @Column({ type: 'enum', enum: TipoSangre, nullable: true, name: 'tipoSangre' })
   tipoSangre: TipoSangre;
@@ -87,7 +87,7 @@ export class Persona {
   discapacidad: string;
 
   @Column({ type: 'varchar', length: 30, nullable: true, name: 'numeroLibretaMilitar' })
-  military_book_numero: string;
+  numeroLibretaMilitar: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true, name: 'lenguaMaterna' })
   lenguaMaterna: string;

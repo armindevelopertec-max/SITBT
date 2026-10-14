@@ -34,9 +34,9 @@ export class ControladorPersonal {
     @Query('page') page = 1,
     @Query('limit') limit = 20,
     @Query('status') status?: EstadoPersonal,
-    @Query('position') position?: CargoPersonal,
+    @Query('cargo') cargo?: CargoPersonal,
   ) {
-    return this.staffsService.findAll(+page, +limit, status, position);
+    return this.staffsService.findAll(+page, +limit, status, cargo);
   }
 
   @Get('active')
@@ -49,9 +49,9 @@ export class ControladorPersonal {
     return this.staffsService.findTeachers();
   }
 
-  @Get('by-position/:position')
-  findByPosition(@Param('position') position: CargoPersonal) {
-    return this.staffsService.findByPosition(position);
+  @Get('por-cargo/:cargo')
+  findByPosition(@Param('cargo') cargo: CargoPersonal) {
+    return this.staffsService.findByPosition(cargo);
   }
 
   @Get(':id')

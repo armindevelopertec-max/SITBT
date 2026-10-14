@@ -1,22 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ConsentRecord, TipoConsentimiento } from '../../entities/consent-record.entity';
+import { RegistroConsentimiento, TipoConsentimiento } from '../../entities/consent-record.entity';
 import { CrearConsentimientoDto } from './dto/crear-consentimiento.dto';
 import { ActualizarConsentimientoDto } from './dto/actualizar-consentimiento.dto';
 
 @Injectable()
 export class ServicioConsentimiento {
   constructor(
-    @InjectRepository(ConsentRecord)
-    private consentimientoRepository: Repository<ConsentRecord>,
+    @InjectRepository(RegistroConsentimiento)
+    private consentimientoRepository: Repository<RegistroConsentimiento>,
   ) {}
 
-  async create(createDto: CrearConsentimientoDto): Promise<ConsentRecord> {
+  async create(createDto: CrearConsentimientoDto): Promise<RegistroConsentimiento> {
     const consent = this.consentimientoRepository.create({
       ...createDto,
       fechaConsentimiento: new Date(),
-    } as Partial<ConsentRecord>);
+    } as Partial<RegistroConsentimiento>);
     return this.consentimientoRepository.save(consent);
   }
 
@@ -24,7 +24,7 @@ export class ServicioConsentimiento {
     page = 1,
     limit = 20,
     estudianteId?: number,
-  ): Promise<{ data: ConsentRecord[]; total: number; page: number; limit: number }> {
+  ): Promise<{ data: RegistroConsentimiento[]; total: number; page: number; limit: number }> {
     const query = this.consentimientoRepository
       .createQueryBuilder('consent')
       .leftJoinAndSelect('consent.estudiante', 'estudiante')
@@ -43,7 +43,7 @@ export class ServicioConsentimiento {
     return { data, total, page, limit };
   }
 
-  async findOne(id: string): Promise<ConsentRecord> {
+  async findOne(id: string): Promise<RegistroConsentimiento> {
     const consent = await this.consentimientoRepository.findOne({
       where: { id },
       relations: ['estudiante', 'estudiante.person'],
@@ -54,27 +54,27 @@ export class ServicioConsentimiento {
     return consent;
   }
 
-  async findByStudent(estudianteId: number): Promise<ConsentRecord[]> {
+  async findByStudent(estudianteId: number): Promise<RegistroConsentimiento[]> {
     return this.consentimientoRepository.find({
       where: { estudianteId: estudianteId },
       order: { fechaConsentimiento: 'DESC' },
     });
   }
 
-  async getLatestConsent(estudianteId: number): Promise<ConsentRecord | null> {
+  async getLatestConsent(estudianteId: number): Promise<RegistroConsentimiento | null> {
     return this.consentimientoRepository.findOne({
       where: { estudianteId: estudianteId },
       order: { fechaConsentimiento: 'DESC' },
     });
   }
 
-  async update(id: string, updateDto: ActualizarConsentimientoDto): Promise<ConsentRecord> {
+  async update(id: string, updateDto: ActualizarConsentimientoDto): Promise<RegistroConsentimiento> {
     const consent = await this.findOne(id);
     Object.assign(consent, updateDto);
     return this.consentimientoRepository.save(consent);
   }
 
-  async exerciseRight(id: string, derecho: TipoConsentimiento, registradoPor?: number): Promise<ConsentRecord> {
+  async exerciseRight(id: string, derecho: TipoConsentimiento, registradoPor?: number): Promise<RegistroConsentimiento> {
     const consent = await this.findOne(id);
     consent.derechoEjercido = derecho;
     consent.derechoFecha = new Date();

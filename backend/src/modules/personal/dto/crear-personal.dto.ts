@@ -18,11 +18,11 @@ export class CrearPersonalDto {
   @IsString()
   @IsOptional()
   @MaxLength(100)
-  profession?: string;
+  profesion?: string;
 
   @ApiProperty({ enum: CargoPersonal })
   @IsEnum(CargoPersonal)
-  position: CargoPersonal;
+  cargo: CargoPersonal;
 
   @ApiProperty({ example: '2020-02-01' })
   @IsDateString()

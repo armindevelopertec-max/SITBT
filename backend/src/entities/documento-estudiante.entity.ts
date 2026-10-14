@@ -22,16 +22,16 @@ export class DocumentoEstudiante {
   estudiante: Estudiante;
 
   @Column({ type: 'varchar', length: 50, name: 'document_type' })
-  document_tipo: string;
+  tipoDocumento: string;
 
-  @Column({ type: 'boolean', default: false })
-  delivered: boolean;
+  @Column({ type: 'boolean', default: false, name: 'delivered' })
+  entregado: boolean;
 
   @Column({ type: 'date', nullable: true, name: 'delivered_date' })
-  delivered_fecha: Date;
+  fechaEntrega: Date;
 
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'file_url' })
-  file_url: string;
+  archivoUrl: string;
 
   @Column({ type: 'text', nullable: true, name: 'notas' })
   notas: string;
