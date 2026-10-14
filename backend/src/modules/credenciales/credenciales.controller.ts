@@ -35,21 +35,21 @@ export class ControladorCredenciales {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
     @Query('gestion') gestion?: string,
-    @Query('semester') semester?: string,
-    @Query('status') status?: EstadoCredencial,
+    @Query('semestre') semester?: string,
+    @Query('estado') status?: EstadoCredencial,
   ) {
     return this.service.findAll(+page, +limit, gestion, semester ? +semester : undefined, status);
   }
 
-  @Get('student/:studentId')
+  @Get('estudiante/:estudianteId')
   findByStudent(@Param('studentId', ParseIntPipe) studentId: number) {
     return this.service.findByStudent(studentId);
   }
 
-  @Get('student/:studentId/gestion/:gestion')
+  @Get('estudiante/:estudianteId/gestion/:gestion')
   findByStudentAndGestion(
     @Param('studentId', ParseIntPipe) studentId: number,
     @Param('gestion') gestion: string,
@@ -57,7 +57,7 @@ export class ControladorCredenciales {
     return this.service.findByStudentAndGestion(studentId, gestion);
   }
 
-  @Get('student/:studentId/active')
+  @Get('estudiante/:estudianteId/activos')
   findActiveByStudent(@Param('studentId', ParseIntPipe) studentId: number) {
     return this.service.findActiveByStudent(studentId);
   }
@@ -72,12 +72,12 @@ export class ControladorCredenciales {
     return this.service.update(id, updateDto);
   }
 
-  @Patch(':id/mark-printed')
+  @Patch(':id/marcar-impreso')
   markAsPrinted(@Param('id', ParseIntPipe) id: number) {
     return this.service.markAsPrinted(id);
   }
 
-  @Patch(':id/annul')
+  @Patch(':id/anular')
   annul(@Param('id', ParseIntPipe) id: number) {
     return this.service.annul(id);
   }

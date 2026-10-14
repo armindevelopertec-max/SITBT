@@ -11,13 +11,13 @@ export default function AccederPage() {
   const [contrasena, setContrasena] = useState('');
   const [cargando, setCargando] = useState(false);
   const router = useRouter();
-  const { login, isAuthenticated, _hasHydrated } = usarAlmacenAutenticacion();
+  const { iniciarSesion, estaAutenticado, _hidratado } = usarAlmacenAutenticacion();
 
   useEffect(() => {
-    if (_hasHydrated && isAuthenticated) {
+    if (_hidratado && estaAutenticado) {
       router.push('/panel');
     }
-  }, [_hasHydrated, isAuthenticated, router]);
+  }, [_hidratado, estaAutenticado, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,10 +25,10 @@ export default function AccederPage() {
     setCargando(true);
 
     try {
-      await login(nombreUsuario, contrasena);
+      await iniciarSesion(nombreUsuario, contrasena);
       router.push('/panel');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Credenciales inválidas');
+      setError(err.response?.data?.mensaje || 'Credenciales inválidas');
     } finally {
       setCargando(false);
     }

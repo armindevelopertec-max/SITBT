@@ -173,8 +173,8 @@ export default function EditStaffPage() {
       router.push('/personal');
     } catch (error: any) {
       console.error('Error al actualizar personal:', error);
-      if (error.response?.data?.message) {
-        setErrors({ submit: error.response.data.message });
+      if (error.response?.data?.mensaje) {
+        setErrors({ submit: error.response.data.mensaje });
       } else {
         setErrors({ submit: 'Error al actualizar el personal' });
       }

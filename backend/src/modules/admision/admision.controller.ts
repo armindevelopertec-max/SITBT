@@ -29,15 +29,15 @@ export class ControladorAdmision {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
     @Query('estado') estado?: EstadoAdmision,
     @Query('origen') origen?: string,
   ) {
     return this.service.findAll(+page, +limit, estado, origen);
   }
 
-  @Get('statistics')
+  @Get('estadisticas')
   getStatistics() {
     return this.service.getStatistics();
   }
@@ -52,7 +52,7 @@ export class ControladorAdmision {
     return this.service.update(id, updateDto);
   }
 
-  @Post(':id/verify')
+  @Post(':id/verificar')
   @HttpCode(200)
   verify(
     @Param('id') id: string,
@@ -62,7 +62,7 @@ export class ControladorAdmision {
     return this.service.verify(id, verificadoPor, observaciones);
   }
 
-  @Post(':id/reject')
+  @Post(':id/rechazar')
   @HttpCode(200)
   reject(
     @Param('id') id: string,
@@ -72,13 +72,13 @@ export class ControladorAdmision {
     return this.service.reject(id, verificadoPor, observaciones);
   }
 
-  @Post(':id/convert-to-student')
+  @Post(':id/convertir-estudiante')
   @HttpCode(200)
   convertToStudent(
     @Param('id') id: string,
-    @Body('admissionGestion') admissionGestion: string,
+    @Body('gestionAdmision') gestionAdmision: string,
   ) {
-    return this.service.convertToStudent(id, admissionGestion);
+    return this.service.convertToStudent(id, gestionAdmision);
   }
 
   @Delete(':id')

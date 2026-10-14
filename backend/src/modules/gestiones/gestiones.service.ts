@@ -100,7 +100,7 @@ export class GestionesService {
     page = 1,
     limit = 20,
     status?: EstadoGestion,
-  ): Promise<{ data: Gestion[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Gestion[]; total: number; pagina: number; limite: number }> {
     const query = this.gestionRepository.createQueryBuilder('gestion');
 
     if (status) {
@@ -113,7 +113,7 @@ export class GestionesService {
 
     const [data, total] = await query.getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<Gestion> {

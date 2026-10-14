@@ -11,10 +11,10 @@ import { CrearPersonalDto } from './dto/crear-personal.dto';
 import { ActualizarPersonalDto } from './dto/actualizar-personal.dto';
 
 export interface PersonalCreadoConUsuario {
-  staff: Personal;
-  user: {
+  personal: Personal;
+  usuario: {
     nombreUsuario: string;
-    password: string;
+    contrasena: string;
   };
 }
 
@@ -66,10 +66,10 @@ export class ServicioPersonal {
     }
 
     return {
-      staff: savedStaff,
-      user: {
+      personal: savedStaff,
+      usuario: {
         nombreUsuario: username,
-        password,
+        contrasena: password,
       },
     };
   }
@@ -91,7 +91,7 @@ export class ServicioPersonal {
     limit = 20,
     status?: EstadoPersonal,
     cargo?: CargoPersonal,
-  ): Promise<{ data: Personal[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Personal[]; total: number; pagina: number; limite: number }> {
     const query = this.staffRepository
       .createQueryBuilder('staff')
       .leftJoinAndSelect('staff.persona', 'persona');
@@ -110,7 +110,7 @@ export class ServicioPersonal {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<Personal> {

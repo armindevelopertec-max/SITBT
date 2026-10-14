@@ -52,7 +52,7 @@ export default function EditarPlanPage() {
 
   const fetchCarreras = async () => {
     try {
-      const response = await api.get('/carreras/active');
+      const response = await api.get('/carreras/activos');
       setCarreras(response.data || []);
     } catch (error) {
       console.error('Error al obtener las carreras:', error);
@@ -109,8 +109,8 @@ export default function EditarPlanPage() {
       router.push('/planes-estudio');
     } catch (error: any) {
       console.error('Error al actualizar el plan de estudio:', error);
-      if (error.response?.data?.message) {
-        setErrors({ submit: error.response.data.message });
+      if (error.response?.data?.mensaje) {
+        setErrors({ submit: error.response.data.mensaje });
       } else {
         setErrors({ submit: 'Error al actualizar el plan de estudio' });
       }

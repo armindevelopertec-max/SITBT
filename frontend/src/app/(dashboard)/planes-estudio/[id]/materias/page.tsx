@@ -101,7 +101,7 @@ export default function PlanMateriasPage() {
 
   const fetchMateriasDisponibles = async () => {
     try {
-      const response = await api.get('/materias/all');
+      const response = await api.get('/materias/todos');
       setMateriasDisponibles(response.data || []);
     } catch (error) {
       console.error('Error al obtener las materias:', error);
@@ -160,7 +160,7 @@ export default function PlanMateriasPage() {
       fetchMateriasPlan();
     } catch (error: any) {
       console.error('Error al guardar la materia:', error);
-      setErrors({ submit: error.response?.data?.message || 'Error al guardar materia' });
+      setErrors({ submit: error.response?.data?.mensaje || 'Error al guardar materia' });
     } finally {
       setSaving(false);
     }
@@ -187,7 +187,7 @@ export default function PlanMateriasPage() {
       fetchMateriasPlan();
     } catch (error: any) {
       console.error('Error al actualizar la materia:', error);
-      setErrors({ submit: error.response?.data?.message || 'Error al actualizar materia' });
+      setErrors({ submit: error.response?.data?.mensaje || 'Error al actualizar materia' });
     } finally {
       setSaving(false);
     }

@@ -119,12 +119,12 @@ export default function PaymentsPage() {
   const fetchPagos = async () => {
     try {
       setLoading(true);
-      const params: any = { limit: 100 };
+      const params: any = { limite: 100 };
       if (filterGestion) params.gestion = filterGestion;
       if (filterStatus) params.status = filterStatus;
 
       const response = await api.get('/pagos', { params });
-      setPagos(response.data.data || []);
+      setPagos(response.data.datos || []);
     } catch (error) {
       console.error('Error al obtener los pagos:', error);
     } finally {
@@ -135,7 +135,7 @@ export default function PaymentsPage() {
   const fetchGestiones = async () => {
     try {
       const response = await api.get('/gestiones');
-      setGestiones(response.data.data || response.data || []);
+      setGestiones(response.data.datos || response.data || []);
     } catch (error) {
       console.error('Error al obtener las gestiones:', error);
     }
@@ -143,7 +143,7 @@ export default function PaymentsPage() {
 
   const fetchConceptos = async () => {
     try {
-      const response = await api.get('/conceptos-pago/all');
+      const response = await api.get('/conceptos-pago/todos');
       setConceptos(response.data || []);
     } catch (error) {
       console.error('Error al obtener los conceptos:', error);
@@ -154,9 +154,9 @@ export default function PaymentsPage() {
     if (!searchStudent.trim()) return;
     try {
       const response = await api.get('/estudiantes', {
-        params: { search: searchStudent, limit: 10 }
+        params: { buscar: searchStudent, limite: 10 }
       });
-      setStudents(response.data.data || []);
+      setStudents(response.data.datos || []);
     } catch (error) {
       console.error('Error al buscar estudiantes:', error);
     }
@@ -233,7 +233,7 @@ export default function PaymentsPage() {
 
   const handleAnnul = async (pago: Pago) => {
     try {
-      await api.patch(`/pagos/${pago.id}/annul`);
+      await api.patch(`/pagos/${pago.id}/anular`);
       fetchPagos();
     } catch (error) {
       console.error('Error al anular el pago:', error);

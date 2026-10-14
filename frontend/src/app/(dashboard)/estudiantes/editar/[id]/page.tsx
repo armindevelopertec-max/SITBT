@@ -174,7 +174,7 @@ export default function EditStudentPage() {
 
   const fetchCareers = async () => {
     try {
-      const response = await api.get('/carreras/active');
+      const response = await api.get('/carreras/activos');
       setCareers(response.data || []);
     } catch (error) {
       console.error('Error al cargar carreras:', error);
@@ -186,7 +186,7 @@ export default function EditStudentPage() {
   const fetchStudyPlans = async (careerId: number) => {
     setLoadingPlans(true);
     try {
-      const response = await api.get(`/planes-estudio/current/${careerId}`);
+      const response = await api.get(`/planes-estudio/actual/${careerId}`);
       setStudyPlans(response.data || []);
     } catch (error) {
       console.error('Error al cargar planes de estudio:', error);
@@ -197,7 +197,7 @@ export default function EditStudentPage() {
 
   const fetchGestiones = async () => {
     try {
-      const response = await api.get('/gestiones/active');
+      const response = await api.get('/gestiones/activos');
       const allGestiones: Gestion[] = response.data || [];
       const allPeriodos: { gestion: Gestion; periodo: Periodo }[] = [];
 
@@ -270,8 +270,8 @@ export default function EditStudentPage() {
       router.push('/estudiantes');
     } catch (error: any) {
       console.error('Error al actualizar estudiante:', error);
-      if (error.response?.data?.message) {
-        setErrors({ submit: error.response.data.message });
+      if (error.response?.data?.mensaje) {
+        setErrors({ submit: error.response.data.mensaje });
       } else {
         setErrors({ submit: 'Error al actualizar el estudiante' });
       }

@@ -10,7 +10,7 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 export class ControladorConceptosPago {
   constructor(private readonly service: ServicioPagos) {}
 
-  @Get('all')
+  @Get('todos')
   findAll() {
     return this.service.listarConceptos();
   }

@@ -31,9 +31,9 @@ export class ControladorUsuarios {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
-    @Query('status') status?: EstadoUsuario,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
+    @Query('estado') status?: EstadoUsuario,
   ) {
     return this.usersService.findAll(+page, +limit, status);
   }

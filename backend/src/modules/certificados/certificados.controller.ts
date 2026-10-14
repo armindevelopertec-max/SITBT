@@ -30,27 +30,27 @@ export class ControladorCertificados {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
     @Query('gestion') gestion?: string,
-    @Query('type') type?: string,
-    @Query('studentId') studentId?: number,
+    @Query('tipo') type?: string,
+    @Query('estudianteId') studentId?: number,
   ) {
     return this.service.findAll(+page, +limit, gestion, type, studentId ? +studentId : undefined);
   }
 
-  @Get('student/:studentId')
+  @Get('estudiante/:estudianteId')
   findByStudent(@Param('studentId', ParseIntPipe) studentId: number) {
     return this.service.findByStudent(studentId);
   }
 
-  @Get('verify/:code')
-  verifyCertificate(@Param('code') code: string) {
+  @Get('verificar/:codigo')
+  verifyCertificate(@Param('codigo') code: string) {
     return this.service.verifyCertificate(code);
   }
 
-  @Get('code/:code')
-  findByCode(@Param('code') code: string) {
+  @Get('codigo/:codigo')
+  findByCode(@Param('codigo') code: string) {
     return this.service.findByCode(code);
   }
 

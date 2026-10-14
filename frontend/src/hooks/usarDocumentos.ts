@@ -23,20 +23,20 @@ export function usarDocumentos() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchDocuments = async (params?: {
-    page?: number;
-    limit?: number;
+    pagina?: number;
+    limite?: number;
     tipo?: string;
     gestion?: string;
     estudianteId?: number;
     estado?: string;
-  }): Promise<{ data: DocumentoEmitido[]; total: number }> => {
+  }): Promise<{ datos: DocumentoEmitido[]; total: number }> => {
     setLoading(true);
     setError(null);
     try {
       const response = await api.get('/documentos', { params });
       return response.data;
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al obtener documentos');
+      setError(err.response?.data?.mensaje || 'Error al obtener documentos');
       throw err;
     } finally {
       setLoading(false);
@@ -49,7 +49,7 @@ export function usarDocumentos() {
   };
 
   const generateBoleta = async (estudianteId: number, gestion: string, gestionId?: number) => {
-    const response = await api.post('/documentos/generate-boleta', {
+    const response = await api.post('/documentos/generar-boleta', {
       estudianteId,
       gestion,
       gestionId,
@@ -58,7 +58,7 @@ export function usarDocumentos() {
   };
 
   const generateRecibo = async (estudianteId: number, gestion: string, paymentId: number, gestionId?: number) => {
-    const response = await api.post('/documentos/generate-recibo', {
+    const response = await api.post('/documentos/generar-recibo', {
       estudianteId,
       gestion,
       paymentId,
@@ -68,22 +68,22 @@ export function usarDocumentos() {
   };
 
   const markAsPrinted = async (id: string, impresoPor: number) => {
-    const response = await api.post(`/documentos/${id}/print`, { impresoPor });
+    const response = await api.post(`/documentos/${id}/imprimir`, { impresoPor });
     return response.data;
   };
 
   const markAsDelivered = async (id: string, entregadoA: string) => {
-    const response = await api.post(`/documentos/${id}/deliver`, { entregadoA });
+    const response = await api.post(`/documentos/${id}/entregar`, { entregadoA });
     return response.data;
   };
 
   const annulDocument = async (id: string, observaciones?: string) => {
-    const response = await api.post(`/documentos/${id}/annul`, { observaciones });
+    const response = await api.post(`/documentos/${id}/anular`, { observaciones });
     return response.data;
   };
 
   const getStatistics = async (gestion?: string) => {
-    const response = await api.get('/documentos/statistics', { params: { gestion } });
+    const response = await api.get('/documentos/estadisticas', { params: { gestion } });
     return response.data;
   };
 

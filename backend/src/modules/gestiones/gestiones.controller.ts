@@ -32,25 +32,25 @@ export class GestionesController {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
-    @Query('status') status?: EstadoGestion,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
+    @Query('estado') status?: EstadoGestion,
   ) {
     return this.gestionesService.findAll(+page, +limit, status);
   }
 
-  @Get('active')
+  @Get('activos')
   findActive() {
     return this.gestionesService.findActive();
   }
 
-  @Get('current')
+  @Get('actual')
   findCurrent() {
     return this.gestionesService.findCurrent();
   }
 
-  @Get('year/:year')
-  findByAnio(@Param('year') year: string) {
+  @Get('anio/:anio')
+  findByAnio(@Param('anio') year: string) {
     return this.gestionesService.findByAnio(year);
   }
 
@@ -69,21 +69,21 @@ export class GestionesController {
     return this.gestionesService.update(id, updateGestionDto);
   }
 
-  @Post(':id/open')
+  @Post(':id/abrir')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   open(@Param('id', ParseIntPipe) id: number) {
     return this.gestionesService.open(id);
   }
 
-  @Post(':id/close')
+  @Post(':id/cerrar')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   close(@Param('id', ParseIntPipe) id: number) {
     return this.gestionesService.close(id);
   }
 
-  @Post(':id/set-current')
+  @Post(':id/establecer-actual')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   setCurrent(@Param('id', ParseIntPipe) id: number) {
@@ -124,14 +124,14 @@ export class GestionesController {
     return this.gestionesService.deletePeriodo(periodoId);
   }
 
-  @Post('periodos/:periodoId/open')
+  @Post('periodos/:periodoId/abrir')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   openPeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
     return this.gestionesService.openPeriodo(periodoId);
   }
 
-  @Post('periodos/:periodoId/close')
+  @Post('periodos/:periodoId/cerrar')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   closePeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {

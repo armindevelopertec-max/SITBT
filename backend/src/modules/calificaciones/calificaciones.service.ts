@@ -41,7 +41,7 @@ export class ServicioCalificaciones {
     limit = 20,
     gestion?: string,
     statusDefinitivo?: EstadoCalificacionDefinitivo,
-  ): Promise<{ data: Calificacion[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Calificacion[]; total: number; pagina: number; limite: number }> {
     const query = this.calificacionRepository
       .createQueryBuilder('grade')
       .leftJoinAndSelect('grade.inscripcion', 'enrollment')
@@ -64,7 +64,7 @@ export class ServicioCalificaciones {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<Calificacion> {

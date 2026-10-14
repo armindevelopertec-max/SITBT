@@ -38,7 +38,7 @@ export default function GestionesPage() {
   const fetchGestiones = async () => {
     try {
       const response = await api.get('/gestiones');
-      setGestiones(response.data.data || []);
+      setGestiones(response.data.datos || []);
     } catch (error) {
       console.error('Error al obtener las gestiones:', error);
     } finally {
@@ -182,19 +182,19 @@ export default function GestionesPage() {
     try {
       switch (confirmAction.type) {
         case 'openGestion':
-          await api.post(`/gestiones/${confirmAction.id}/open`);
+          await api.post(`/gestiones/${confirmAction.id}/abrir`);
           break;
         case 'closeGestion':
-          await api.post(`/gestiones/${confirmAction.id}/close`);
+          await api.post(`/gestiones/${confirmAction.id}/cerrar`);
           break;
         case 'setCurrent':
-          await api.post(`/gestiones/${confirmAction.id}/set-current`);
+          await api.post(`/gestiones/${confirmAction.id}/establecer-actual`);
           break;
         case 'openPeriodo':
-          await api.post(`/gestiones/periodos/${confirmAction.id}/open`);
+          await api.post(`/gestiones/periodos/${confirmAction.id}/abrir`);
           break;
         case 'closePeriodo':
-          await api.post(`/gestiones/periodos/${confirmAction.id}/close`);
+          await api.post(`/gestiones/periodos/${confirmAction.id}/cerrar`);
           break;
       }
       setConfirmModalOpen(false);

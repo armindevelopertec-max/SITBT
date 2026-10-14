@@ -75,7 +75,7 @@ export default function ConfiguracionPage() {
     } catch (error: any) {
       setMessage({
         type: 'error',
-        text: error.response?.data?.message || 'Error al guardar la configuración',
+        text: error.response?.data?.mensaje || 'Error al guardar la configuración',
       });
     } finally {
       setSaving(false);

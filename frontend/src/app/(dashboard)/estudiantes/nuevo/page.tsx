@@ -49,7 +49,7 @@ export default function NewStudentPage() {
   const [studyPlans, setStudyPlans] = useState<PlanEstudio[]>([]);
   const [periodos, setPeriodos] = useState<{ gestion: Gestion; periodo: Periodo }[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [credentialsModal, setCredentialsModal] = useState<{ nombreUsuario: string; password: string } | null>(null);
+  const [credentialsModal, setCredentialsModal] = useState<{ nombreUsuario: string; contrasena: string } | null>(null);
 
   const [personData, setPersonData] = useState({
     ci: '',
@@ -97,7 +97,7 @@ export default function NewStudentPage() {
 
   const fetchCareers = async () => {
     try {
-      const response = await api.get('/carreras/active');
+      const response = await api.get('/carreras/activos');
       setCareers(response.data || []);
     } catch (error) {
       console.error('Error al cargar carreras:', error);
@@ -109,7 +109,7 @@ export default function NewStudentPage() {
   const fetchStudyPlans = async (careerId: number) => {
     setLoadingPlans(true);
     try {
-      const response = await api.get(`/planes-estudio/current/${careerId}`);
+      const response = await api.get(`/planes-estudio/actual/${careerId}`);
       setStudyPlans(response.data || []);
     } catch (error) {
       console.error('Error al cargar planes de estudio:', error);
@@ -120,7 +120,7 @@ export default function NewStudentPage() {
 
   const fetchGestiones = async () => {
     try {
-      const response = await api.get('/gestiones/active');
+      const response = await api.get('/gestiones/activos');
       const allGestiones: Gestion[] = response.data || [];
       const allPeriodos: { gestion: Gestion; periodo: Periodo }[] = [];
 
@@ -190,15 +190,15 @@ export default function NewStudentPage() {
 
       const response = await api.post('/estudiantes', studentPayload);
 
-      if (response.data.user) {
-        setCredentialsModal(response.data.user);
+      if (response.data.usuario) {
+        setCredentialsModal(response.data.usuario);
       } else {
         router.push('/estudiantes');
       }
     } catch (error: any) {
       console.error('Error al crear estudiante:', error);
-      if (error.response?.data?.message) {
-        setErrors({ submit: error.response.data.message });
+      if (error.response?.data?.mensaje) {
+        setErrors({ submit: error.response.data.mensaje });
       } else {
         setErrors({ submit: 'Error al crear el estudiante' });
       }
@@ -556,7 +556,7 @@ export default function NewStudentPage() {
                 <Key className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Contraseña temporal</p>
-                  <p className="font-mono font-medium">{credentialsModal.password}</p>
+                  <p className="font-mono font-medium">{credentialsModal.contrasena}</p>
                 </div>
               </div>
             </div>

@@ -121,7 +121,7 @@ export default function GruposPage() {
     planEstudioId: '' as string,
     capacidad: '30',
   });
-  const [generateResult, setGenerateResult] = useState<{ created: number; message: string } | null>(null);
+  const [generateResult, setGenerateResult] = useState<{ creados: number; mensaje: string } | null>(null);
 
   const [newForm, setNewForm] = useState({
     carreraId: '',
@@ -146,14 +146,14 @@ export default function GruposPage() {
   const fetchInitialData = async () => {
     try {
       const [carrerasRes, gestionesRes, turnosRes] = await Promise.all([
-        api.get('/carreras/active'),
+        api.get('/carreras/activos'),
         api.get('/gestiones'),
-        api.get('/turnos/all'),
+        api.get('/turnos/todos'),
       ]);
       setCarreras(carrerasRes.data || []);
-      const allGestiones = gestionesRes.data.data || gestionesRes.data || [];
+      const allGestiones = gestionesRes.data.datos || gestionesRes.data || [];
       setGestiones(allGestiones);
-      setTurnos(turnosRes.data.data || turnosRes.data || []);
+      setTurnos(turnosRes.data.datos || turnosRes.data || []);
 
       const current = allGestiones.find((g: any) => g.esActual);
       if (current) {
@@ -169,13 +169,13 @@ export default function GruposPage() {
   const fetchGrupos = async () => {
     try {
       setLoading(true);
-      const params: any = { limit: 100 };
+      const params: any = { limite: 100 };
       if (filterGestion) params.gestion = filterGestion;
       if (filterCarrera) params.careerId = filterCarrera;
       if (filterSemestre) params.semester = parseInt(filterSemestre);
 
       const response = await api.get(`/grupos`, { params });
-      setGrupos(response.data.data || []);
+      setGrupos(response.data.datos || []);
     } catch (error) {
       console.error('Error al obtener grupos:', error);
     } finally {
@@ -188,8 +188,8 @@ export default function GruposPage() {
     setLoadingDetails(true);
     try {
       const [studentsRes, assignmentsRes] = await Promise.all([
-        api.get(`/grupos/${grupo.id}/students`),
-        api.get(`/asignaciones-docentes/group/${grupo.id}?gestion=${grupo.gestion}`),
+        api.get(`/grupos/${grupo.id}/estudiantes`),
+        api.get(`/asignaciones-docentes/grupo/${grupo.id}?gestion=${grupo.gestion}`),
       ]);
       setGrupoStudents(studentsRes.data || []);
       setGrupoAssignments(assignmentsRes.data || []);
@@ -225,12 +225,12 @@ export default function GruposPage() {
 
   const handleGenerate = async () => {
     if (!generateForm.planEstudioId) {
-      setGenerateResult({ created: 0, message: 'Selecciona un plan de estudios' });
+      setGenerateResult({ creados: 0, mensaje: 'Selecciona un plan de estudios' });
       return;
     }
     setSaving(true);
     try {
-      const result = await api.post('/grupos/generate', {
+      const result = await api.post('/grupos/generar', {
         gestion: generateForm.gestion,
         periodo: generateForm.periodo,
         turnoIds: generateForm.turnoIds,
@@ -239,12 +239,12 @@ export default function GruposPage() {
         capacidad: generateForm.capacidad,
       });
       setGenerateResult(result.data);
-      if (result.data.created > 0) {
+      if (result.data.creados > 0) {
         fetchGrupos();
       }
     } catch (error) {
       console.error('Error al generar grupos:', error);
-      setGenerateResult({ created: 0, message: 'Error al generar grupos' });
+      setGenerateResult({ creados: 0, mensaje: 'Error al generar grupos' });
     } finally {
       setSaving(false);
     }
@@ -256,7 +256,7 @@ export default function GruposPage() {
       return;
     }
     try {
-      const response = await api.get(`/planes-estudio/current/${carreraId}`);
+      const response = await api.get(`/planes-estudio/actual/${carreraId}`);
       setPlanesCarrera(response.data || []);
     } catch (error) {
       console.error('Error al obtener planes:', error);
@@ -701,8 +701,8 @@ export default function GruposPage() {
           </div>
 
           {generateResult && (
-            <div className={`p-3 rounded-lg ${generateResult.created > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-              {generateResult.message}
+            <div className={`p-3 rounded-lg ${generateResult.creados > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+              {generateResult.mensaje}
             </div>
           )}
 

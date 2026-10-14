@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { FiltroExcepcionesEspanol } from './common/filtro-excepciones-espanol';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,27 +16,40 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
+  app.useGlobalFilters(new FiltroExcepcionesEspanol());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      exceptionFactory: (errores) => {
+        const campos = errores
+          .map((e) => e.property)
+          .filter(Boolean)
+          .join(', ');
+        return new BadRequestException(
+          campos
+            ? `Datos de entrada inválidos: ${campos}`
+            : 'Datos de entrada inválidos',
+        );
+      },
     }),
   );
 
   const config = new DocumentBuilder()
-    .setTitle('SITBT API')
+    .setTitle('API del SITBT')
     .setDescription('Sistema Académico Instituto Tecnológico Boliviana de Tecnología')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('api/documentacion', app, document);
 
   const port = process.env.PORT || 4000;
   await app.listen(port);
-  console.log(`🚀 Server running on http://localhost:${port}`);
-  console.log(`📚 API Docs at http://localhost:${port}/api/docs`);
+  console.log(`🚀 Servidor ejecutándose en http://localhost:${port}`);
+  console.log(`📚 Documentación de la API en http://localhost:${port}/api/documentacion`);
 }
 bootstrap();

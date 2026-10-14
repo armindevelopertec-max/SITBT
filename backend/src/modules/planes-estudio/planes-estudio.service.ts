@@ -28,7 +28,7 @@ export class ServicioPlanesEstudio {
     limit = 20,
     status?: EstadoPlanEstudio,
     careerId?: number,
-  ): Promise<{ data: PlanEstudio[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: PlanEstudio[]; total: number; pagina: number; limite: number }> {
     const query = this.planEstudioRepository
       .createQueryBuilder('study_plan')
       .leftJoinAndSelect('study_plan.carrera', 'career');
@@ -47,7 +47,7 @@ export class ServicioPlanesEstudio {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<PlanEstudio> {

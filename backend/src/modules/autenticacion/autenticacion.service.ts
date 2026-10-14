@@ -57,7 +57,7 @@ export class AutenticacionServicio {
       await this.userRoleRepository.save(userRole);
     }
 
-    return { message: 'Usuario registrado exitosamente', usuarioId: (user as any).id };
+    return { mensaje: 'Usuario registrado exitosamente', usuarioId: (user as any).id };
   }
 
   async login(nombreUsuario: string, contrasena: string) {
@@ -89,15 +89,15 @@ export class AutenticacionServicio {
     });
 
     const payload = {
-      sub: user.id,
+      usuarioId: user.id,
       nombreUsuario: user.nombreUsuario as any,
       personaId: user.personaId,
       roles: roles.map((ur) => ur.rol.codigo),
     };
 
     return {
-      access_token: this.jwtService.sign(payload),
-      user: {
+      tokenAcceso: this.jwtService.sign(payload),
+      usuario: {
         id: user.id,
         nombreUsuario: user.nombreUsuario as any,
         personaId: user.personaId,

@@ -31,21 +31,21 @@ export class ControladorConvalidaciones {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
-    @Query('status') status?: EstadoConvalidacion,
-    @Query('type') type?: TipoConvalidacion,
-    @Query('studentId') studentId?: number,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
+    @Query('estado') status?: EstadoConvalidacion,
+    @Query('tipo') type?: TipoConvalidacion,
+    @Query('estudianteId') studentId?: number,
   ) {
     return this.service.findAll(+page, +limit, status, type, studentId ? +studentId : undefined);
   }
 
-  @Get('pending')
+  @Get('pendientes')
   getPending() {
     return this.service.getPending();
   }
 
-  @Get('student/:studentId')
+  @Get('estudiante/:estudianteId')
   findByStudent(@Param('studentId', ParseIntPipe) studentId: number) {
     return this.service.findByStudent(studentId);
   }

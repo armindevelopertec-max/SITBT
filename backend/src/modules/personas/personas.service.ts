@@ -28,7 +28,7 @@ export class ServicioPersonas {
     page = 1,
     limit = 20,
     status?: EstadoPersona,
-  ): Promise<{ data: Persona[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Persona[]; total: number; pagina: number; limite: number }> {
     const query = this.personaRepository.createQueryBuilder('person');
 
     if (status) {
@@ -41,7 +41,7 @@ export class ServicioPersonas {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<Persona> {
@@ -71,7 +71,7 @@ export class ServicioPersonas {
     await this.personaRepository.remove(person);
   }
 
-  async search(query: string, page = 1, limit = 20): Promise<{ data: Persona[]; total: number }> {
+  async search(query: string, page = 1, limit = 20): Promise<{ datos: Persona[]; total: number }> {
     const [data, total] = await this.personaRepository
       .createQueryBuilder('person')
       .where('person.nombres ILIKE :query', { query: `%${query}%` })
@@ -83,7 +83,7 @@ export class ServicioPersonas {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total };
+    return { datos: data, total };
   }
 
   async findActive(): Promise<Persona[]> {

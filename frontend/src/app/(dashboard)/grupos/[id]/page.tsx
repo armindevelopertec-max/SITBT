@@ -80,11 +80,11 @@ export default function EditarGrupoPage() {
     setLoadingData(true);
     try {
       const [carrerasRes, turnosRes] = await Promise.all([
-        api.get('/carreras/active'),
-        api.get('/turnos/all'),
+        api.get('/carreras/activos'),
+        api.get('/turnos/todos'),
       ]);
-      setCarreras(carrerasRes.data.data || []);
-      setTurnos(turnosRes.data.data || []);
+      setCarreras(carrerasRes.data.datos || []);
+      setTurnos(turnosRes.data.datos || []);
     } catch (error) {
       console.error('Error al obtener los datos:', error);
     } finally {
@@ -115,10 +115,10 @@ export default function EditarGrupoPage() {
 
   const fetchPlanesEstudio = async (careerId: number) => {
     try {
-      const response = await api.get(`/planes-estudio/current/${careerId}`);
+      const response = await api.get(`/planes-estudio/actual/${careerId}`);
       setPlanesEstudio(response.data || []);
       if (!response.data || response.data.length === 0) {
-        const allResponse = await api.get(`/planes-estudio?careerId=${careerId}`);
+        const allResponse = await api.get(`/planes-estudio?carreraId=${careerId}`);
         setPlanesEstudio(allResponse.data?.data || []);
       }
     } catch (error) {
@@ -160,8 +160,8 @@ export default function EditarGrupoPage() {
       router.push('/grupos');
     } catch (error: any) {
       console.error('Error al actualizar el grupo:', error);
-      if (error.response?.data?.message) {
-        setErrors({ submit: error.response.data.message });
+      if (error.response?.data?.mensaje) {
+        setErrors({ submit: error.response.data.mensaje });
       } else {
         setErrors({ submit: 'Error al actualizar el grupo' });
       }

@@ -35,7 +35,7 @@ export class ServicioCredenciales {
     gestion?: string,
     semester?: number,
     status?: EstadoCredencial,
-  ): Promise<{ data: Credencial[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Credencial[]; total: number; pagina: number; limite: number }> {
     const query = this.credencialRepository
       .createQueryBuilder('credential')
       .leftJoinAndSelect('credential.estudiante', 'student')
@@ -62,7 +62,7 @@ export class ServicioCredenciales {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<Credencial> {

@@ -3,10 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { Client } from 'minio';
 
 export interface UploadedFile {
-  filename: string;
-  originalname: string;
-  mimetype: string;
-  size: number;
+  nombreArchivo: string;
+  nombreOriginal: string;
+  tipoMime: string;
+  tamano: number;
   url: string;
 }
 
@@ -45,30 +45,30 @@ export class ServicioAlmacenamiento {
   }
 
   async uploadFile(
-    file: any,
-    folder: string = 'general',
+    archivo: any,
+    carpeta: string = 'general',
   ): Promise<UploadedFile> {
     try {
-      const filename = `${folder}/${Date.now()}-${file.originalname}`;
+      const filename = `${carpeta}/${Date.now()}-${archivo.originalname}`;
       await this.minioClient.putObject(
         this.bucket,
         filename,
-        file.buffer,
-        file.size,
-        { 'Content-Type': file.mimetype },
+        archivo.buffer,
+        archivo.size,
+        { 'Content-Type': archivo.mimetype },
       );
 
-      const url = `/api/almacenamiento/files/${filename}`;
+      const url = `/api/almacenamiento/archivos/${filename}`;
 
       return {
-        filename,
-        originalname: file.originalname,
-        mimetype: file.mimetype,
-        size: file.size,
+        nombreArchivo: filename,
+        nombreOriginal: archivo.originalname,
+        tipoMime: archivo.mimetype,
+        tamano: archivo.size,
         url,
       };
     } catch (error: any) {
-      throw new InternalServerErrorException(`Failed to upload file: ${error.message}`);
+      throw new InternalServerErrorException(`No se pudo subir el archivo: ${error.message}`);
     }
   }
 
@@ -76,10 +76,10 @@ export class ServicioAlmacenamiento {
     buffer: Buffer,
     filename: string,
     mimetype: string,
-    folder: string = 'general',
+    carpeta: string = 'general',
   ): Promise<UploadedFile> {
     try {
-      const fullPath = `${folder}/${filename}`;
+      const fullPath = `${carpeta}/${filename}`;
       await this.minioClient.putObject(
         this.bucket,
         fullPath,
@@ -88,17 +88,17 @@ export class ServicioAlmacenamiento {
         { 'Content-Type': mimetype },
       );
 
-      const url = `/api/almacenamiento/files/${fullPath}`;
+      const url = `/api/almacenamiento/archivos/${fullPath}`;
 
       return {
-        filename: fullPath,
-        originalname: filename,
-        mimetype,
-        size: buffer.length,
+        nombreArchivo: fullPath,
+        nombreOriginal: filename,
+        tipoMime: mimetype,
+        tamano: buffer.length,
         url,
       };
     } catch (error: any) {
-      throw new InternalServerErrorException(`Failed to upload file: ${error.message}`);
+      throw new InternalServerErrorException(`No se pudo subir el archivo: ${error.message}`);
     }
   }
 
@@ -114,7 +114,7 @@ export class ServicioAlmacenamiento {
 
       return `${protocol}://${endpoint}:${port}/${this.bucket}/${filename}`;
     } catch (error: any) {
-      throw new InternalServerErrorException(`Failed to get file URL: ${error.message}`);
+      throw new InternalServerErrorException(`No se pudo obtener la URL del archivo: ${error.message}`);
     }
   }
 
@@ -122,7 +122,7 @@ export class ServicioAlmacenamiento {
     try {
       await this.minioClient.removeObject(this.bucket, filename);
     } catch (error: any) {
-      throw new InternalServerErrorException(`Failed to delete file: ${error.message}`);
+      throw new InternalServerErrorException(`No se pudo eliminar el archivo: ${error.message}`);
     }
   }
 
@@ -137,7 +137,7 @@ export class ServicioAlmacenamiento {
         stream.on('error', reject);
       });
     } catch (error: any) {
-      throw new InternalServerErrorException(`Failed to get file: ${error.message}`);
+      throw new InternalServerErrorException(`No se pudo obtener el archivo: ${error.message}`);
     }
   }
 
@@ -154,7 +154,7 @@ export class ServicioAlmacenamiento {
         stream.on('error', reject);
       });
     } catch (error: any) {
-      throw new InternalServerErrorException(`Failed to list files: ${error.message}`);
+      throw new InternalServerErrorException(`No se pudieron listar los archivos: ${error.message}`);
     }
   }
 
@@ -177,7 +177,7 @@ export class ServicioAlmacenamiento {
         mimetype: stat.metaData?.['content-type'] || 'application/octet-stream',
       };
     } catch (error: any) {
-      throw new InternalServerErrorException(`Failed to get file stream: ${error.message}`);
+      throw new InternalServerErrorException(`No se pudo obtener el flujo del archivo: ${error.message}`);
     }
   }
 
@@ -189,7 +189,7 @@ export class ServicioAlmacenamiento {
         mimetype: stat.metaData?.['content-type'] || 'application/octet-stream',
       };
     } catch (error: any) {
-      throw new InternalServerErrorException(`Failed to get file metadata: ${error.message}`);
+      throw new InternalServerErrorException(`No se pudo obtener los metadatos del archivo: ${error.message}`);
     }
   }
 }

@@ -172,10 +172,10 @@ export default function CareerDetailPage() {
   useEffect(() => {
     const fetchCareer = async () => {
       try {
-        const response = await publicApi.get<{ data: Carrera[] }>('/carreras', {
+        const response = await publicApi.get<{ datos: Carrera[] }>('/carreras', {
           params: { estado: 'activo' },
         });
-        const found = response.data.data.find((c) => c.id === careerId);
+        const found = response.data.datos.find((c) => c.id === careerId);
         setCareer(found || null);
       } catch (error) {
         console.error('Error al obtener la carrera:', error);

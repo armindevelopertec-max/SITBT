@@ -30,24 +30,24 @@ export class ControladorConsentimiento {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
     @Query('estudianteId') estudianteId?: number,
   ) {
     return this.service.findAll(+page, +limit, estudianteId ? +estudianteId : undefined);
   }
 
-  @Get('student/:estudianteId')
+  @Get('estudiante/:estudianteId')
   findByStudent(@Param('estudianteId') estudianteId: string) {
     return this.service.findByStudent(+estudianteId);
   }
 
-  @Get('student/:estudianteId/latest')
+  @Get('estudiante/:estudianteId/ultimo')
   getLatestConsent(@Param('estudianteId') estudianteId: string) {
     return this.service.getLatestConsent(+estudianteId);
   }
 
-  @Get('check/:estudianteId/:version')
+  @Get('verificar/:estudianteId/:version')
   checkValidConsent(
     @Param('estudianteId') estudianteId: string,
     @Param('version') version: string,
@@ -65,7 +65,7 @@ export class ControladorConsentimiento {
     return this.service.update(id, updateDto);
   }
 
-  @Post(':id/exercise-right')
+  @Post(':id/ejercer-derecho')
   @HttpCode(200)
   exerciseRight(
     @Param('id') id: string,

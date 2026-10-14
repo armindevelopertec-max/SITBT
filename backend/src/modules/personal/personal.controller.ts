@@ -31,20 +31,20 @@ export class ControladorPersonal {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
-    @Query('status') status?: EstadoPersonal,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
+    @Query('estado') status?: EstadoPersonal,
     @Query('cargo') cargo?: CargoPersonal,
   ) {
     return this.staffsService.findAll(+page, +limit, status, cargo);
   }
 
-  @Get('active')
+  @Get('activos')
   findActive() {
     return this.staffsService.findActive();
   }
 
-  @Get('teachers')
+  @Get('docentes')
   findTeachers() {
     return this.staffsService.findTeachers();
   }

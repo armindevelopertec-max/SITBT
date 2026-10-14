@@ -31,7 +31,7 @@ export class ServicioTurnos {
   async findAll(
     page = 1,
     limit = 20,
-  ): Promise<{ data: Turno[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Turno[]; total: number; pagina: number; limite: number }> {
     const [data, total] = await this.turnoRepository
       .createQueryBuilder('turno')
       .orderBy('turno.horaInicio', 'ASC')
@@ -39,7 +39,7 @@ export class ServicioTurnos {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<Turno> {

@@ -16,7 +16,7 @@ export default function DashboardLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
-  const { isAuthenticated, _hasHydrated } = usarAlmacenAutenticacion();
+  const { estaAutenticado, _hidratado } = usarAlmacenAutenticacion();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -33,16 +33,16 @@ export default function DashboardLayout({
   }, []);
 
   useEffect(() => {
-    if (_hasHydrated && !isAuthenticated) {
-      router.push('/login');
+    if (_hidratado && !estaAutenticado) {
+      router.push('/acceder');
     }
-  }, [_hasHydrated, isAuthenticated, router]);
+  }, [_hidratado, estaAutenticado, router]);
 
-  if (!_hasHydrated) {
+  if (!_hidratado) {
     return null;
   }
 
-  if (!isAuthenticated) {
+  if (!estaAutenticado) {
     return null;
   }
 

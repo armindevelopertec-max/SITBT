@@ -16,7 +16,7 @@ interface ImageUploadProps {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
-const getUploadUrl = () => API_URL ? `${API_URL}/almacenamiento/upload` : `${API_BASE}/api/almacenamiento/upload`;
+const obtenerUrlSubida = () => API_URL ? `${API_URL}/almacenamiento/subir` : `${API_BASE}/api/almacenamiento/subir`;
 
 export function CargarImagen({
   label,
@@ -29,7 +29,7 @@ export function CargarImagen({
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { token } = usarAlmacenAutenticacion();
+  const { tokenAcceso } = usarAlmacenAutenticacion();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,10 +51,10 @@ export function CargarImagen({
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('archivo', file);
 
-      const tokenValue = token || '';
-      const response = await fetch(`${getUploadUrl()}?folder=logos`, {
+      const tokenValue = tokenAcceso || '';
+      const response = await fetch(`${obtenerUrlSubida()}?carpeta=logos`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${tokenValue}`,
@@ -64,7 +64,7 @@ export function CargarImagen({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al subir');
+        throw new Error(errorData.mensaje || 'Error al subir');
       }
 
       const data = await response.json();

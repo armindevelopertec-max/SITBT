@@ -284,8 +284,8 @@ export default function CredentialsPage() {
 
   const fetchCredentials = async () => {
     try {
-      const response = await api.get('/credenciales', { params: { limit: 100 } });
-      setCredentials(response.data.data || []);
+      const response = await api.get('/credenciales', { params: { limite: 100 } });
+      setCredentials(response.data.datos || []);
     } catch (error) {
       console.error('Error al obtener las credenciales:', error);
     } finally {
@@ -295,7 +295,7 @@ export default function CredentialsPage() {
 
   const fetchInstitution = async () => {
     try {
-      const response = await api.get('/configuracion-institucional/public');
+      const response = await api.get('/configuracion-institucional/publico');
       setInstitucion(response.data);
     } catch (error) {
       console.error('Error al obtener la institución:', error);
@@ -323,7 +323,7 @@ export default function CredentialsPage() {
     if (!cancelModal) return;
     setSaving(true);
     try {
-      await api.patch(`/credenciales/${cancelModal.id}/annul`);
+      await api.patch(`/credenciales/${cancelModal.id}/anular`);
       setCancelModal(null);
       fetchCredentials();
       if (selected?.id === cancelModal.id) {
@@ -356,7 +356,7 @@ export default function CredentialsPage() {
   const handlePrint = async () => {
     if (!selected) return;
     try {
-      await api.patch(`/credenciales/${selected.id}/mark-printed`);
+      await api.patch(`/credenciales/${selected.id}/marcar-impreso`);
       fetchCredentials();
       window.print();
     } catch (error) {

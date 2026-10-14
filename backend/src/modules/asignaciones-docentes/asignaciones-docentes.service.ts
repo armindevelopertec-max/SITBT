@@ -22,7 +22,7 @@ export class ServicioAsignacionesDocentes {
     limit = 20,
     gestion?: string,
     status?: EstadoAsignacionDocente,
-  ): Promise<{ data: AsignacionDocente[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: AsignacionDocente[]; total: number; pagina: number; limite: number }> {
     const query = this.assignmentRepository
       .createQueryBuilder('assignment')
       .leftJoinAndSelect('assignment.docente', 'teacher')
@@ -44,7 +44,7 @@ export class ServicioAsignacionesDocentes {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<AsignacionDocente> {

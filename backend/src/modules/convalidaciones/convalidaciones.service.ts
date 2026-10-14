@@ -23,7 +23,7 @@ export class ServicioConvalidaciones {
     status?: EstadoConvalidacion,
     type?: TipoConvalidacion,
     studentId?: number,
-  ): Promise<{ data: ConvalidacionEstudiante[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: ConvalidacionEstudiante[]; total: number; pagina: number; limite: number }> {
     const query = this.convalidacionRepository
       .createQueryBuilder('convalidation')
       .leftJoinAndSelect('convalidation.estudiante', 'student')
@@ -50,7 +50,7 @@ export class ServicioConvalidaciones {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<ConvalidacionEstudiante> {

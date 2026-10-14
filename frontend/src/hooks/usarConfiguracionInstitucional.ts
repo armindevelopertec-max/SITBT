@@ -25,11 +25,11 @@ export function usarConfiguracionInstitucional() {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.get('/configuracion-institucional/public');
+      const response = await api.get('/configuracion-institucional/publico');
       setSettings(response.data);
     } catch (err: any) {
       console.error('Error al cargar la configuración institucional:', err);
-      setError(err.response?.data?.message || 'Error al cargar configuración');
+      setError(err.response?.data?.mensaje || 'Error al cargar configuración');
       setSettings({
         nombre: 'Instituto Tecnológico Boliviana de Tecnología',
         nombreCorto: 'SITBT',

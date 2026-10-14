@@ -29,18 +29,18 @@ export class ControladorInscripciones {
     return this.enrollmentsService.create(crearInscripcionDto);
   }
 
-  @Post('bulk')
+  @Post('lote')
   bulkCreate(@Body() crearInscripcionDtos: CrearInscripcionDto[]) {
     return this.enrollmentsService.bulkCreate(crearInscripcionDtos);
   }
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
     @Query('gestion') gestion?: string,
-    @Query('status') status?: EstadoInscripcion,
-    @Query('studentId') studentId?: number,
+    @Query('estado') status?: EstadoInscripcion,
+    @Query('estudianteId') studentId?: number,
   ) {
     return this.enrollmentsService.findAll(
       +page,
@@ -51,22 +51,22 @@ export class ControladorInscripciones {
     );
   }
 
-  @Get('student/:studentId')
+  @Get('estudiante/:estudianteId')
   findByStudent(@Param('studentId', ParseIntPipe) studentId: number, @Query('gestion') gestion?: string) {
     return this.enrollmentsService.findByStudent(studentId, gestion);
   }
 
-  @Get('student/:studentId/academic-record')
+  @Get('estudiante/:estudianteId/historial-academico')
   getAcademicRecord(@Param('studentId', ParseIntPipe) studentId: number) {
     return this.enrollmentsService.getStudentAcademicRecord(studentId);
   }
 
-  @Get('subject/:subjectId')
+  @Get('materia/:materiaId')
   findBySubject(@Param('subjectId', ParseIntPipe) subjectId: number, @Query('gestion') gestion: string) {
     return this.enrollmentsService.findBySubject(subjectId, gestion);
   }
 
-  @Get('group/:groupId')
+  @Get('grupo/:grupoId')
   findByGroup(@Param('groupId', ParseIntPipe) groupId: number, @Query('gestion') gestion: string) {
     return this.enrollmentsService.findByGroup(groupId, gestion);
   }

@@ -23,7 +23,7 @@ export class ServicioAuditoria {
     table?: string,
     startDate?: Date,
     endDate?: Date,
-  ): Promise<{ data: RegistroAuditoria[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: RegistroAuditoria[]; total: number; pagina: number; limite: number }> {
     const query = this.auditoriaRepository
       .createQueryBuilder('audit')
       .leftJoinAndSelect('audit.usuario', 'user');
@@ -50,7 +50,7 @@ export class ServicioAuditoria {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findByUser(userId: number, limit = 50): Promise<RegistroAuditoria[]> {

@@ -8,7 +8,7 @@ import { GuardaJwt } from './guarda-jwt';
 export class ControladorAutenticacion {
   constructor(private autenticacionServicio: AutenticacionServicio) {}
 
-  @Post('login')
+  @Post('iniciar-sesion')
   async login(@Body() body: { nombreUsuario: string; contrasena: string }) {
     return this.autenticacionServicio.login(body.nombreUsuario, body.contrasena);
   }

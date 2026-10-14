@@ -26,21 +26,21 @@ export class ControladorAlmacenamiento {
   private readonly logger = new Logger(ControladorAlmacenamiento.name);
   constructor(private readonly service: ServicioAlmacenamiento) {}
 
-  @Post('upload')
+  @Post('subir')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('archivo'))
   async uploadFile(
-    @UploadedFile() file: any,
-    @Query('folder') folder: string = 'general',
+    @UploadedFile() archivo: any,
+    @Query('carpeta') carpeta: string = 'general',
   ) {
-    if (!file) {
-      throw new BadRequestException('No file provided');
+    if (!archivo) {
+      throw new BadRequestException('No se proporcionó ningún archivo');
     }
-    return this.service.uploadFile(file, folder);
+    return this.service.uploadFile(archivo, carpeta);
   }
 
-  @Get('files/*')
+  @Get('archivos/*')
   async getFileStream(
     @Param('0') filename: string,
     @Res({ passthrough: true }) res: Response,
@@ -60,33 +60,33 @@ export class ControladorAlmacenamiento {
     }
   }
 
-  @Get(':filename')
-  async getFile(@Param('filename') filename: string) {
+  @Get(':nombreArchivo')
+  async getFile(@Param('nombreArchivo') filename: string) {
     const file = await this.service.getFile(filename);
-    return { buffer: file.toString('base64') };
+    return { contenidoBase64: file.toString('base64') };
   }
 
-  @Get(':filename/url')
+  @Get(':nombreArchivo/url')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  async getFileUrl(@Param('filename') filename: string) {
+  async getFileUrl(@Param('nombreArchivo') filename: string) {
     const url = await this.service.getFileUrl(filename);
     return { url };
   }
 
-  @Delete(':filename')
+  @Delete(':nombreArchivo')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  async deleteFile(@Param('filename') filename: string) {
+  async deleteFile(@Param('nombreArchivo') filename: string) {
     await this.service.deleteFile(filename);
-    return { message: 'File deleted successfully' };
+    return { mensaje: 'Archivo eliminado correctamente' };
   }
 
   @Get()
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  async listFiles(@Query('prefix') prefix: string = '') {
+  async listFiles(@Query('prefijo') prefix: string = '') {
     const files = await this.service.listFiles(prefix);
-    return { files };
+    return { archivos: files };
   }
 }

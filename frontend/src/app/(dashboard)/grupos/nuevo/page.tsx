@@ -63,8 +63,8 @@ export default function NuevoGrupoPage() {
     setLoadingData(true);
     try {
       const [carrerasRes, turnosRes] = await Promise.all([
-        api.get('/carreras/active'),
-        api.get('/turnos/all'),
+        api.get('/carreras/activos'),
+        api.get('/turnos/todos'),
       ]);
       setCarreras(carrerasRes.data || []);
       setTurnos(turnosRes.data || []);
@@ -77,10 +77,10 @@ export default function NuevoGrupoPage() {
 
   const fetchPlanesEstudio = async (careerId: number) => {
     try {
-      const response = await api.get(`/planes-estudio/current/${careerId}`);
+      const response = await api.get(`/planes-estudio/actual/${careerId}`);
       setPlanesEstudio(response.data || []);
       if (!response.data || response.data.length === 0) {
-        const allResponse = await api.get(`/planes-estudio?careerId=${careerId}`);
+        const allResponse = await api.get(`/planes-estudio?carreraId=${careerId}`);
         setPlanesEstudio(allResponse.data?.data || []);
       }
     } catch (error) {
@@ -122,8 +122,8 @@ export default function NuevoGrupoPage() {
       router.push('/grupos');
     } catch (error: any) {
       console.error('Error al crear el grupo:', error);
-      if (error.response?.data?.message) {
-        setErrors({ submit: error.response.data.message });
+      if (error.response?.data?.mensaje) {
+        setErrors({ submit: error.response.data.mensaje });
       } else {
         setErrors({ submit: 'Error al crear el grupo' });
       }

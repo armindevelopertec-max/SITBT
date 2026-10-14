@@ -31,25 +31,25 @@ export class ControladorPlanesEstudio {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
-    @Query('status') status?: EstadoPlanEstudio,
-    @Query('careerId') careerId?: number,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
+    @Query('estado') status?: EstadoPlanEstudio,
+    @Query('carreraId') careerId?: number,
   ) {
     return this.studyPlansService.findAll(+page, +limit, status, careerId ? +careerId : undefined);
   }
 
-  @Get('active')
+  @Get('activos')
   findActive() {
     return this.studyPlansService.findActive();
   }
 
-  @Get('by-career/:careerId')
+  @Get('por-carrera/:carreraId')
   findByCareer(@Param('careerId', ParseIntPipe) careerId: number) {
     return this.studyPlansService.findByCareer(careerId);
   }
 
-  @Get('current/:careerId')
+  @Get('actual/:carreraId')
   findCurrentByCareer(@Param('careerId', ParseIntPipe) careerId: number) {
     return this.studyPlansService.findCurrentByCareer(careerId);
   }

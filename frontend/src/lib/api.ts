@@ -4,7 +4,7 @@ import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
 
-const getBaseUrl = () => {
+const obtenerUrlBase = () => {
   if (API_URL) {
     return API_URL;
   }
@@ -12,7 +12,7 @@ const getBaseUrl = () => {
 };
 
 export const api = axios.create({
-  baseURL: `${getBaseUrl()}`,
+  baseURL: `${obtenerUrlBase()}`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -20,10 +20,7 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    let token = usarAlmacenAutenticacion.getState().token;
-    if (!token && typeof window !== 'undefined') {
-      token = localStorage.getItem('token');
-    }
+    let token = usarAlmacenAutenticacion.getState().tokenAcceso;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -38,9 +35,9 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      usarAlmacenAutenticacion.getState().logout();
+      usarAlmacenAutenticacion.getState().cerrarSesion();
       if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        window.location.href = '/acceder';
       }
     }
     return Promise.reject(error);
@@ -48,7 +45,7 @@ api.interceptors.response.use(
 );
 
 export const publicApi = axios.create({
-  baseURL: `${getBaseUrl()}`,
+  baseURL: `${obtenerUrlBase()}`,
   headers: {
     'Content-Type': 'application/json',
   },

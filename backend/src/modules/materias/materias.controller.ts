@@ -29,22 +29,22 @@ export class ControladorMaterias {
   }
 
   @Get()
-  findAll(@Query('page') page = 1, @Query('limit') limit = 20) {
+  findAll(@Query('pagina') page = 1, @Query('limite') limit = 20) {
     return this.subjectsService.findAll(+page, +limit);
   }
 
-  @Get('all')
+  @Get('todos')
   findAllSubjects() {
     return this.subjectsService.findAllSubjects();
   }
 
-  @Get('search')
+  @Get('buscar')
   search(@Query('q') query: string) {
     return this.subjectsService.search(query);
   }
 
-  @Get('code/:code')
-  findByCodigo(@Param('code') code: string) {
+  @Get('codigo/:codigo')
+  findByCodigo(@Param('codigo') code: string) {
     return this.subjectsService.findByCodigo(code);
   }
 

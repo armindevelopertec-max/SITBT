@@ -30,9 +30,9 @@ export default function EmitDocumentPage() {
     setSearching(true);
     try {
       const response = await api.get('/estudiantes', {
-        params: { search: studentSearch, limit: 10 },
+        params: { buscar: studentSearch, limite: 10 },
       });
-      setStudents(response.data.data || []);
+      setStudents(response.data.datos || []);
     } catch (error) {
       console.error('Error al buscar estudiantes:', error);
     } finally {
@@ -62,7 +62,7 @@ export default function EmitDocumentPage() {
       }
       router.push('/documentos');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al generar documento');
+      setError(err.response?.data?.mensaje || 'Error al generar documento');
     } finally {
       setLoading(false);
     }

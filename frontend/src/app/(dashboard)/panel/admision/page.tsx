@@ -141,7 +141,7 @@ export default function AdmisionPage() {
   const fetchAdmissions = async () => {
     try {
       const response = await api.get('/admision');
-      setAdmissions(response.data.data);
+      setAdmissions(response.data.datos);
     } catch (error) {
       console.error('Error al obtener las admisiones:', error);
     } finally {
@@ -151,7 +151,7 @@ export default function AdmisionPage() {
 
   const fetchCareers = async () => {
     try {
-      const response = await api.get('/carreras/active');
+      const response = await api.get('/carreras/activos');
       setCareers(response.data || []);
     } catch (error) {
       console.error('Error al obtener las carreras:', error);
@@ -175,7 +175,7 @@ export default function AdmisionPage() {
 
   const fetchStudyPlans = async (careerId: number) => {
     try {
-      const response = await api.get(`/planes-estudio/current/${careerId}`);
+      const response = await api.get(`/planes-estudio/actual/${careerId}`);
       setStudyPlans(response.data || []);
     } catch (error) {
       console.error('Error al obtener los planes de estudio:', error);
@@ -204,15 +204,15 @@ export default function AdmisionPage() {
     if (!convertirModal) return;
     setFormLoading(true);
     try {
-      await api.post(`/admision/${convertirModal.id}/convert-to-student`, {
-        admissionGestion: convertForm.gestionAdmision,
+      await api.post(`/admision/${convertirModal.id}/convertir-estudiante`, {
+        gestionAdmision: convertForm.gestionAdmision,
       });
 
       setConvertirModal(null);
       fetchAdmissions();
     } catch (error: any) {
       console.error('Error al convertir:', error);
-      alert(error.response?.data?.message || 'Error al convertir a estudiante');
+      alert(error.response?.data?.mensaje || 'Error al convertir a estudiante');
     } finally {
       setFormLoading(false);
     }
@@ -248,7 +248,7 @@ export default function AdmisionPage() {
     if (!verificarModal) return;
     setFormLoading(true);
     try {
-      await api.post(`/admision/${verificarModal.id}/verify`, {
+      await api.post(`/admision/${verificarModal.id}/verificar`, {
         verificadoPor: 1,
         observaciones,
       });
@@ -266,7 +266,7 @@ export default function AdmisionPage() {
     if (!rechazarModal) return;
     setFormLoading(true);
     try {
-      await api.post(`/admision/${rechazarModal.id}/reject`, {
+      await api.post(`/admision/${rechazarModal.id}/rechazar`, {
         verificadoPor: 1,
         observaciones,
       });

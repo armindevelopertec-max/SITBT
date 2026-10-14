@@ -29,18 +29,18 @@ export class ControladorGrupos {
     return this.groupsService.create(crearGrupoDto);
   }
 
-  @Post('generate')
+  @Post('generar')
   generate(@Body() generateGroupsDto: GenerarGruposDto) {
     return this.groupsService.generateGroups(generateGroupsDto);
   }
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
     @Query('gestion') gestion?: string,
-    @Query('careerId') careerId?: number,
-    @Query('semester') semester?: number,
+    @Query('carreraId') careerId?: number,
+    @Query('semestre') semester?: number,
   ) {
     return this.groupsService.findAll(
       +page,
@@ -56,22 +56,22 @@ export class ControladorGrupos {
     return this.groupsService.findOne(id);
   }
 
-  @Get(':id/students')
+  @Get(':id/estudiantes')
   getStudents(@Param('id', ParseIntPipe) id: number) {
     return this.groupsService.getStudents(id);
   }
 
-  @Get(':id/stats')
+  @Get(':id/estadisticas')
   getGroupStats(@Param('id', ParseIntPipe) id: number) {
     return this.groupsService.getGroupStats(id);
   }
 
-  @Get('by-career-shift')
+  @Get('por-carrera-turno')
   findByCareerAndShift(
-    @Query('careerId') careerId: number,
+    @Query('carreraId') careerId: number,
     @Query('gestion') gestion: string,
-    @Query('semester') semester: number,
-    @Query('shiftId') shiftId: number,
+    @Query('semestre') semester: number,
+    @Query('turnoId') shiftId: number,
   ) {
     return this.groupsService.findByCareerAndShift(+careerId, gestion, +semester, +shiftId);
   }
@@ -86,12 +86,12 @@ export class ControladorGrupos {
     return this.groupsService.remove(id);
   }
 
-  @Post(':id/students/:studentId')
+  @Post(':id/estudiantes/:estudianteId')
   addStudent(@Param('id', ParseIntPipe) id: number, @Param('studentId', ParseIntPipe) studentId: number) {
     return this.groupsService.addStudent(id, studentId);
   }
 
-  @Delete(':id/students/:studentId')
+  @Delete(':id/estudiantes/:estudianteId')
   removeStudent(@Param('id', ParseIntPipe) id: number, @Param('studentId', ParseIntPipe) studentId: number) {
     return this.groupsService.removeStudent(id, studentId);
   }

@@ -36,7 +36,7 @@ export class ServicioGrupos {
     gestion?: string,
     careerId?: number,
     semestre?: number,
-  ): Promise<{ data: Grupo[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Grupo[]; total: number; pagina: number; limite: number }> {
     const query = this.grupoRepository
       .createQueryBuilder('group')
       .leftJoinAndSelect('group.carrera', 'career')
@@ -64,7 +64,7 @@ export class ServicioGrupos {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<Grupo> {
@@ -134,7 +134,7 @@ export class ServicioGrupos {
     return { total: count, capacity: group.capacidad };
   }
 
-  async generateGroups(dto: GenerarGruposDto): Promise<{ created: number; message: string }> {
+  async generateGroups(dto: GenerarGruposDto): Promise<{ creados: number; mensaje: string }> {
     try {
       const { gestion, periodo, turnoIds, paralelos, planEstudioId } = dto;
       const capacidad = parseInt(dto.capacidad || '30');
@@ -145,7 +145,7 @@ export class ServicioGrupos {
       });
 
       if (!plan) {
-        return { created: 0, message: 'No se encontró el plan de estudio' };
+        return { creados: 0, mensaje: 'No se encontró el plan de estudio' };
       }
 
       const materias = await this.materiaPlanRepository
@@ -157,7 +157,7 @@ export class ServicioGrupos {
         .getMany();
 
       if (materias.length === 0) {
-        return { created: 0, message: 'No se encontraron materias en el plan de estudio' };
+        return { creados: 0, mensaje: 'No se encontraron materias en el plan de estudio' };
       }
 
       const gruposCreados: Grupo[] = [];
@@ -204,11 +204,11 @@ export class ServicioGrupos {
       }
 
       return {
-        created: gruposCreados.length,
-        message: `Se crearon ${gruposCreados.length} grupos para ${materias.length} materias`,
+        creados: gruposCreados.length,
+        mensaje: `Se crearon ${gruposCreados.length} grupos para ${materias.length} materias`,
       };
     } catch (error) {
-      console.error('Error in generateGroups:', error);
+      console.error('Error al generar grupos:', error);
       throw error;
     }
   }

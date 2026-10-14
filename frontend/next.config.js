@@ -10,12 +10,12 @@ const nextConfig = {
         destination: `${backendUrl}/api/:path*`,
       },
       {
-        source: '/auth/:path*',
+        source: '/autenticacion/:path*',
         destination: `${backendUrl}/api/:path*`,
       },
       {
-        source: '/storage/files/:path*',
-        destination: `${backendUrl}/api/almacenamiento/files/:path*`,
+        source: '/almacenamiento/archivos/:path*',
+        destination: `${backendUrl}/api/almacenamiento/archivos/:path*`,
       },
     ];
   },

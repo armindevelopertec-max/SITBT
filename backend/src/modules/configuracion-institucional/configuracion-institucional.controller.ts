@@ -23,13 +23,13 @@ export class ControladorConfiguracionInstitucional {
     return this.settingsService.findAll();
   }
 
-  @Get('public')
+  @Get('publico')
   @ApiOperation({ summary: 'Obtener datos públicos de la institución' })
   getPublicSettings() {
     return this.settingsService.getPublicSettings();
   }
 
-  @Get('single')
+  @Get('individual')
   @ApiOperation({ summary: 'Obtener configuración única' })
   findOne() {
     return this.settingsService.findOne();

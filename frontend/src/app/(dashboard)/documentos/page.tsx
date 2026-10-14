@@ -46,12 +46,12 @@ export default function DocumentsPage() {
 
   useEffect(() => {
     fetchDocuments({
-      page,
-      limit: 20,
+      pagina: page,
+      limite: 20,
       tipo: tipoFilter || undefined,
       estado: estadoFilter || undefined,
     }).then((result) => {
-      setDocuments(result.data);
+      setDocuments(result.datos);
       setTotal(result.total);
     }).catch(console.error);
   }, [page, tipoFilter, estadoFilter]);

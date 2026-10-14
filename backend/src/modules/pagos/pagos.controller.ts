@@ -31,12 +31,12 @@ export class ControladorPagos {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
     @Query('gestion') gestion?: string,
-    @Query('status') status?: EstadoPago,
-    @Query('studentId') studentId?: number,
-    @Query('conceptId') conceptId?: number,
+    @Query('estado') status?: EstadoPago,
+    @Query('estudianteId') studentId?: number,
+    @Query('conceptoId') conceptId?: number,
   ) {
     return this.service.findAll(
       +page,
@@ -48,30 +48,30 @@ export class ControladorPagos {
     );
   }
 
-  @Get('student/:studentId')
+  @Get('estudiante/:estudianteId')
   findByStudent(@Param('studentId', ParseIntPipe) studentId: number, @Query('gestion') gestion?: string) {
     return this.service.findByStudent(studentId, gestion);
   }
 
-  @Get('student/:studentId/debt')
+  @Get('estudiante/:estudianteId/deuda')
   getStudentDebt(@Param('studentId', ParseIntPipe) studentId: number, @Query('gestion') gestion: string) {
     return this.service.getStudentDebt(studentId, gestion);
   }
 
-  @Get('daily-collection')
+  @Get('recaudacion-diaria')
   getDailyCollection(@Query('fecha') fecha: string, @Query('gestion') gestion: string) {
     return this.service.getDailyCollection(fecha, gestion);
   }
 
-  @Get('summary/:gestion')
+  @Get('resumen/:gestion')
   getCollectionSummary(@Param('gestion') gestion: string) {
     return this.service.getCollectionSummary(gestion);
   }
 
-  @Get('date-range')
+  @Get('rango-fechas')
   getPaymentsByDateRange(
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string,
+    @Query('fechaInicio') startDate: string,
+    @Query('fechaFin') endDate: string,
     @Query('gestion') gestion?: string,
   ) {
     return this.service.getPaymentsByDateRange(new Date(startDate), new Date(endDate), gestion);
@@ -87,7 +87,7 @@ export class ControladorPagos {
     return this.service.update(id, updateDto);
   }
 
-  @Patch(':id/annul')
+  @Patch(':id/anular')
   annul(@Param('id', ParseIntPipe) id: number) {
     return this.service.annul(id);
   }

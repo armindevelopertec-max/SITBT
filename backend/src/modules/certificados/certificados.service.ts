@@ -23,7 +23,7 @@ export class ServicioCertificados {
     gestion?: string,
     type?: string,
     studentId?: number,
-  ): Promise<{ data: Certificado[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Certificado[]; total: number; pagina: number; limite: number }> {
     const query = this.certificadoRepository
       .createQueryBuilder('certificate')
       .leftJoinAndSelect('certificate.estudiante', 'student')
@@ -48,7 +48,7 @@ export class ServicioCertificados {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<Certificado> {
@@ -92,11 +92,11 @@ export class ServicioCertificados {
     });
   }
 
-  async verifyCertificate(code: string): Promise<{ valid: boolean; certificate?: Certificado }> {
+  async verifyCertificate(code: string): Promise<{ valido: boolean; certificado?: Certificado }> {
     const certificate = await this.findByCode(code);
     if (certificate) {
-      return { valid: true, certificate };
+      return { valido: true, certificado: certificate };
     }
-    return { valid: false };
+    return { valido: false };
   }
 }

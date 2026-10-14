@@ -31,30 +31,30 @@ export class ControladorCalificaciones {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
     @Query('gestion') gestion?: string,
-    @Query('statusDefinitivo') statusDefinitivo?: EstadoCalificacionDefinitivo,
+    @Query('estadoDefinitivo') statusDefinitivo?: EstadoCalificacionDefinitivo,
   ) {
     return this.gradesService.findAll(+page, +limit, gestion, statusDefinitivo);
   }
 
-  @Get('student/:studentId')
+  @Get('estudiante/:estudianteId')
   getGradesByStudent(@Param('studentId', ParseIntPipe) studentId: number, @Query('gestion') gestion?: string) {
     return this.gradesService.getGradesByStudent(studentId, gestion);
   }
 
-  @Get('group/:groupId')
+  @Get('grupo/:grupoId')
   getGradesByGroup(@Param('groupId', ParseIntPipe) groupId: number, @Query('gestion') gestion: string) {
     return this.gradesService.getGradesByGroup(groupId, gestion);
   }
 
-  @Get('enrollment/:enrollmentId')
+  @Get('inscripcion/:inscripcionId')
   findByEnrollment(@Param('enrollmentId', ParseIntPipe) enrollmentId: number) {
     return this.gradesService.findByEnrollment(enrollmentId);
   }
 
-  @Get('enrollment/:enrollmentId/history')
+  @Get('inscripcion/:inscripcionId/historial')
   getGradeHistory(@Param('enrollmentId', ParseIntPipe) enrollmentId: number) {
     return this.gradesService.getGradeHistory(enrollmentId);
   }
@@ -73,7 +73,7 @@ export class ControladorCalificaciones {
     return this.gradesService.update(id, actualizarCalificacionDto, registradoPor);
   }
 
-  @Patch(':id/partials')
+  @Patch(':id/parciales')
   updatePartialGrades(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: { parcial1?: number; parcial2?: number; registradoPor?: number },
@@ -81,7 +81,7 @@ export class ControladorCalificaciones {
     return this.gradesService.updatePartialGrades(id, body.parcial1, body.parcial2, body.registradoPor);
   }
 
-  @Patch(':id/second-turn')
+  @Patch(':id/segundo-turno')
   applySecondTurn(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: { nota: number; registradoPor?: number },

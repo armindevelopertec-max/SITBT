@@ -108,7 +108,7 @@ export default function PreinscripcionPage() {
 
   const fetchTurnos = async () => {
     try {
-      const res = await api.get('/turnos/all');
+      const res = await api.get('/turnos/todos');
       setTurnos(res.data || []);
     } catch (error) {
       console.error('Error al obtener los turnos:', error);
@@ -117,7 +117,7 @@ export default function PreinscripcionPage() {
 
   const fetchCurrentGestion = async () => {
     try {
-      const res = await api.get('/gestiones/current');
+      const res = await api.get('/gestiones/actual');
       if (res.data) {
         setCurrentGestion(res.data.anio);
         const openPeriodo = res.data.periodos?.find((p: any) => p.estado === 'abierta');
@@ -135,9 +135,9 @@ export default function PreinscripcionPage() {
     setLoading(true);
     try {
       const res = await api.get('/estudiantes', {
-        params: { search: searchQuery, limit: 20 }
+        params: { buscar: searchQuery, limite: 20 }
       });
-      setStudents(res.data.data || []);
+      setStudents(res.data.datos || []);
     } catch (error) {
       console.error('Error al buscar:', error);
     } finally {
@@ -154,7 +154,7 @@ export default function PreinscripcionPage() {
   const checkPayments = async (studentId: number) => {
     setLoading(true);
     try {
-      const res = await api.post('/preinscripcion/verify-payments', {
+      const res = await api.post('/preinscripcion/verificar-pagos', {
         estudianteId: studentId,
         gestion: currentGestion,
         periodo: currentPeriodo,
@@ -173,7 +173,7 @@ export default function PreinscripcionPage() {
 
   const calculateSubjects = async (studentId: number) => {
     try {
-      const res = await api.post('/preinscripcion/calculate-subjects', {
+      const res = await api.post('/preinscripcion/calcular-materias', {
         estudianteId: studentId,
         gestion: currentGestion,
         periodo: currentPeriodo,
@@ -194,11 +194,11 @@ export default function PreinscripcionPage() {
   const fetchGroups = async (subjectId: number) => {
     if (!selectedStudent) return;
     try {
-      const res = await api.get('/preinscripcion/groups', {
+      const res = await api.get('/preinscripcion/grupos', {
         params: {
-          careerId: selectedStudent.carrera?.id,
+          carreraId: selectedStudent.carrera?.id,
           gestion: currentGestion,
-          semester: subjects[0]?.semestre || 1,
+          semestre: subjects[0]?.semestre || 1,
         }
       });
       setGroups(res.data || []);
@@ -227,7 +227,7 @@ export default function PreinscripcionPage() {
 
     setLoading(true);
     try {
-      const res = await api.post('/preinscripcion/enroll-batch', {
+      const res = await api.post('/preinscripcion/inscribir-lote', {
         estudianteId: selectedStudent.id,
         gestion: currentGestion,
         periodo: currentPeriodo,

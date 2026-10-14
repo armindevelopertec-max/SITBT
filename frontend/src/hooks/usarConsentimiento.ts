@@ -19,7 +19,7 @@ export function usarConsentimiento() {
       const response = await api.post<RegistroConsentimiento>('/consentimiento', data);
       return response.data;
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al registrar consentimiento');
+      setError(err.response?.data?.mensaje || 'Error al registrar consentimiento');
       throw err;
     } finally {
       setLoading(false);
@@ -27,13 +27,13 @@ export function usarConsentimiento() {
   };
 
   const getConsentByStudent = async (estudianteId: number): Promise<RegistroConsentimiento[]> => {
-    const response = await api.get<RegistroConsentimiento[]>(`/consentimiento/student/${estudianteId}`);
+    const response = await api.get<RegistroConsentimiento[]>(`/consentimiento/estudiante/${estudianteId}`);
     return response.data;
   };
 
   const getLatestConsent = async (estudianteId: number): Promise<RegistroConsentimiento | null> => {
     try {
-      const response = await api.get<RegistroConsentimiento | null>(`/consentimiento/student/${estudianteId}/latest`);
+      const response = await api.get<RegistroConsentimiento | null>(`/consentimiento/estudiante/${estudianteId}/ultimo`);
       return response.data;
     } catch {
       return null;
@@ -41,7 +41,7 @@ export function usarConsentimiento() {
   };
 
   const hasValidConsent = async (estudianteId: number, version: string): Promise<boolean> => {
-    const response = await api.get<boolean>(`/consentimiento/check/${estudianteId}/${version}`);
+    const response = await api.get<boolean>(`/consentimiento/verificar/${estudianteId}/${version}`);
     return response.data;
   };
 

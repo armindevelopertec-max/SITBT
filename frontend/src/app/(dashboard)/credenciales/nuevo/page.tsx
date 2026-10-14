@@ -75,8 +75,8 @@ export default function NewCredentialPage() {
   const fetchStudents = async () => {
     try {
       setLoadingStudents(true);
-      const response = await api.get('/estudiantes', { params: { limit: 100 } });
-      setStudents(response.data.data || []);
+      const response = await api.get('/estudiantes', { params: { limite: 100 } });
+      setStudents(response.data.datos || []);
     } catch (error) {
       console.error('Error al obtener los estudiantes:', error);
     } finally {
@@ -87,7 +87,7 @@ export default function NewCredentialPage() {
   const fetchGestiones = async () => {
     try {
       const response = await api.get('/gestiones');
-      const data = response.data.data || response.data || [];
+      const data = response.data.datos || response.data || [];
       setGestiones(data);
       const current = data.find((g: Gestion) => g.esActual);
       if (current) {
@@ -156,8 +156,8 @@ export default function NewCredentialPage() {
       router.push('/credenciales');
     } catch (error: any) {
       console.error('Error al crear la credencial:', error);
-      if (error.response?.data?.message) {
-        setErrors({ submit: error.response.data.message });
+      if (error.response?.data?.mensaje) {
+        setErrors({ submit: error.response.data.mensaje });
       } else {
         setErrors({ submit: 'Error al crear la credencial' });
       }

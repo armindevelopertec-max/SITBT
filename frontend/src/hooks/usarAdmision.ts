@@ -13,7 +13,7 @@ export function usePublicAdmission() {
       const response = await publicApi.post<SolicitudAdmision>('/admision', data);
       return response.data;
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al crear pre-registro');
+      setError(err.response?.data?.mensaje || 'Error al crear pre-registro');
       throw err;
     } finally {
       setLoading(false);
@@ -22,8 +22,8 @@ export function usePublicAdmission() {
 
   const getCarreras = async (): Promise<Carrera[]> => {
     try {
-      const response = await publicApi.get<{ data: Carrera[] }>('/carreras?estado=activo');
-      return response.data.data;
+      const response = await publicApi.get<{ datos: Carrera[] }>('/carreras?estado=activo');
+      return response.data.datos;
     } catch (err) {
       console.error('Error fetching carreras:', err);
       return [];
@@ -54,15 +54,15 @@ export function usarAdmision() {
     setError(null);
     try {
       const response = await api.get<{
-        data: SolicitudAdmision[];
+        datos: SolicitudAdmision[];
         total: number;
-        page: number;
-        limit: number;
+        pagina: number;
+        limite: number;
       }>('/admision', { params });
-      setRequests(response.data.data);
+      setRequests(response.data.datos);
       setTotal(response.data.total);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al obtener solicitudes');
+      setError(err.response?.data?.mensaje || 'Error al obtener solicitudes');
     } finally {
       setLoading(false);
     }
@@ -74,22 +74,22 @@ export function usarAdmision() {
   };
 
   const verifyRequest = async (id: string, verificadoPor: number, observaciones?: string) => {
-    const response = await api.post(`/admision/${id}/verify`, { verificadoPor, observaciones });
+    const response = await api.post(`/admision/${id}/verificar`, { verificadoPor, observaciones });
     return response.data;
   };
 
   const rejectRequest = async (id: string, verificadoPor: number, observaciones: string) => {
-    const response = await api.post(`/admision/${id}/reject`, { verificadoPor, observaciones });
+    const response = await api.post(`/admision/${id}/rechazar`, { verificadoPor, observaciones });
     return response.data;
   };
 
   const convertToStudent = async (id: string, admissionGestion: string) => {
-    const response = await api.post(`/admision/${id}/convert-to-student`, { admissionGestion });
+    const response = await api.post(`/admision/${id}/convertir-estudiante`, { admissionGestion });
     return response.data;
   };
 
   const getStatistics = async () => {
-    const response = await api.get('/admision/statistics');
+    const response = await api.get('/admision/estadisticas');
     return response.data;
   };
 

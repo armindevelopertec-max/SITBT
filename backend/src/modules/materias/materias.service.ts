@@ -26,7 +26,7 @@ export class ServicioMaterias {
   async findAll(
     page = 1,
     limit = 20,
-  ): Promise<{ data: Materia[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Materia[]; total: number; pagina: number; limite: number }> {
     const [data, total] = await this.materiaRepository
       .createQueryBuilder('subject')
       .orderBy('subject.nombre', 'ASC')
@@ -34,7 +34,7 @@ export class ServicioMaterias {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findAllSubjects(): Promise<Materia[]> {

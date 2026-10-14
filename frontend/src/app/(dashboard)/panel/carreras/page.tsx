@@ -50,7 +50,7 @@ export default function CarrerasPage() {
       const params: any = {};
       if (statusFilter) params.status = statusFilter;
       const response = await api.get('/carreras', { params });
-      setCareers(response.data.data || response.data);
+      setCareers(response.data.datos || response.data);
     } catch (error) {
       console.error('Error al obtener las carreras:', error);
     } finally {

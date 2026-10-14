@@ -31,36 +31,36 @@ export class ControladorEstudiantes {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
-    @Query('status') status?: EstadoEstudiante,
-    @Query('careerId') careerId?: number,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
+    @Query('estado') status?: EstadoEstudiante,
+    @Query('carreraId') careerId?: number,
   ) {
     return this.studentsService.findAll(+page, +limit, status, careerId ? +careerId : undefined);
   }
 
-  @Get('stats')
+  @Get('estadisticas')
   getStats() {
     return this.studentsService.getStudentStats();
   }
 
-  @Get('by-career/:careerId')
+  @Get('por-carrera/:carreraId')
   findByCareer(@Param('careerId', ParseIntPipe) careerId: number, @Query('gestion') gestion?: string) {
     return this.studentsService.findByCareer(careerId, gestion);
   }
 
-  @Get('active')
+  @Get('activos')
   findActive() {
     return this.studentsService.findActive();
   }
 
-  @Get('count-by-status')
-  countByStatus(@Query('careerId') careerId?: number) {
+  @Get('conteo-por-estado')
+  countByStatus(@Query('carreraId') careerId?: number) {
     return this.studentsService.countByStatus(careerId ? +careerId : undefined);
   }
 
-  @Get('inscription/:code')
-  findByInscriptionCode(@Param('code') code: string) {
+  @Get('inscripcion/:codigo')
+  findByInscriptionCode(@Param('codigo') code: string) {
     return this.studentsService.findByInscriptionCode(code);
   }
 

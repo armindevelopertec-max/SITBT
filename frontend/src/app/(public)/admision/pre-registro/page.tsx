@@ -41,10 +41,10 @@ function PreRegistroForm() {
   useEffect(() => {
     const fetchCareers = async () => {
       try {
-        const response = await publicApi.get<{ data: Carrera[] }>('/carreras', {
+        const response = await publicApi.get<{ datos: Carrera[] }>('/carreras', {
           params: { estado: 'activo' },
         });
-        setCareers(response.data.data);
+        setCareers(response.data.datos);
       } catch (error) {
         console.error('Error al obtener carreras:', error);
       }
@@ -71,7 +71,7 @@ function PreRegistroForm() {
       await publicApi.post('/admision', form);
       setSuccess(true);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al enviar el pre-registro');
+      setError(err.response?.data?.mensaje || 'Error al enviar el pre-registro');
     } finally {
       setLoading(false);
     }

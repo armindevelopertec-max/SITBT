@@ -29,7 +29,7 @@ export default function StaffPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const [deleteModal, setDeleteModal] = useState<Personal | null>(null);
-  const [credentialsModal, setCredentialsModal] = useState<{ username: string; password: string; nombre: string; staffId: number; personId: number } | null>(null);
+  const [credentialsModal, setCredentialsModal] = useState<{ nombreUsuario: string; contrasena: string; nombre: string; personalId: number; personaId: number } | null>(null);
 
   const [formLoading, setFormLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
@@ -41,7 +41,7 @@ export default function StaffPage() {
   const fetchStaff = async () => {
     try {
       const response = await api.get('/personal');
-      setStaff(response.data.data);
+      setStaff(response.data.datos);
     } catch (error) {
       console.error('Error al cargar personal:', error);
     } finally {
@@ -96,20 +96,20 @@ export default function StaffPage() {
   const viewCredentials = async (s: Personal) => {
     try {
       const response = await api.get(`/usuarios?personaId=${s.personaId}`);
-      const users = response.data.data;
+      const users = response.data.datos;
       const persona = s.persona;
       const nombre = persona ? `${persona.nombres} ${persona.apellidoPaterno}` : 'Personal';
 
       if (users && users.length > 0 && persona) {
         const user = users[0];
         const newPassword = `${persona.ci}-${new Date().getFullYear()}`;
-        setCredentialsModal({ username: user.nombreUsuario, password: newPassword, nombre, staffId: s.id, personId: s.personaId });
+        setCredentialsModal({ nombreUsuario: user.nombreUsuario, contrasena: newPassword, nombre, personalId: s.id, personaId: s.personaId });
       } else {
-        setCredentialsModal({ username: 'No tiene usuario', password: '', nombre, staffId: s.id, personId: s.personaId });
+        setCredentialsModal({ nombreUsuario: 'No tiene usuario', contrasena: '', nombre, personalId: s.id, personaId: s.personaId });
       }
     } catch (error) {
       console.error('Error al obtener usuario:', error);
-      setCredentialsModal({ username: 'Error al cargar', password: '', nombre: s.persona?.nombres || '', staffId: s.id, personId: s.personaId });
+      setCredentialsModal({ nombreUsuario: 'Error al cargar', contrasena: '', nombre: s.persona?.nombres || '', personalId: s.id, personaId: s.personaId });
     }
   };
 
@@ -117,10 +117,10 @@ export default function StaffPage() {
     if (!credentialsModal) return;
     setResetLoading(true);
     try {
-      const response = await api.get(`/usuarios?personaId=${credentialsModal.personId}`);
-      const users = response.data.data;
+      const response = await api.get(`/usuarios?personaId=${credentialsModal.personaId}`);
+      const users = response.data.datos;
       if (users && users.length > 0) {
-        await api.post(`/usuarios/${users[0].id}/cambiar-contrasena`, { nuevaContrasena: credentialsModal.password });
+        await api.post(`/usuarios/${users[0].id}/cambiar-contrasena`, { nuevaContrasena: credentialsModal.contrasena });
       }
       setCredentialsModal(null);
     } catch (error) {
@@ -238,14 +238,14 @@ export default function StaffPage() {
                 <User className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Nombre de usuario</p>
-                  <p className="font-mono font-medium">{credentialsModal.username}</p>
+                  <p className="font-mono font-medium">{credentialsModal.nombreUsuario}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Key className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Contraseña temporal</p>
-                  <p className="font-mono font-medium text-green-600">{credentialsModal.password}</p>
+                  <p className="font-mono font-medium text-green-600">{credentialsModal.contrasena}</p>
                 </div>
               </div>
             </div>
@@ -254,7 +254,7 @@ export default function StaffPage() {
             </p>
             <div className="flex justify-end gap-3">
               <Boton variant="outline" onClick={() => setCredentialsModal(null)}>Cerrar</Boton>
-              <Boton onClick={handleResetPassword} isLoading={resetLoading} disabled={credentialsModal.username === 'No tiene usuario' || credentialsModal.username === 'Error al cargar'}>
+              <Boton onClick={handleResetPassword} isLoading={resetLoading} disabled={credentialsModal.nombreUsuario === 'No tiene usuario' || credentialsModal.nombreUsuario === 'Error al cargar'}>
                 Restablecer Contraseña
               </Boton>
             </div>

@@ -20,17 +20,17 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 export class PreinscripcionController {
   constructor(private readonly service: PreinscripcionService) {}
 
-  @Post('verify-payments')
+  @Post('verificar-pagos')
   verifyPayments(@Body() dto: VerificarPagosDto) {
     return this.service.verifyPayments(dto);
   }
 
-  @Post('calculate-subjects')
+  @Post('calcular-materias')
   calculateSubjects(@Body() dto: CalcularMateriasDto) {
     return this.service.calculateSubjects(dto);
   }
 
-  @Post('enroll-batch')
+  @Post('inscribir-lote')
   createEnrollmentBatch(@Body() dto: CrearInscripcionLoteDto) {
     return this.service.createEnrollmentBatch(dto);
   }
@@ -44,17 +44,17 @@ export class PreinscripcionController {
     return this.service.getEnrollmentBoleta(estudianteId, gestion, periodo);
   }
 
-  @Get('groups')
+  @Get('grupos')
   getGroupsByCareerAndSemester(
-    @Query('careerId') careerId: number,
+    @Query('carreraId') careerId: number,
     @Query('gestion') gestion: string,
-    @Query('semester') semester: number,
-    @Query('shiftId') shiftId?: number,
+    @Query('semestre') semester: number,
+    @Query('turnoId') shiftId?: number,
   ) {
     return this.service.getGroupsByCareerAndSemester(careerId, gestion, semester, shiftId ? +shiftId : undefined);
   }
 
-  @Get('open-periodo')
+  @Get('abrir-periodo')
   getOpenPeriodo(@Query('gestion') gestion: string) {
     return this.service.getOpenPeriodo(gestion);
   }

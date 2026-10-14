@@ -16,7 +16,7 @@ export default function Encabezado({ title, onMenuClick }: PropsEncabezado) {
   const [desplegableAbierto, setDesplegableAbierto] = useState(false);
   const refDesplegable = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { user, logout } = usarAlmacenAutenticacion();
+  const { usuario, cerrarSesion } = usarAlmacenAutenticacion();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -30,8 +30,8 @@ export default function Encabezado({ title, onMenuClick }: PropsEncabezado) {
   }, []);
 
   const handleLogout = () => {
-    logout();
-    router.push('/login');
+    cerrarSesion();
+    router.push('/acceder');
   };
 
   return (
@@ -64,8 +64,8 @@ export default function Encabezado({ title, onMenuClick }: PropsEncabezado) {
                 <User className="w-4 h-4 text-primary-600" />
               </div>
               <div className="hidden sm:block text-left">
-                <p className="text-sm font-medium text-gray-900">{user?.nombreUsuario}</p>
-                <p className="text-xs text-gray-500">{user?.correo}</p>
+                <p className="text-sm font-medium text-gray-900">{usuario?.nombreUsuario}</p>
+                <p className="text-xs text-gray-500">{usuario?.correo}</p>
               </div>
               <ChevronDown
                 className={cn(
@@ -78,15 +78,15 @@ export default function Encabezado({ title, onMenuClick }: PropsEncabezado) {
             {desplegableAbierto && (
               <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900">{user?.nombreUsuario}</p>
-                  <p className="text-xs text-gray-500">{user?.correo}</p>
+                  <p className="text-sm font-medium text-gray-900">{usuario?.nombreUsuario}</p>
+                  <p className="text-xs text-gray-500">{usuario?.correo}</p>
                   <span
                     className={cn(
                       'inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full capitalize',
-                      user?.rol && colorRol(user.rol as any)
+                      usuario?.rol && colorRol(usuario.rol as any)
                     )}
                   >
-                    {user?.rol && etiquetaRol(user.rol)}
+                    {usuario?.rol && etiquetaRol(usuario.rol)}
                   </span>
                 </div>
 

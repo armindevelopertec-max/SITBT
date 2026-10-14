@@ -15,7 +15,7 @@ export default function NewStaffPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [credentialsModal, setCredentialsModal] = useState<{ nombreUsuario: string; password: string } | null>(null);
+  const [credentialsModal, setCredentialsModal] = useState<{ nombreUsuario: string; contrasena: string } | null>(null);
 
   const [personData, setPersonData] = useState({
     ci: '',
@@ -101,15 +101,15 @@ export default function NewStaffPage() {
 
       const response = await api.post('/personal', staffPayload);
 
-      if (response.data.user) {
-        setCredentialsModal(response.data.user);
+      if (response.data.usuario) {
+        setCredentialsModal(response.data.usuario);
       } else {
         router.push('/personal');
       }
     } catch (error: any) {
       console.error('Error al crear personal:', error);
-      if (error.response?.data?.message) {
-        setErrors({ submit: error.response.data.message });
+      if (error.response?.data?.mensaje) {
+        setErrors({ submit: error.response.data.mensaje });
       } else {
         setErrors({ submit: 'Error al crear el personal' });
       }
@@ -444,7 +444,7 @@ export default function NewStaffPage() {
                 <Key className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Contraseña temporal</p>
-                  <p className="font-mono font-medium">{credentialsModal.password}</p>
+                  <p className="font-mono font-medium">{credentialsModal.contrasena}</p>
                 </div>
               </div>
             </div>

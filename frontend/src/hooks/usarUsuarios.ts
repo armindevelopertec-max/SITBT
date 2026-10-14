@@ -57,7 +57,7 @@ export function usarUsuarios() {
       setPaginacion({ pagina: paginaActual, limite: limiteActual, total });
     } catch (err: any) {
       console.error('Error al obtener usuarios:', err);
-      setError(err.response?.data?.message || 'Error al cargar usuarios');
+      setError(err.response?.data?.mensaje || 'Error al cargar usuarios');
     } finally {
       setCargando(false);
     }
@@ -71,7 +71,7 @@ export function usarUsuarios() {
       setUsuarios(respuesta.data);
     } catch (err: any) {
       console.error('Error al obtener usuarios activos:', err);
-      setError(err.response?.data?.message || 'Error al cargar usuarios activos');
+      setError(err.response?.data?.mensaje || 'Error al cargar usuarios activos');
     } finally {
       setCargando(false);
     }

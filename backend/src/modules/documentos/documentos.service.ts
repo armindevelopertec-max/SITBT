@@ -24,7 +24,7 @@ export class ServicioDocumentos {
     gestion?: string,
     estudianteId?: number,
     estado?: EstadoDocumento,
-  ): Promise<{ data: DocumentoEmitido[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: DocumentoEmitido[]; total: number; pagina: number; limite: number }> {
     const query = this.documentoRepository
       .createQueryBuilder('document')
       .leftJoinAndSelect('document.estudiante', 'estudiante')
@@ -53,7 +53,7 @@ export class ServicioDocumentos {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: string): Promise<DocumentoEmitido> {

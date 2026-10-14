@@ -43,7 +43,7 @@ export class ServicioUsuarios {
     page = 1,
     limit = 20,
     estado?: EstadoUsuario,
-  ): Promise<{ data: Usuario[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Usuario[]; total: number; pagina: number; limite: number }> {
     const query = this.usuarioRepository
       .createQueryBuilder('usuario')
       .leftJoinAndSelect('usuario.persona', 'persona')
@@ -65,7 +65,7 @@ export class ServicioUsuarios {
       roles: usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
     }));
 
-    return { data: usuariosConRoles as any, total, page, limit };
+    return { datos: usuariosConRoles as any, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<any> {

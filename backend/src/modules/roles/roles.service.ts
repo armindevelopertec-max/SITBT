@@ -32,7 +32,7 @@ export class ServicioRoles {
     page = 1,
     limit = 20,
     estado?: EstadoRol,
-  ): Promise<{ data: Rol[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Rol[]; total: number; pagina: number; limite: number }> {
     const query = this.rolRepository.createQueryBuilder('rol');
 
     if (estado) {
@@ -45,7 +45,7 @@ export class ServicioRoles {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<Rol> {

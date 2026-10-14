@@ -37,7 +37,7 @@ export class ServicioPagos {
     status?: EstadoPago,
     studentId?: number,
     conceptId?: number,
-  ): Promise<{ data: Pago[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Pago[]; total: number; pagina: number; limite: number }> {
     const query = this.pagoRepository
       .createQueryBuilder('payment')
       .leftJoinAndSelect('payment.estudiante', 'student')
@@ -67,7 +67,7 @@ export class ServicioPagos {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<Pago> {

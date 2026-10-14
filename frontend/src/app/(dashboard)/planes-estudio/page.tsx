@@ -55,7 +55,7 @@ export default function PlanesEstudioPage() {
       if (filterStatus) params.append('status', filterStatus);
 
       const response = await api.get(`/planes-estudio?${params.toString()}`);
-      setPlanes(response.data.data?.data || response.data.data || []);
+      setPlanes(response.data.datos?.data || response.data.datos || []);
     } catch (error) {
       console.error('Error al obtener los planes:', error);
     } finally {
@@ -65,7 +65,7 @@ export default function PlanesEstudioPage() {
 
   const fetchCarreras = async () => {
     try {
-      const response = await api.get('/carreras/active');
+      const response = await api.get('/carreras/activos');
       setCarreras(response.data || []);
     } catch (error) {
       console.error('Error al obtener las carreras:', error);

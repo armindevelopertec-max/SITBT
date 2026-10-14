@@ -24,7 +24,7 @@ export class ServicioConsentimiento {
     page = 1,
     limit = 20,
     estudianteId?: number,
-  ): Promise<{ data: RegistroConsentimiento[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: RegistroConsentimiento[]; total: number; pagina: number; limite: number }> {
     const query = this.consentimientoRepository
       .createQueryBuilder('consent')
       .leftJoinAndSelect('consent.estudiante', 'estudiante')
@@ -40,7 +40,7 @@ export class ServicioConsentimiento {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: string): Promise<RegistroConsentimiento> {

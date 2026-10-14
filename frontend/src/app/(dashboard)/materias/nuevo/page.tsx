@@ -53,8 +53,8 @@ export default function NuevaMateriaPage() {
       router.push('/materias');
     } catch (error: any) {
       console.error('Error al crear la materia:', error);
-      if (error.response?.data?.message) {
-        setErrors({ submit: error.response.data.message });
+      if (error.response?.data?.mensaje) {
+        setErrors({ submit: error.response.data.mensaje });
       } else if (error.response?.data?.error?.code === '23505') {
         setErrors({ submit: 'Ya existe una materia con este código' });
       } else {

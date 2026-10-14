@@ -36,7 +36,7 @@ export default function StudentsPage() {
   const [origenFilter, setOrigenFilter] = useState<string>('');
 
   const [deleteModal, setDeleteModal] = useState<Estudiante | null>(null);
-  const [credentialsModal, setCredentialsModal] = useState<{ username: string; password: string; nombre: string; studentId: number; personId: number } | null>(null);
+  const [credentialsModal, setCredentialsModal] = useState<{ nombreUsuario: string; contrasena: string; nombre: string; estudianteId: number; personaId: number } | null>(null);
   const [resetLoading, setResetLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
 
@@ -47,7 +47,7 @@ export default function StudentsPage() {
   const fetchStudents = async () => {
     try {
       const response = await api.get('/estudiantes');
-      setStudents(response.data.data);
+      setStudents(response.data.datos);
     } catch (error) {
       console.error('Error al cargar estudiantes:', error);
     } finally {
@@ -89,20 +89,20 @@ export default function StudentsPage() {
   const viewCredentials = async (student: Estudiante) => {
     try {
       const response = await api.get(`/usuarios?personaId=${student.personaId}`);
-      const users = response.data.data;
+      const users = response.data.datos;
       const persona = student.persona;
       const nombre = persona ? `${persona.nombres} ${persona.apellidoPaterno}` : 'Estudiante';
 
       if (users && users.length > 0 && persona) {
         const user = users[0];
         const newPassword = `${persona.ci}-${new Date().getFullYear()}`;
-        setCredentialsModal({ username: user.nombreUsuario, password: newPassword, nombre, studentId: student.id, personId: student.personaId });
+        setCredentialsModal({ nombreUsuario: user.nombreUsuario, contrasena: newPassword, nombre, estudianteId: student.id, personaId: student.personaId });
       } else {
-        setCredentialsModal({ username: 'No tiene usuario', password: '', nombre, studentId: student.id, personId: student.personaId });
+        setCredentialsModal({ nombreUsuario: 'No tiene usuario', contrasena: '', nombre, estudianteId: student.id, personaId: student.personaId });
       }
     } catch (error) {
       console.error('Error al obtener usuario:', error);
-      setCredentialsModal({ username: 'Error al cargar', password: '', nombre: student.persona?.nombres || '', studentId: student.id, personId: student.personaId });
+      setCredentialsModal({ nombreUsuario: 'Error al cargar', contrasena: '', nombre: student.persona?.nombres || '', estudianteId: student.id, personaId: student.personaId });
     }
   };
 
@@ -110,10 +110,10 @@ export default function StudentsPage() {
     if (!credentialsModal) return;
     setResetLoading(true);
     try {
-      const response = await api.get(`/usuarios?personaId=${credentialsModal.personId}`);
-      const users = response.data.data;
+      const response = await api.get(`/usuarios?personaId=${credentialsModal.personaId}`);
+      const users = response.data.datos;
       if (users && users.length > 0) {
-        await api.post(`/usuarios/${users[0].id}/cambiar-contrasena`, { nuevaContrasena: credentialsModal.password });
+        await api.post(`/usuarios/${users[0].id}/cambiar-contrasena`, { nuevaContrasena: credentialsModal.contrasena });
       }
       setCredentialsModal(null);
     } catch (error) {
@@ -262,14 +262,14 @@ export default function StudentsPage() {
                 <User className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Nombre de usuario</p>
-                  <p className="font-mono font-medium">{credentialsModal.username}</p>
+                  <p className="font-mono font-medium">{credentialsModal.nombreUsuario}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Key className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Contraseña temporal</p>
-                  <p className="font-mono font-medium text-green-600">{credentialsModal.password}</p>
+                  <p className="font-mono font-medium text-green-600">{credentialsModal.contrasena}</p>
                 </div>
               </div>
             </div>
@@ -278,7 +278,7 @@ export default function StudentsPage() {
             </p>
             <div className="flex justify-end gap-3">
               <Boton variant="outline" onClick={() => setCredentialsModal(null)}>Cerrar</Boton>
-              <Boton onClick={handleResetPassword} isLoading={resetLoading} disabled={credentialsModal.username === 'No tiene usuario' || credentialsModal.username === 'Error al cargar'}>
+              <Boton onClick={handleResetPassword} isLoading={resetLoading} disabled={credentialsModal.nombreUsuario === 'No tiene usuario' || credentialsModal.nombreUsuario === 'Error al cargar'}>
                 Restablecer Contraseña
               </Boton>
             </div>

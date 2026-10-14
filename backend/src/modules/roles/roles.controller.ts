@@ -30,11 +30,11 @@ export class ControladorRoles {
   }
 
   @Get()
-  findAll(@Query('page') page = 1, @Query('limit') limit = 20, @Query('estado') estado?: EstadoRol) {
+  findAll(@Query('pagina') page = 1, @Query('limite') limit = 20, @Query('estado') estado?: EstadoRol) {
     return this.rolesService.findAll(+page, +limit, estado);
   }
 
-  @Get('active')
+  @Get('activos')
   findActive() {
     return this.rolesService.findActive();
   }

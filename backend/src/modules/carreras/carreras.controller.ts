@@ -30,11 +30,11 @@ export class ControladorCarreras {
   }
 
   @Get()
-  listar(@Query('page') page = 1, @Query('limit') limit = 20, @Query('status') estado?: EstadoCarrera) {
+  listar(@Query('pagina') page = 1, @Query('limite') limit = 20, @Query('estado') estado?: EstadoCarrera) {
     return this.servicioCarreras.findAll(+page, +limit, estado);
   }
 
-  @Get('active')
+  @Get('activos')
   listarActivas() {
     return this.servicioCarreras.findActive();
   }
@@ -44,8 +44,8 @@ export class ControladorCarreras {
     return this.servicioCarreras.findByArea(area);
   }
 
-  @Get('code/:code')
-  buscarPorCodigo(@Param('code') code: string) {
+  @Get('codigo/:codigo')
+  buscarPorCodigo(@Param('codigo') code: string) {
     return this.servicioCarreras.findByCode(code);
   }
 

@@ -76,7 +76,7 @@ export class ServicioAdmision {
     limit = 20,
     estado?: EstadoAdmision,
     origen?: string,
-  ): Promise<{ data: SolicitudAdmision[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: SolicitudAdmision[]; total: number; pagina: number; limite: number }> {
     const query = this.admissionRepository
       .createQueryBuilder('request')
       .leftJoinAndSelect('request.carrera', 'carrera');
@@ -95,7 +95,7 @@ export class ServicioAdmision {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: string): Promise<SolicitudAdmision> {
@@ -141,7 +141,7 @@ export class ServicioAdmision {
     } as ActualizarAdmisionDto);
   }
 
-  async convertToStudent(id: string, admissionGestion: string): Promise<{ student: Estudiante; persona: Persona }> {
+  async convertToStudent(id: string, gestionAdmision: string): Promise<{ estudiante: Estudiante; persona: Persona }> {
     const request = await this.findOne(id);
 
     if (request.estado === EstadoAdmision.CONVERTIDO) {
@@ -167,7 +167,7 @@ export class ServicioAdmision {
       const existingEmail = await this.personaRepository
         .createQueryBuilder('person')
         .innerJoin('person.estudiantes', 'student')
-        .where('person.correo = :email', { email: request.correo })
+        .where('person.correo = :correo', { correo: request.correo })
         .andWhere('student.estado = :estado', { estado: 'activo' })
         .getOne();
       if (existingEmail) {
@@ -238,7 +238,7 @@ export class ServicioAdmision {
       personaId: persona.id,
       numeroTituloBachiller: undefined,
       fechaTituloBachiller: undefined,
-      gestionAdmision: admissionGestion,
+      gestionAdmision: gestionAdmision,
       numeroFolder: undefined,
       codigoInscripcion: inscriptionCode,
       codigoFormulario01: undefined,
@@ -262,7 +262,7 @@ export class ServicioAdmision {
     request.estudianteConvertidoId = savedStudent.id;
     await this.admissionRepository.save(request);
 
-    return { student: savedStudent, persona };
+    return { estudiante: savedStudent, persona };
   }
 
   private async generateInscriptionCode(request: SolicitudAdmision): Promise<string> {

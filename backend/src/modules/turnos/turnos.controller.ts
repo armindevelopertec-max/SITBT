@@ -29,11 +29,11 @@ export class ControladorTurnos {
   }
 
   @Get()
-  findAll(@Query('page') page = 1, @Query('limit') limit = 20) {
+  findAll(@Query('pagina') page = 1, @Query('limite') limit = 20) {
     return this.shiftsService.findAll(+page, +limit);
   }
 
-  @Get('all')
+  @Get('todos')
   findAllTurnos() {
     return this.shiftsService.findAllTurnos();
   }

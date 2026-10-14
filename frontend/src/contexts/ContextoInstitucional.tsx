@@ -36,7 +36,7 @@ export function ProveedorInstitucion({ children }: { children: ReactNode }) {
   useEffect(() => {
     const obtenerInstitucion = async () => {
       try {
-        const response = await publicApi.get('/configuracion-institucional/public');
+        const response = await publicApi.get('/configuracion-institucional/publico');
         setInstitucion(response.data);
       } catch (error) {
         console.error('Error al obtener institución:', error);

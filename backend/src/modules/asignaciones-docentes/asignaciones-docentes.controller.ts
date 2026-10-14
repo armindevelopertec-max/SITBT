@@ -31,30 +31,30 @@ export class ControladorAsignacionesDocentes {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
     @Query('gestion') gestion?: string,
-    @Query('status') status?: EstadoAsignacionDocente,
+    @Query('estado') status?: EstadoAsignacionDocente,
   ) {
     return this.service.findAll(+page, +limit, gestion, status);
   }
 
-  @Get('active')
+  @Get('activos')
   findActive(@Query('gestion') gestion: string) {
     return this.service.findActive(gestion);
   }
 
-  @Get('teacher/:teacherId')
+  @Get('docente/:docenteId')
   findByTeacher(@Param('teacherId', ParseIntPipe) teacherId: number, @Query('gestion') gestion?: string) {
     return this.service.findByTeacher(teacherId, gestion);
   }
 
-  @Get('group/:groupId')
+  @Get('grupo/:grupoId')
   findByGroup(@Param('groupId', ParseIntPipe) groupId: number, @Query('gestion') gestion: string) {
     return this.service.findByGroup(groupId, gestion);
   }
 
-  @Get('subject/:subjectId')
+  @Get('materia/:materiaId')
   findBySubject(@Param('subjectId', ParseIntPipe) subjectId: number, @Query('gestion') gestion: string) {
     return this.service.findBySubject(subjectId, gestion);
   }

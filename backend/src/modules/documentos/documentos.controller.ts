@@ -30,8 +30,8 @@ export class ControladorDocumentos {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
     @Query('tipo') tipo?: TipoDocumento,
     @Query('gestion') gestion?: string,
     @Query('estudianteId') estudianteId?: number,
@@ -47,12 +47,12 @@ export class ControladorDocumentos {
     );
   }
 
-  @Get('statistics')
+  @Get('estadisticas')
   getStatistics(@Query('gestion') gestion?: string) {
     return this.service.getDocumentStatistics(gestion);
   }
 
-  @Get('student/:estudianteId')
+  @Get('estudiante/:estudianteId')
   findByStudent(
     @Param('estudianteId') estudianteId: string,
     @Query('tipo') tipo?: TipoDocumento,
@@ -70,25 +70,25 @@ export class ControladorDocumentos {
     return this.service.update(id, updateDto);
   }
 
-  @Post(':id/print')
+  @Post(':id/imprimir')
   @HttpCode(200)
   markAsPrinted(@Param('id') id: string, @Body('impresoPor') impresoPor: number) {
     return this.service.markAsPrinted(id, impresoPor);
   }
 
-  @Post(':id/deliver')
+  @Post(':id/entregar')
   @HttpCode(200)
   markAsDelivered(@Param('id') id: string, @Body('entregadoA') entregadoA: string) {
     return this.service.markAsDelivered(id, entregadoA);
   }
 
-  @Post(':id/annul')
+  @Post(':id/anular')
   @HttpCode(200)
   annul(@Param('id') id: string, @Body('observaciones') observaciones?: string) {
     return this.service.annul(id, observaciones);
   }
 
-  @Post('generate-boleta')
+  @Post('generar-boleta')
   @HttpCode(200)
   generateBoleta(
     @Body('estudianteId') estudianteId: number,
@@ -98,7 +98,7 @@ export class ControladorDocumentos {
     return this.service.generateBoletaInscripcion(estudianteId, gestion, gestionId);
   }
 
-  @Post('generate-recibo')
+  @Post('generar-recibo')
   @HttpCode(200)
   generateRecibo(
     @Body('estudianteId') estudianteId: number,

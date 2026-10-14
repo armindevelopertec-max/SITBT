@@ -14,11 +14,11 @@ import { Credencial } from '../../entities/credencial.entity';
 import { CrearEstudianteDto } from './dto/crear-estudiante.dto';
 import { ActualizarEstudianteDto } from './dto/actualizar-estudiante.dto';
 
-export interface CreatedStudentWithUser {
-  student: Estudiante;
-  user: {
-    username: string;
-    password: string;
+export interface EstudianteCreadoConUsuario {
+  estudiante: Estudiante;
+  usuario: {
+    nombreUsuario: string;
+    contrasena: string;
   };
 }
 
@@ -39,7 +39,7 @@ export class ServicioEstudiantes {
     private credencialRepository: Repository<Credencial>,
   ) {}
 
-  async create(crearEstudianteDto: CrearEstudianteDto): Promise<CreatedStudentWithUser> {
+  async create(crearEstudianteDto: CrearEstudianteDto): Promise<EstudianteCreadoConUsuario> {
     const existingStudent = await this.estudianteRepository.findOne({
       where: { personaId: crearEstudianteDto.personaId },
     });
@@ -113,10 +113,10 @@ export class ServicioEstudiantes {
     }
 
     return {
-      student: savedStudent,
-      user: {
+      estudiante: savedStudent,
+      usuario: {
         nombreUsuario: username,
-        password: password,
+        contrasena: password,
       },
     } as any;
   }
@@ -147,7 +147,7 @@ export class ServicioEstudiantes {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<Estudiante> {
@@ -240,11 +240,11 @@ export class ServicioEstudiantes {
     });
   }
 
-  async countByStatus(careerId?: number): Promise<{ status: string; count: number }[]> {
+  async countByStatus(careerId?: number): Promise<{ estado: string; cantidad: number }[]> {
     const query = this.estudianteRepository
       .createQueryBuilder('student')
-      .select('student.estado', 'status')
-      .addSelect('COUNT(*)', 'count')
+      .select('student.estado', 'estado')
+      .addSelect('COUNT(*)', 'cantidad')
       .groupBy('student.estado');
 
     if (careerId) {

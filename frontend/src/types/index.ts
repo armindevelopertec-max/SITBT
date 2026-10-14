@@ -253,15 +253,15 @@ export interface Periodo {
 }
 
 export interface EstadoAutenticacion {
-  user: Usuario | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  _hasHydrated: boolean;
-  setHasHydrated: (estado: boolean) => void;
-  login: (nombreUsuario: string, contrasena: string) => Promise<void>;
-  logout: () => void;
-  setUser: (usuario: Usuario) => void;
+  usuario: Usuario | null;
+  tokenAcceso: string | null;
+  estaAutenticado: boolean;
+  cargando: boolean;
+  _hidratado: boolean;
+  establecerHidratado: (estado: boolean) => void;
+  iniciarSesion: (nombreUsuario: string, contrasena: string) => Promise<void>;
+  cerrarSesion: () => void;
+  establecerUsuario: (usuario: Usuario) => void;
 }
 
 export interface ElementoMenu {

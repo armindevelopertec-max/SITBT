@@ -4,33 +4,33 @@ import { Injectable, Logger } from '@nestjs/common';
 export class ServicioNotificaciones {
   private readonly logger = new Logger(ServicioNotificaciones.name);
 
-  async sendEmail(to: string, subject: string, content: string): Promise<boolean> {
-    this.logger.log(`Email disabled. Would send to ${to}: ${subject}`);
+  async enviarCorreo(para: string, asunto: string, contenido: string): Promise<boolean> {
+    this.logger.log(`Correo deshabilitado. Se enviaría a ${para}: ${asunto}`);
     return true;
   }
 
-  async notifyPreRegistroAceptado(estudianteId: number, email: string, nombre: string): Promise<boolean> {
-    this.logger.log(`Notification: Pre-registro aceptado para ${nombre} (${email})`);
+  async notificarPreRegistroAceptado(estudianteId: number, correo: string, nombre: string): Promise<boolean> {
+    this.logger.log(`Notificación: Pre-registro aceptado para ${nombre} (${correo})`);
     return true;
   }
 
-  async notifyPagoConfirmado(estudianteId: number, email: string, nombre: string, monto: number): Promise<boolean> {
-    this.logger.log(`Notification: Pago confirmado de ${monto} Bs para ${nombre} (${email})`);
+  async notificarPagoConfirmado(estudianteId: number, correo: string, nombre: string, monto: number): Promise<boolean> {
+    this.logger.log(`Notificación: Pago confirmado de ${monto} Bs para ${nombre} (${correo})`);
     return true;
   }
 
-  async notifyCarnetListo(estudianteId: number, email: string, nombre: string): Promise<boolean> {
-    this.logger.log(`Notification: Carnet listo para ${nombre} (${email})`);
+  async notificarCarnetListo(estudianteId: number, correo: string, nombre: string): Promise<boolean> {
+    this.logger.log(`Notificación: Carnet listo para ${nombre} (${correo})`);
     return true;
   }
 
-  async notifyDeudaPendiente(estudianteId: number, email: string, nombre: string, monto: number): Promise<boolean> {
-    this.logger.log(`Notification: Deuda pendiente de ${monto} Bs para ${nombre} (${email})`);
+  async notificarDeudaPendiente(estudianteId: number, correo: string, nombre: string, monto: number): Promise<boolean> {
+    this.logger.log(`Notificación: Deuda pendiente de ${monto} Bs para ${nombre} (${correo})`);
     return true;
   }
 
-  async notifyDocumentoGenerado(estudianteId: number, email: string, nombre: string, tipoDoc: string): Promise<boolean> {
-    this.logger.log(`Notification: ${tipoDoc} generado para ${nombre} (${email})`);
+  async notificarDocumentoGenerado(estudianteId: number, correo: string, nombre: string, tipoDoc: string): Promise<boolean> {
+    this.logger.log(`Notificación: ${tipoDoc} generado para ${nombre} (${correo})`);
     return true;
   }
 }

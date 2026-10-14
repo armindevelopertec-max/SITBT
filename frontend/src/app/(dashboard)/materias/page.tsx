@@ -31,7 +31,7 @@ export default function MateriasPage() {
 
   const fetchMaterias = async () => {
     try {
-      const response = await api.get('/materias/all');
+      const response = await api.get('/materias/todos');
       setMaterias(response.data || []);
     } catch (error) {
       console.error('Error al obtener las materias:', error);

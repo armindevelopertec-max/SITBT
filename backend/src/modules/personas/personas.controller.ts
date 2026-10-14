@@ -29,19 +29,19 @@ export class ControladorPersonas {
 
   @Get()
   findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
-    @Query('status') status?: EstadoPersona,
+    @Query('pagina') page = 1,
+    @Query('limite') limit = 20,
+    @Query('estado') status?: EstadoPersona,
   ) {
     return this.personsService.findAll(+page, +limit, status);
   }
 
-  @Get('search')
-  search(@Query('q') query: string, @Query('page') page = 1, @Query('limit') limit = 20) {
+  @Get('buscar')
+  search(@Query('q') query: string, @Query('pagina') page = 1, @Query('limite') limit = 20) {
     return this.personsService.search(query, +page, +limit);
   }
 
-  @Get('active')
+  @Get('activos')
   findActive() {
     return this.personsService.findActive();
   }

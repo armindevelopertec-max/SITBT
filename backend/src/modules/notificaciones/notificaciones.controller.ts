@@ -19,60 +19,60 @@ export class ControladorNotificaciones {
 
   @Post('correo')
   @HttpCode(200)
-  sendEmail(@Body() dto: EnviarCorreoDto) {
-    return this.service.sendEmail(dto.para, dto.asunto, dto.contenido);
+  enviarCorreo(@Body() dto: EnviarCorreoDto) {
+    return this.service.enviarCorreo(dto.para, dto.asunto, dto.contenido);
   }
 
   @Post('pre-registro-aceptado')
   @HttpCode(200)
-  notifyPreRegistroAceptado(
+  notificarPreRegistroAceptado(
     @Body('estudianteId') estudianteId: number,
     @Body('correo') correo: string,
     @Body('nombre') nombre: string,
   ) {
-    return this.service.notifyPreRegistroAceptado(estudianteId, correo, nombre);
+    return this.service.notificarPreRegistroAceptado(estudianteId, correo, nombre);
   }
 
   @Post('pago-confirmado')
   @HttpCode(200)
-  notifyPagoConfirmado(
+  notificarPagoConfirmado(
     @Body('estudianteId') estudianteId: number,
     @Body('correo') correo: string,
     @Body('nombre') nombre: string,
     @Body('monto') monto: number,
   ) {
-    return this.service.notifyPagoConfirmado(estudianteId, correo, nombre, monto);
+    return this.service.notificarPagoConfirmado(estudianteId, correo, nombre, monto);
   }
 
   @Post('carnet-listo')
   @HttpCode(200)
-  notifyCarnetListo(
+  notificarCarnetListo(
     @Body('estudianteId') estudianteId: number,
     @Body('correo') correo: string,
     @Body('nombre') nombre: string,
   ) {
-    return this.service.notifyCarnetListo(estudianteId, correo, nombre);
+    return this.service.notificarCarnetListo(estudianteId, correo, nombre);
   }
 
   @Post('deuda-pendiente')
   @HttpCode(200)
-  notifyDeudaPendiente(
+  notificarDeudaPendiente(
     @Body('estudianteId') estudianteId: number,
     @Body('correo') correo: string,
     @Body('nombre') nombre: string,
     @Body('monto') monto: number,
   ) {
-    return this.service.notifyDeudaPendiente(estudianteId, correo, nombre, monto);
+    return this.service.notificarDeudaPendiente(estudianteId, correo, nombre, monto);
   }
 
   @Post('documento-generado')
   @HttpCode(200)
-  notifyDocumentoGenerado(
+  notificarDocumentoGenerado(
     @Body('estudianteId') estudianteId: number,
     @Body('correo') correo: string,
     @Body('nombre') nombre: string,
     @Body('tipoDoc') tipoDoc: string,
   ) {
-    return this.service.notifyDocumentoGenerado(estudianteId, correo, nombre, tipoDoc);
+    return this.service.notificarDocumentoGenerado(estudianteId, correo, nombre, tipoDoc);
   }
 }

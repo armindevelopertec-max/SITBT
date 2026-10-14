@@ -27,7 +27,7 @@ export class ServicioCarreras {
     page = 1,
     limit = 20,
     status?: EstadoCarrera,
-  ): Promise<{ data: Carrera[]; total: number; page: number; limit: number }> {
+  ): Promise<{ datos: Carrera[]; total: number; pagina: number; limite: number }> {
     const query = this.careerRepository.createQueryBuilder('career');
 
     if (status) {
@@ -40,7 +40,7 @@ export class ServicioCarreras {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total, page, limit };
+    return { datos: data, total, pagina: page, limite: limit };
   }
 
   async findOne(id: number): Promise<Carrera> {

@@ -160,12 +160,12 @@ const seccionesMenu: SeccionMenu[] = [
 
 export default function BarraLateral({ colapsada, abierta = true, onCerrar, onColapsar }: PropsBarraLateral) {
   const pathname = usePathname();
-  const { user } = usarAlmacenAutenticacion();
+  const { usuario } = usarAlmacenAutenticacion();
   const userRoles: string[] =
-    user?.roles && user.roles.length > 0
-      ? user.roles.map((r: any) => r.codigo || r.code || r)
-      : user?.rol
-        ? [user.rol]
+    usuario?.roles && usuario.roles.length > 0
+      ? usuario.roles.map((r: any) => r.codigo || r.code || r)
+      : usuario?.rol
+        ? [usuario.rol]
         : [];
   const { settings } = usarConfiguracionInstitucional();
 
@@ -173,7 +173,7 @@ export default function BarraLateral({ colapsada, abierta = true, onCerrar, onCo
     .map((section) => ({
       ...section,
       items: section.items.filter((item) => {
-        if (!user) return false;
+        if (!usuario) return false;
         return item.roles.some((r) => userRoles.includes(r));
       }),
     }))
@@ -288,7 +288,7 @@ export default function BarraLateral({ colapsada, abierta = true, onCerrar, onCo
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.nombreUsuario}
+                  {usuario?.nombreUsuario}
                 </p>
                 <p className="text-xs text-gray-500 truncate capitalize">
                   {userRoles[0]?.replace('_', ' ') || 'Usuario'}
