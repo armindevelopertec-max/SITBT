@@ -108,13 +108,13 @@ export class SolicitudAdmision {
   origen: OrigenAdmision;
 
   @Column({ name: 'documento_ci_ruta', type: 'varchar', length: 255, nullable: true })
-  documentoCiPath: string;
+  documentoCiRuta: string;
 
   @Column({ name: 'certificado_bachiller_ruta', type: 'varchar', length: 255, nullable: true })
-  certificadoBachillerPath: string;
+  certificadoBachillerRuta: string;
 
   @Column({ name: 'foto_ruta', type: 'varchar', length: 255, nullable: true })
-  fotoPath: string;
+  fotoRuta: string;
 
   @Column({ nullable: true, name: 'converted_estudianteId' })
   estudianteConvertidoId: number;

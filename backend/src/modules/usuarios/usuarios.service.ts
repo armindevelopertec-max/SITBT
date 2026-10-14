@@ -17,7 +17,7 @@ export class ServicioUsuarios {
   ) {}
 
   async create(crearUsuarioDto: CrearUsuarioDto & { codigoRol?: string }): Promise<Usuario> {
-    const contrasenaHash = await bcrypt.hash(crearUsuarioDto.password, 10);
+    const contrasenaHash = await bcrypt.hash(crearUsuarioDto.contrasena, 10);
     const usuario = this.usuarioRepository.create({
       ...crearUsuarioDto,
       contrasenaHash: contrasenaHash,
@@ -60,12 +60,12 @@ export class ServicioUsuarios {
       .take(limit)
       .getManyAndCount();
 
-    const usuariosConRoles = data.map(usuario => ({
+    const usuariosConRoles = data.map(({ contrasenaHash, usuarioRoles, ...usuario }) => ({
       ...usuario,
-      roles: usuario.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
+      roles: usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
     }));
 
-    return { data: usuariosConRoles, total, page, limit };
+    return { data: usuariosConRoles as any, total, page, limit };
   }
 
   async findOne(id: number): Promise<any> {
@@ -76,9 +76,10 @@ export class ServicioUsuarios {
     if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
     }
+    const { contrasenaHash, usuarioRoles, ...resto } = usuario;
     return {
-      ...usuario,
-      roles: usuario.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
+      ...resto,
+      roles: usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
     };
   }
 
@@ -90,19 +91,20 @@ export class ServicioUsuarios {
     if (!usuario) {
       throw new NotFoundException(`Usuario ${nombreUsuario} no encontrado`);
     }
+    const { contrasenaHash, usuarioRoles, ...resto } = usuario;
     return {
-      ...usuario,
-      roles: usuario.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
+      ...resto,
+      roles: usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
     };
   }
 
   async update(id: number, actualizarUsuarioDto: ActualizarUsuarioDto): Promise<Usuario> {
     const usuario = await this.findOne(id);
 
-    if (actualizarUsuarioDto.password) {
-      actualizarUsuarioDto.password = await bcrypt.hash(actualizarUsuarioDto.password, 10);
-      (usuario as any).contrasenaHash = actualizarUsuarioDto.password;
-      delete (actualizarUsuarioDto as any).password;
+    if (actualizarUsuarioDto.contrasena) {
+      actualizarUsuarioDto.contrasena = await bcrypt.hash(actualizarUsuarioDto.contrasena, 10);
+      (usuario as any).contrasenaHash = actualizarUsuarioDto.contrasena;
+      delete (actualizarUsuarioDto as any).contrasena;
     }
 
     Object.assign(usuario, actualizarUsuarioDto);
@@ -148,7 +150,7 @@ export class ServicioUsuarios {
 
   async obtenerRolesUsuario(usuarioId: number): Promise<UsuarioRol[]> {
     return this.usuarioRolRepository.find({
-      where: { usuarioId: undefined },
+      where: { usuarioId: usuarioId },
       relations: ['rol'],
     });
   }
@@ -159,9 +161,9 @@ export class ServicioUsuarios {
       relations: ['persona', 'usuarioRoles', 'usuarioRoles.rol'],
       order: { nombreUsuario: 'ASC' },
     });
-    return usuarios.map(usuario => ({
+    return usuarios.map(({ contrasenaHash, usuarioRoles, ...usuario }) => ({
       ...usuario,
-      roles: usuario.usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
+      roles: usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
     }));
   }
 }

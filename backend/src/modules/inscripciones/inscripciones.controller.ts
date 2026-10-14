@@ -81,12 +81,12 @@ export class ControladorInscripciones {
     return this.enrollmentsService.update(id, actualizarInscripcionDto);
   }
 
-  @Patch(':id/status')
+  @Patch(':id/estado')
   updateStatus(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { status: EstadoInscripcion; finalGrade?: number },
+    @Body() body: { estado: EstadoInscripcion; notaFinal?: number },
   ) {
-    return this.enrollmentsService.updateStatus(id, body.status, body.finalGrade);
+    return this.enrollmentsService.updateStatus(id, body.estado, body.notaFinal);
   }
 
   @Delete(':id')

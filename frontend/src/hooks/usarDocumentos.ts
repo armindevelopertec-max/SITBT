@@ -10,7 +10,7 @@ export interface DocumentoEmitido {
   gestion: string;
   gestionId?: number;
   fechaEmision: string;
-  pdfPath?: string;
+  rutaPdf?: string;
   entregadoA?: string;
   fechaEntrega?: string;
   estado: 'generado' | 'impreso' | 'entregado' | 'anulado';

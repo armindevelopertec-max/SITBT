@@ -109,7 +109,7 @@ export class ServicioGrupos {
   async getStudents(groupId: number): Promise<GrupoEstudiante[]> {
     return this.grupoEstudianteRepository.find({
       where: { grupoId: groupId },
-      relations: ['student', 'student.person'],
+      relations: ['estudiante', 'estudiante.persona'],
     });
   }
 

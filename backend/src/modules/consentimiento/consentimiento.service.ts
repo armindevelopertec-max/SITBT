@@ -28,10 +28,10 @@ export class ServicioConsentimiento {
     const query = this.consentimientoRepository
       .createQueryBuilder('consent')
       .leftJoinAndSelect('consent.estudiante', 'estudiante')
-      .leftJoinAndSelect('estudiante.person', 'person');
+      .leftJoinAndSelect('estudiante.persona', 'person');
 
     if (estudianteId) {
-      query.andWhere('consent.estudiante_id = :estudianteId', { estudianteId: undefined });
+      query.andWhere('consent.estudianteId = :estudianteId', { estudianteId });
     }
 
     const [data, total] = await query
@@ -46,7 +46,7 @@ export class ServicioConsentimiento {
   async findOne(id: string): Promise<RegistroConsentimiento> {
     const consent = await this.consentimientoRepository.findOne({
       where: { id },
-      relations: ['estudiante', 'estudiante.person'],
+      relations: ['estudiante', 'estudiante.persona'],
     });
     if (!consent) {
       throw new NotFoundException(`Consent record with ID ${id} no encontrado`);

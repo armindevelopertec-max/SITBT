@@ -26,7 +26,7 @@ export class CrearPersonalDto {
 
   @ApiProperty({ example: '2020-02-01' })
   @IsDateString()
-  hire_date: string;
+  fechaContrato: string;
 
   @ApiPropertyOptional({ enum: EstadoPersonal })
   @IsEnum(EstadoPersonal)

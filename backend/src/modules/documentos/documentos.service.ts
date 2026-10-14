@@ -28,7 +28,7 @@ export class ServicioDocumentos {
     const query = this.documentoRepository
       .createQueryBuilder('document')
       .leftJoinAndSelect('document.estudiante', 'estudiante')
-      .leftJoinAndSelect('estudiante.person', 'person')
+      .leftJoinAndSelect('estudiante.persona', 'person')
       .leftJoinAndSelect('document.gestionEntity', 'gestion');
 
     if (tipo) {
@@ -40,7 +40,7 @@ export class ServicioDocumentos {
     }
 
     if (estudianteId) {
-      query.andWhere('document.estudiante_id = :estudianteId', { estudianteId: undefined });
+      query.andWhere('document.estudianteId = :estudianteId', { estudianteId });
     }
 
     if (estado) {
@@ -59,7 +59,7 @@ export class ServicioDocumentos {
   async findOne(id: string): Promise<DocumentoEmitido> {
     const document = await this.documentoRepository.findOne({
       where: { id },
-      relations: ['estudiante', 'estudiante.person', 'gestionEntity', 'impresor'],
+      relations: ['estudiante', 'estudiante.persona', 'gestionEntity', 'impresor'],
     });
     if (!document) {
       throw new NotFoundException(`Documento con ID ${id} no encontrado`);
@@ -70,7 +70,7 @@ export class ServicioDocumentos {
   async findByStudent(estudianteId: number, tipo?: TipoDocumento): Promise<DocumentoEmitido[]> {
     const query = this.documentoRepository
       .createQueryBuilder('document')
-      .where('document.estudiante_id = :estudianteId', { estudianteId: undefined });
+      .where('document.estudianteId = :estudianteId', { estudianteId });
 
     if (tipo) {
       query.andWhere('document.tipo = :tipo', { tipo: tipo });
@@ -120,7 +120,7 @@ export class ServicioDocumentos {
     const numeroDocumento = `BOL-INS-${gestion}-${Date.now()}`;
 
     return this.create({
-      estudiante_id: estudianteId,
+      estudianteId: estudianteId,
       tipo: TipoDocumento.BOLETA_INSCRIPCION,
       numeroDocumento,
       gestion,
@@ -137,19 +137,19 @@ export class ServicioDocumentos {
     const numeroDocumento = `REC-PAG-${gestion}-${Date.now()}`;
 
     return this.create({
-      estudiante_id: estudianteId,
+      estudianteId: estudianteId,
       tipo: TipoDocumento.RECIBO_PAGO,
       numeroDocumento,
       gestion,
       gestionId: gestionId,
-      related_payment_id: paymentId,
+      pagoRelacionadoId: paymentId,
     });
   }
 
   async getDocumentStatistics(gestion?: string): Promise<{
     total: number;
-    byType: { tipo: TipoDocumento; count: number }[];
-    byStatus: { estado: EstadoDocumento; count: number }[];
+    porTipo: { tipo: TipoDocumento; cantidad: number }[];
+    porEstado: { estado: EstadoDocumento; cantidad: number }[];
   }> {
     const query = this.documentoRepository.createQueryBuilder('document');
 
@@ -169,8 +169,8 @@ export class ServicioDocumentos {
 
     return {
       total: documents.length,
-      byType: Array.from(byTypeMap.entries()).map(([tipo, count]) => ({ tipo, count })),
-      byStatus: Array.from(byStatusMap.entries()).map(([estado, count]) => ({ estado, count })),
+      porTipo: Array.from(byTypeMap.entries()).map(([tipo, count]) => ({ tipo, cantidad: count })),
+      porEstado: Array.from(byStatusMap.entries()).map(([estado, count]) => ({ estado, cantidad: count })),
     };
   }
 

@@ -78,7 +78,7 @@ export class ServicioAuditoria {
 
   async getRecentActions(limit = 20): Promise<RegistroAuditoria[]> {
     return this.auditoriaRepository.find({
-      relations: ['user'],
+      relations: ['usuario'],
       order: { fecha: 'DESC' },
       take: limit,
     });

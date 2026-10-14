@@ -5,7 +5,7 @@ import { TipoDocumento, EstadoDocumento } from '../../../entities/emitted-docume
 export class CrearDocumentoEmitidoDto {
   @ApiProperty()
   @IsNumber()
-  estudiante_id: number;
+  estudianteId: number;
 
   @ApiProperty({ enum: TipoDocumento })
   @IsEnum(TipoDocumento)
@@ -27,15 +27,15 @@ export class CrearDocumentoEmitidoDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  pdfPath?: string;
+  rutaPdf?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  related_payment_id?: number;
+  pagoRelacionadoId?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  related_credential_id?: number;
+  credencialRelacionadaId?: number;
 }

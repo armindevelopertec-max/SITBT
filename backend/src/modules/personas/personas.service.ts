@@ -32,7 +32,7 @@ export class ServicioPersonas {
     const query = this.personaRepository.createQueryBuilder('person');
 
     if (status) {
-      query.where('person.estado = :status', { estado: status });
+      query.where('person.estado = :estado', { estado: status });
     }
 
     const [data, total] = await query
@@ -74,7 +74,7 @@ export class ServicioPersonas {
   async search(query: string, page = 1, limit = 20): Promise<{ data: Persona[]; total: number }> {
     const [data, total] = await this.personaRepository
       .createQueryBuilder('person')
-      .where('person.names ILIKE :query', { query: `%${query}%` })
+      .where('person.nombres ILIKE :query', { query: `%${query}%` })
       .orWhere('person.apellidoPaterno ILIKE :query', { query: `%${query}%` })
       .orWhere('person.apellidoMaterno ILIKE :query', { query: `%${query}%` })
       .orWhere('person.ci ILIKE :query', { query: `%${query}%` })

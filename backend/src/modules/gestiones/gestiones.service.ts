@@ -104,7 +104,7 @@ export class GestionesService {
     const query = this.gestionRepository.createQueryBuilder('gestion');
 
     if (status) {
-      query.andWhere('gestion.estado = :status', { estado: status });
+      query.andWhere('gestion.estado = :estado', { estado: status });
     }
 
     query.orderBy('gestion.anio', 'DESC');

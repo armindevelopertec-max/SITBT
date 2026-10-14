@@ -26,18 +26,18 @@ export class ServicioConvalidaciones {
   ): Promise<{ data: ConvalidacionEstudiante[]; total: number; page: number; limit: number }> {
     const query = this.convalidacionRepository
       .createQueryBuilder('convalidation')
-      .leftJoinAndSelect('convalidation.student', 'student')
-      .leftJoinAndSelect('student.person', 'person')
-      .leftJoinAndSelect('convalidation.target_subject', 'subject')
-      .leftJoinAndSelect('convalidation.equivalence', 'equivalence')
-      .leftJoinAndSelect('convalidation.approver', 'approver');
+      .leftJoinAndSelect('convalidation.estudiante', 'student')
+      .leftJoinAndSelect('student.persona', 'person')
+      .leftJoinAndSelect('convalidation.materia_destino', 'subject')
+      .leftJoinAndSelect('convalidation.equivalencia', 'equivalence')
+      .leftJoinAndSelect('convalidation.aprobador', 'approver');
 
     if (status) {
-      query.andWhere('convalidation.estado = :status', { estado: status });
+      query.andWhere('convalidation.estado = :estado', { estado: status });
     }
 
     if (type) {
-      query.andWhere('convalidation.tipo = :type', { tipo: type });
+      query.andWhere('convalidation.tipo = :tipo', { tipo: type });
     }
 
     if (studentId) {
@@ -45,7 +45,7 @@ export class ServicioConvalidaciones {
     }
 
     const [data, total] = await query
-      .orderBy('convalidation.created_at', 'DESC')
+      .orderBy('convalidation.creadoEn', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -56,7 +56,7 @@ export class ServicioConvalidaciones {
   async findOne(id: number): Promise<ConvalidacionEstudiante> {
     const convalidation = await this.convalidacionRepository.findOne({
       where: { id },
-      relations: ['student', 'student.person', 'target_subject', 'equivalence', 'approver'],
+      relations: ['estudiante', 'estudiante.persona', 'materia_destino', 'equivalencia', 'aprobador'],
     });
     if (!convalidation) {
       throw new NotFoundException(`Convalidación con ID ${id} no encontrada`);
@@ -78,7 +78,7 @@ export class ServicioConvalidaciones {
   async findByStudent(studentId: number): Promise<ConvalidacionEstudiante[]> {
     return this.convalidacionRepository.find({
       where: { estudianteId: studentId },
-      relations: ['target_subject', 'equivalence', 'approver'],
+      relations: ['materia_destino', 'equivalencia', 'aprobador'],
       order: { creadoEn: 'DESC' },
     });
   }
@@ -101,7 +101,7 @@ export class ServicioConvalidaciones {
   async getPending(): Promise<ConvalidacionEstudiante[]> {
     return this.convalidacionRepository.find({
       where: { estado: EstadoConvalidacion.PENDIENTE },
-      relations: ['student', 'student.person', 'target_subject'],
+      relations: ['estudiante', 'estudiante.persona', 'materia_destino'],
       order: { creadoEn: 'ASC' },
     });
   }

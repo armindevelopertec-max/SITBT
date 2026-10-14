@@ -250,7 +250,7 @@ export default function DocumentDetailPage() {
                 </Boton>
               )}
 
-              <Boton variant="outline" className="w-full" disabled={!document.pdfPath}>
+              <Boton variant="outline" className="w-full" disabled={!document.rutaPdf}>
                 <FileText className="w-4 h-4 mr-2" />
                 Descargar PDF
               </Boton>

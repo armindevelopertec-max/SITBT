@@ -31,7 +31,7 @@ export class ServicioCarreras {
     const query = this.careerRepository.createQueryBuilder('career');
 
     if (status) {
-      query.where('career.estado = :status', { estado: status });
+      query.where('career.estado = :estado', { estado: status });
     }
 
     const [data, total] = await query

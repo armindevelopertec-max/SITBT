@@ -84,19 +84,19 @@ export default function DocumentsPage() {
           </div>
           <div className="bg-blue-50 rounded-lg shadow-sm p-4">
             <div className="text-2xl font-bold text-blue-600">
-              {stats.byType?.find((t: any) => t.tipo === 'boleta_inscripcion')?.count || 0}
+              {stats.porTipo?.find((t: any) => t.tipo === 'boleta_inscripcion')?.cantidad || 0}
             </div>
             <div className="text-sm text-blue-600">Boletas</div>
           </div>
           <div className="bg-green-50 rounded-lg shadow-sm p-4">
             <div className="text-2xl font-bold text-green-600">
-              {stats.byType?.find((t: any) => t.tipo === 'recibo_pago')?.count || 0}
+              {stats.porTipo?.find((t: any) => t.tipo === 'recibo_pago')?.cantidad || 0}
             </div>
             <div className="text-sm text-green-600">Recibos</div>
           </div>
           <div className="bg-purple-50 rounded-lg shadow-sm p-4">
             <div className="text-2xl font-bold text-purple-600">
-              {stats.byType?.find((t: any) => t.tipo === 'carnet')?.count || 0}
+              {stats.porTipo?.find((t: any) => t.tipo === 'carnet')?.cantidad || 0}
             </div>
             <div className="text-sm text-purple-600">Carnets</div>
           </div>

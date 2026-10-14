@@ -68,25 +68,25 @@ export class ControladorCalificaciones {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() actualizarCalificacionDto: ActualizarCalificacionDto,
-    @Body('registeredBy') registeredBy: number,
+    @Body('registradoPor') registradoPor: number,
   ) {
-    return this.gradesService.update(id, actualizarCalificacionDto, registeredBy);
+    return this.gradesService.update(id, actualizarCalificacionDto, registradoPor);
   }
 
   @Patch(':id/partials')
   updatePartialGrades(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { partial1?: number; partial2?: number; registeredBy?: number },
+    @Body() body: { parcial1?: number; parcial2?: number; registradoPor?: number },
   ) {
-    return this.gradesService.updatePartialGrades(id, body.partial1, body.partial2, body.registeredBy);
+    return this.gradesService.updatePartialGrades(id, body.parcial1, body.parcial2, body.registradoPor);
   }
 
   @Patch(':id/second-turn')
   applySecondTurn(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { score: number; registeredBy?: number },
+    @Body() body: { nota: number; registradoPor?: number },
   ) {
-    return this.gradesService.applySecondTurn(id, body.score, body.registeredBy);
+    return this.gradesService.applySecondTurn(id, body.nota, body.registradoPor);
   }
 
   @Delete(':id')

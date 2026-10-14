@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pago, EstadoPago, MetodoPago } from '../../entities/pago.entity';
+import { ConceptoPago, EstadoConceptoPago } from '../../entities/concepto-pago.entity';
 import { CrearPagoDto } from './dto/crear-pago.dto';
 import { ActualizarPagoDto } from './dto/actualizar-pago.dto';
 
@@ -10,12 +11,21 @@ export class ServicioPagos {
   constructor(
     @InjectRepository(Pago)
     private pagoRepository: Repository<Pago>,
+    @InjectRepository(ConceptoPago)
+    private conceptoRepository: Repository<ConceptoPago>,
   ) {}
+
+  async listarConceptos(): Promise<ConceptoPago[]> {
+    return this.conceptoRepository.find({
+      where: { estado: EstadoConceptoPago.ACTIVO },
+      order: { nombre: 'ASC' },
+    });
+  }
 
   async create(createDto: CrearPagoDto): Promise<Pago> {
     const payment = this.pagoRepository.create({
       ...createDto,
-      payment_date: new Date(createDto.fechaPago),
+      fechaPago: new Date(createDto.fechaPago),
     } as any);
     return this.pagoRepository.save(payment as any);
   }
@@ -30,17 +40,17 @@ export class ServicioPagos {
   ): Promise<{ data: Pago[]; total: number; page: number; limit: number }> {
     const query = this.pagoRepository
       .createQueryBuilder('payment')
-      .leftJoinAndSelect('payment.student', 'student')
-      .leftJoinAndSelect('student.person', 'person')
-      .leftJoinAndSelect('payment.concept', 'concept')
-      .leftJoinAndSelect('payment.receiver', 'receiver');
+      .leftJoinAndSelect('payment.estudiante', 'student')
+      .leftJoinAndSelect('student.persona', 'person')
+      .leftJoinAndSelect('payment.concepto', 'concept')
+      .leftJoinAndSelect('payment.receptor', 'receiver');
 
     if (gestion) {
       query.andWhere('payment.gestion = :gestion', { gestion });
     }
 
     if (status) {
-      query.andWhere('payment.estado = :status', { estado: status });
+      query.andWhere('payment.estado = :estado', { estado: status });
     }
 
     if (studentId) {
@@ -63,7 +73,7 @@ export class ServicioPagos {
   async findOne(id: number): Promise<Pago> {
     const payment = await this.pagoRepository.findOne({
       where: { id },
-      relations: ['student', 'student.person', 'concept', 'receiver'],
+      relations: ['estudiante', 'estudiante.persona', 'concepto', 'receptor'],
     });
     if (!payment) {
       throw new NotFoundException(`Pago con ID ${id} no encontrado`);
@@ -85,8 +95,8 @@ export class ServicioPagos {
   async findByStudent(studentId: number, gestion?: string): Promise<Pago[]> {
     const query = this.pagoRepository
       .createQueryBuilder('payment')
-      .leftJoinAndSelect('payment.concept', 'concept')
-      .leftJoinAndSelect('payment.receiver', 'receiver')
+      .leftJoinAndSelect('payment.concepto', 'concept')
+      .leftJoinAndSelect('payment.receptor', 'receiver')
       .where('payment.estudianteId = :studentId', { studentId });
 
     if (gestion) {
@@ -113,11 +123,11 @@ export class ServicioPagos {
   ): Promise<Pago[]> {
     const query = this.pagoRepository
       .createQueryBuilder('payment')
-      .leftJoinAndSelect('payment.student', 'student')
-      .leftJoinAndSelect('student.person', 'person')
-      .leftJoinAndSelect('payment.concept', 'concept')
+      .leftJoinAndSelect('payment.estudiante', 'student')
+      .leftJoinAndSelect('student.persona', 'person')
+      .leftJoinAndSelect('payment.concepto', 'concept')
       .where('payment.fechaPago BETWEEN :startDate AND :endDate', { startDate, endDate })
-      .andWhere('payment.estado = :status', { estado: EstadoPago.PAGADO });
+      .andWhere('payment.estado = :estado', { estado: EstadoPago.PAGADO });
 
     if (gestion) {
       query.andWhere('payment.gestion = :gestion', { gestion });
@@ -135,7 +145,7 @@ export class ServicioPagos {
       .createQueryBuilder('payment')
       .where('payment.fechaPago BETWEEN :startDate AND :endDate', { startDate, endDate })
       .andWhere('payment.gestion = :gestion', { gestion })
-      .andWhere('payment.estado = :status', { estado: EstadoPago.PAGADO })
+      .andWhere('payment.estado = :estado', { estado: EstadoPago.PAGADO })
       .getMany();
 
     const total = payments.reduce((sum, p) => sum + Number(p.monto), 0);
@@ -156,7 +166,7 @@ export class ServicioPagos {
   }> {
     const payments = await this.pagoRepository.find({
       where: { gestion, estado: EstadoPago.PAGADO },
-      relations: ['concept'],
+      relations: ['concepto'],
     });
 
     const total = payments.reduce((sum, p) => sum + Number(p.monto), 0);

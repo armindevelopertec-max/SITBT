@@ -1,23 +1,23 @@
 import { IsString, IsOptional, IsNumber, IsArray } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class SendEmailDto {
+export class EnviarCorreoDto {
   @ApiProperty()
   @IsString()
-  to: string;
+  para: string;
 
   @ApiProperty()
   @IsString()
-  subject: string;
+  asunto: string;
 
   @ApiProperty()
   @IsString()
-  content: string;
+  contenido: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsArray()
-  attachments?: { filename: string; path: string }[];
+  adjuntos?: { nombreArchivo: string; ruta: string }[];
 }
 
 export class EnviarNotificacionDto {

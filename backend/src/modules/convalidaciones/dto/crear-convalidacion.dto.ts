@@ -17,11 +17,11 @@ export class CrearConvalidacionDto {
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
-  equivalence_id?: number;
+  equivalenciaId?: number;
 
   @ApiProperty()
   @IsInt()
-  target_subject_id: number;
+  materiaDestinoId: number;
 
   @ApiProperty({ enum: TipoConvalidacion })
   @IsEnum(TipoConvalidacion)
@@ -31,12 +31,12 @@ export class CrearConvalidacionDto {
   @IsString()
   @IsOptional()
   @MaxLength(50)
-  resolution_number?: string;
+  numeroResolucion?: string;
 
   @ApiPropertyOptional({ example: '2024-06-15' })
   @IsDateString()
   @IsOptional()
-  resolution_date?: string;
+  fechaResolucion?: string;
 
   @ApiPropertyOptional({ enum: EstadoConvalidacion })
   @IsEnum(EstadoConvalidacion)
@@ -46,5 +46,5 @@ export class CrearConvalidacionDto {
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
-  approved_by?: number;
+  aprobadoPor?: number;
 }

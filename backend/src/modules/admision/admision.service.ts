@@ -29,13 +29,11 @@ export class ServicioAdmision {
   ) {}
 
   async create(createDto: CrearAdmisionDto): Promise<SolicitudAdmision> {
-    const { names, apellidoPaterno, apellidoMaterno, ...rest } = createDto as any;
-
     const existingStudent = await this.estudianteRepository
       .createQueryBuilder('student')
       .innerJoin('student.persona', 'person')
       .where('person.ci = :ci', { ci: createDto.ci })
-      .andWhere('student.estado = :status', { estado: 'activo' })
+      .andWhere('student.estado = :estado', { estado: 'activo' })
       .getOne();
 
     if (existingStudent) {
@@ -46,8 +44,8 @@ export class ServicioAdmision {
       const existingEmail = await this.personaRepository
         .createQueryBuilder('person')
         .innerJoin('person.estudiantes', 'student')
-        .where('person.correo = :email', { email: createDto.correo })
-        .andWhere('student.estado = :status', { estado: 'activo' })
+        .where('person.correo = :correo', { correo: createDto.correo })
+        .andWhere('student.estado = :estado', { estado: 'activo' })
         .getOne();
       if (existingEmail) {
         throw new BadRequestException('Ya existe un estudiante activo con este correo electrónico');
@@ -58,8 +56,8 @@ export class ServicioAdmision {
       const existingPhone = await this.personaRepository
         .createQueryBuilder('person')
         .innerJoin('person.estudiantes', 'student')
-        .where('person.telefono = :phone', { phone: createDto.telefono })
-        .andWhere('student.estado = :status', { estado: 'activo' })
+        .where('person.telefono = :telefono', { telefono: createDto.telefono })
+        .andWhere('student.estado = :estado', { estado: 'activo' })
         .getOne();
       if (existingPhone) {
         throw new BadRequestException('Ya existe un estudiante activo con este número de celular');
@@ -67,10 +65,7 @@ export class ServicioAdmision {
     }
 
     const request = this.admissionRepository.create({
-      ...rest,
-      nombre: names,
-      apellido_paterno: apellidoPaterno,
-      apellido_materno: apellidoMaterno,
+      ...createDto,
       fechaNacimiento: new Date(createDto.fechaNacimiento),
     } as Partial<SolicitudAdmision>);
     return this.admissionRepository.save(request as any) as any;
@@ -87,7 +82,7 @@ export class ServicioAdmision {
       .leftJoinAndSelect('request.carrera', 'carrera');
 
     if (estado) {
-      query.andWhere('request.estado = :estado', { estado: status });
+      query.andWhere('request.estado = :estado', { estado });
     }
 
     if (origen) {
@@ -173,7 +168,7 @@ export class ServicioAdmision {
         .createQueryBuilder('person')
         .innerJoin('person.estudiantes', 'student')
         .where('person.correo = :email', { email: request.correo })
-        .andWhere('student.estado = :status', { estado: 'activo' })
+        .andWhere('student.estado = :estado', { estado: 'activo' })
         .getOne();
       if (existingEmail) {
         throw new BadRequestException('Ya existe un estudiante activo con este correo electrónico');
@@ -185,7 +180,7 @@ export class ServicioAdmision {
         .createQueryBuilder('person')
         .innerJoin('person.estudiantes', 'student')
         .where('person.telefono = :phone', { phone: request.telefono })
-        .andWhere('student.estado = :status', { estado: 'activo' })
+        .andWhere('student.estado = :estado', { estado: 'activo' })
         .getOne();
       if (existingPhone) {
         throw new BadRequestException('Ya existe un estudiante activo con este número de celular');
@@ -199,7 +194,7 @@ export class ServicioAdmision {
       .innerJoin('student.persona', 'person')
       .where('person.ci = :ci', { ci: request.ci })
       .andWhere('student.carreraId = :careerId', { careerId: request.carreraId })
-      .andWhere('student.estado = :status', { estado: 'activo' })
+      .andWhere('student.estado = :estado', { estado: 'activo' })
       .getOne();
 
     if (existingStudentInCareer) {
@@ -219,10 +214,10 @@ export class ServicioAdmision {
         lugarNacimiento: finalBirthplace,
         genero: request.genero as any,
         estadoCivil: request.estadoCivil as any,
-        nationality: finalNationality,
-        phone: request.telefono,
-        email: request.correo,
-        address: request.direccion,
+        nacionalidad: finalNationality,
+        telefono: request.telefono,
+        correo: request.correo,
+        direccion: request.direccion,
       } as any);
       const saved = await (this.personaRepository.save as any)(persona as any);
       persona = (Array.isArray(saved) ? saved[0] : saved) as Persona;

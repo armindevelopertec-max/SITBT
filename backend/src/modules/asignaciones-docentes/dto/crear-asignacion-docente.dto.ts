@@ -5,7 +5,7 @@ import { EstadoAsignacionDocente } from '../../../entities/asignacion-docente.en
 export class CrearAsignacionDocenteDto {
   @ApiProperty()
   @IsInt()
-  teacher_id: number;
+  docenteId: number;
 
   @ApiProperty()
   @IsInt()

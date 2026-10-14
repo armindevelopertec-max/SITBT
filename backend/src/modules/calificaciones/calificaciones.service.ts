@@ -44,11 +44,11 @@ export class ServicioCalificaciones {
   ): Promise<{ data: Calificacion[]; total: number; page: number; limit: number }> {
     const query = this.calificacionRepository
       .createQueryBuilder('grade')
-      .leftJoinAndSelect('grade.enrollment', 'enrollment')
-      .leftJoinAndSelect('enrollment.student', 'student')
-      .leftJoinAndSelect('enrollment.person', 'person')
-      .leftJoinAndSelect('enrollment.subject', 'subject')
-      .leftJoinAndSelect('enrollment.group', 'group');
+      .leftJoinAndSelect('grade.inscripcion', 'enrollment')
+      .leftJoinAndSelect('enrollment.estudiante', 'student')
+      .leftJoinAndSelect('student.persona', 'person')
+      .leftJoinAndSelect('enrollment.materia', 'subject')
+      .leftJoinAndSelect('enrollment.grupo', 'group');
 
     if (gestion) {
       query.andWhere('enrollment.gestion = :gestion', { gestion });
@@ -59,7 +59,7 @@ export class ServicioCalificaciones {
     }
 
     const [data, total] = await query
-      .orderBy('grade.registered_at', 'DESC')
+      .orderBy('grade.registradoEn', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -70,7 +70,7 @@ export class ServicioCalificaciones {
   async findOne(id: number): Promise<Calificacion> {
     const grade = await this.calificacionRepository.findOne({
       where: { id },
-      relations: ['enrollment', 'enrollment.student', 'enrollment.person', 'enrollment.subject', 'teacher'],
+      relations: ['inscripcion', 'inscripcion.estudiante', 'inscripcion.estudiante.persona', 'inscripcion.materia', 'docente'],
     });
     if (!grade) {
       throw new NotFoundException(`Calificación con ID ${id} no encontrada`);
@@ -81,10 +81,10 @@ export class ServicioCalificaciones {
   async findByEnrollment(enrollmentId: number): Promise<Calificacion> {
     const grade = await this.calificacionRepository.findOne({
       where: { inscripcionId: enrollmentId },
-      relations: ['enrollment', 'enrollment.student', 'enrollment.person', 'enrollment.subject'],
+      relations: ['inscripcion', 'inscripcion.estudiante', 'inscripcion.estudiante.persona', 'inscripcion.materia'],
     });
     if (!grade) {
-      throw new NotFoundException(`Grade for enrollment ${enrollmentId} no encontrada`);
+      throw new NotFoundException(`Calificación de la inscripción ${enrollmentId} no encontrada`);
     }
     return grade;
   }
@@ -187,7 +187,7 @@ export class ServicioCalificaciones {
   async getGradeHistory(enrollmentId: number): Promise<AuditoriaCalificacion[]> {
     return this.gradeAuditRepository.find({
       where: { calificacionId: enrollmentId },
-      relations: ['user'],
+      relations: ['usuario'],
       order: { cambiadoEn: 'DESC' },
     });
   }
@@ -195,9 +195,9 @@ export class ServicioCalificaciones {
   async getGradesByStudent(studentId: number, gestion?: string): Promise<Calificacion[]> {
     const query = this.calificacionRepository
       .createQueryBuilder('grade')
-      .leftJoinAndSelect('grade.enrollment', 'enrollment')
-      .leftJoinAndSelect('enrollment.subject', 'subject')
-      .leftJoinAndSelect('enrollment.group', 'group')
+      .leftJoinAndSelect('grade.inscripcion', 'enrollment')
+      .leftJoinAndSelect('enrollment.materia', 'subject')
+      .leftJoinAndSelect('enrollment.grupo', 'group')
       .where('enrollment.estudianteId = :studentId', { studentId });
 
     if (gestion) {
@@ -210,13 +210,13 @@ export class ServicioCalificaciones {
   async getGradesByGroup(groupId: number, gestion: string): Promise<Calificacion[]> {
     return this.calificacionRepository
       .createQueryBuilder('grade')
-      .leftJoinAndSelect('grade.enrollment', 'enrollment')
-      .leftJoinAndSelect('enrollment.student', 'student')
-      .leftJoinAndSelect('enrollment.person', 'person')
-      .leftJoinAndSelect('enrollment.subject', 'subject')
+      .leftJoinAndSelect('grade.inscripcion', 'enrollment')
+      .leftJoinAndSelect('enrollment.estudiante', 'student')
+      .leftJoinAndSelect('student.persona', 'person')
+      .leftJoinAndSelect('enrollment.materia', 'subject')
       .where('enrollment.grupoId = :groupId', { groupId })
       .andWhere('enrollment.gestion = :gestion', { gestion })
-      .orderBy('student.person.lastname_paternal', 'ASC')
+      .orderBy('student.persona.apellidoPaterno', 'ASC')
       .getMany();
   }
 }

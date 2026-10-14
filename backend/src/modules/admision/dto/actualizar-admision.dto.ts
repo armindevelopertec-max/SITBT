@@ -21,22 +21,22 @@ export class ActualizarAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  carrera_id?: number;
+  carreraId?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  names?: string;
+  nombre?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  lastname_paternal?: string;
+  apellidoPaterno?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  lastname_maternal?: string;
+  apellidoMaterno?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -56,6 +56,11 @@ export class ActualizarAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  lugarNacimientoOtro?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   genero?: string;
 
   @ApiPropertyOptional()
@@ -67,6 +72,11 @@ export class ActualizarAdmisionDto {
   @IsOptional()
   @IsString()
   nacionalidad?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  nacionalidadOtra?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

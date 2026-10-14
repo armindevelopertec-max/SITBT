@@ -120,7 +120,7 @@ export default function StaffPage() {
       const response = await api.get(`/usuarios?personaId=${credentialsModal.personId}`);
       const users = response.data.data;
       if (users && users.length > 0) {
-        await api.post(`/usuarios/${users[0].id}/change-password`, { newPassword: credentialsModal.password });
+        await api.post(`/usuarios/${users[0].id}/cambiar-contrasena`, { nuevaContrasena: credentialsModal.password });
       }
       setCredentialsModal(null);
     } catch (error) {

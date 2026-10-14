@@ -16,7 +16,7 @@ export class ActualizarDocumentoEmitidoDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  pdfPath?: string;
+  rutaPdf?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

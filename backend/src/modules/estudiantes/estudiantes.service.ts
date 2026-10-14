@@ -256,18 +256,19 @@ export class ServicioEstudiantes {
 
   async getStudentStats(): Promise<any> {
     const stats = await this.estudianteRepository
-      .createQueryBuilder('student')
-      .select('student.estado', 'status')
-      .addSelect('COUNT(*)', 'count')
-      .groupBy('student.estado')
+      .createQueryBuilder('estudiante')
+      .select('estudiante.estado', 'estado')
+      .addSelect('COUNT(*)', 'cantidad')
+      .groupBy('estudiante.estado')
       .getRawMany();
 
-    const result = { total: 0, active: 0, graduated: 0, frozen: 0 };
+    const result = { total: 0, activos: 0, egresados: 0, congelados: 0 };
     stats.forEach((s) => {
-      result.total += parseInt(s.count);
-      if (s.estado === EstadoEstudiante.ACTIVO) result.active = parseInt(s.count);
-      if (s.estado === EstadoEstudiante.EGRESADO || s.estado === EstadoEstudiante.TITULADO) result.graduated += parseInt(s.count);
-      if (s.estado === EstadoEstudiante.CONGELADO) result.frozen = parseInt(s.count);
+      const cantidad = parseInt(s.cantidad);
+      result.total += cantidad;
+      if (s.estado === EstadoEstudiante.ACTIVO) result.activos = cantidad;
+      if (s.estado === EstadoEstudiante.EGRESADO || s.estado === EstadoEstudiante.TITULADO) result.egresados += cantidad;
+      if (s.estado === EstadoEstudiante.CONGELADO) result.congelados = cantidad;
     });
 
     return result;

@@ -38,25 +38,25 @@ export class ServicioInscripciones {
   ): Promise<{ data: Inscripcion[]; total: number; page: number; limit: number }> {
     const query = this.inscripcionRepository
       .createQueryBuilder('inscripcion')
-      .leftJoinAndSelect('enrollment.student', 'student')
-      .leftJoinAndSelect('student.person', 'person')
-      .leftJoinAndSelect('enrollment.subject', 'materia')
-      .leftJoinAndSelect('enrollment.group', 'grupo');
+      .leftJoinAndSelect('inscripcion.estudiante', 'student')
+      .leftJoinAndSelect('student.persona', 'person')
+      .leftJoinAndSelect('inscripcion.materia', 'materia')
+      .leftJoinAndSelect('inscripcion.grupo', 'grupo');
 
     if (gestion) {
-      query.andWhere('enrollment.gestion = :gestion', { gestion });
+      query.andWhere('inscripcion.gestion = :gestion', { gestion });
     }
 
     if (status) {
-      query.andWhere('enrollment.estado = :status', { estado: status });
+      query.andWhere('inscripcion.estado = :estado', { estado: status });
     }
 
     if (studentId) {
-      query.andWhere('enrollment.estudianteId = :studentId', { studentId });
+      query.andWhere('inscripcion.estudianteId = :studentId', { studentId });
     }
 
     const [data, total] = await query
-      .orderBy('enrollment.created_at', 'DESC')
+      .orderBy('inscripcion.creadoEn', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -67,7 +67,7 @@ export class ServicioInscripciones {
   async findOne(id: number): Promise<Inscripcion> {
     const enrollment = await this.inscripcionRepository.findOne({
       where: { id },
-      relations: ['student', 'student.person', 'materia', 'grupo'],
+      relations: ['estudiante', 'estudiante.persona', 'materia', 'grupo'],
     });
     if (!enrollment) {
       throw new NotFoundException(`Inscripción con ID ${id} no encontrada`);
@@ -89,21 +89,21 @@ export class ServicioInscripciones {
   async findByStudent(studentId: number, gestion?: string): Promise<Inscripcion[]> {
     const query = this.inscripcionRepository
       .createQueryBuilder('inscripcion')
-      .leftJoinAndSelect('enrollment.subject', 'materia')
-      .leftJoinAndSelect('enrollment.group', 'grupo')
-      .where('enrollment.estudianteId = :studentId', { studentId });
+      .leftJoinAndSelect('inscripcion.materia', 'materia')
+      .leftJoinAndSelect('inscripcion.grupo', 'grupo')
+      .where('inscripcion.estudianteId = :studentId', { studentId });
 
     if (gestion) {
-      query.andWhere('enrollment.gestion = :gestion', { gestion });
+      query.andWhere('inscripcion.gestion = :gestion', { gestion });
     }
 
-    return query.orderBy('enrollment.semestre', 'ASC').getMany();
+    return query.orderBy('inscripcion.semestre', 'ASC').getMany();
   }
 
   async findBySubject(subjectId: number, gestion: string): Promise<Inscripcion[]> {
     return this.inscripcionRepository.find({
       where: { materiaId: subjectId, gestion },
-      relations: ['student', 'student.person', 'grupo'],
+      relations: ['estudiante', 'estudiante.persona', 'grupo'],
       order: { creadoEn: 'ASC' },
     });
   }
@@ -111,7 +111,7 @@ export class ServicioInscripciones {
   async findByGroup(groupId: number, gestion: string): Promise<Inscripcion[]> {
     return this.inscripcionRepository.find({
       where: { grupoId: groupId, gestion },
-      relations: ['student', 'student.person', 'materia'],
+      relations: ['estudiante', 'estudiante.persona', 'materia'],
       order: { creadoEn: 'ASC' },
     });
   }
@@ -127,7 +127,7 @@ export class ServicioInscripciones {
 
   async getStudentAcademicRecord(studentId: number): Promise<{
     enrollments: Inscripcion[];
-    stats: { approved: number; failed: number; inProgress: number; average: number };
+    stats: { aprobadas: number; reprobadas: number; enCurso: number; promedio: number };
   }> {
     const enrollments = await this.inscripcionRepository.find({
       where: { estudianteId: studentId },
@@ -136,10 +136,10 @@ export class ServicioInscripciones {
     });
 
     const stats = {
-      approved: 0,
-      failed: 0,
-      inProgress: 0,
-      average: 0,
+      aprobadas: 0,
+      reprobadas: 0,
+      enCurso: 0,
+      promedio: 0,
     };
 
     let totalGrade = 0;
@@ -147,20 +147,20 @@ export class ServicioInscripciones {
 
     enrollments.forEach((e) => {
       if (e.estado === EstadoInscripcion.APROBADO) {
-        stats.approved++;
+        stats.aprobadas++;
         if (e.notaFinal) {
           totalGrade += e.notaFinal;
           countWithGrade++;
         }
       } else if (e.estado === EstadoInscripcion.REPROBADO) {
-        stats.failed++;
+        stats.reprobadas++;
       } else if (e.estado === EstadoInscripcion.CURSANDO) {
-        stats.inProgress++;
+        stats.enCurso++;
       }
     });
 
     if (countWithGrade > 0) {
-      stats.average = Math.round(totalGrade / countWithGrade * 100) / 100;
+      stats.promedio = Math.round(totalGrade / countWithGrade * 100) / 100;
     }
 
     return { enrollments, stats };

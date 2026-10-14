@@ -307,9 +307,9 @@ export interface SolicitudAdmision {
   verificador?: Usuario;
   fechaVerificacion?: string;
   origen: OrigenAdmision;
-  documentoCiPath?: string;
-  certificadoBachillerPath?: string;
-  fotoPath?: string;
+  documentoCiRuta?: string;
+  certificadoBachillerRuta?: string;
+  fotoRuta?: string;
   estudianteConvertidoId?: number;
   creadoEn?: string;
   actualizadoEn?: string;

@@ -21,11 +21,11 @@ export class CrearUsuarioDto {
   @MaxLength(50)
   nombreUsuario: string;
 
-  @ApiProperty({ example: 'securePassword123' })
+  @ApiProperty({ example: 'ContrasenaSegura123' })
   @IsString()
   @MinLength(6)
   @MaxLength(100)
-  password: string;
+  contrasena: string;
 
   @ApiPropertyOptional({ enum: EstadoUsuario })
   @IsEnum(EstadoUsuario)

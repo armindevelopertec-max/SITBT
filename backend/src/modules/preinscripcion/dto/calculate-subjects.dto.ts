@@ -1,4 +1,4 @@
-import { IsInt, IsString, IsOptional } from 'class-validator';
+import { IsInt, IsString, IsOptional, IsBoolean } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CalcularMateriasDto {
@@ -22,14 +22,44 @@ export class CalcularMateriasDto {
 }
 
 export class MateriaAInscribir {
+  @ApiProperty()
+  @IsInt()
   materiaPlanId: number;
+
+  @ApiProperty()
+  @IsInt()
   materiaId: number;
+
+  @ApiProperty()
+  @IsString()
   materiaCodigo: string;
+
+  @ApiProperty()
+  @IsString()
   materiaNombre: string;
+
+  @ApiProperty()
+  @IsInt()
   semestre: number;
-  esReprobada: boolean;
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  esReprobada?: boolean;
+
+  @ApiPropertyOptional()
+  @IsInt()
+  @IsOptional()
   notaAnteriorReprobada?: number;
-  prerrequisitoBloqueado: boolean;
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  prerrequisitoBloqueado?: boolean;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
   nombrePrerrequisito?: string;
 }
 

@@ -17,7 +17,7 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 import { TipoDocumento, EstadoDocumento } from '../../entities/emitted-document.entity';
 
 @ApiTags('Documentos')
-@Controller('documents')
+@Controller('documentos')
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorDocumentos {

@@ -38,7 +38,7 @@ export class ControladorUsuarios {
     return this.usersService.findAll(+page, +limit, status);
   }
 
-  @Get('active')
+  @Get('activos')
   findActive() {
     return this.usersService.findActive();
   }

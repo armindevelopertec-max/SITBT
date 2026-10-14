@@ -26,16 +26,16 @@ export class ServicioCertificados {
   ): Promise<{ data: Certificado[]; total: number; page: number; limit: number }> {
     const query = this.certificadoRepository
       .createQueryBuilder('certificate')
-      .leftJoinAndSelect('certificate.student', 'student')
-      .leftJoinAndSelect('student.person', 'person')
-      .leftJoinAndSelect('certificate.issuer', 'issuer');
+      .leftJoinAndSelect('certificate.estudiante', 'student')
+      .leftJoinAndSelect('student.persona', 'person')
+      .leftJoinAndSelect('certificate.emisor', 'issuer');
 
     if (gestion) {
       query.andWhere('EXTRACT(YEAR FROM certificate.fecha) = :gestion', { gestion });
     }
 
     if (type) {
-      query.andWhere('certificate.tipo = :type', { tipo: type });
+      query.andWhere('certificate.tipo = :tipo', { tipo: type });
     }
 
     if (studentId) {
@@ -54,7 +54,7 @@ export class ServicioCertificados {
   async findOne(id: number): Promise<Certificado> {
     const certificate = await this.certificadoRepository.findOne({
       where: { id },
-      relations: ['student', 'student.person', 'issuer'],
+      relations: ['estudiante', 'estudiante.persona', 'emisor'],
     });
     if (!certificate) {
       throw new NotFoundException(`Certificado con ID ${id} no encontrado`);
@@ -65,7 +65,7 @@ export class ServicioCertificados {
   async findByCode(code: string): Promise<Certificado> {
     const certificate = await this.certificadoRepository.findOne({
       where: { codigo: undefined },
-      relations: ['student', 'student.person', 'issuer'],
+      relations: ['estudiante', 'estudiante.persona', 'emisor'],
     });
     if (!certificate) {
       throw new NotFoundException(`Certificado con código ${code} no encontrado`);
@@ -87,7 +87,7 @@ export class ServicioCertificados {
   async findByStudent(studentId: number): Promise<Certificado[]> {
     return this.certificadoRepository.find({
       where: { estudianteId: studentId },
-      relations: ['issuer'],
+      relations: ['emisor'],
       order: { fecha: 'DESC' },
     });
   }

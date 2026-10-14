@@ -5,17 +5,17 @@ import { OrigenAdmision } from '../../../entities/admission-request.entity';
 export class CrearAdmisionDto {
   @ApiProperty()
   @IsString()
-  names: string;
+  nombre: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  lastname_paternal?: string;
+  apellidoPaterno?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  lastname_maternal?: string;
+  apellidoMaterno?: string;
 
   @ApiProperty()
   @IsString()
@@ -33,7 +33,7 @@ export class CrearAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  birthplace_other?: string;
+  lugarNacimientoOtro?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -53,7 +53,7 @@ export class CrearAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  nationality_other?: string;
+  nacionalidadOtra?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -87,7 +87,7 @@ export class CrearAdmisionDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  carrera_id?: number;
+  carreraId?: number;
 
   @ApiPropertyOptional()
   @IsOptional()

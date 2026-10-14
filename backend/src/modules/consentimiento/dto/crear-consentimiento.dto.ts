@@ -5,7 +5,7 @@ import { TipoConsentimiento } from '../../../entities/consent-record.entity';
 export class CrearConsentimientoDto {
   @ApiProperty()
   @IsNumber()
-  estudiante_id: number;
+  estudianteId: number;
 
   @ApiProperty()
   @IsString()
@@ -34,5 +34,5 @@ export class CrearConsentimientoDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  registrado_por?: number;
+  registradoPor?: number;
 }

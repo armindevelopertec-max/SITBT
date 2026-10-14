@@ -25,17 +25,17 @@ export class ServicioAsignacionesDocentes {
   ): Promise<{ data: AsignacionDocente[]; total: number; page: number; limit: number }> {
     const query = this.assignmentRepository
       .createQueryBuilder('assignment')
-      .leftJoinAndSelect('assignment.teacher', 'teacher')
-      .leftJoinAndSelect('teacher.person', 'person')
-      .leftJoinAndSelect('assignment.subject', 'subject')
-      .leftJoinAndSelect('assignment.group', 'group');
+      .leftJoinAndSelect('assignment.docente', 'teacher')
+      .leftJoinAndSelect('teacher.persona', 'person')
+      .leftJoinAndSelect('assignment.materia', 'subject')
+      .leftJoinAndSelect('assignment.grupo', 'group');
 
     if (gestion) {
       query.andWhere('assignment.gestion = :gestion', { gestion });
     }
 
     if (status) {
-      query.andWhere('assignment.estado = :status', { estado: status });
+      query.andWhere('assignment.estado = :estado', { estado: status });
     }
 
     const [data, total] = await query
@@ -50,7 +50,7 @@ export class ServicioAsignacionesDocentes {
   async findOne(id: number): Promise<AsignacionDocente> {
     const assignment = await this.assignmentRepository.findOne({
       where: { id },
-      relations: ['teacher', 'teacher.person', 'subject', 'group'],
+      relations: ['docente', 'docente.persona', 'materia', 'grupo'],
     });
     if (!assignment) {
       throw new NotFoundException(`Asignación docente con ID ${id} no encontrada`);
@@ -72,8 +72,8 @@ export class ServicioAsignacionesDocentes {
   async findByTeacher(teacherId: number, gestion?: string): Promise<AsignacionDocente[]> {
     const query = this.assignmentRepository
       .createQueryBuilder('assignment')
-      .leftJoinAndSelect('assignment.subject', 'subject')
-      .leftJoinAndSelect('assignment.group', 'group')
+      .leftJoinAndSelect('assignment.materia', 'subject')
+      .leftJoinAndSelect('assignment.grupo', 'group')
       .where('assignment.docenteId = :teacherId', { teacherId });
 
     if (gestion) {
@@ -86,21 +86,21 @@ export class ServicioAsignacionesDocentes {
   async findByGroup(groupId: number, gestion: string): Promise<AsignacionDocente[]> {
     return this.assignmentRepository.find({
       where: { grupoId: groupId, gestion },
-      relations: ['teacher', 'teacher.person', 'subject'],
+      relations: ['docente', 'docente.persona', 'materia'],
     });
   }
 
   async findBySubject(subjectId: number, gestion: string): Promise<AsignacionDocente[]> {
     return this.assignmentRepository.find({
       where: { materiaId: subjectId, gestion },
-      relations: ['teacher', 'teacher.person', 'group'],
+      relations: ['docente', 'docente.persona', 'grupo'],
     });
   }
 
   async findActive(gestion: string): Promise<AsignacionDocente[]> {
     return this.assignmentRepository.find({
       where: { gestion, estado: EstadoAsignacionDocente.ACTIVO },
-      relations: ['teacher', 'teacher.person', 'subject', 'group'],
+      relations: ['docente', 'docente.persona', 'materia', 'grupo'],
       order: { creadoEn: 'DESC' },
     });
   }

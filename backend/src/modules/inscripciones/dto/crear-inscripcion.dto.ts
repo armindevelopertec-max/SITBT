@@ -32,5 +32,5 @@ export class CrearInscripcionDto {
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
-  final_grade?: number;
+  notaFinal?: number;
 }

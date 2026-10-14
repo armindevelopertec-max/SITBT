@@ -17,7 +17,7 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 import { TipoConsentimiento } from '../../entities/consent-record.entity';
 
 @ApiTags('Consentimiento')
-@Controller('consent')
+@Controller('consentimiento')
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorConsentimiento {

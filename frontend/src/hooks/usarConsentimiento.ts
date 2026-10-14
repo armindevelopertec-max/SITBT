@@ -7,7 +7,7 @@ export function usarConsentimiento() {
   const [error, setError] = useState<string | null>(null);
 
   const createConsent = async (data: {
-    estudiante_id: number;
+    estudianteId: number;
     versionPolitica: string;
     nombreTutor?: string;
     ciTutor?: string;

@@ -11,5 +11,5 @@ export class ActualizarConsentimientoDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  registrado_por?: number;
+  registradoPor?: number;
 }

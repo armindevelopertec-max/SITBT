@@ -60,20 +60,20 @@ export class ControladorConvalidaciones {
     return this.service.update(id, updateDto);
   }
 
-  @Patch(':id/approve')
+  @Patch(':id/aprobar')
   approve(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { approvedBy: number; resolutionNumber?: string; resolutionDate?: string },
+    @Body() body: { aprobadoPor: number; numeroResolucion?: string; fechaResolucion?: string },
   ) {
     return this.service.approve(
       id,
-      body.approvedBy,
-      body.resolutionNumber,
-      body.resolutionDate ? new Date(body.resolutionDate) : undefined,
+      body.aprobadoPor,
+      body.numeroResolucion,
+      body.fechaResolucion ? new Date(body.fechaResolucion) : undefined,
     );
   }
 
-  @Patch(':id/reject')
+  @Patch(':id/rechazar')
   reject(@Param('id', ParseIntPipe) id: number) {
     return this.service.reject(id);
   }

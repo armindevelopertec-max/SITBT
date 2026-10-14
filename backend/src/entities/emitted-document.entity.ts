@@ -59,7 +59,7 @@ export class DocumentoEmitido {
   fechaEmision: Date;
 
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'ruta_pdf' })
-  pdfPath: string;
+  rutaPdf: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'entregadoA' })
   entregadoA: string;

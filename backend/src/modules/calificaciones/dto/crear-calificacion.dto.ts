@@ -21,61 +21,61 @@ export class CrearCalificacionDto {
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
-  partial_1?: number;
+  parcial1?: number;
 
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
-  partial_2?: number;
+  parcial2?: number;
 
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
-  final_average?: number;
+  promedioFinal?: number;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MaxLength(30)
-  observation?: string;
+  observacion?: string;
 
   @ApiPropertyOptional({ enum: EstadoCalificacionRegular })
   @IsEnum(EstadoCalificacionRegular)
   @IsOptional()
-  status_regular?: EstadoCalificacionRegular;
+  estadoRegular?: EstadoCalificacionRegular;
 
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
-  second_turn_eligible?: boolean;
+  aptoSegundaTurno?: boolean;
 
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
-  second_turn_score?: number;
+  notaSegundaTurno?: number;
 
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
-  second_turn_applied?: boolean;
+  segundaTurnoAplicado?: boolean;
 
   @ApiPropertyOptional({ enum: EstadoCalificacion2T })
   @IsEnum(EstadoCalificacion2T)
   @IsOptional()
-  status_2t?: EstadoCalificacion2T;
+  estado2T?: EstadoCalificacion2T;
 
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
-  definitive_grade?: number;
+  notaDefinitiva?: number;
 
   @ApiPropertyOptional({ enum: EstadoCalificacionDefinitivo })
   @IsEnum(EstadoCalificacionDefinitivo)
   @IsOptional()
-  status_definitivo?: EstadoCalificacionDefinitivo;
+  estadoDefinitivo?: EstadoCalificacionDefinitivo;
 
   @ApiPropertyOptional()
   @IsInt()
   @IsOptional()
-  registered_by?: number;
+  registradoPor?: number;
 }
