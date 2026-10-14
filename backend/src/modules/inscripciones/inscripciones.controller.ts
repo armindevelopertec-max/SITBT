@@ -52,23 +52,23 @@ export class ControladorInscripciones {
   }
 
   @Get('estudiante/:estudianteId')
-  findByStudent(@Param('studentId', ParseIntPipe) studentId: number, @Query('gestion') gestion?: string) {
-    return this.enrollmentsService.findByStudent(studentId, gestion);
+  findByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number, @Query('gestion') gestion?: string) {
+    return this.enrollmentsService.findByStudent(estudianteId, gestion);
   }
 
   @Get('estudiante/:estudianteId/historial-academico')
-  getAcademicRecord(@Param('studentId', ParseIntPipe) studentId: number) {
-    return this.enrollmentsService.getStudentAcademicRecord(studentId);
+  getAcademicRecord(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
+    return this.enrollmentsService.getStudentAcademicRecord(estudianteId);
   }
 
   @Get('materia/:materiaId')
-  findBySubject(@Param('subjectId', ParseIntPipe) subjectId: number, @Query('gestion') gestion: string) {
-    return this.enrollmentsService.findBySubject(subjectId, gestion);
+  findBySubject(@Param('materiaId', ParseIntPipe) materiaId: number, @Query('gestion') gestion: string) {
+    return this.enrollmentsService.findBySubject(materiaId, gestion);
   }
 
   @Get('grupo/:grupoId')
-  findByGroup(@Param('groupId', ParseIntPipe) groupId: number, @Query('gestion') gestion: string) {
-    return this.enrollmentsService.findByGroup(groupId, gestion);
+  findByGroup(@Param('grupoId', ParseIntPipe) grupoId: number, @Query('gestion') gestion: string) {
+    return this.enrollmentsService.findByGroup(grupoId, gestion);
   }
 
   @Get(':id')

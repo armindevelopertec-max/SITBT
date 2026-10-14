@@ -49,13 +49,13 @@ export class ControladorPagos {
   }
 
   @Get('estudiante/:estudianteId')
-  findByStudent(@Param('studentId', ParseIntPipe) studentId: number, @Query('gestion') gestion?: string) {
-    return this.service.findByStudent(studentId, gestion);
+  findByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number, @Query('gestion') gestion?: string) {
+    return this.service.findByStudent(estudianteId, gestion);
   }
 
   @Get('estudiante/:estudianteId/deuda')
-  getStudentDebt(@Param('studentId', ParseIntPipe) studentId: number, @Query('gestion') gestion: string) {
-    return this.service.getStudentDebt(studentId, gestion);
+  getStudentDebt(@Param('estudianteId', ParseIntPipe) estudianteId: number, @Query('gestion') gestion: string) {
+    return this.service.getStudentDebt(estudianteId, gestion);
   }
 
   @Get('recaudacion-diaria')

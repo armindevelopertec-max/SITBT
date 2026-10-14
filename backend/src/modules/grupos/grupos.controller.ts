@@ -87,12 +87,12 @@ export class ControladorGrupos {
   }
 
   @Post(':id/estudiantes/:estudianteId')
-  addStudent(@Param('id', ParseIntPipe) id: number, @Param('studentId', ParseIntPipe) studentId: number) {
-    return this.groupsService.addStudent(id, studentId);
+  addStudent(@Param('id', ParseIntPipe) id: number, @Param('estudianteId', ParseIntPipe) estudianteId: number) {
+    return this.groupsService.addStudent(id, estudianteId);
   }
 
   @Delete(':id/estudiantes/:estudianteId')
-  removeStudent(@Param('id', ParseIntPipe) id: number, @Param('studentId', ParseIntPipe) studentId: number) {
-    return this.groupsService.removeStudent(id, studentId);
+  removeStudent(@Param('id', ParseIntPipe) id: number, @Param('estudianteId', ParseIntPipe) estudianteId: number) {
+    return this.groupsService.removeStudent(id, estudianteId);
   }
 }

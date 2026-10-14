@@ -40,23 +40,23 @@ export class ControladorCalificaciones {
   }
 
   @Get('estudiante/:estudianteId')
-  getGradesByStudent(@Param('studentId', ParseIntPipe) studentId: number, @Query('gestion') gestion?: string) {
-    return this.gradesService.getGradesByStudent(studentId, gestion);
+  getGradesByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number, @Query('gestion') gestion?: string) {
+    return this.gradesService.getGradesByStudent(estudianteId, gestion);
   }
 
   @Get('grupo/:grupoId')
-  getGradesByGroup(@Param('groupId', ParseIntPipe) groupId: number, @Query('gestion') gestion: string) {
-    return this.gradesService.getGradesByGroup(groupId, gestion);
+  getGradesByGroup(@Param('grupoId', ParseIntPipe) grupoId: number, @Query('gestion') gestion: string) {
+    return this.gradesService.getGradesByGroup(grupoId, gestion);
   }
 
   @Get('inscripcion/:inscripcionId')
-  findByEnrollment(@Param('enrollmentId', ParseIntPipe) enrollmentId: number) {
-    return this.gradesService.findByEnrollment(enrollmentId);
+  findByEnrollment(@Param('inscripcionId', ParseIntPipe) inscripcionId: number) {
+    return this.gradesService.findByEnrollment(inscripcionId);
   }
 
   @Get('inscripcion/:inscripcionId/historial')
-  getGradeHistory(@Param('enrollmentId', ParseIntPipe) enrollmentId: number) {
-    return this.gradesService.getGradeHistory(enrollmentId);
+  getGradeHistory(@Param('inscripcionId', ParseIntPipe) inscripcionId: number) {
+    return this.gradesService.getGradeHistory(inscripcionId);
   }
 
   @Get(':id')

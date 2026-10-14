@@ -43,8 +43,8 @@ export class ControladorAuditoria {
   }
 
   @Get('usuario/:usuarioId')
-  findByUser(@Param('userId', ParseIntPipe) userId: number, @Query('limite') limit = 50) {
-    return this.service.findByUser(userId, +limit);
+  findByUser(@Param('usuarioId', ParseIntPipe) usuarioId: number, @Query('limite') limit = 50) {
+    return this.service.findByUser(usuarioId, +limit);
   }
 
   @Get('tabla/:tabla')
@@ -53,8 +53,8 @@ export class ControladorAuditoria {
   }
 
   @Get('registro/:tabla/:registroId')
-  findByRecord(@Param('tabla') tableName: string, @Param('recordId', ParseIntPipe) recordId: number) {
-    return this.service.findByRecord(tableName, recordId);
+  findByRecord(@Param('tabla') tableName: string, @Param('registroId', ParseIntPipe) registroId: number) {
+    return this.service.findByRecord(tableName, registroId);
   }
 
   @Get('recientes')

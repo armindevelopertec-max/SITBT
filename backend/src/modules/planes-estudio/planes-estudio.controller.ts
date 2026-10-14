@@ -45,13 +45,13 @@ export class ControladorPlanesEstudio {
   }
 
   @Get('por-carrera/:carreraId')
-  findByCareer(@Param('careerId', ParseIntPipe) careerId: number) {
-    return this.studyPlansService.findByCareer(careerId);
+  findByCareer(@Param('carreraId', ParseIntPipe) carreraId: number) {
+    return this.studyPlansService.findByCareer(carreraId);
   }
 
   @Get('actual/:carreraId')
-  findCurrentByCareer(@Param('careerId', ParseIntPipe) careerId: number) {
-    return this.studyPlansService.findCurrentByCareer(careerId);
+  findCurrentByCareer(@Param('carreraId', ParseIntPipe) carreraId: number) {
+    return this.studyPlansService.findCurrentByCareer(carreraId);
   }
 
   @Get(':id')

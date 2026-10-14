@@ -23,7 +23,7 @@ BEGIN
   SELECT id INTO v_carrera_id FROM carreras WHERE codigo = 'AUT';
   IF v_carrera_id IS NULL THEN
     INSERT INTO carreras (codigo, nombre, titulo, area, horas_carga, estado, descripcion, creado_en, actualizado_en)
-      VALUES ('AUT', 'Autotrónica', 'Técnico en Autotrónica', 'Tecnología', 3600, 'activo', 'Plan importado de autotronica.json', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      VALUES ('AUT', 'Autotrónica', 'Técnico en Autotrónica', 'Tecnología', 3600, 'activo', 'Formación técnica en diagnóstico, mantenimiento y reparación de los sistemas eléctricos, electrónicos y mecánicos del automóvil, con énfasis en vehículos de inyección electrónica e híbridos.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       RETURNING id INTO v_carrera_id;
   END IF;
 
@@ -181,7 +181,7 @@ BEGIN
   SELECT id INTO v_carrera_id FROM carreras WHERE codigo = 'MEC';
   IF v_carrera_id IS NULL THEN
     INSERT INTO carreras (codigo, nombre, titulo, area, horas_carga, estado, descripcion, creado_en, actualizado_en)
-      VALUES ('MEC', 'Mecánica Automotriz', 'Técnico en Mecánica Automotriz', 'Tecnología', 3600, 'activo', 'Plan importado de mecanica_automotriz.json', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      VALUES ('MEC', 'Mecánica Automotriz', 'Técnico en Mecánica Automotriz', 'Tecnología', 3600, 'activo', 'Formación técnica en mantenimiento y reparación de motores a gasolina y diésel, transmisiones, sistemas de inyección y electrónica automotriz, con prácticas de taller especializado.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       RETURNING id INTO v_carrera_id;
   END IF;
 

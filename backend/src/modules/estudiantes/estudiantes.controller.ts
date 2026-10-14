@@ -45,8 +45,8 @@ export class ControladorEstudiantes {
   }
 
   @Get('por-carrera/:carreraId')
-  findByCareer(@Param('careerId', ParseIntPipe) careerId: number, @Query('gestion') gestion?: string) {
-    return this.studentsService.findByCareer(careerId, gestion);
+  findByCareer(@Param('carreraId', ParseIntPipe) carreraId: number, @Query('gestion') gestion?: string) {
+    return this.studentsService.findByCareer(carreraId, gestion);
   }
 
   @Get('activos')

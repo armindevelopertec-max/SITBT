@@ -107,6 +107,33 @@ export class ServicioPlanesEstudio {
     });
   }
 
+  /**
+   * Devuelve el plan de estudio vigente de una carrera junto con sus materias,
+   * en un formato apto para el sitio público (sin datos internos).
+   */
+  async findPublicByCareer(careerId: number): Promise<{ plan: PlanEstudio | null; materias: any[] }> {
+    const planes = await this.findCurrentByCareer(careerId);
+    const plan = planes.length > 0 ? planes[0] : null;
+
+    if (!plan) {
+      return { plan: null, materias: [] };
+    }
+
+    const registros = await this.getMaterias(plan.id);
+    const materias = registros.map((mp) => ({
+      id: mp.id,
+      semestre: mp.semestre,
+      horasSemanales: mp.horasSemanales,
+      codigo: mp.materia?.codigo ?? null,
+      nombre: mp.materia?.nombre ?? null,
+      prerrequisito: mp.prerrequisito
+        ? { codigo: mp.prerrequisito.codigo, nombre: mp.prerrequisito.nombre }
+        : null,
+    }));
+
+    return { plan, materias };
+  }
+
   async addMateria(planId: number, subjectId: number, semestre: number, weeklyHours: number, prerequisiteId?: number): Promise<MateriaPlan> {
     const existing = await this.materiaPlanRepository.findOne({
       where: { planEstudioId: planId, materiaId: subjectId },

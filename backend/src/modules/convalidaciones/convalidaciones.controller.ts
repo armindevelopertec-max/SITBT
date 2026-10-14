@@ -46,8 +46,8 @@ export class ControladorConvalidaciones {
   }
 
   @Get('estudiante/:estudianteId')
-  findByStudent(@Param('studentId', ParseIntPipe) studentId: number) {
-    return this.service.findByStudent(studentId);
+  findByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
+    return this.service.findByStudent(estudianteId);
   }
 
   @Get(':id')

@@ -45,18 +45,18 @@ export class ControladorAsignacionesDocentes {
   }
 
   @Get('docente/:docenteId')
-  findByTeacher(@Param('teacherId', ParseIntPipe) teacherId: number, @Query('gestion') gestion?: string) {
-    return this.service.findByTeacher(teacherId, gestion);
+  findByTeacher(@Param('docenteId', ParseIntPipe) docenteId: number, @Query('gestion') gestion?: string) {
+    return this.service.findByTeacher(docenteId, gestion);
   }
 
   @Get('grupo/:grupoId')
-  findByGroup(@Param('groupId', ParseIntPipe) groupId: number, @Query('gestion') gestion: string) {
-    return this.service.findByGroup(groupId, gestion);
+  findByGroup(@Param('grupoId', ParseIntPipe) grupoId: number, @Query('gestion') gestion: string) {
+    return this.service.findByGroup(grupoId, gestion);
   }
 
   @Get('materia/:materiaId')
-  findBySubject(@Param('subjectId', ParseIntPipe) subjectId: number, @Query('gestion') gestion: string) {
-    return this.service.findBySubject(subjectId, gestion);
+  findBySubject(@Param('materiaId', ParseIntPipe) materiaId: number, @Query('gestion') gestion: string) {
+    return this.service.findBySubject(materiaId, gestion);
   }
 
   @Get(':id')

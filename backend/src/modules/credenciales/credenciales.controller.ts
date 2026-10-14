@@ -45,21 +45,21 @@ export class ControladorCredenciales {
   }
 
   @Get('estudiante/:estudianteId')
-  findByStudent(@Param('studentId', ParseIntPipe) studentId: number) {
-    return this.service.findByStudent(studentId);
+  findByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
+    return this.service.findByStudent(estudianteId);
   }
 
   @Get('estudiante/:estudianteId/gestion/:gestion')
   findByStudentAndGestion(
-    @Param('studentId', ParseIntPipe) studentId: number,
+    @Param('estudianteId', ParseIntPipe) estudianteId: number,
     @Param('gestion') gestion: string,
   ) {
-    return this.service.findByStudentAndGestion(studentId, gestion);
+    return this.service.findByStudentAndGestion(estudianteId, gestion);
   }
 
   @Get('estudiante/:estudianteId/activos')
-  findActiveByStudent(@Param('studentId', ParseIntPipe) studentId: number) {
-    return this.service.findActiveByStudent(studentId);
+  findActiveByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
+    return this.service.findActiveByStudent(estudianteId);
   }
 
   @Get(':id')
