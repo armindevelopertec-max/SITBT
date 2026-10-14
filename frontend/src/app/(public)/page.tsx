@@ -8,60 +8,60 @@ import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 const heroImages = [
   {
     url: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80',
-    title: 'Formación Técnica de Excelencia',
-    subtitle: 'Prepárate para el mercado laboral con educación de calidad'
+    titulo: 'Formación Técnica de Excelencia',
+    subtitulo: 'Prepárate para el mercado laboral con educación de calidad'
   },
   {
     url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1920&q=80',
-    title: 'Talleres Equipados',
-    subtitle: 'Practica con tecnología de vanguardia'
+    titulo: 'Talleres Equipados',
+    subtitulo: 'Practica con tecnología de vanguardia'
   },
   {
     url: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80',
-    title: 'Tu Futuro Comienza Aquí',
-    subtitle: 'Únete a miles de profesionales exitosos'
+    titulo: 'Tu Futuro Comienza Aquí',
+    subtitulo: 'Únete a miles de profesionales exitosos'
   }
 ];
 
 const careers = [
   {
-    name: 'Autotrónica',
-    title: 'Técnico Superior en Autotrónica',
-    code: 'R.M. 1049/2024',
+    nombre: 'Autotrónica',
+    titulo: 'Técnico Superior en Autotrónica',
+    codigo: 'R.M. 1049/2024',
     area: 'Electrónica y Electricidad',
     icon: <Zap className="w-8 h-8" />,
     color: 'bg-primary-500/10 text-primary-400',
-    description: 'Especialización en sistemas electrónicos automotrices, diagnóstico computarizado y tecnologías híbridas.'
+    descripcion: 'Especialización en sistemas electrónicos automotrices, diagnóstico computarizado y tecnologías híbridas.'
   },
   {
-    name: 'Mecánica Automotriz',
-    title: 'Técnico Superior en Mecánica Automotriz',
-    code: 'R.M. 0210/2024',
+    nombre: 'Mecánica Automotriz',
+    titulo: 'Técnico Superior en Mecánica Automotriz',
+    codigo: 'R.M. 0210/2024',
     area: 'Mecánica',
     icon: <Wrench className="w-8 h-8" />,
     color: 'bg-primary-500/10 text-primary-400',
-    description: 'Diagnóstico, mantenimiento y reparación de vehículos automotores con tecnología de punta.'
+    descripcion: 'Diagnóstico, mantenimiento y reparación de vehículos automotores con tecnología de punta.'
   }
 ];
 
 const values = [
-  { icon: <Target className="w-6 h-6" />, title: 'Excelencia', description: 'Formación de calidad con estándares internacionales' },
-  { icon: <Heart className="w-6 h-6" />, title: 'Compromiso', description: 'Dedicación total con cada estudiante' },
-  { icon: <Globe className="w-6 h-6" />, title: 'Innovación', description: 'Tecnología de vanguardia en enseñanza' },
-  { icon: <Shield className="w-6 h-6" />, title: 'Ética', description: 'Valores sólidos en cada profesional' },
+  { icon: <Target className="w-6 h-6" />, titulo: 'Excelencia', descripcion: 'Formación de calidad con estándares internacionales' },
+  { icon: <Heart className="w-6 h-6" />, titulo: 'Compromiso', descripcion: 'Dedicación total con cada estudiante' },
+  { icon: <Globe className="w-6 h-6" />, titulo: 'Innovación', descripcion: 'Tecnología de vanguardia en enseñanza' },
+  { icon: <Shield className="w-6 h-6" />, titulo: 'Ética', descripcion: 'Valores sólidos en cada profesional' },
 ];
 
 const methodology = [
-  { icon: <BookOpen className="w-8 h-8" />, title: 'Clases Teóricas', description: 'Fundamentos técnicos y conceptos fundamentales impartidos por profesores especializados.' },
-  { icon: <Laptop className="w-8 h-8" />, title: 'Prácticas en Talleres', description: 'Experiencia hands-on con equipos y tecnología de última generación.' },
-  { icon: <Users className="w-8 h-8" />, title: 'Tutorías', description: 'Seguimiento personalizado para asegurar tu éxito académico.' },
-  { icon: <Briefcase className="w-8 h-8" />, title: 'Prácticas Profesionales', description: 'Conexión con empresas del sector para tu inserción laboral.' },
+  { icon: <BookOpen className="w-8 h-8" />, titulo: 'Clases Teóricas', descripcion: 'Fundamentos técnicos y conceptos fundamentales impartidos por profesores especializados.' },
+  { icon: <Laptop className="w-8 h-8" />, titulo: 'Prácticas en Talleres', descripcion: 'Experiencia hands-on con equipos y tecnología de última generación.' },
+  { icon: <Users className="w-8 h-8" />, titulo: 'Tutorías', descripcion: 'Seguimiento personalizado para asegurar tu éxito académico.' },
+  { icon: <Briefcase className="w-8 h-8" />, titulo: 'Prácticas Profesionales', descripcion: 'Conexión con empresas del sector para tu inserción laboral.' },
 ];
 
 const authorities = [
-  { name: 'Lic. Juan Pérez', role: 'Director General', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop' },
-  { name: 'Ing. María López', role: 'Jefe Académico', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop' },
-  { name: 'Lic. Carlos Mamani', role: 'Secretario Académico', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
+  { nombre: 'Lic. Juan Pérez', rol: 'Director General', imagen: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop' },
+  { nombre: 'Ing. María López', rol: 'Jefe Académico', imagen: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop' },
+  { nombre: 'Lic. Carlos Mamani', rol: 'Secretario Académico', imagen: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
 ];
 
 export default function HomePage() {
@@ -116,7 +116,7 @@ export default function HomePage() {
 
   return (
     <div className="bg-dark-900">
-      {/* Side Navigation */}
+      {/* Navegación lateral */}
       <nav className="fixed right-6 top-1/2 -translate-y-1/2 z-50 hidden lg:flex flex-col gap-3">
         {navItems.map((item) => (
           <button
@@ -137,7 +137,7 @@ export default function HomePage() {
         ))}
       </nav>
 
-      {/* Hero Slider */}
+      {/* Carrusel principal */}
       <section id="inicio" data-section className="relative h-[65vh] min-h-[500px] overflow-hidden">
         {heroImages.map((slide, index) => (
           <div
@@ -152,10 +152,10 @@ export default function HomePage() {
             <div className="relative z-20 h-full flex items-center justify-center text-center">
               <div className="max-w-4xl px-4 sm:px-6">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-100 mb-4 sm:mb-6 tracking-tight leading-tight">
-                  {slide.title}
+                  {slide.titulo}
                 </h1>
                 <p className="text-lg sm:text-xl md:text-2xl text-primary-400 mb-6 sm:mb-10 max-w-2xl mx-auto">
-                  {slide.subtitle}
+                  {slide.subtitulo}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                   <Link href="/admision/pre-registro" className="px-6 sm:px-8 lg:px-10 py-3 sm:py-4 bg-primary-500 text-dark-900 font-bold rounded-lg hover:bg-primary-400 transition-all text-base sm:text-lg">
@@ -188,7 +188,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* About */}
+      {/* Acerca de */}
       <section id="nosotros" data-section className="bg-dark-900 py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -225,7 +225,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Values */}
+      {/* Valores */}
       <section id="valores" data-section className="bg-dark-800 py-24 border-y border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -241,15 +241,15 @@ export default function HomePage() {
                 <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-4">
                   {value.icon}
                 </div>
-                <h4 className="text-lg font-bold text-gray-100 mb-2">{value.title}</h4>
-                <p className="text-gray-400 text-sm">{value.description}</p>
+                <h4 className="text-lg font-bold text-gray-100 mb-2">{value.titulo}</h4>
+                <p className="text-gray-400 text-sm">{value.descripcion}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Careers */}
+      {/* Carreras */}
       <section id="carreras" data-section className="bg-dark-900 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -265,11 +265,11 @@ export default function HomePage() {
                 <div className={`inline-flex p-4 rounded-xl mb-4 ${career.color}`}>
                   {career.icon}
                 </div>
-                <h3 className="text-2xl font-bold text-gray-100 mb-2">{career.name}</h3>
-                <p className="text-primary-400 font-medium mb-4">{career.title}</p>
-                <p className="text-gray-400 mb-6">{career.description}</p>
+                <h3 className="text-2xl font-bold text-gray-100 mb-2">{career.nombre}</h3>
+                <p className="text-primary-400 font-medium mb-4">{career.titulo}</p>
+                <p className="text-gray-400 mb-6">{career.descripcion}</p>
                 <div className="flex items-center justify-between pt-4 border-t border-dark-600">
-                  <span className="text-sm text-gray-500">{career.code}</span>
+                  <span className="text-sm text-gray-500">{career.codigo}</span>
                   <Link href="/carreras" className="text-primary-400 font-medium text-sm hover:text-primary-300 flex items-center gap-1">
                     Ver plan <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -280,7 +280,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Methodology */}
+      {/* Metodología */}
       <section id="metodologia" data-section className="bg-dark-800 py-24 border-y border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -296,15 +296,15 @@ export default function HomePage() {
                 <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mb-4">
                   {item.icon}
                 </div>
-                <h4 className="text-lg font-bold text-gray-100 mb-2">{item.title}</h4>
-                <p className="text-gray-400 text-sm">{item.description}</p>
+                <h4 className="text-lg font-bold text-gray-100 mb-2">{item.titulo}</h4>
+                <p className="text-gray-400 text-sm">{item.descripcion}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Mission & Vision */}
+      {/* Misión y Visión */}
       <section className="bg-dark-900 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
@@ -334,7 +334,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Authorities */}
+      {/* Autoridades */}
       <section id="autoridades" data-section className="bg-dark-900 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -347,16 +347,16 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8 max-w-3xl mx-auto">
             {authorities.map((auth, index) => (
               <div key={index} className="text-center">
-                <img src={auth.image} alt={auth.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-2 border-dark-600" />
-                <h4 className="text-lg font-bold text-gray-100">{auth.name}</h4>
-                <p className="text-primary-400 font-medium">{auth.role}</p>
+                <img src={auth.imagen} alt={auth.nombre} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-2 border-dark-600" />
+                <h4 className="text-lg font-bold text-gray-100">{auth.nombre}</h4>
+                <p className="text-primary-400 font-medium">{auth.rol}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Location */}
+      {/* Ubicación */}
       <section id="ubicacion" data-section className="bg-dark-800 py-16 sm:py-24 border-t border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
@@ -383,8 +383,8 @@ export default function HomePage() {
                 <div className="flex items-start gap-4">
                   <Mail className="w-6 h-6 text-primary-400 mt-1" />
                   <div>
-                    <h4 className="font-semibold text-gray-100">Email</h4>
-                    <p className="text-gray-400">{institucion?.email || 'ITBT@edu.bo'}</p>
+                    <h4 className="font-semibold text-gray-100">Correo</h4>
+                    <p className="text-gray-400">{institucion?.correo || 'ITBT@edu.bo'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -412,7 +412,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Llamada a la acción */}
       <section className="bg-dark-700 py-24 border-t border-dark-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-100 mb-6">¿Listo para comenzar tu carrera técnica?</h2>

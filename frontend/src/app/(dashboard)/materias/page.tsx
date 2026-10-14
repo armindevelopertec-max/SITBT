@@ -12,8 +12,8 @@ import { Search, Plus, Edit2, Trash2, Loader2 } from 'lucide-react';
 
 interface Materia {
   id: number;
-  code: string;
-  name: string;
+  codigo: string;
+  nombre: string;
 }
 
 export default function MateriasPage() {
@@ -34,7 +34,7 @@ export default function MateriasPage() {
       const response = await api.get('/materias/all');
       setMaterias(response.data || []);
     } catch (error) {
-      console.error('Error fetching materias:', error);
+      console.error('Error al obtener las materias:', error);
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,7 @@ export default function MateriasPage() {
       setDeletingMateria(null);
       fetchMaterias();
     } catch (error) {
-      console.error('Error deleting materia:', error);
+      console.error('Error al eliminar la materia:', error);
       alert('Error al eliminar la materia');
     } finally {
       setSaving(false);
@@ -57,8 +57,8 @@ export default function MateriasPage() {
   };
 
   const filteredMaterias = materias.filter(m =>
-    m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    m.code.toLowerCase().includes(searchQuery.toLowerCase())
+    m.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    m.codigo.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) {
@@ -103,8 +103,8 @@ export default function MateriasPage() {
               className="flex items-center justify-between p-2 border rounded hover:bg-gray-50 group"
             >
               <div className="flex-1 mr-2">
-                <p className="text-[10px] text-primary-600 font-medium">{materia.code}</p>
-                <p className="text-sm font-medium break-words">{materia.name}</p>
+                <p className="text-[10px] text-primary-600 font-medium">{materia.codigo}</p>
+                <p className="text-sm font-medium break-words">{materia.nombre}</p>
               </div>
               <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Boton variant="ghost" size="icon" className="h-6 w-6" onClick={() => router.push(`/materias/${materia.id}`)}>
@@ -124,7 +124,7 @@ export default function MateriasPage() {
         onClose={() => { setDeleteModalOpen(false); setDeletingMateria(null); }}
         onConfirm={handleDelete}
         title="Eliminar Materia"
-        message={`¿Eliminar "${deletingMateria?.name}"?`}
+        message={`¿Eliminar "${deletingMateria?.nombre}"?`}
         confirmText="Eliminar"
         variant="destructive"
         loading={saving}

@@ -15,20 +15,20 @@ import { Search, Plus, Edit2, Trash2, Loader2, BookOpen } from 'lucide-react';
 
 interface PlanEstudio {
   id: number;
-  career_id: number;
-  rm_number: string;
-  rm_date: string;
+  carreraId: number;
+  numeroRm: string;
+  fechaRm: string;
   estado: 'vigente' | 'historico';
-  notes: string | null;
-  carrera?: { id: number; code: string; name: string };
-  created_at: string;
-  updated_at: string;
+  notas: string | null;
+  carrera?: { id: number; codigo: string; nombre: string };
+  creadoEn: string;
+  actualizadoEn: string;
 }
 
 interface Carrera {
   id: number;
-  code: string;
-  name: string;
+  codigo: string;
+  nombre: string;
 }
 
 export default function PlanesEstudioPage() {
@@ -57,7 +57,7 @@ export default function PlanesEstudioPage() {
       const response = await api.get(`/planes-estudio?${params.toString()}`);
       setPlanes(response.data.data?.data || response.data.data || []);
     } catch (error) {
-      console.error('Error fetching planes:', error);
+      console.error('Error al obtener los planes:', error);
     } finally {
       setLoading(false);
     }
@@ -68,7 +68,7 @@ export default function PlanesEstudioPage() {
       const response = await api.get('/carreras/active');
       setCarreras(response.data || []);
     } catch (error) {
-      console.error('Error fetching carreras:', error);
+      console.error('Error al obtener las carreras:', error);
     }
   };
 
@@ -86,7 +86,7 @@ export default function PlanesEstudioPage() {
       setDeletingPlan(null);
       fetchPlanes();
     } catch (error) {
-      console.error('Error deleting plan:', error);
+      console.error('Error al eliminar el plan:', error);
     } finally {
       setSaving(false);
     }
@@ -95,9 +95,9 @@ export default function PlanesEstudioPage() {
   const filteredPlanes = planes.filter(p => {
     const searchLower = searchQuery.toLowerCase();
     return (
-      p.rm_number.toLowerCase().includes(searchLower) ||
-      (p.carrera?.name && p.carrera.name.toLowerCase().includes(searchLower)) ||
-      (p.carrera?.code && p.carrera.code.toLowerCase().includes(searchLower))
+      p.numeroRm.toLowerCase().includes(searchLower) ||
+      (p.carrera?.nombre && p.carrera.nombre.toLowerCase().includes(searchLower)) ||
+      (p.carrera?.codigo && p.carrera.codigo.toLowerCase().includes(searchLower))
     );
   });
 
@@ -140,7 +140,7 @@ export default function PlanesEstudioPage() {
                 onChange={(e) => setFilterCarrera(e.target.value)}
                 options={[
                   { value: '', label: 'Todas las carreras' },
-                  ...carreras.map(c => ({ value: c.id.toString(), label: c.name })),
+                  ...carreras.map(c => ({ value: c.id.toString(), label: c.nombre })),
                 ]}
                 placeholder="Carrera"
               />
@@ -178,9 +178,9 @@ export default function PlanesEstudioPage() {
               ) : (
                 filteredPlanes.map((plan) => (
                   <FilaTabla key={plan.id}>
-                    <CeldaTabla className="font-medium">{plan.rm_number}</CeldaTabla>
-                    <CeldaTabla>{new Date(plan.rm_date).toLocaleDateString()}</CeldaTabla>
-                    <CeldaTabla>{plan.carrera?.name || '-'}</CeldaTabla>
+                    <CeldaTabla className="font-medium">{plan.numeroRm}</CeldaTabla>
+                    <CeldaTabla>{new Date(plan.fechaRm).toLocaleDateString()}</CeldaTabla>
+                    <CeldaTabla>{plan.carrera?.nombre || '-'}</CeldaTabla>
                     <CeldaTabla>
                       <Insignia variant={plan.estado === 'vigente' ? 'exito' : 'secondary'}>
                         {plan.estado}
@@ -212,7 +212,7 @@ export default function PlanesEstudioPage() {
         onClose={() => { setDeleteModalOpen(false); setDeletingPlan(null); }}
         onConfirm={handleDelete}
         title="Eliminar Plan de Estudio"
-        message={`¿Estás seguro de eliminar el plan "${deletingPlan?.rm_number}"? Esta acción no se puede deshacer.`}
+        message={`¿Estás seguro de eliminar el plan "${deletingPlan?.numeroRm}"? Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
         variant="destructive"
         loading={saving}

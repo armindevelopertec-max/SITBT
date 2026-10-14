@@ -7,31 +7,31 @@ import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 const processSteps = [
   {
     step: 1,
-    title: 'Pre-registro',
-    description: 'Llena el formulario en línea con tus datos personales y académicos',
+    titulo: 'Pre-registro',
+    descripcion: 'Llena el formulario en línea con tus datos personales y académicos',
     icon: <FileText className="w-5 h-5" />,
   },
   {
     step: 2,
-    title: 'Verificación',
-    description: 'Presenta tus documentos originales en secretaría',
+    titulo: 'Verificación',
+    descripcion: 'Presenta tus documentos originales en secretaría',
     icon: <CheckCircle className="w-5 h-5" />,
   },
   {
     step: 3,
-    title: 'Pago',
-    description: 'Realiza el pago de la matrícula',
+    titulo: 'Pago',
+    descripcion: 'Realiza el pago de la matrícula',
     icon: <CreditCard className="w-5 h-5" />,
   },
   {
     step: 4,
-    title: 'Formalización',
-    description: 'Recibe tu comprobante y carnet de estudiante',
+    titulo: 'Formalización',
+    descripcion: 'Recibe tu comprobante y carnet de estudiante',
     icon: <Users className="w-5 h-5" />,
   },
 ];
 
-const requirements = [
+const requisitos = [
   'Cédula de Identidad (original y 2 copias)',
   'Certificado de nacimiento (original y 2 copias)',
   'Título de bachiller o diploma (original y 2 copias)',
@@ -41,9 +41,9 @@ const requirements = [
   'Pago de formulario (Bs. 150)',
 ];
 
-const costs = [
-  { amount: 'Bs. 150', concept: 'Formulario de inscripción' },
-  { amount: 'Bs. 400', concept: 'Matrícula semestral' },
+const costos = [
+  { monto: 'Bs. 150', concepto: 'Formulario de inscripción' },
+  { monto: 'Bs. 400', concepto: 'Matrícula semestral' },
 ];
 
 
@@ -53,7 +53,7 @@ export default function AdmisionPage() {
 
   return (
     <div>
-      {/* Hero */}
+      {/* Encabezado */}
       <section className="relative h-64 sm:h-80 overflow-hidden bg-dark-800">
         <div className="absolute inset-0 opacity-30">
           <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80" alt="" className="w-full h-full object-cover" />
@@ -68,7 +68,7 @@ export default function AdmisionPage() {
         </div>
       </section>
 
-      {/* Process */}
+      {/* Proceso */}
       <section className="bg-dark-900 py-16 sm:py-24 border-y border-dark-600">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 sm:mb-16">
@@ -105,8 +105,8 @@ export default function AdmisionPage() {
                         <div className={`w-14 h-14 ${c.bgLight} ${c.text} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
                           {step.icon}
                         </div>
-                        <h4 className="text-xl font-bold text-gray-100 mb-2">{step.title}</h4>
-                        <p className="text-gray-400 text-sm">{step.description}</p>
+                        <h4 className="text-xl font-bold text-gray-100 mb-2">{step.titulo}</h4>
+                        <p className="text-gray-400 text-sm">{step.descripcion}</p>
                       </div>
                     </div>
                   </div>
@@ -123,14 +123,14 @@ export default function AdmisionPage() {
         </div>
       </section>
 
-      {/* Requirements & Costs */}
+      {/* Requisitos y costos */}
       <section className="bg-dark-700 py-16 sm:py-24 border-y border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8 sm:gap-12">
             <div>
               <h3 className="text-xl sm:text-2xl font-bold text-gray-100 mb-4 sm:mb-6">Requisitos</h3>
               <ul className="space-y-4">
-                {requirements.map((req, index) => (
+                {requisitos.map((req, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 text-primary-400 mt-0.5 flex-shrink-0" />
                     <span className="text-gray-300">{req}</span>
@@ -142,10 +142,10 @@ export default function AdmisionPage() {
             <div>
               <h3 className="text-xl sm:text-2xl font-bold text-gray-100 mb-4 sm:mb-6">Costos</h3>
               <div className="space-y-4">
-                {costs.map((cost, index) => (
+                {costos.map((cost, index) => (
                   <div key={index} className="bg-dark-700 border border-dark-600 rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span className="text-gray-300">{cost.concept}</span>
-                    <span className="text-xl sm:text-2xl font-bold text-primary-400">{cost.amount}</span>
+                    <span className="text-gray-300">{cost.concepto}</span>
+                    <span className="text-xl sm:text-2xl font-bold text-primary-400">{cost.monto}</span>
                   </div>
                 ))}
               </div>

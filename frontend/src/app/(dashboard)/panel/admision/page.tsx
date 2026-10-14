@@ -26,62 +26,62 @@ const originLabels: Record<string, string> = {
 
 interface SolicitudAdmision {
   id: string;
-  names: string;
-  lastname_paternal: string;
-  lastname_maternal: string;
+  nombre: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
   ci: string;
-  ci_issued: string;
-  birthdate: string;
-  phone: string;
-  email: string;
-  address: string;
+  ciExpedido: string;
+  fechaNacimiento: string;
+  telefono: string;
+  correo: string;
+  direccion: string;
   nombreTutor: string;
   ciTutor: string;
   telefonoTutor: string;
-  gender: string;
-  birthplace: string;
-  marital_status: string;
-  nationality: string;
-  carrera_id: number;
-  carrera: { id: number; name: string } | null;
+  genero: string;
+  lugarNacimiento: string;
+  estadoCivil: string;
+  nacionalidad: string;
+  carreraId: number;
+  carrera: { id: number; nombre: string } | null;
   estado: string;
   observaciones: string;
-  verificado_por: number;
+  verificadoPor: number;
   fechaVerificacion: string;
   origen: string;
-  converted_student_id: number;
-  created_at: string;
+  estudianteConvertidoId: number;
+  creadoEn: string;
 }
 
 interface Carrera {
   id: number;
-  name: string;
-  code: string;
+  nombre: string;
+  codigo: string;
 }
 
 interface StudyPlan {
   id: number;
-  career_id: number;
-  rm_number: string;
+  carreraId: number;
+  numeroRm: string;
 }
 
 interface EditFormData {
-  names: string;
-  lastname_paternal: string;
-  lastname_maternal: string;
+  nombre: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
   ci: string;
-  birthdate: string;
-  birthplace: string;
-  gender: string;
-  marital_status: string;
-  nationality: string;
-  phone: string;
-  email: string;
-  address: string;
+  fechaNacimiento: string;
+  lugarNacimiento: string;
+  genero: string;
+  estadoCivil: string;
+  nacionalidad: string;
+  telefono: string;
+  correo: string;
+  direccion: string;
   nombreTutor: string;
   ciTutor: string;
   telefonoTutor: string;
-  carrera_id: number;
+  carreraId: number;
 }
 
 interface DetalleModalData {
@@ -91,14 +91,14 @@ interface DetalleModalData {
 }
 
 interface ConvertFormData {
-  admission_gestion: string;
-  admission_date: string;
-  career_id: number;
-  study_plan_id: number;
-  folder_number: string;
-  form01_code: string;
-  bachelor_title_number: string;
-  bachelor_title_date: string;
+  gestionAdmision: string;
+  fechaAdmision: string;
+  carreraId: number;
+  planEstudioId: number;
+  numeroFolder: string;
+  codigoFormulario01: string;
+  numeroTituloBachiller: string;
+  fechaTituloBachiller: string;
 }
 
 export default function AdmisionPage() {
@@ -122,14 +122,14 @@ export default function AdmisionPage() {
   const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
   const [gestiones, setGestiones] = useState<string[]>([]);
   const [convertForm, setConvertForm] = useState<ConvertFormData>({
-    admission_gestion: new Date().getFullYear().toString(),
-    admission_date: new Date().toISOString().split('T')[0],
-    career_id: 0,
-    study_plan_id: 0,
-    folder_number: '',
-    form01_code: '',
-    bachelor_title_number: '',
-    bachelor_title_date: '',
+    gestionAdmision: new Date().getFullYear().toString(),
+    fechaAdmision: new Date().toISOString().split('T')[0],
+    carreraId: 0,
+    planEstudioId: 0,
+    numeroFolder: '',
+    codigoFormulario01: '',
+    numeroTituloBachiller: '',
+    fechaTituloBachiller: '',
   });
 
   useEffect(() => {
@@ -143,7 +143,7 @@ export default function AdmisionPage() {
       const response = await api.get('/admision');
       setAdmissions(response.data.data);
     } catch (error) {
-      console.error('Error fetching admissions:', error);
+      console.error('Error al obtener las admisiones:', error);
     } finally {
       setLoading(false);
     }
@@ -154,7 +154,7 @@ export default function AdmisionPage() {
       const response = await api.get('/carreras/active');
       setCareers(response.data || []);
     } catch (error) {
-      console.error('Error fetching careers:', error);
+      console.error('Error al obtener las carreras:', error);
     }
   };
 
@@ -163,12 +163,12 @@ export default function AdmisionPage() {
       const response = await api.get('/gestiones');
       const data = response.data;
       if (Array.isArray(data)) {
-        setGestiones(data.map((g: any) => g.year || g.gestion || g));
+        setGestiones(data.map((g: any) => g.anio || g.gestion || g));
       } else if (data.data) {
-        setGestiones(data.data.map((g: any) => g.year || g.gestion || g));
+        setGestiones(data.data.map((g: any) => g.anio || g.gestion || g));
       }
     } catch (error) {
-      console.error('Error fetching gestiones:', error);
+      console.error('Error al obtener las gestiones:', error);
       setGestiones([new Date().getFullYear().toString()]);
     }
   };
@@ -178,7 +178,7 @@ export default function AdmisionPage() {
       const response = await api.get(`/planes-estudio/current/${careerId}`);
       setStudyPlans(response.data || []);
     } catch (error) {
-      console.error('Error fetching study plans:', error);
+      console.error('Error al obtener los planes de estudio:', error);
       setStudyPlans([]);
     }
   };
@@ -186,17 +186,17 @@ export default function AdmisionPage() {
   const handleOpenConvert = (request: SolicitudAdmision) => {
     setConvertirModal(request);
     setConvertForm({
-      admission_gestion: new Date().getFullYear().toString(),
-      admission_date: new Date().toISOString().split('T')[0],
-      career_id: request.carrera_id || 0,
-      study_plan_id: 0,
-      folder_number: '',
-      form01_code: '',
-      bachelor_title_number: '',
-      bachelor_title_date: '',
+      gestionAdmision: new Date().getFullYear().toString(),
+      fechaAdmision: new Date().toISOString().split('T')[0],
+      carreraId: request.carreraId || 0,
+      planEstudioId: 0,
+      numeroFolder: '',
+      codigoFormulario01: '',
+      numeroTituloBachiller: '',
+      fechaTituloBachiller: '',
     });
-    if (request.carrera_id) {
-      fetchStudyPlans(request.carrera_id);
+    if (request.carreraId) {
+      fetchStudyPlans(request.carreraId);
     }
   };
 
@@ -205,13 +205,13 @@ export default function AdmisionPage() {
     setFormLoading(true);
     try {
       await api.post(`/admision/${convertirModal.id}/convert-to-student`, {
-        admissionGestion: convertForm.admission_gestion,
+        admissionGestion: convertForm.gestionAdmision,
       });
 
       setConvertirModal(null);
       fetchAdmissions();
     } catch (error: any) {
-      console.error('Error converting:', error);
+      console.error('Error al convertir:', error);
       alert(error.response?.data?.message || 'Error al convertir a estudiante');
     } finally {
       setFormLoading(false);
@@ -219,7 +219,7 @@ export default function AdmisionPage() {
   };
 
   const filteredAdmissions = admissions.filter((admission) => {
-    const fullName = `${admission.names} ${admission.lastname_paternal || ''} ${admission.lastname_maternal || ''}`.toLowerCase();
+    const fullName = `${admission.nombre} ${admission.apellidoPaterno || ''} ${admission.apellidoMaterno || ''}`.toLowerCase();
     const ci = admission.ci.toLowerCase();
     const search = searchTerm.toLowerCase();
     const matchesSearch = fullName.includes(search) || ci.includes(search);
@@ -233,10 +233,10 @@ export default function AdmisionPage() {
     return <Insignia className={config.color}>{config.label}</Insignia>;
   };
 
-  const isMinor = (birthdate: string): boolean => {
-    if (!birthdate) return false;
+  const isMinor = (fechaNacimiento: string): boolean => {
+    if (!fechaNacimiento) return false;
     const hoy = new Date();
-    const nacimiento = new Date(birthdate);
+    const nacimiento = new Date(fechaNacimiento);
     const edad = hoy.getFullYear() - nacimiento.getFullYear();
     const mesDiff = hoy.getMonth() - nacimiento.getMonth();
     const diaDiff = hoy.getDate() - nacimiento.getDate();
@@ -256,7 +256,7 @@ export default function AdmisionPage() {
       setObservaciones('');
       fetchAdmissions();
     } catch (error) {
-      console.error('Error verifying:', error);
+      console.error('Error al verificar:', error);
     } finally {
       setFormLoading(false);
     }
@@ -274,7 +274,7 @@ export default function AdmisionPage() {
       setObservaciones('');
       fetchAdmissions();
     } catch (error) {
-      console.error('Error rejecting:', error);
+      console.error('Error al rechazar:', error);
     } finally {
       setFormLoading(false);
     }
@@ -288,7 +288,7 @@ export default function AdmisionPage() {
       setDeleteModal(null);
       fetchAdmissions();
     } catch (error) {
-      console.error('Error deleting:', error);
+      console.error('Error al eliminar:', error);
     } finally {
       setFormLoading(false);
     }
@@ -296,22 +296,22 @@ export default function AdmisionPage() {
 
   const handleEnableEdit = (request: SolicitudAdmision) => {
     setEditForm({
-      names: request.names,
-      lastname_paternal: request.lastname_paternal || '',
-      lastname_maternal: request.lastname_maternal || '',
+      nombre: request.nombre,
+      apellidoPaterno: request.apellidoPaterno || '',
+      apellidoMaterno: request.apellidoMaterno || '',
       ci: request.ci,
-      birthdate: request.birthdate,
-      birthplace: request.birthplace || '',
-      gender: request.gender || '',
-      marital_status: request.marital_status || '',
-      nationality: request.nationality || '',
-      phone: request.phone || '',
-      email: request.email,
-      address: request.address || '',
+      fechaNacimiento: request.fechaNacimiento,
+      lugarNacimiento: request.lugarNacimiento || '',
+      genero: request.genero || '',
+      estadoCivil: request.estadoCivil || '',
+      nacionalidad: request.nacionalidad || '',
+      telefono: request.telefono || '',
+      correo: request.correo,
+      direccion: request.direccion || '',
       nombreTutor: request.nombreTutor || '',
       ciTutor: request.ciTutor || '',
       telefonoTutor: request.telefonoTutor || '',
-      carrera_id: request.carrera_id,
+      carreraId: request.carreraId,
     });
     setDetalleModal({ request, showConvert: request.estado === 'verificado', editMode: true });
   };
@@ -332,7 +332,7 @@ export default function AdmisionPage() {
       setEditForm(null);
       fetchAdmissions();
     } catch (error) {
-      console.error('Error updating:', error);
+      console.error('Error al actualizar:', error);
       alert('Error al actualizar los datos');
     } finally {
       setFormLoading(false);
@@ -413,17 +413,17 @@ export default function AdmisionPage() {
               {filteredAdmissions.map((admission) => (
                 <FilaTabla key={admission.id}>
                   <CeldaTabla className="font-medium">
-                    {admission.ci} {admission.ci_issued && `- ${admission.ci_issued}`}
+                    {admission.ci} {admission.ciExpedido && `- ${admission.ciExpedido}`}
                   </CeldaTabla>
                   <CeldaTabla>
-                    {admission.names} {admission.lastname_paternal} {admission.lastname_maternal}
+                    {admission.nombre} {admission.apellidoPaterno} {admission.apellidoMaterno}
                   </CeldaTabla>
-                  <CeldaTabla>{admission.carrera?.name || '-'}</CeldaTabla>
+                  <CeldaTabla>{admission.carrera?.nombre || '-'}</CeldaTabla>
                   <CeldaTabla>
                     <Insignia variant="outline">{originLabels[admission.origen] || '-'}</Insignia>
                   </CeldaTabla>
                   <CeldaTabla>{getStatusBadge(admission.estado)}</CeldaTabla>
-                  <CeldaTabla>{new Date(admission.created_at).toLocaleString('es-BO', { hour12: false })}</CeldaTabla>
+                  <CeldaTabla>{new Date(admission.creadoEn).toLocaleString('es-BO', { hour12: false })}</CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
                       <Boton variant="ghost" size="icon" title="Ver detalles" onClick={() => setDetalleModal({ request: admission, showConvert: admission.estado === 'verificado' })}>
@@ -478,15 +478,15 @@ export default function AdmisionPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-gray-500">Nombres</label>
-                  <Entrada value={editForm.names} onChange={(e) => setEditForm({ ...editForm, names: e.target.value })} />
+                  <Entrada value={editForm.nombre} onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Apellido Paterno</label>
-                  <Entrada value={editForm.lastname_paternal} onChange={(e) => setEditForm({ ...editForm, lastname_paternal: e.target.value })} />
+                  <Entrada value={editForm.apellidoPaterno} onChange={(e) => setEditForm({ ...editForm, apellidoPaterno: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Apellido Materno</label>
-                  <Entrada value={editForm.lastname_maternal} onChange={(e) => setEditForm({ ...editForm, lastname_maternal: e.target.value })} />
+                  <Entrada value={editForm.apellidoMaterno} onChange={(e) => setEditForm({ ...editForm, apellidoMaterno: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">CI</label>
@@ -494,21 +494,21 @@ export default function AdmisionPage() {
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Fecha de nacimiento</label>
-                  <Entrada type="date" value={editForm.birthdate} onChange={(e) => setEditForm({ ...editForm, birthdate: e.target.value })} />
+                  <Entrada type="date" value={editForm.fechaNacimiento} onChange={(e) => setEditForm({ ...editForm, fechaNacimiento: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Lugar de nacimiento</label>
-                  <Entrada value={editForm.birthplace} onChange={(e) => setEditForm({ ...editForm, birthplace: e.target.value })} />
+                  <Entrada value={editForm.lugarNacimiento} onChange={(e) => setEditForm({ ...editForm, lugarNacimiento: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500 block mb-2">Género</label>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="gender" value="M" checked={editForm.gender === 'M'} onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })} />
+                      <input type="radio" name="genero" value="M" checked={editForm.genero === 'M'} onChange={(e) => setEditForm({ ...editForm, genero: e.target.value })} />
                       <span className="text-sm">Masculino</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="gender" value="F" checked={editForm.gender === 'F'} onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })} />
+                      <input type="radio" name="genero" value="F" checked={editForm.genero === 'F'} onChange={(e) => setEditForm({ ...editForm, genero: e.target.value })} />
                       <span className="text-sm">Femenino</span>
                     </label>
                   </div>
@@ -517,41 +517,41 @@ export default function AdmisionPage() {
                   <label className="text-sm text-gray-500 block mb-2">Estado civil</label>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="marital_status" value="Soltera(o)" checked={editForm.marital_status === 'Soltera(o)'} onChange={(e) => setEditForm({ ...editForm, marital_status: e.target.value })} />
+                      <input type="radio" name="estadoCivil" value="Soltera(o)" checked={editForm.estadoCivil === 'Soltera(o)'} onChange={(e) => setEditForm({ ...editForm, estadoCivil: e.target.value })} />
                       <span className="text-sm">Soltero(a)</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="marital_status" value="Casada(o)" checked={editForm.marital_status === 'Casada(o)'} onChange={(e) => setEditForm({ ...editForm, marital_status: e.target.value })} />
+                      <input type="radio" name="estadoCivil" value="Casada(o)" checked={editForm.estadoCivil === 'Casada(o)'} onChange={(e) => setEditForm({ ...editForm, estadoCivil: e.target.value })} />
                       <span className="text-sm">Casado(a)</span>
                     </label>
                   </div>
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Nacionalidad</label>
-                  <Entrada value={editForm.nationality} onChange={(e) => setEditForm({ ...editForm, nationality: e.target.value })} />
+                  <Entrada value={editForm.nacionalidad} onChange={(e) => setEditForm({ ...editForm, nacionalidad: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Teléfono</label>
-                  <Entrada value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} />
+                  <Entrada value={editForm.telefono} onChange={(e) => setEditForm({ ...editForm, telefono: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">Email</label>
-                  <Entrada type="email" value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
+                  <label className="text-sm text-gray-500">Correo</label>
+                  <Entrada type="email" value={editForm.correo} onChange={(e) => setEditForm({ ...editForm, correo: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Dirección</label>
-                  <Entrada value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} />
+                  <Entrada value={editForm.direccion} onChange={(e) => setEditForm({ ...editForm, direccion: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Carrera</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg" value={editForm.carrera_id} onChange={(e) => setEditForm({ ...editForm, carrera_id: parseInt(e.target.value) })}>
+                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg" value={editForm.carreraId} onChange={(e) => setEditForm({ ...editForm, carreraId: parseInt(e.target.value) })}>
                     <option value={0}>Seleccionar carrera</option>
                     {careers.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
+                      <option key={c.id} value={c.id}>{c.nombre}</option>
                     ))}
                   </select>
                 </div>
-                {isMinor(editForm.birthdate) && (
+                {isMinor(editForm.fechaNacimiento) && (
                   <>
                     <div className="col-span-2 border-t pt-4 mt-2">
                       <p className="text-sm font-semibold text-gray-700">Datos del Tutor</p>
@@ -579,49 +579,49 @@ export default function AdmisionPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Nombre completo</p>
-                  <p className="font-medium">{detalleModal.request.names} {detalleModal.request.lastname_paternal} {detalleModal.request.lastname_maternal}</p>
+                  <p className="font-medium">{detalleModal.request.nombre} {detalleModal.request.apellidoPaterno} {detalleModal.request.apellidoMaterno}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">CI</p>
-                  <p className="font-medium">{detalleModal.request.ci} {detalleModal.request.ci_issued && `- ${detalleModal.request.ci_issued}`}</p>
+                  <p className="font-medium">{detalleModal.request.ci} {detalleModal.request.ciExpedido && `- ${detalleModal.request.ciExpedido}`}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Fecha de nacimiento</p>
-                  <p className="font-medium">{new Date(detalleModal.request.birthdate).toLocaleDateString('es-BO')}</p>
+                  <p className="font-medium">{new Date(detalleModal.request.fechaNacimiento).toLocaleDateString('es-BO')}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Lugar de nacimiento</p>
-                  <p className="font-medium">{detalleModal.request.birthplace || '-'}</p>
+                  <p className="font-medium">{detalleModal.request.lugarNacimiento || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Género</p>
-                  <p className="font-medium">{detalleModal.request.gender === 'M' ? 'Masculino' : detalleModal.request.gender === 'F' ? 'Femenino' : '-'}</p>
+                  <p className="font-medium">{detalleModal.request.genero === 'M' ? 'Masculino' : detalleModal.request.genero === 'F' ? 'Femenino' : '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Estado civil</p>
-                  <p className="font-medium">{detalleModal.request.marital_status || '-'}</p>
+                  <p className="font-medium">{detalleModal.request.estadoCivil || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Nacionalidad</p>
-                  <p className="font-medium">{detalleModal.request.nationality || '-'}</p>
+                  <p className="font-medium">{detalleModal.request.nacionalidad || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Teléfono</p>
-                  <p className="font-medium">{detalleModal.request.phone || '-'}</p>
+                  <p className="font-medium">{detalleModal.request.telefono || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium">{detalleModal.request.email}</p>
+                  <p className="text-sm text-gray-500">Correo</p>
+                  <p className="font-medium">{detalleModal.request.correo}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Dirección</p>
-                  <p className="font-medium">{detalleModal.request.address || '-'}</p>
+                  <p className="font-medium">{detalleModal.request.direccion || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Carrera</p>
-                  <p className="font-medium">{detalleModal.request.carrera?.name || '-'}</p>
+                  <p className="font-medium">{detalleModal.request.carrera?.nombre || '-'}</p>
                 </div>
-                {isMinor(detalleModal.request.birthdate) && detalleModal.request.nombreTutor && (
+                {isMinor(detalleModal.request.fechaNacimiento) && detalleModal.request.nombreTutor && (
                   <>
                     <div className="col-span-2 border-t pt-4 mt-2">
                       <p className="text-sm font-semibold text-gray-700">Datos del Tutor (menor de edad)</p>
@@ -657,7 +657,7 @@ export default function AdmisionPage() {
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            ¿Está seguro de verificar el pre-registro de <strong>{verificarModal?.names} {verificarModal?.lastname_paternal}</strong>?
+            ¿Está seguro de verificar el pre-registro de <strong>{verificarModal?.nombre} {verificarModal?.apellidoPaterno}</strong>?
           </p>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones (opcional)</label>
@@ -684,7 +684,7 @@ export default function AdmisionPage() {
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            ¿Está seguro de rechazar el pre-registro de <strong>{rechazarModal?.names} {rechazarModal?.lastname_paternal}</strong>?
+            ¿Está seguro de rechazar el pre-registro de <strong>{rechazarModal?.nombre} {rechazarModal?.apellidoPaterno}</strong>?
           </p>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Motivo del rechazo *</label>
@@ -706,8 +706,8 @@ export default function AdmisionPage() {
           <div className="space-y-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm text-blue-800">
-                <strong>Datos del pre-registro:</strong> {convertirModal.names} {convertirModal.lastname_paternal} {convertirModal.lastname_maternal}<br />
-                CI: {convertirModal.ci} {convertirModal.ci_issued && `- ${convertirModal.ci_issued}`}
+                <strong>Datos del pre-registro:</strong> {convertirModal.nombre} {convertirModal.apellidoPaterno} {convertirModal.apellidoMaterno}<br />
+                CI: {convertirModal.ci} {convertirModal.ciExpedido && `- ${convertirModal.ciExpedido}`}
               </p>
             </div>
 
@@ -715,8 +715,8 @@ export default function AdmisionPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Gestión de ingreso *</label>
                 <Selector
-                  value={convertForm.admission_gestion}
-                  onChange={(e) => setConvertForm({ ...convertForm, admission_gestion: e.target.value })}
+                  value={convertForm.gestionAdmision}
+                  onChange={(e) => setConvertForm({ ...convertForm, gestionAdmision: e.target.value })}
                   options={gestiones.map(g => ({ value: g, label: g }))}
                 />
               </div>
@@ -724,52 +724,52 @@ export default function AdmisionPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de ingreso *</label>
                 <Entrada
                   type="date"
-                  value={convertForm.admission_date}
-                  onChange={(e) => setConvertForm({ ...convertForm, admission_date: e.target.value })}
+                  value={convertForm.fechaAdmision}
+                  onChange={(e) => setConvertForm({ ...convertForm, fechaAdmision: e.target.value })}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Carrera *</label>
                 <Selector
-                  value={convertForm.career_id.toString()}
+                  value={convertForm.carreraId.toString()}
                   onChange={(e) => {
                     const careerId = parseInt(e.target.value);
-                    setConvertForm({ ...convertForm, career_id: careerId, study_plan_id: 0 });
+                    setConvertForm({ ...convertForm, carreraId: careerId, planEstudioId: 0 });
                     fetchStudyPlans(careerId);
                   }}
-                  options={careers.map(c => ({ value: c.id.toString(), label: c.name }))}
+                  options={careers.map(c => ({ value: c.id.toString(), label: c.nombre }))}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Plan de estudio *</label>
                 <Selector
-                  value={convertForm.study_plan_id.toString()}
-                  onChange={(e) => setConvertForm({ ...convertForm, study_plan_id: parseInt(e.target.value) })}
-                  options={studyPlans.map(sp => ({ value: sp.id.toString(), label: sp.rm_number }))}
+                  value={convertForm.planEstudioId.toString()}
+                  onChange={(e) => setConvertForm({ ...convertForm, planEstudioId: parseInt(e.target.value) })}
+                  options={studyPlans.map(sp => ({ value: sp.id.toString(), label: sp.numeroRm }))}
                   placeholder="Seleccionar plan..."
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Número de carpeta</label>
                 <Entrada
-                  value={convertForm.folder_number}
-                  onChange={(e) => setConvertForm({ ...convertForm, folder_number: e.target.value })}
+                  value={convertForm.numeroFolder}
+                  onChange={(e) => setConvertForm({ ...convertForm, numeroFolder: e.target.value })}
                   placeholder="Opcional"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Código Formulario 01</label>
                 <Entrada
-                  value={convertForm.form01_code}
-                  onChange={(e) => setConvertForm({ ...convertForm, form01_code: e.target.value })}
+                  value={convertForm.codigoFormulario01}
+                  onChange={(e) => setConvertForm({ ...convertForm, codigoFormulario01: e.target.value })}
                   placeholder="Opcional"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Número de Título Bachiller</label>
                 <Entrada
-                  value={convertForm.bachelor_title_number}
-                  onChange={(e) => setConvertForm({ ...convertForm, bachelor_title_number: e.target.value })}
+                  value={convertForm.numeroTituloBachiller}
+                  onChange={(e) => setConvertForm({ ...convertForm, numeroTituloBachiller: e.target.value })}
                   placeholder="Opcional"
                 />
               </div>
@@ -777,8 +777,8 @@ export default function AdmisionPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Título Bachiller</label>
                 <Entrada
                   type="date"
-                  value={convertForm.bachelor_title_date}
-                  onChange={(e) => setConvertForm({ ...convertForm, bachelor_title_date: e.target.value })}
+                  value={convertForm.fechaTituloBachiller}
+                  onChange={(e) => setConvertForm({ ...convertForm, fechaTituloBachiller: e.target.value })}
                 />
               </div>
             </div>
@@ -801,7 +801,7 @@ export default function AdmisionPage() {
         onClose={() => setDeleteModal(null)}
         onConfirm={handleDelete}
         title="Eliminar Pre-registro"
-        message={`¿Está seguro de eliminar el pre-registro de "${deleteModal?.names} ${deleteModal?.lastname_paternal}"? Esta acción no se puede deshacer.`}
+        message={`¿Está seguro de eliminar el pre-registro de "${deleteModal?.nombre} ${deleteModal?.apellidoPaterno}"? Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
         variant="destructive"
         loading={formLoading}

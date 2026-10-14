@@ -16,75 +16,75 @@ import { Search, Plus, Edit2, Trash2, Loader2, Users, UserCheck, BookOpen, Arrow
 
 interface Grupo {
   id: number;
-  code: string;
-  career_id: number;
-  study_plan_id: number;
-  subject_id: number;
-  semester: number;
-  shift_id: number;
-  parallel: string;
+  codigo: string;
+  carreraId: number;
+  planEstudioId: number;
+  materiaId: number;
+  semestre: number;
+  turnoId: number;
+  paralelo: string;
   gestion: string;
   periodo: string;
-  capacity: number;
-  carrera?: { id: number; code: string; name: string };
-  turno?: { id: number; code: string; name: string; start_time: string; end_time: string };
-  plan_estudio?: { rm_number: string };
-  materia?: { id: number; code: string; name: string };
+  capacidad: number;
+  carrera?: { id: number; codigo: string; nombre: string };
+  turno?: { id: number; codigo: string; nombre: string; horaInicio: string; horaFin: string };
+  plan_estudio?: { numeroRm: string };
+  materia?: { id: number; codigo: string; nombre: string };
 }
 
 interface StudentInGroup {
   id: number;
-  group_id: number;
-  student_id: number;
-  enrolled_at: string;
+  grupoId: number;
+  estudianteId: number;
+  inscritoEn: string;
   estudiante?: {
     id: number;
-    inscription_code: string;
+    codigoInscripcion: string;
     persona?: {
       ci: string;
-      names: string;
-      lastname_paternal: string;
-      lastname_maternal: string;
+      nombres: string;
+      apellidoPaterno: string;
+      apellidoMaterno: string;
     };
   };
 }
 
 interface Carrera {
   id: number;
-  code: string;
-  name: string;
+  codigo: string;
+  nombre: string;
 }
 
 interface Gestion {
   id: number;
-  year: string;
-  is_current: boolean;
+  anio: string;
+  esActual: boolean;
 }
 
 interface Personal {
   id: number;
-  person_id: number;
-  position: string;
+  personaId: number;
+  cargo: string;
   persona?: {
     ci: string;
-    names: string;
-    lastname_paternal: string;
-    lastname_maternal: string;
+    nombres: string;
+    apellidoPaterno: string;
+    apellidoMaterno: string;
   };
 }
 
-interface TeachingAssignment {
+interface AsignacionDocente {
   id: number;
-  teacher_id: number;
-  subject_id: number;
-  group_id: number;
+  docenteId: number;
+  materiaId: number;
+  grupoId: number;
   gestion: string;
-  status: string;
+  estado: string;
   docente?: Personal;
   materia?: {
     id: number;
-    code: string;
-    name: string;
+    codigo: string;
+    nombre: string;
   };
 }
 
@@ -101,7 +101,7 @@ export default function GruposPage() {
 
   const [selectedGrupo, setSelectedGrupo] = useState<Grupo | null>(null);
   const [grupoStudents, setGrupoStudents] = useState<StudentInGroup[]>([]);
-  const [grupoAssignments, setGrupoAssignments] = useState<TeachingAssignment[]>([]);
+  const [grupoAssignments, setGrupoAssignments] = useState<AsignacionDocente[]>([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -115,24 +115,24 @@ export default function GruposPage() {
   const [generateForm, setGenerateForm] = useState({
     gestion: new Date().getFullYear().toString(),
     periodo: 'I',
-    shift_ids: [] as number[],
-    parallels: ['A'],
-    career_id: '' as string,
-    study_plan_id: '' as string,
+    turnoIds: [] as number[],
+    paralelos: ['A'],
+    carreraId: '' as string,
+    planEstudioId: '' as string,
     capacidad: '30',
   });
   const [generateResult, setGenerateResult] = useState<{ created: number; message: string } | null>(null);
 
   const [newForm, setNewForm] = useState({
-    career_id: '',
-    study_plan_id: '',
-    subject_id: '',
-    semester: '',
-    shift_id: '',
-    parallel: '',
+    carreraId: '',
+    planEstudioId: '',
+    materiaId: '',
+    semestre: '',
+    turnoId: '',
+    paralelo: '',
     gestion: new Date().getFullYear().toString(),
     periodo: 'I',
-    capacity: '30',
+    capacidad: '30',
   });
 
   useEffect(() => {
@@ -155,12 +155,12 @@ export default function GruposPage() {
       setGestiones(allGestiones);
       setTurnos(turnosRes.data.data || turnosRes.data || []);
 
-      const current = allGestiones.find((g: any) => g.is_current);
+      const current = allGestiones.find((g: any) => g.esActual);
       if (current) {
-        setFilterGestion(current.year);
+        setFilterGestion(current.anio);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error al obtener datos:', error);
     } finally {
       setLoading(false);
     }
@@ -177,7 +177,7 @@ export default function GruposPage() {
       const response = await api.get(`/grupos`, { params });
       setGrupos(response.data.data || []);
     } catch (error) {
-      console.error('Error fetching grupos:', error);
+      console.error('Error al obtener grupos:', error);
     } finally {
       setLoading(false);
     }
@@ -194,7 +194,7 @@ export default function GruposPage() {
       setGrupoStudents(studentsRes.data || []);
       setGrupoAssignments(assignmentsRes.data || []);
     } catch (error) {
-      console.error('Error fetching details:', error);
+      console.error('Error al obtener detalles:', error);
     } finally {
       setLoadingDetails(false);
     }
@@ -204,27 +204,27 @@ export default function GruposPage() {
     setSaving(true);
     try {
       await api.post('/grupos', {
-        career_id: parseInt(newForm.career_id),
-        study_plan_id: parseInt(newForm.study_plan_id) || undefined,
-        subject_id: parseInt(newForm.subject_id) || undefined,
-        semester: parseInt(newForm.semester),
-        shift_id: parseInt(newForm.shift_id) || undefined,
-        parallel: newForm.parallel.toUpperCase(),
+        carreraId: parseInt(newForm.carreraId),
+        planEstudioId: parseInt(newForm.planEstudioId) || undefined,
+        materiaId: parseInt(newForm.materiaId) || undefined,
+        semestre: parseInt(newForm.semestre),
+        turnoId: parseInt(newForm.turnoId) || undefined,
+        paralelo: newForm.paralelo.toUpperCase(),
         gestion: newForm.gestion,
         periodo: newForm.periodo,
-        capacity: parseInt(newForm.capacity) || 30,
+        capacidad: parseInt(newForm.capacidad) || 30,
       });
       setModalOpen(false);
       fetchGrupos();
     } catch (error) {
-      console.error('Error creating grupo:', error);
+      console.error('Error al crear grupo:', error);
     } finally {
       setSaving(false);
     }
   };
 
   const handleGenerate = async () => {
-    if (!generateForm.study_plan_id) {
+    if (!generateForm.planEstudioId) {
       setGenerateResult({ created: 0, message: 'Selecciona un plan de estudios' });
       return;
     }
@@ -233,9 +233,9 @@ export default function GruposPage() {
       const result = await api.post('/grupos/generate', {
         gestion: generateForm.gestion,
         periodo: generateForm.periodo,
-        shift_ids: generateForm.shift_ids,
-        parallels: generateForm.parallels,
-        study_plan_id: parseInt(generateForm.study_plan_id),
+        turnoIds: generateForm.turnoIds,
+        paralelos: generateForm.paralelos,
+        planEstudioId: parseInt(generateForm.planEstudioId),
         capacidad: generateForm.capacidad,
       });
       setGenerateResult(result.data);
@@ -243,23 +243,23 @@ export default function GruposPage() {
         fetchGrupos();
       }
     } catch (error) {
-      console.error('Error generating groups:', error);
+      console.error('Error al generar grupos:', error);
       setGenerateResult({ created: 0, message: 'Error al generar grupos' });
     } finally {
       setSaving(false);
     }
   };
 
-  const fetchPlanesPorCarrera = async (careerId: string) => {
-    if (!careerId) {
+  const fetchPlanesPorCarrera = async (carreraId: string) => {
+    if (!carreraId) {
       setPlanesCarrera([]);
       return;
     }
     try {
-      const response = await api.get(`/planes-estudio/current/${careerId}`);
+      const response = await api.get(`/planes-estudio/current/${carreraId}`);
       setPlanesCarrera(response.data || []);
     } catch (error) {
-      console.error('Error fetching planes:', error);
+      console.error('Error al obtener planes:', error);
       setPlanesCarrera([]);
     }
   };
@@ -274,7 +274,7 @@ export default function GruposPage() {
       setSelectedGrupo(null);
       fetchGrupos();
     } catch (error) {
-      console.error('Error deleting grupo:', error);
+      console.error('Error al eliminar grupo:', error);
     } finally {
       setSaving(false);
     }
@@ -284,9 +284,9 @@ export default function GruposPage() {
     if (!searchQuery) return true;
     const search = searchQuery.toLowerCase();
     return (
-      g.parallel.toLowerCase().includes(search) ||
-      g.turno?.name?.toLowerCase().includes(search) ||
-      g.carrera?.name?.toLowerCase().includes(search)
+      g.paralelo.toLowerCase().includes(search) ||
+      g.turno?.nombre?.toLowerCase().includes(search) ||
+      g.carrera?.nombre?.toLowerCase().includes(search)
     );
   });
 
@@ -300,7 +300,7 @@ export default function GruposPage() {
       <Migas items={[{ label: 'Grupos' }]} />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gestion de Grupos</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Gestión de Grupos</h1>
         <div className="flex gap-2">
           <Boton variant="outline" onClick={() => setGenerateModalOpen(true)}>
             <BookOpen className="w-4 h-4 mr-2" />
@@ -332,7 +332,7 @@ export default function GruposPage() {
                 onChange={(e) => setFilterGestion(e.target.value)}
                 options={[
                   { value: '', label: 'Todas las gestiones' },
-                  ...gestiones.map(g => ({ value: g.year, label: g.year }))
+                  ...gestiones.map(g => ({ value: g.anio, label: g.anio }))
                 ]}
               />
               <Selector
@@ -340,7 +340,7 @@ export default function GruposPage() {
                 onChange={(e) => setFilterCarrera(e.target.value)}
                 options={[
                   { value: '', label: 'Todas las carreras' },
-                  ...carreras.map(c => ({ value: c.id.toString(), label: c.name }))
+                  ...carreras.map(c => ({ value: c.id.toString(), label: c.nombre }))
                 ]}
               />
               <Selector
@@ -388,15 +388,15 @@ export default function GruposPage() {
                           onClick={() => fetchGrupoDetails(grupo)}
                           className="text-primary-600 hover:underline text-left"
                         >
-                          <div className="font-bold">{grupo.code}</div>
+                          <div className="font-bold">{grupo.codigo}</div>
                         </button>
                       </CeldaTabla>
                       <CeldaTabla>
-                        <div className="text-sm font-medium">{grupo.materia?.code || '-'}</div>
-                        <div className="text-xs text-gray-500">{grupo.materia?.name || '-'}</div>
+                        <div className="text-sm font-medium">{grupo.materia?.codigo || '-'}</div>
+                        <div className="text-xs text-gray-500">{grupo.materia?.nombre || '-'}</div>
                       </CeldaTabla>
-                      <CeldaTabla>{grupo.semester}°</CeldaTabla>
-                      <CeldaTabla>{grupo.capacity}</CeldaTabla>
+                      <CeldaTabla>{grupo.semestre}°</CeldaTabla>
+                      <CeldaTabla>{grupo.capacidad}</CeldaTabla>
                       <CeldaTabla>
                         <div className="flex items-center gap-2">
                           <Boton variant="ghost" size="icon" onClick={() => router.push(`/grupos/${grupo.id}`)}>
@@ -425,7 +425,7 @@ export default function GruposPage() {
             <div className="flex items-center justify-between">
               <TituloTarjeta className="flex items-center gap-2">
                 <Users className="w-5 h-5" />
-                Detalles del Grupo: {selectedGrupo.parallel} - {selectedGrupo.turno?.name}
+                Detalles del Grupo: {selectedGrupo.paralelo} - {selectedGrupo.turno?.nombre}
               </TituloTarjeta>
               <Boton variant="ghost" size="icon" onClick={() => setSelectedGrupo(null)}>
                 <ArrowLeft className="w-4 h-4" />
@@ -442,7 +442,7 @@ export default function GruposPage() {
                 <div>
                   <h4 className="font-medium mb-3 flex items-center gap-2">
                     <Users className="w-4 h-4" />
-                    Estudiantes ({grupoStudents.length}/{selectedGrupo.capacity})
+                    Estudiantes ({grupoStudents.length}/{selectedGrupo.capacidad})
                   </h4>
                   {grupoStudents.length === 0 ? (
                     <p className="text-gray-500 text-sm">No hay estudiantes en este grupo</p>
@@ -451,10 +451,10 @@ export default function GruposPage() {
                       {grupoStudents.map((sg) => (
                         <div key={sg.id} className="p-3 bg-gray-50 rounded-lg">
                           <p className="font-medium text-sm">
-                            {sg.estudiante?.persona?.names} {sg.estudiante?.persona?.lastname_paternal}
+                            {sg.estudiante?.persona?.nombres} {sg.estudiante?.persona?.apellidoPaterno}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {sg.estudiante?.persona?.ci} · {sg.estudiante?.inscription_code}
+                            {sg.estudiante?.persona?.ci} · {sg.estudiante?.codigoInscripcion}
                           </p>
                         </div>
                       ))}
@@ -474,10 +474,10 @@ export default function GruposPage() {
                       {grupoAssignments.map((a) => (
                         <div key={a.id} className="p-3 bg-gray-50 rounded-lg">
                           <p className="font-medium text-sm">
-                            {a.docente?.persona?.names} {a.docente?.persona?.lastname_paternal}
+                            {a.docente?.persona?.nombres} {a.docente?.persona?.apellidoPaterno}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {a.materia?.code} - {a.materia?.name}
+                            {a.materia?.codigo} - {a.materia?.nombre}
                           </p>
                         </div>
                       ))}
@@ -494,7 +494,7 @@ export default function GruposPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Gestion *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Gestión *</label>
               <Entrada
                 value={newForm.gestion}
                 onChange={(e) => setNewForm({ ...newForm, gestion: e.target.value })}
@@ -514,8 +514,8 @@ export default function GruposPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Paralelo *</label>
               <Entrada
-                value={newForm.parallel}
-                onChange={(e) => setNewForm({ ...newForm, parallel: e.target.value.toUpperCase() })}
+                value={newForm.paralelo}
+                onChange={(e) => setNewForm({ ...newForm, paralelo: e.target.value.toUpperCase() })}
                 placeholder="A"
               />
             </div>
@@ -526,8 +526,8 @@ export default function GruposPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Semestre *</label>
               <select
                 className="w-full h-10 px-3 border rounded-lg text-sm"
-                value={newForm.semester}
-                onChange={(e) => setNewForm({ ...newForm, semester: e.target.value })}
+                value={newForm.semestre}
+                onChange={(e) => setNewForm({ ...newForm, semestre: e.target.value })}
               >
                 <option value="">Seleccionar...</option>
                 {getSemesters().map(s => (
@@ -539,8 +539,8 @@ export default function GruposPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad</label>
               <Entrada
                 type="number"
-                value={newForm.capacity}
-                onChange={(e) => setNewForm({ ...newForm, capacity: e.target.value })}
+                value={newForm.capacidad}
+                onChange={(e) => setNewForm({ ...newForm, capacidad: e.target.value })}
                 placeholder="30"
               />
             </div>
@@ -550,12 +550,12 @@ export default function GruposPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">Carrera *</label>
             <select
               className="w-full h-10 px-3 border rounded-lg text-sm"
-              value={newForm.career_id}
-              onChange={(e) => setNewForm({ ...newForm, career_id: e.target.value })}
+              value={newForm.carreraId}
+              onChange={(e) => setNewForm({ ...newForm, carreraId: e.target.value })}
             >
               <option value="">Seleccionar...</option>
               {carreras.map(c => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+                <option key={c.id} value={c.id}>{c.nombre}</option>
               ))}
             </select>
           </div>
@@ -564,7 +564,7 @@ export default function GruposPage() {
             <Boton variant="outline" onClick={() => setModalOpen(false)}>
               Cancelar
             </Boton>
-            <Boton onClick={handleCreate} disabled={saving || !newForm.career_id || !newForm.semester || !newForm.parallel}>
+            <Boton onClick={handleCreate} disabled={saving || !newForm.carreraId || !newForm.semestre || !newForm.paralelo}>
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Crear Grupo'}
             </Boton>
           </div>
@@ -576,7 +576,7 @@ export default function GruposPage() {
         onClose={() => { setDeleteModalOpen(false); setDeletingGrupo(null); }}
         onConfirm={handleDelete}
         title="Eliminar Grupo"
-        message={`¿Estás seguro de eliminar el grupo "${deletingGrupo?.parallel}"?`}
+        message={`¿Estás seguro de eliminar el grupo "${deletingGrupo?.paralelo}"?`}
         confirmText="Eliminar"
         variant="destructive"
         loading={saving}
@@ -617,15 +617,15 @@ export default function GruposPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">Carrera *</label>
             <select
               className="w-full h-10 px-3 border rounded-lg text-sm"
-              value={generateForm.career_id}
+              value={generateForm.carreraId}
               onChange={(e) => {
-                setGenerateForm({ ...generateForm, career_id: e.target.value, study_plan_id: '' });
+                setGenerateForm({ ...generateForm, carreraId: e.target.value, planEstudioId: '' });
                 fetchPlanesPorCarrera(e.target.value);
               }}
             >
               <option value="">Seleccionar...</option>
               {carreras.map(c => (
-                <option key={c.id} value={c.id}>{c.code} - {c.name}</option>
+                <option key={c.id} value={c.id}>{c.codigo} - {c.nombre}</option>
               ))}
             </select>
           </div>
@@ -634,13 +634,13 @@ export default function GruposPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">Plan de Estudios *</label>
             <select
               className="w-full h-10 px-3 border rounded-lg text-sm"
-              value={generateForm.study_plan_id}
-              onChange={(e) => setGenerateForm({ ...generateForm, study_plan_id: e.target.value })}
-              disabled={!generateForm.career_id}
+              value={generateForm.planEstudioId}
+              onChange={(e) => setGenerateForm({ ...generateForm, planEstudioId: e.target.value })}
+              disabled={!generateForm.carreraId}
             >
               <option value="">Seleccionar...</option>
               {planesCarrera.map(p => (
-                <option key={p.id} value={p.id}>{p.rm_number}</option>
+                <option key={p.id} value={p.id}>{p.numeroRm}</option>
               ))}
             </select>
           </div>
@@ -652,17 +652,17 @@ export default function GruposPage() {
                 <label key={turno.id} className="flex items-center gap-1 px-3 py-1 border rounded-lg cursor-pointer hover:bg-gray-50">
                   <input
                     type="checkbox"
-                    checked={generateForm.shift_ids.includes(turno.id)}
+                    checked={generateForm.turnoIds.includes(turno.id)}
                     onChange={(e) => {
                       if (e.target.checked) {
-                        setGenerateForm({ ...generateForm, shift_ids: [...generateForm.shift_ids, turno.id] });
+                        setGenerateForm({ ...generateForm, turnoIds: [...generateForm.turnoIds, turno.id] });
                       } else {
-                        setGenerateForm({ ...generateForm, shift_ids: generateForm.shift_ids.filter(id => id !== turno.id) });
+                        setGenerateForm({ ...generateForm, turnoIds: generateForm.turnoIds.filter(id => id !== turno.id) });
                       }
                     }}
                   />
-                  <span className="text-sm font-medium">{turno.code}</span>
-                  <span className="text-xs text-gray-500">({turno.name})</span>
+                  <span className="text-sm font-medium">{turno.codigo}</span>
+                  <span className="text-xs text-gray-500">({turno.nombre})</span>
                 </label>
               ))}
             </div>
@@ -675,12 +675,12 @@ export default function GruposPage() {
                 <label key={p} className="flex items-center gap-1 px-3 py-1 border rounded-lg cursor-pointer hover:bg-gray-50">
                   <input
                     type="checkbox"
-                    checked={generateForm.parallels.includes(p)}
+                    checked={generateForm.paralelos.includes(p)}
                     onChange={(e) => {
                       if (e.target.checked) {
-                        setGenerateForm({ ...generateForm, parallels: [...generateForm.parallels, p] });
+                        setGenerateForm({ ...generateForm, paralelos: [...generateForm.paralelos, p] });
                       } else {
-                        setGenerateForm({ ...generateForm, parallels: generateForm.parallels.filter(x => x !== p) });
+                        setGenerateForm({ ...generateForm, paralelos: generateForm.paralelos.filter(x => x !== p) });
                       }
                     }}
                   />
@@ -712,7 +712,7 @@ export default function GruposPage() {
             </Boton>
             <Boton
               onClick={handleGenerate}
-              disabled={saving || !generateForm.study_plan_id || generateForm.shift_ids.length === 0 || generateForm.parallels.length === 0}
+              disabled={saving || !generateForm.planEstudioId || generateForm.turnoIds.length === 0 || generateForm.paralelos.length === 0}
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Generar Grupos'}
             </Boton>

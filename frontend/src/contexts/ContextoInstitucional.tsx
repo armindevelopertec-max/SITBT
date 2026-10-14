@@ -5,12 +5,12 @@ import { publicApi } from '@/lib/api';
 
 interface ConfiguracionInstitucional {
   nombre: string;
-  nombre_corto: string;
+  nombreCorto: string;
   lema: string;
-  logo_url: string;
+  logoUrl: string;
   direccion: string;
   telefono: string;
-  email: string;
+  correo: string;
   ciudad: string;
   pais: string;
 }

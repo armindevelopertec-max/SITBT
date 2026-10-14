@@ -174,8 +174,8 @@ export default function DocumentsPage() {
                     </CeldaTabla>
                     <CeldaTabla>
                       {doc.estudiante
-                        ? `${doc.estudiante.persona?.names} ${doc.estudiante.persona?.lastname_paternal}`
-                        : `ID: ${doc.estudiante_id}`}
+                        ? `${doc.estudiante.persona?.nombres} ${doc.estudiante.persona?.apellidoPaterno}`
+                        : `ID: ${doc.estudianteId}`}
                     </CeldaTabla>
                     <CeldaTabla>{doc.gestion}</CeldaTabla>
                     <CeldaTabla>

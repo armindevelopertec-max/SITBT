@@ -7,30 +7,30 @@ import { GraduationCap, ArrowRight, CheckCircle, Award, Clock, FileText } from '
 import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
 interface Materia {
-  code: string;
-  name: string;
-  weekly_hours: number;
+  codigo: string;
+  nombre: string;
+  horasSemanales: number;
 }
 
-interface StudyPlan {
-  rm_number: string;
-  rm_date: string;
-  subjectsBySemester: Record<number, Materia[]>;
+interface PlanEstudio {
+  numeroRm: string;
+  fechaRm: string;
+  materiasPorSemestre: Record<number, Materia[]>;
 }
 
 interface Carrera {
   id: number;
-  code: string;
-  name: string;
+  codigo: string;
+  nombre: string;
   area: string;
-  title: string;
-  description: string;
-  load_hours: number;
-  status: string;
+  titulo: string;
+  descripcion: string;
+  horasCarga: number;
+  estado: string;
 }
 
-interface CareerWithPlan extends Carrera {
-  studyPlan?: StudyPlan;
+interface CarreraConPlan extends Carrera {
+  planEstudio?: PlanEstudio;
 }
 
 const careerImages: Record<number, string> = {
@@ -40,20 +40,20 @@ const careerImages: Record<number, string> = {
 
 export default function CareersPage() {
   const { institucion } = usarInstitucion();
-  const [careers, setCareers] = useState<CareerWithPlan[]>([]);
+  const [careers, setCareers] = useState<CarreraConPlan[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await publicApi.get<{ data: Carrera[] }>('/carreras', { params: { estado: 'activo' } });
-        const careersWithPlans: CareerWithPlan[] = response.data.data.map((career) => ({
+        const careersWithPlans: CarreraConPlan[] = response.data.data.map((career) => ({
           ...career,
-          studyPlan: getStudyPlanForCareer(career.id),
+          planEstudio: getPlanEstudioForCareer(career.id),
         }));
         setCareers(careersWithPlans);
       } catch (error) {
-        console.error('Error fetching careers:', error);
+        console.error('Error al obtener carreras:', error);
       } finally {
         setLoading(false);
       }
@@ -61,125 +61,125 @@ export default function CareersPage() {
     fetchData();
   }, []);
 
-  const getStudyPlanForCareer = (careerId: number): StudyPlan | undefined => {
-    const studyPlansData: Record<number, StudyPlan> = {
+  const getPlanEstudioForCareer = (careerId: number): PlanEstudio | undefined => {
+    const planEstudiosData: Record<number, PlanEstudio> = {
       1: {
-        rm_number: 'R.M. 1049/2024',
-        rm_date: '15/12/2023',
-        subjectsBySemester: {
+        numeroRm: 'R.M. 1049/2024',
+        fechaRm: '15/12/2023',
+        materiasPorSemestre: {
           1: [
-            { code: 'SOM-100', name: 'Seguridad Ocupacional y Medio Ambiente', weekly_hours: 4 },
-            { code: 'MAA-100', name: 'Matemática Aplicada', weekly_hours: 4 },
-            { code: 'EMC-100', name: 'Electricidad del Motor y Carrocería I', weekly_hours: 4 },
-            { code: 'MEA-100', name: 'Metrología Automotriz', weekly_hours: 6 },
-            { code: 'MGD-100', name: 'Motores a Gasolina y Diiesel I', weekly_hours: 6 },
-            { code: 'TRA-100', name: 'Transmisiones', weekly_hours: 6 },
+            { codigo: 'SOM-100', nombre: 'Seguridad Ocupacional y Medio Ambiente', horasSemanales: 4 },
+            { codigo: 'MAA-100', nombre: 'Matemática Aplicada', horasSemanales: 4 },
+            { codigo: 'EMC-100', nombre: 'Electricidad del Motor y Carrocería I', horasSemanales: 4 },
+            { codigo: 'MEA-100', nombre: 'Metrología Automotriz', horasSemanales: 6 },
+            { codigo: 'MGD-100', nombre: 'Motores a Gasolina y Diiesel I', horasSemanales: 6 },
+            { codigo: 'TRA-100', nombre: 'Transmisiones', horasSemanales: 6 },
           ],
           2: [
-            { code: 'INT-200', name: 'Inglés Técnico', weekly_hours: 4 },
-            { code: 'FIS-200', name: 'Física Aplicada', weekly_hours: 4 },
-            { code: 'EMC-200', name: 'Electricidad del Motor y Carrocería II', weekly_hours: 4 },
-            { code: 'CIF-200', name: 'Circuitos de Fluidos', weekly_hours: 6 },
-            { code: 'MGD-200', name: 'Motores a Gasolina y Diése II', weekly_hours: 6 },
-            { code: 'DIT-200', name: 'Dibujo Técnico', weekly_hours: 2 },
-            { code: 'SIA-200', name: 'Sistema de Iluminación Automotriz', weekly_hours: 4 },
+            { codigo: 'INT-200', nombre: 'Inglés Técnico', horasSemanales: 4 },
+            { codigo: 'FIS-200', nombre: 'Física Aplicada', horasSemanales: 4 },
+            { codigo: 'EMC-200', nombre: 'Electricidad del Motor y Carrocería II', horasSemanales: 4 },
+            { codigo: 'CIF-200', nombre: 'Circuitos de Fluidos', horasSemanales: 6 },
+            { codigo: 'MGD-200', nombre: 'Motores a Gasolina y Diése II', horasSemanales: 6 },
+            { codigo: 'DIT-200', nombre: 'Dibujo Técnico', horasSemanales: 2 },
+            { codigo: 'SIA-200', nombre: 'Sistema de Iluminación Automotriz', horasSemanales: 4 },
           ],
           3: [
-            { code: 'SIM-300', name: 'Sistema del Motor', weekly_hours: 6 },
-            { code: 'VHE-300', name: 'Vehículos Híbridos y Eléctricos', weekly_hours: 6 },
-            { code: 'PRO-300', name: 'Programación', weekly_hours: 4 },
-            { code: 'CAC-300', name: 'Circuitos de Arranque y Carga', weekly_hours: 6 },
-            { code: 'IGA-300', name: 'Inyección a Gasolina', weekly_hours: 4 },
-            { code: 'AUT-300', name: 'Autotrónica I', weekly_hours: 4 },
+            { codigo: 'SIM-300', nombre: 'Sistema del Motor', horasSemanales: 6 },
+            { codigo: 'VHE-300', nombre: 'Vehículos Híbridos y Eléctricos', horasSemanales: 6 },
+            { codigo: 'PRO-300', nombre: 'Programación', horasSemanales: 4 },
+            { codigo: 'CAC-300', nombre: 'Circuitos de Arranque y Carga', horasSemanales: 6 },
+            { codigo: 'IGA-300', nombre: 'Inyección a Gasolina', horasSemanales: 4 },
+            { codigo: 'AUT-300', nombre: 'Autotrónica I', horasSemanales: 4 },
           ],
           4: [
-            { code: 'EDA-400', name: 'Electrónica Digital del Automóvil', weekly_hours: 6 },
-            { code: 'MAN-400', name: 'Mantenimiento del Automóvil', weekly_hours: 4 },
-            { code: 'EAA-400', name: 'Electrónica Analógica del Automóvil', weekly_hours: 6 },
-            { code: 'MIC-400', name: 'Microcontroladores', weekly_hours: 6 },
-            { code: 'RMD-400', name: 'Reparación de Motores a Diése', weekly_hours: 4 },
-            { code: 'AUT-400', name: 'Autotrónica II', weekly_hours: 4 },
+            { codigo: 'EDA-400', nombre: 'Electrónica Digital del Automóvil', horasSemanales: 6 },
+            { codigo: 'MAN-400', nombre: 'Mantenimiento del Automóvil', horasSemanales: 4 },
+            { codigo: 'EAA-400', nombre: 'Electrónica Analógica del Automóvil', horasSemanales: 6 },
+            { codigo: 'MIC-400', nombre: 'Microcontroladores', horasSemanales: 6 },
+            { codigo: 'RMD-400', nombre: 'Reparación de Motores a Diése', horasSemanales: 4 },
+            { codigo: 'AUT-400', nombre: 'Autotrónica II', horasSemanales: 4 },
           ],
           5: [
-            { code: 'IEG-500', name: 'Inyección Electrónica a Gasolina', weekly_hours: 4 },
-            { code: 'ATM-500', name: 'Automatización', weekly_hours: 4 },
-            { code: 'RMP-500', name: 'Redes Multiplexadas y Protocolos', weekly_hours: 6 },
-            { code: 'RSA-500', name: 'Reparación de Caja Automática', weekly_hours: 4 },
-            { code: 'LAU-500', name: 'Laboratorio Autotrónica I', weekly_hours: 4 },
-            { code: 'EMP-500', name: 'Emprendimiento Productivo', weekly_hours: 4 },
-            { code: 'TMG-500', name: 'Taller de Modalidad de Graduación I', weekly_hours: 4 },
+            { codigo: 'IEG-500', nombre: 'Inyección Electrónica a Gasolina', horasSemanales: 4 },
+            { codigo: 'ATM-500', nombre: 'Automatización', horasSemanales: 4 },
+            { codigo: 'RMP-500', nombre: 'Redes Multiplexadas y Protocolos', horasSemanales: 6 },
+            { codigo: 'RSA-500', nombre: 'Reparación de Caja Automática', horasSemanales: 4 },
+            { codigo: 'LAU-500', nombre: 'Laboratorio Autotrónica I', horasSemanales: 4 },
+            { codigo: 'EMP-500', nombre: 'Emprendimiento Productivo', horasSemanales: 4 },
+            { codigo: 'TMG-500', nombre: 'Taller de Modalidad de Graduación I', horasSemanales: 4 },
           ],
           6: [
-            { code: 'PMI-600', name: 'Potenciamiento del Motor a Inyección Electrónica', weekly_hours: 4 },
-            { code: 'SCO-600', name: 'Seguridad y Confort', weekly_hours: 6 },
-            { code: 'IED-600', name: 'Inyección Electrónica a Diése', weekly_hours: 6 },
-            { code: 'SHI-600', name: 'Sistemas Híbridos', weekly_hours: 4 },
-            { code: 'LAU-600', name: 'Laboratorio Autotrónica II', weekly_hours: 4 },
-            { code: 'ENE-600', name: 'Electroneumática', weekly_hours: 2 },
-            { code: 'TMG-600', name: 'Taller de Modalidad de Graduación II', weekly_hours: 4 },
+            { codigo: 'PMI-600', nombre: 'Potenciamiento del Motor a Inyección Electrónica', horasSemanales: 4 },
+            { codigo: 'SCO-600', nombre: 'Seguridad y Confort', horasSemanales: 6 },
+            { codigo: 'IED-600', nombre: 'Inyección Electrónica a Diése', horasSemanales: 6 },
+            { codigo: 'SHI-600', nombre: 'Sistemas Híbridos', horasSemanales: 4 },
+            { codigo: 'LAU-600', nombre: 'Laboratorio Autotrónica II', horasSemanales: 4 },
+            { codigo: 'ENE-600', nombre: 'Electroneumática', horasSemanales: 2 },
+            { codigo: 'TMG-600', nombre: 'Taller de Modalidad de Graduación II', horasSemanales: 4 },
           ],
         },
       },
       2: {
-        rm_number: 'R.M. 0210/2024',
-        rm_date: '15/03/2024',
-        subjectsBySemester: {
+        numeroRm: 'R.M. 0210/2024',
+        fechaRm: '15/03/2024',
+        materiasPorSemestre: {
           1: [
-            { code: 'SOM-100', name: 'Seguridad Ocupacional y Medio Ambiente', weekly_hours: 4 },
-            { code: 'MOG-100', name: 'Motores a Gasolina I', weekly_hours: 6 },
-            { code: 'ELA-100', name: 'Electricidad Automotriz I', weekly_hours: 6 },
-            { code: 'MAA-100', name: 'Matemática Automotriz', weekly_hours: 4 },
-            { code: 'MEA-100', name: 'Metrología Automotriz', weekly_hours: 4 },
-            { code: 'DTA-100', name: 'Dibujo Técnico Automotriz I', weekly_hours: 2 },
-            { code: 'QUA-100', name: 'Química Automotriz', weekly_hours: 4 },
+            { codigo: 'SOM-100', nombre: 'Seguridad Ocupacional y Medio Ambiente', horasSemanales: 4 },
+            { codigo: 'MOG-100', nombre: 'Motores a Gasolina I', horasSemanales: 6 },
+            { codigo: 'ELA-100', nombre: 'Electricidad Automotriz I', horasSemanales: 6 },
+            { codigo: 'MAA-100', nombre: 'Matemática Automotriz', horasSemanales: 4 },
+            { codigo: 'MEA-100', nombre: 'Metrología Automotriz', horasSemanales: 4 },
+            { codigo: 'DTA-100', nombre: 'Dibujo Técnico Automotriz I', horasSemanales: 2 },
+            { codigo: 'QUA-100', nombre: 'Química Automotriz', horasSemanales: 4 },
           ],
           2: [
-            { code: 'INT-200', name: 'Inglés Técnico', weekly_hours: 4 },
-            { code: 'MOG-200', name: 'Motores a Gasolina II', weekly_hours: 6 },
-            { code: 'ELA-200', name: 'Electricidad Automotriz II', weekly_hours: 6 },
-            { code: 'CHS-200', name: 'Chapería y Soldadura', weekly_hours: 6 },
-            { code: 'FIS-200', name: 'Física Automotriz', weekly_hours: 4 },
-            { code: 'DTA-200', name: 'Dibujo Técnico Automotriz II', weekly_hours: 4 },
+            { codigo: 'INT-200', nombre: 'Inglés Técnico', horasSemanales: 4 },
+            { codigo: 'MOG-200', nombre: 'Motores a Gasolina II', horasSemanales: 6 },
+            { codigo: 'ELA-200', nombre: 'Electricidad Automotriz II', horasSemanales: 6 },
+            { codigo: 'CHS-200', nombre: 'Chapería y Soldadura', horasSemanales: 6 },
+            { codigo: 'FIS-200', nombre: 'Física Automotriz', horasSemanales: 4 },
+            { codigo: 'DTA-200', nombre: 'Dibujo Técnico Automotriz II', horasSemanales: 4 },
           ],
           3: [
-            { code: 'MOG-300', name: 'Motores a Gasolina III', weekly_hours: 6 },
-            { code: 'ELA-300', name: 'Electricidad Automotriz III', weekly_hours: 4 },
-            { code: 'MOD-300', name: 'Motores Diése I', weekly_hours: 4 },
-            { code: 'ETA-300', name: 'Electrónica Automotriz I', weekly_hours: 6 },
-            { code: 'TER-300', name: 'Termodinámica', weekly_hours: 2 },
-            { code: 'TRA-300', name: 'Transmisiones I', weekly_hours: 8 },
+            { codigo: 'MOG-300', nombre: 'Motores a Gasolina III', horasSemanales: 6 },
+            { codigo: 'ELA-300', nombre: 'Electricidad Automotriz III', horasSemanales: 4 },
+            { codigo: 'MOD-300', nombre: 'Motores Diése I', horasSemanales: 4 },
+            { codigo: 'ETA-300', nombre: 'Electrónica Automotriz I', horasSemanales: 6 },
+            { codigo: 'TER-300', nombre: 'Termodinámica', horasSemanales: 2 },
+            { codigo: 'TRA-300', nombre: 'Transmisiones I', horasSemanales: 8 },
           ],
           4: [
-            { code: 'MOG-400', name: 'Motores a Gasolina IV', weekly_hours: 6 },
-            { code: 'IAG-400', name: 'Inyección a Gasolina I', weekly_hours: 6 },
-            { code: 'MOD-400', name: 'Motores Diése II', weekly_hours: 4 },
-            { code: 'ETA-400', name: 'Electrónica Automotriz II', weekly_hours: 6 },
-            { code: 'TRA-400', name: 'Transmisiones II', weekly_hours: 4 },
-            { code: 'EMP-400', name: 'Emprendimiento Productivo', weekly_hours: 4 },
+            { codigo: 'MOG-400', nombre: 'Motores a Gasolina IV', horasSemanales: 6 },
+            { codigo: 'IAG-400', nombre: 'Inyección a Gasolina I', horasSemanales: 6 },
+            { codigo: 'MOD-400', nombre: 'Motores Diése II', horasSemanales: 4 },
+            { codigo: 'ETA-400', nombre: 'Electrónica Automotriz II', horasSemanales: 6 },
+            { codigo: 'TRA-400', nombre: 'Transmisiones II', horasSemanales: 4 },
+            { codigo: 'EMP-400', nombre: 'Emprendimiento Productivo', horasSemanales: 4 },
           ],
           5: [
-            { code: 'IED-500', name: 'Inyección Electrónica Diése I', weekly_hours: 4 },
-            { code: 'IAG-500', name: 'Inyección a Gasolina II', weekly_hours: 6 },
-            { code: 'LAD-500', name: 'Laboratorio Diése I', weekly_hours: 4 },
-            { code: 'ETA-500', name: 'Electrónica Automotriz III', weekly_hours: 6 },
-            { code: 'NEU-500', name: 'Neumática', weekly_hours: 2 },
-            { code: 'TRA-500', name: 'Transmisiones III', weekly_hours: 4 },
-            { code: 'TMG-500', name: 'Taller de Modalidad de Graduación I', weekly_hours: 4 },
+            { codigo: 'IED-500', nombre: 'Inyección Electrónica Diése I', horasSemanales: 4 },
+            { codigo: 'IAG-500', nombre: 'Inyección a Gasolina II', horasSemanales: 6 },
+            { codigo: 'LAD-500', nombre: 'Laboratorio Diése I', horasSemanales: 4 },
+            { codigo: 'ETA-500', nombre: 'Electrónica Automotriz III', horasSemanales: 6 },
+            { codigo: 'NEU-500', nombre: 'Neumática', horasSemanales: 2 },
+            { codigo: 'TRA-500', nombre: 'Transmisiones III', horasSemanales: 4 },
+            { codigo: 'TMG-500', nombre: 'Taller de Modalidad de Graduación I', horasSemanales: 4 },
           ],
           6: [
-            { code: 'IED-600', name: 'Inyección Electrónica Diése II', weekly_hours: 4 },
-            { code: 'DAU-600', name: 'Diagnóstico del Automóvil', weekly_hours: 4 },
-            { code: 'LAD-600', name: 'Laboratorio Diése II', weekly_hours: 4 },
-            { code: 'HID-600', name: 'Hidráulica', weekly_hours: 2 },
-            { code: 'MAP-600', name: 'Maquinaria Agrícola y Pesada', weekly_hours: 4 },
-            { code: 'IAG-600', name: 'Inyección a Gasolina III', weekly_hours: 4 },
-            { code: 'TRA-600', name: 'Transmisiones IV', weekly_hours: 4 },
-            { code: 'TMG-600', name: 'Taller de Modalidad de Graduación II', weekly_hours: 4 },
+            { codigo: 'IED-600', nombre: 'Inyección Electrónica Diése II', horasSemanales: 4 },
+            { codigo: 'DAU-600', nombre: 'Diagnóstico del Automóvil', horasSemanales: 4 },
+            { codigo: 'LAD-600', nombre: 'Laboratorio Diése II', horasSemanales: 4 },
+            { codigo: 'HID-600', nombre: 'Hidráulica', horasSemanales: 2 },
+            { codigo: 'MAP-600', nombre: 'Maquinaria Agrícola y Pesada', horasSemanales: 4 },
+            { codigo: 'IAG-600', nombre: 'Inyección a Gasolina III', horasSemanales: 4 },
+            { codigo: 'TRA-600', nombre: 'Transmisiones IV', horasSemanales: 4 },
+            { codigo: 'TMG-600', nombre: 'Taller de Modalidad de Graduación II', horasSemanales: 4 },
           ],
         },
       },
     };
-    return studyPlansData[careerId];
+    return planEstudiosData[careerId];
   };
 
   if (loading) {
@@ -192,7 +192,7 @@ export default function CareersPage() {
 
   return (
     <div className="bg-dark-900">
-      {/* Hero */}
+      {/* Encabezado */}
       <section className="relative h-64 sm:h-80 overflow-hidden bg-dark-900">
         <div className="absolute inset-0 opacity-30">
           <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80" alt="" className="w-full h-full object-cover" />
@@ -207,34 +207,34 @@ export default function CareersPage() {
         </div>
       </section>
 
-      {/* Careers */}
+      {/* Carreras */}
       <section className="bg-dark-900 text-gray-100 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-6 sm:space-y-8">
             {careers.map((career) => (
               <div key={career.id} className="bg-dark-700 rounded-2xl overflow-hidden">
                 <div className="md:flex">
-                  {/* Image */}
+                  {/* Imagen */}
                   <div className="md:w-1/3 relative">
                     <img
                       src={careerImages[career.id] || 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&q=80'}
-                      alt={career.name}
+                      alt={career.nombre}
                       className="w-full h-48 sm:h-64 md:h-full object-cover"
                     />
                   </div>
 
-                  {/* Content */}
+                  {/* Contenido */}
                   <div className="md:w-2/3 p-6 sm:p-8">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
                       <div>
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                          <h2 className="text-xl sm:text-2xl font-bold">{career.name}</h2>
+                          <h2 className="text-xl sm:text-2xl font-bold">{career.nombre}</h2>
                           <span className="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full flex items-center gap-1 w-fit">
                             <CheckCircle className="w-4 h-4" />
                             Activo
                           </span>
                         </div>
-                        <p className="text-primary-400 font-medium text-sm sm:text-base">{career.title}</p>
+                        <p className="text-primary-400 font-medium text-sm sm:text-base">{career.titulo}</p>
                       </div>
                       <Link
                         href={`/admision/pre-registro?carrera=${career.id}`}
@@ -244,7 +244,7 @@ export default function CareersPage() {
                       </Link>
                     </div>
 
-                    <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">{career.description}</p>
+                    <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">{career.descripcion}</p>
 
                     <div className="flex flex-wrap gap-4 sm:gap-6 text-sm text-gray-500 mb-4 sm:mb-6">
                       <div className="flex items-center gap-2">
@@ -253,11 +253,11 @@ export default function CareersPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4" />
-                        <span>{career.load_hours} horas</span>
+                        <span>{career.horasCarga} horas</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4" />
-                        <span>{career.studyPlan?.rm_number}</span>
+                        <span>{career.planEstudio?.numeroRm}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <GraduationCap className="w-4 h-4" />
@@ -290,7 +290,7 @@ export default function CareersPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Llamada a la acción */}
       <section className="bg-dark-700 py-12 sm:py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-3 sm:mb-4">¿Quieres más información?</h2>

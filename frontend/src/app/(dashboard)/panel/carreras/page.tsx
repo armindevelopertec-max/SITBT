@@ -13,18 +13,18 @@ import { api } from '@/lib/api';
 
 interface Carrera {
   id: number;
-  name: string;
-  code: string;
-  description: string;
+  nombre: string;
+  codigo: string;
+  descripcion: string;
   area: string;
-  status: string;
-  created_at: string;
+  estado: string;
+  creadoEn: string;
 }
 
 interface CareerFormData {
-  name: string;
-  code: string;
-  description: string;
+  nombre: string;
+  codigo: string;
+  descripcion: string;
   area: string;
 }
 
@@ -38,9 +38,9 @@ export default function CarrerasPage() {
   const [formLoading, setFormLoading] = useState(false);
   const [deleteModal, setDeleteModal] = useState<Carrera | null>(null);
   const [form, setForm] = useState<CareerFormData>({
-    name: '',
-    code: '',
-    description: '',
+    nombre: '',
+    codigo: '',
+    descripcion: '',
     area: '',
   });
 
@@ -52,7 +52,7 @@ export default function CarrerasPage() {
       const response = await api.get('/carreras', { params });
       setCareers(response.data.data || response.data);
     } catch (error) {
-      console.error('Error fetching careers:', error);
+      console.error('Error al obtener las carreras:', error);
     } finally {
       setLoading(false);
     }
@@ -65,8 +65,8 @@ export default function CarrerasPage() {
   const filteredCareers = careers.filter((career) => {
     const search = searchTerm.toLowerCase();
     return (
-      career.name.toLowerCase().includes(search) ||
-      career.code.toLowerCase().includes(search) ||
+      career.nombre.toLowerCase().includes(search) ||
+      career.codigo.toLowerCase().includes(search) ||
       career.area.toLowerCase().includes(search)
     );
   });
@@ -75,14 +75,14 @@ export default function CarrerasPage() {
     if (career) {
       setEditingCareer(career);
       setForm({
-        name: career.name,
-        code: career.code,
-        description: career.description || '',
+        nombre: career.nombre,
+        codigo: career.codigo,
+        descripcion: career.descripcion || '',
         area: career.area || '',
       });
     } else {
       setEditingCareer(null);
-      setForm({ name: '', code: '', description: '', area: '' });
+      setForm({ nombre: '', codigo: '', descripcion: '', area: '' });
     }
     setIsModalOpen(true);
   };
@@ -90,7 +90,7 @@ export default function CarrerasPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingCareer(null);
-    setForm({ name: '', code: '', description: '', area: '' });
+    setForm({ nombre: '', codigo: '', descripcion: '', area: '' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,7 +105,7 @@ export default function CarrerasPage() {
       handleCloseModal();
       fetchCareers();
     } catch (error) {
-      console.error('Error saving career:', error);
+      console.error('Error al guardar la carrera:', error);
       alert('Error al guardar la carrera');
     } finally {
       setFormLoading(false);
@@ -120,7 +120,7 @@ export default function CarrerasPage() {
       setDeleteModal(null);
       fetchCareers();
     } catch (error) {
-      console.error('Error deleting career:', error);
+      console.error('Error al eliminar la carrera:', error);
       alert('Error al eliminar la carrera');
     } finally {
       setFormLoading(false);
@@ -194,11 +194,11 @@ export default function CarrerasPage() {
             <CuerpoTabla>
               {filteredCareers.map((career) => (
                 <FilaTabla key={career.id}>
-                  <CeldaTabla className="font-medium">{career.code}</CeldaTabla>
-                  <CeldaTabla>{career.name}</CeldaTabla>
+                  <CeldaTabla className="font-medium">{career.codigo}</CeldaTabla>
+                  <CeldaTabla>{career.nombre}</CeldaTabla>
                   <CeldaTabla>{career.area || '-'}</CeldaTabla>
-                  <CeldaTabla className="max-w-xs truncate">{career.description || '-'}</CeldaTabla>
-                  <CeldaTabla>{getStatusBadge(career.status)}</CeldaTabla>
+                  <CeldaTabla className="max-w-xs truncate">{career.descripcion || '-'}</CeldaTabla>
+                  <CeldaTabla>{getStatusBadge(career.estado)}</CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
                       <Boton variant="ghost" size="icon" onClick={() => handleOpenModal(career)}>
@@ -229,8 +229,8 @@ export default function CarrerasPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Código *</label>
             <Entrada
-              value={form.code}
-              onChange={(e) => setForm({ ...form, code: e.target.value })}
+              value={form.codigo}
+              onChange={(e) => setForm({ ...form, codigo: e.target.value })}
               placeholder="Ej: ING-SIS"
               required
             />
@@ -238,8 +238,8 @@ export default function CarrerasPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
             <Entrada
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              value={form.nombre}
+              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
               placeholder="Ej: Ingeniería de Sistemas"
               required
             />
@@ -264,8 +264,8 @@ export default function CarrerasPage() {
             <textarea
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               rows={3}
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              value={form.descripcion}
+              onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
               placeholder="Descripción de la carrera..."
             />
           </div>
@@ -284,7 +284,7 @@ export default function CarrerasPage() {
       <Modal open={!!deleteModal} onClose={() => setDeleteModal(null)} title="Eliminar Carrera" size="sm">
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            ¿Está seguro de eliminar la carrera <strong>{deleteModal?.name}</strong>?
+            ¿Está seguro de eliminar la carrera <strong>{deleteModal?.nombre}</strong>?
           </p>
           <div className="flex justify-end gap-2">
             <Boton variant="outline" onClick={() => setDeleteModal(null)}>

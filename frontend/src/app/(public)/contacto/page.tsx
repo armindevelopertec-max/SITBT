@@ -11,7 +11,7 @@ export default function ContactoPage() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     nombre: '',
-    email: '',
+    correo: '',
     telefono: '',
     mensaje: '',
   });
@@ -37,7 +37,7 @@ export default function ContactoPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => { setSubmitted(false); setForm({ nombre: '', email: '', telefono: '', mensaje: '' }); }}
+              onClick={() => { setSubmitted(false); setForm({ nombre: '', correo: '', telefono: '', mensaje: '' }); }}
               className="px-6 py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all"
             >
               Enviar otro mensaje
@@ -53,7 +53,7 @@ export default function ContactoPage() {
 
   return (
     <div>
-      {/* Hero */}
+      {/* Encabezado */}
       <section className="relative h-56 sm:h-64 overflow-hidden bg-dark-800">
         <div className="absolute inset-0 opacity-30">
           <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80" alt="" className="w-full h-full object-cover" />
@@ -66,11 +66,11 @@ export default function ContactoPage() {
         </div>
       </section>
 
-      {/* Contact Info & Form */}
+      {/* Información de contacto y formulario */}
       <section className="bg-dark-900 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
-            {/* Contact Info */}
+            {/* Información de contacto */}
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-4 sm:mb-6">Información de contacto</h2>
               <p className="text-gray-400 mb-6 sm:mb-8 text-sm sm:text-base">
@@ -106,8 +106,8 @@ export default function ContactoPage() {
                     <Mail className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-100 mb-1">Email</h4>
-                    <p className="text-gray-400 text-sm sm:text-base">{institucion?.email || 'ITBT@edu.bo'}</p>
+                    <h4 className="font-semibold text-gray-100 mb-1">Correo</h4>
+                    <p className="text-gray-400 text-sm sm:text-base">{institucion?.correo || 'ITBT@edu.bo'}</p>
                   </div>
                 </div>
 
@@ -126,7 +126,7 @@ export default function ContactoPage() {
               <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-dark-700 border border-dark-600 rounded-xl">
                 <div className="flex items-center gap-3 mb-2 sm:mb-3">
                   <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-primary-400" />
-                  <h4 className="font-semibold text-gray-100">¿PrefieresWhatsApp?</h4>
+                  <h4 className="font-semibold text-gray-100">¿Prefieres WhatsApp?</h4>
                 </div>
                 <p className="text-gray-400 text-xs sm:text-sm">
                   Contáctanos directamente por WhatsApp para una respuesta más rápida.
@@ -142,7 +142,7 @@ export default function ContactoPage() {
               </div>
             </div>
 
-            {/* Contact Form */}
+            {/* Formulario de contacto */}
             <div>
               <div className="bg-dark-700 border border-dark-600 rounded-2xl p-6 sm:p-8">
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-100 mb-4 sm:mb-6">Envíanos un mensaje</h3>
@@ -163,17 +163,17 @@ export default function ContactoPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                    <label htmlFor="correo" className="block text-sm font-medium text-gray-300 mb-2">
                       Correo electrónico
                     </label>
                     <input
                       type="email"
-                      id="email"
+                      id="correo"
                       required
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      value={form.correo}
+                      onChange={(e) => setForm({ ...form, correo: e.target.value })}
                       className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
-                      placeholder="tu@email.com"
+                      placeholder="tu@correo.com"
                     />
                   </div>
 
@@ -232,7 +232,7 @@ export default function ContactoPage() {
         </div>
       </section>
 
-      {/* Map */}
+      {/* Mapa */}
       <section className="bg-dark-800 border-t border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-4 sm:mb-6 text-center">Nuestra Ubicación</h2>

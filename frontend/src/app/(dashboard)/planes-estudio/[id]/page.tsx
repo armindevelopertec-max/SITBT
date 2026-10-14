@@ -12,17 +12,17 @@ import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
 interface Carrera {
   id: number;
-  code: string;
-  name: string;
+  codigo: string;
+  nombre: string;
 }
 
 interface PlanEstudio {
   id: number;
-  career_id: number;
-  rm_number: string;
-  rm_date: string;
+  carreraId: number;
+  numeroRm: string;
+  fechaRm: string;
   estado: 'vigente' | 'historico';
-  notes: string | null;
+  notas: string | null;
 }
 
 export default function EditarPlanPage() {
@@ -38,11 +38,11 @@ export default function EditarPlanPage() {
   const [notFound, setNotFound] = useState(false);
 
   const [formData, setFormData] = useState({
-    career_id: '',
-    rm_number: '',
-    rm_date: '',
+    carreraId: '',
+    numeroRm: '',
+    fechaRm: '',
     estado: 'vigente',
-    notes: '',
+    notas: '',
   });
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function EditarPlanPage() {
       const response = await api.get('/carreras/active');
       setCarreras(response.data || []);
     } catch (error) {
-      console.error('Error fetching carreras:', error);
+      console.error('Error al obtener las carreras:', error);
     } finally {
       setLoadingData(false);
     }
@@ -66,14 +66,14 @@ export default function EditarPlanPage() {
       const response = await api.get(`/planes-estudio/${planId}`);
       const plan: PlanEstudio = response.data;
       setFormData({
-        career_id: plan.career_id.toString(),
-        rm_number: plan.rm_number,
-        rm_date: plan.rm_date.split('T')[0],
+        carreraId: plan.carreraId.toString(),
+        numeroRm: plan.numeroRm,
+        fechaRm: plan.fechaRm.split('T')[0],
         estado: plan.estado,
-        notes: plan.notes || '',
+        notas: plan.notas || '',
       });
     } catch (error) {
-      console.error('Error fetching plan:', error);
+      console.error('Error al obtener el plan:', error);
       setNotFound(true);
     } finally {
       setLoading(false);
@@ -83,9 +83,9 @@ export default function EditarPlanPage() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.career_id) newErrors.career_id = 'Carrera es requerida';
-    if (!formData.rm_number.trim()) newErrors.rm_number = 'Número RM es requerido';
-    if (!formData.rm_date) newErrors.rm_date = 'Fecha RM es requerida';
+    if (!formData.carreraId) newErrors.carreraId = 'Carrera es requerida';
+    if (!formData.numeroRm.trim()) newErrors.numeroRm = 'Número RM es requerido';
+    if (!formData.fechaRm) newErrors.fechaRm = 'Fecha RM es requerida';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -99,16 +99,16 @@ export default function EditarPlanPage() {
     setSaving(true);
     try {
       await api.patch(`/planes-estudio/${planId}`, {
-        career_id: parseInt(formData.career_id),
-        rm_number: formData.rm_number.trim().toUpperCase(),
-        rm_date: formData.rm_date,
+        carreraId: parseInt(formData.carreraId),
+        numeroRm: formData.numeroRm.trim().toUpperCase(),
+        fechaRm: formData.fechaRm,
         estado: formData.estado,
-        notes: formData.notes.trim() || null,
+        notas: formData.notas.trim() || null,
       });
 
       router.push('/planes-estudio');
     } catch (error: any) {
-      console.error('Error updating plan:', error);
+      console.error('Error al actualizar el plan de estudio:', error);
       if (error.response?.data?.message) {
         setErrors({ submit: error.response.data.message });
       } else {
@@ -174,10 +174,10 @@ export default function EditarPlanPage() {
               <div>
                 <Selector
                   label="Carrera *"
-                  value={formData.career_id}
-                  onChange={(e) => setFormData({ ...formData, career_id: e.target.value })}
-                  error={errors.career_id}
-                  options={carreras.map(c => ({ value: c.id.toString(), label: c.name }))}
+                  value={formData.carreraId}
+                  onChange={(e) => setFormData({ ...formData, carreraId: e.target.value })}
+                  error={errors.carreraId}
+                  options={carreras.map(c => ({ value: c.id.toString(), label: c.nombre }))}
                   placeholder={loadingData ? 'Cargando...' : 'Seleccionar carrera...'}
                   disabled={loadingData}
                 />
@@ -185,9 +185,9 @@ export default function EditarPlanPage() {
               <div>
                 <Entrada
                   label="Número RM *"
-                  value={formData.rm_number}
-                  onChange={(e) => setFormData({ ...formData, rm_number: e.target.value.toUpperCase() })}
-                  error={errors.rm_number}
+                  value={formData.numeroRm}
+                  onChange={(e) => setFormData({ ...formData, numeroRm: e.target.value.toUpperCase() })}
+                  error={errors.numeroRm}
                   placeholder="RM 2024/001"
                 />
               </div>
@@ -198,9 +198,9 @@ export default function EditarPlanPage() {
                 <Entrada
                   label="Fecha RM *"
                   type="date"
-                  value={formData.rm_date}
-                  onChange={(e) => setFormData({ ...formData, rm_date: e.target.value })}
-                  error={errors.rm_date}
+                  value={formData.fechaRm}
+                  onChange={(e) => setFormData({ ...formData, fechaRm: e.target.value })}
+                  error={errors.fechaRm}
                 />
               </div>
               <div>
@@ -219,8 +219,8 @@ export default function EditarPlanPage() {
             <div>
               <Entrada
                 label="Notas"
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                value={formData.notas}
+                onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
                 placeholder="Notas adicionales..."
               />
             </div>

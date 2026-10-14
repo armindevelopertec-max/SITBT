@@ -15,23 +15,23 @@ export default function NuevaMateriaPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
-    code: '',
-    name: '',
+    codigo: '',
+    nombre: '',
   });
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.code.trim()) {
-      newErrors.code = 'Código es requerido';
-    } else if (formData.code.length < 3) {
-      newErrors.code = 'Código debe tener al menos 3 caracteres';
+    if (!formData.codigo.trim()) {
+      newErrors.codigo = 'Código es requerido';
+    } else if (formData.codigo.length < 3) {
+      newErrors.codigo = 'Código debe tener al menos 3 caracteres';
     }
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Nombre es requerido';
-    } else if (formData.name.length < 3) {
-      newErrors.name = 'Nombre debe tener al menos 3 caracteres';
+    if (!formData.nombre.trim()) {
+      newErrors.nombre = 'Nombre es requerido';
+    } else if (formData.nombre.length < 3) {
+      newErrors.nombre = 'Nombre debe tener al menos 3 caracteres';
     }
 
     setErrors(newErrors);
@@ -46,13 +46,13 @@ export default function NuevaMateriaPage() {
     setLoading(true);
     try {
       await api.post('/materias', {
-        code: formData.code.trim().toUpperCase(),
-        name: formData.name.trim(),
+        codigo: formData.codigo.trim().toUpperCase(),
+        nombre: formData.nombre.trim(),
       });
 
       router.push('/materias');
     } catch (error: any) {
-      console.error('Error creating materia:', error);
+      console.error('Error al crear la materia:', error);
       if (error.response?.data?.message) {
         setErrors({ submit: error.response.data.message });
       } else if (error.response?.data?.error?.code === '23505') {
@@ -92,18 +92,18 @@ export default function NuevaMateriaPage() {
               <div>
                 <Entrada
                   label="Código *"
-                  value={formData.code}
-                  onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                  error={errors.code}
+                  value={formData.codigo}
+                  onChange={(e) => setFormData({ ...formData, codigo: e.target.value.toUpperCase() })}
+                  error={errors.codigo}
                   placeholder="MAT-101"
                 />
               </div>
               <div>
                 <Entrada
                   label="Nombre *"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  error={errors.name}
+                  value={formData.nombre}
+                  onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                  error={errors.nombre}
                   placeholder="Matemáticas I"
                 />
               </div>

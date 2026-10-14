@@ -43,7 +43,7 @@ export default function StaffPage() {
       const response = await api.get('/personal');
       setStaff(response.data.data);
     } catch (error) {
-      console.error('Error fetching staff:', error);
+      console.error('Error al cargar personal:', error);
     } finally {
       setLoading(false);
     }
@@ -52,7 +52,7 @@ export default function StaffPage() {
   const filteredStaff = staff.filter((s) => {
     const person = s.persona;
     if (!person) return false;
-    const fullName = `${person.names} ${person.lastname_paternal} ${person.lastname_maternal}`.toLowerCase();
+    const fullName = `${person.nombres} ${person.apellidoPaterno} ${person.apellidoMaterno}`.toLowerCase();
     const ci = person.ci.toLowerCase();
     const search = searchTerm.toLowerCase();
     return fullName.includes(search) || ci.includes(search);
@@ -87,7 +87,7 @@ export default function StaffPage() {
       setDeleteModal(null);
       fetchStaff();
     } catch (error) {
-      console.error('Error deleting staff:', error);
+      console.error('Error al eliminar personal:', error);
     } finally {
       setFormLoading(false);
     }
@@ -95,21 +95,21 @@ export default function StaffPage() {
 
   const viewCredentials = async (s: Personal) => {
     try {
-      const response = await api.get(`/usuarios?person_id=${s.person_id}`);
+      const response = await api.get(`/usuarios?personaId=${s.personaId}`);
       const users = response.data.data;
       const persona = s.persona;
-      const nombre = persona ? `${persona.names} ${persona.lastname_paternal}` : 'Personal';
+      const nombre = persona ? `${persona.nombres} ${persona.apellidoPaterno}` : 'Personal';
 
       if (users && users.length > 0 && persona) {
         const user = users[0];
         const newPassword = `${persona.ci}-${new Date().getFullYear()}`;
-        setCredentialsModal({ username: user.nombreUsuario, password: newPassword, nombre, staffId: s.id, personId: s.person_id });
+        setCredentialsModal({ username: user.nombreUsuario, password: newPassword, nombre, staffId: s.id, personId: s.personaId });
       } else {
-        setCredentialsModal({ username: 'No tiene usuario', password: '', nombre, staffId: s.id, personId: s.person_id });
+        setCredentialsModal({ username: 'No tiene usuario', password: '', nombre, staffId: s.id, personId: s.personaId });
       }
     } catch (error) {
-      console.error('Error fetching user:', error);
-      setCredentialsModal({ username: 'Error al cargar', password: '', nombre: s.persona?.names || '', staffId: s.id, personId: s.person_id });
+      console.error('Error al obtener usuario:', error);
+      setCredentialsModal({ username: 'Error al cargar', password: '', nombre: s.persona?.nombres || '', staffId: s.id, personId: s.personaId });
     }
   };
 
@@ -117,14 +117,14 @@ export default function StaffPage() {
     if (!credentialsModal) return;
     setResetLoading(true);
     try {
-      const response = await api.get(`/usuarios?person_id=${credentialsModal.personId}`);
+      const response = await api.get(`/usuarios?personaId=${credentialsModal.personId}`);
       const users = response.data.data;
       if (users && users.length > 0) {
         await api.post(`/usuarios/${users[0].id}/change-password`, { newPassword: credentialsModal.password });
       }
       setCredentialsModal(null);
     } catch (error) {
-      console.error('Error resetting password:', error);
+      console.error('Error al restablecer contraseña:', error);
     } finally {
       setResetLoading(false);
     }
@@ -184,11 +184,11 @@ export default function StaffPage() {
                     {s.persona?.ci}
                   </CeldaTabla>
                   <CeldaTabla>
-                    {s.persona?.names} {s.persona?.lastname_paternal} {s.persona?.lastname_maternal}
+                    {s.persona?.nombres} {s.persona?.apellidoPaterno} {s.persona?.apellidoMaterno}
                   </CeldaTabla>
-                  <CeldaTabla>{getRolBadge(s.position)}</CeldaTabla>
-                  <CeldaTabla>{s.profession || '-'}</CeldaTabla>
-                  <CeldaTabla>{getStatusBadge(s.status)}</CeldaTabla>
+                  <CeldaTabla>{getRolBadge(s.cargo)}</CeldaTabla>
+                  <CeldaTabla>{s.profesion || '-'}</CeldaTabla>
+                  <CeldaTabla>{getStatusBadge(s.estado)}</CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
                       <Boton variant="ghost" size="icon" title="Ver credenciales" onClick={() => viewCredentials(s)}>
@@ -221,7 +221,7 @@ export default function StaffPage() {
         onClose={() => setDeleteModal(null)}
         onConfirm={handleDelete}
         title="Eliminar Personal"
-        message={`¿Está seguro de eliminar a "${deleteModal?.persona?.names} ${deleteModal?.persona?.lastname_paternal}"? Esta acción no se puede deshacer.`}
+        message={`¿Está seguro de eliminar a "${deleteModal?.persona?.nombres} ${deleteModal?.persona?.apellidoPaterno}"? Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
         variant="destructive"
         loading={formLoading}

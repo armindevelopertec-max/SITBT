@@ -71,7 +71,7 @@ export default function UsersPage() {
       setCreateModal(false);
       setFormData({ nombreUsuario: '', contrasena: '', personaId: 1, codigoRol: 'estudiante' });
     } catch (err) {
-      console.error('Error creating user:', err);
+      console.error('Error al crear usuario:', err);
     } finally {
       setFormLoading(false);
     }
@@ -84,7 +84,7 @@ export default function UsersPage() {
       await actualizarUsuario(editModal.id, { nombreUsuario: formData.nombreUsuario });
       setEditModal(null);
     } catch (err) {
-      console.error('Error updating user:', err);
+      console.error('Error al actualizar usuario:', err);
     } finally {
       setFormLoading(false);
     }
@@ -97,7 +97,7 @@ export default function UsersPage() {
       await eliminarUsuario(deleteModal.user.id);
       setDeleteModal({ open: false, user: null });
     } catch (err) {
-      console.error('Error deleting user:', err);
+      console.error('Error al eliminar usuario:', err);
     } finally {
       setFormLoading(false);
     }
@@ -111,7 +111,7 @@ export default function UsersPage() {
       setResetPasswordModal({ open: false, user: null });
       setNewPassword('');
     } catch (err) {
-      console.error('Error resetting password:', err);
+      console.error('Error al restablecer contraseña:', err);
     } finally {
       setResetLoading(false);
     }
@@ -169,7 +169,7 @@ export default function UsersPage() {
               <EncabezadoTabla>
                 <FilaTabla>
                   <CeldaEncabezado>Usuario</CeldaEncabezado>
-                  <CeldaEncabezado>Email</CeldaEncabezado>
+                  <CeldaEncabezado>Correo</CeldaEncabezado>
                   <CeldaEncabezado>Rol</CeldaEncabezado>
                   <CeldaEncabezado>Estado</CeldaEncabezado>
                   <CeldaEncabezado>Acciones</CeldaEncabezado>

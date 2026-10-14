@@ -11,8 +11,8 @@ export default function DisenoPublico({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const logoUrl = institucion?.logo_url;
-  const nombreInstitucion = institucion?.nombre_corto || 'ITBT';
+  const logoUrl = institucion?.logoUrl;
+  const nombreInstitucion = institucion?.nombreCorto || 'ITBT';
 
   const navItems = [
     { href: '/', label: 'Inicio' },
@@ -184,7 +184,7 @@ export default function DisenoPublico({ children }: { children: React.ReactNode 
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail className="w-4 h-4 flex-shrink-0" />
-                  <span>{institucion?.email || 'ITBT@edu.bo'}</span>
+                  <span>{institucion?.correo || 'ITBT@edu.bo'}</span>
                 </li>
               </ul>
             </div>

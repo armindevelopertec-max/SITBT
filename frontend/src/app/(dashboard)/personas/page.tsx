@@ -9,9 +9,9 @@ import { Insignia } from '@/components/ui/insignia';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 
 const personsData = [
-  { id: 1, ci: '12345678', nombre: 'Juan', primerApellido: 'Perez', segundoApellido: 'Gomez', telefono: '76543210', email: 'juan.perez@email.com', genero: 'M' },
-  { id: 2, ci: '87654321', nombre: 'Maria', primerApellido: 'Lopez', segundoApellido: 'Rodriguez', telefono: '71234567', email: 'maria.lopez@email.com', genero: 'F' },
-  { id: 3, ci: '11223344', nombre: 'Carlos', primerApellido: 'Mendez', segundoApellido: 'Fernandez', telefono: '77889900', email: 'carlos.mendez@email.com', genero: 'M' },
+  { id: 1, ci: '12345678', nombre: 'Juan', primerApellido: 'Perez', segundoApellido: 'Gomez', telefono: '76543210', correo: 'juan.perez@email.com', genero: 'M' },
+  { id: 2, ci: '87654321', nombre: 'Maria', primerApellido: 'Lopez', segundoApellido: 'Rodriguez', telefono: '71234567', correo: 'maria.lopez@email.com', genero: 'F' },
+  { id: 3, ci: '11223344', nombre: 'Carlos', primerApellido: 'Mendez', segundoApellido: 'Fernandez', telefono: '77889900', correo: 'carlos.mendez@email.com', genero: 'M' },
 ];
 
 export default function PersonsPage() {
@@ -45,7 +45,7 @@ export default function PersonsPage() {
                 <CeldaEncabezado>Nombre</CeldaEncabezado>
                 <CeldaEncabezado>Apellidos</CeldaEncabezado>
                 <CeldaEncabezado>Teléfono</CeldaEncabezado>
-                <CeldaEncabezado>Email</CeldaEncabezado>
+                <CeldaEncabezado>Correo</CeldaEncabezado>
                 <CeldaEncabezado>Género</CeldaEncabezado>
                 <CeldaEncabezado>Acciones</CeldaEncabezado>
               </FilaTabla>
@@ -57,7 +57,7 @@ export default function PersonsPage() {
                   <CeldaTabla>{person.nombre}</CeldaTabla>
                   <CeldaTabla>{person.primerApellido} {person.segundoApellido}</CeldaTabla>
                   <CeldaTabla>{person.telefono}</CeldaTabla>
-                  <CeldaTabla>{person.email}</CeldaTabla>
+                  <CeldaTabla>{person.correo}</CeldaTabla>
                   <CeldaTabla>
                     <Insignia variant={person.genero === 'M' ? 'primary' : 'secondary'}>
                       {person.genero === 'M' ? 'Masculino' : 'Femenino'}

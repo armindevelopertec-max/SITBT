@@ -12,22 +12,22 @@ import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
 interface Carrera {
   id: number;
-  code: string;
-  name: string;
+  codigo: string;
+  nombre: string;
 }
 
 interface Turno {
   id: number;
-  code: string;
-  name: string;
-  start_time: string;
-  end_time: string;
+  codigo: string;
+  nombre: string;
+  horaInicio: string;
+  horaFin: string;
 }
 
 interface PlanEstudio {
   id: number;
-  career_id: number;
-  rm_number: string;
+  carreraId: number;
+  numeroRm: string;
 }
 
 export default function NuevoGrupoPage() {
@@ -40,13 +40,13 @@ export default function NuevoGrupoPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
-    career_id: '',
-    study_plan_id: '',
-    semester: '',
-    shift_id: '',
-    parallel: '',
+    carreraId: '',
+    planEstudioId: '',
+    semestre: '',
+    turnoId: '',
+    paralelo: '',
     gestion: new Date().getFullYear().toString(),
-    capacity: '30',
+    capacidad: '30',
   });
 
   useEffect(() => {
@@ -54,10 +54,10 @@ export default function NuevoGrupoPage() {
   }, []);
 
   useEffect(() => {
-    if (formData.career_id) {
-      fetchPlanesEstudio(Number(formData.career_id));
+    if (formData.carreraId) {
+      fetchPlanesEstudio(Number(formData.carreraId));
     }
-  }, [formData.career_id]);
+  }, [formData.carreraId]);
 
   const fetchInitialData = async () => {
     setLoadingData(true);
@@ -69,7 +69,7 @@ export default function NuevoGrupoPage() {
       setCarreras(carrerasRes.data || []);
       setTurnos(turnosRes.data || []);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error al obtener los datos:', error);
     } finally {
       setLoadingData(false);
     }
@@ -84,18 +84,18 @@ export default function NuevoGrupoPage() {
         setPlanesEstudio(allResponse.data?.data || []);
       }
     } catch (error) {
-      console.error('Error fetching planes:', error);
+      console.error('Error al obtener los planes de estudio:', error);
     }
   };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.career_id) newErrors.career_id = 'Carrera es requerida';
-    if (!formData.study_plan_id) newErrors.study_plan_id = 'Plan de estudio es requerido';
-    if (!formData.semester) newErrors.semester = 'Semestre es requerido';
-    if (!formData.shift_id) newErrors.shift_id = 'Turno es requerido';
-    if (!formData.parallel.trim()) newErrors.parallel = 'Paralelo es requerido';
+    if (!formData.carreraId) newErrors.carreraId = 'Carrera es requerida';
+    if (!formData.planEstudioId) newErrors.planEstudioId = 'Plan de estudio es requerido';
+    if (!formData.semestre) newErrors.semestre = 'Semestre es requerido';
+    if (!formData.turnoId) newErrors.turnoId = 'Turno es requerido';
+    if (!formData.paralelo.trim()) newErrors.paralelo = 'Paralelo es requerido';
     if (!formData.gestion.trim()) newErrors.gestion = 'Gestión es requerida';
 
     setErrors(newErrors);
@@ -110,18 +110,18 @@ export default function NuevoGrupoPage() {
     setLoading(true);
     try {
       await api.post('/grupos', {
-        career_id: parseInt(formData.career_id),
-        study_plan_id: parseInt(formData.study_plan_id),
-        semester: parseInt(formData.semester),
-        shift_id: parseInt(formData.shift_id),
-        parallel: formData.parallel.toUpperCase(),
+        carreraId: parseInt(formData.carreraId),
+        planEstudioId: parseInt(formData.planEstudioId),
+        semestre: parseInt(formData.semestre),
+        turnoId: parseInt(formData.turnoId),
+        paralelo: formData.paralelo.toUpperCase(),
         gestion: formData.gestion,
-        capacity: parseInt(formData.capacity) || 30,
+        capacidad: parseInt(formData.capacidad) || 30,
       });
 
       router.push('/grupos');
     } catch (error: any) {
-      console.error('Error creating grupo:', error);
+      console.error('Error al crear el grupo:', error);
       if (error.response?.data?.message) {
         setErrors({ submit: error.response.data.message });
       } else {
@@ -166,10 +166,10 @@ export default function NuevoGrupoPage() {
               <div>
                 <Selector
                   label="Carrera *"
-                  value={formData.career_id}
-                  onChange={(e) => setFormData({ ...formData, career_id: e.target.value, study_plan_id: '' })}
-                  error={errors.career_id}
-                  options={carreras.map(c => ({ value: c.id.toString(), label: c.name }))}
+                  value={formData.carreraId}
+                  onChange={(e) => setFormData({ ...formData, carreraId: e.target.value, planEstudioId: '' })}
+                  error={errors.carreraId}
+                  options={carreras.map(c => ({ value: c.id.toString(), label: c.nombre }))}
                   placeholder={loadingData ? 'Cargando...' : 'Seleccionar carrera...'}
                   disabled={loadingData}
                 />
@@ -177,20 +177,20 @@ export default function NuevoGrupoPage() {
               <div>
                 <Selector
                   label="Plan de Estudio *"
-                  value={formData.study_plan_id}
-                  onChange={(e) => setFormData({ ...formData, study_plan_id: e.target.value })}
-                  error={errors.study_plan_id}
-                  options={planesEstudio.map(p => ({ value: p.id.toString(), label: `RM ${p.rm_number}` }))}
-                  placeholder={!formData.career_id ? 'Primero seleccione carrera' : planesEstudio.length ? 'Seleccionar plan...' : 'No hay planes'}
-                  disabled={!formData.career_id || loadingData}
+                  value={formData.planEstudioId}
+                  onChange={(e) => setFormData({ ...formData, planEstudioId: e.target.value })}
+                  error={errors.planEstudioId}
+                  options={planesEstudio.map(p => ({ value: p.id.toString(), label: `RM ${p.numeroRm}` }))}
+                  placeholder={!formData.carreraId ? 'Primero seleccione carrera' : planesEstudio.length ? 'Seleccionar plan...' : 'No hay planes'}
+                  disabled={!formData.carreraId || loadingData}
                 />
               </div>
               <div>
                 <Selector
                   label="Semestre *"
-                  value={formData.semester}
-                  onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
-                  error={errors.semester}
+                  value={formData.semestre}
+                  onChange={(e) => setFormData({ ...formData, semestre: e.target.value })}
+                  error={errors.semestre}
                   options={getSemesters()}
                   placeholder="Seleccionar semestre..."
                 />
@@ -201,10 +201,10 @@ export default function NuevoGrupoPage() {
               <div>
                 <Selector
                   label="Turno *"
-                  value={formData.shift_id}
-                  onChange={(e) => setFormData({ ...formData, shift_id: e.target.value })}
-                  error={errors.shift_id}
-                  options={turnos.map(t => ({ value: t.id.toString(), label: `${t.name} (${t.start_time}-${t.end_time})` }))}
+                  value={formData.turnoId}
+                  onChange={(e) => setFormData({ ...formData, turnoId: e.target.value })}
+                  error={errors.turnoId}
+                  options={turnos.map(t => ({ value: t.id.toString(), label: `${t.nombre} (${t.horaInicio}-${t.horaFin})` }))}
                   placeholder={loadingData ? 'Cargando...' : 'Seleccionar turno...'}
                   disabled={loadingData}
                 />
@@ -212,9 +212,9 @@ export default function NuevoGrupoPage() {
               <div>
                 <Entrada
                   label="Paralelo *"
-                  value={formData.parallel}
-                  onChange={(e) => setFormData({ ...formData, parallel: e.target.value.toUpperCase() })}
-                  error={errors.parallel}
+                  value={formData.paralelo}
+                  onChange={(e) => setFormData({ ...formData, paralelo: e.target.value.toUpperCase() })}
+                  error={errors.paralelo}
                   placeholder="A"
                 />
               </div>
@@ -233,8 +233,8 @@ export default function NuevoGrupoPage() {
               <Entrada
                 label="Capacidad"
                 type="number"
-                value={formData.capacity}
-                onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+                value={formData.capacidad}
+                onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })}
                 placeholder="30"
               />
             </div>

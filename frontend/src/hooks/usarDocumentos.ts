@@ -3,19 +3,19 @@ import { api } from '@/lib/api';
 
 export interface DocumentoEmitido {
   id: string;
-  estudiante_id: number;
+  estudianteId: number;
   estudiante?: any;
   tipo: 'boleta_inscripcion' | 'recibo_pago' | 'carnet' | 'certificado' | 'constancia' | 'record_academico';
   numeroDocumento: string;
   gestion: string;
-  gestion_id?: number;
+  gestionId?: number;
   fechaEmision: string;
   pdfPath?: string;
   entregadoA?: string;
   fechaEntrega?: string;
   estado: 'generado' | 'impreso' | 'entregado' | 'anulado';
   observaciones?: string;
-  created_at?: string;
+  creadoEn?: string;
 }
 
 export function usarDocumentos() {

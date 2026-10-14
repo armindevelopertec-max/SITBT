@@ -13,30 +13,27 @@ import { ArrowLeft, Plus, Trash2, Loader2, BookOpen, Edit2, Save, X, Check, Sear
 
 interface Materia {
   id: number;
-  code: string;
-  name: string;
+  codigo: string;
+  nombre: string;
 }
 
 interface MateriaPlan {
   id: number;
-  study_plan_id: number;
-  subject_id: number;
-  semester: number;
-  weekly_hours: number;
-  materia_id?: number;
-  materia_code?: string;
-  materia_name?: string;
-  prerequisite_id?: number;
-  prerequisite_code?: string;
-  prerequisite_name?: string;
+  planEstudioId: number;
+  materiaId: number;
+  semestre: number;
+  horasSemanales: number;
+  prerrequisitoId?: number | null;
+  materia?: { id: number; codigo: string; nombre: string };
+  prerrequisito?: { id: number; codigo: string; nombre: string } | null;
 }
 
 interface PlanEstudio {
   id: number;
-  rm_number: string;
-  career_id: number;
-  status: string;
-  carrera?: { id: number; name: string; code: string };
+  numeroRm: string;
+  carreraId: number;
+  estado: string;
+  carrera?: { id: number; nombre: string; codigo: string };
 }
 
 export default function PlanMateriasPage() {
@@ -62,13 +59,13 @@ export default function PlanMateriasPage() {
   const filteredMaterias = materiasDisponibles.filter(m => {
     if (!materiaSearch) return true;
     const search = materiaSearch.toLowerCase();
-    return m.code.toLowerCase().includes(search) || m.name.toLowerCase().includes(search);
+    return m.codigo.toLowerCase().includes(search) || m.nombre.toLowerCase().includes(search);
   });
 
   const filteredPrerequisites = materiasDisponibles.filter(m => {
     if (!prerequisiteSearch) return true;
     const search = prerequisiteSearch.toLowerCase();
-    return m.code.toLowerCase().includes(search) || m.name.toLowerCase().includes(search);
+    return m.codigo.toLowerCase().includes(search) || m.nombre.toLowerCase().includes(search);
   });
 
   useEffect(() => {
@@ -87,7 +84,7 @@ export default function PlanMateriasPage() {
       const response = await api.get(`/planes-estudio/${planId}`);
       setPlan(response.data);
     } catch (error) {
-      console.error('Error fetching plan:', error);
+      console.error('Error al obtener el plan:', error);
     } finally {
       setLoading(false);
     }
@@ -98,7 +95,7 @@ export default function PlanMateriasPage() {
       const response = await api.get(`/planes-estudio/${planId}/materias`);
       setMateriasPlan(response.data || []);
     } catch (error) {
-      console.error('Error fetching materias plan:', error);
+      console.error('Error al obtener las materias del plan:', error);
     }
   };
 
@@ -107,21 +104,21 @@ export default function PlanMateriasPage() {
       const response = await api.get('/materias/all');
       setMateriasDisponibles(response.data || []);
     } catch (error) {
-      console.error('Error fetching materias:', error);
+      console.error('Error al obtener las materias:', error);
     }
   };
 
   const getSemesterMaterias = (semester: number) => {
-    return materiasPlan.filter(m => m.semester === semester);
+    return materiasPlan.filter(m => m.semestre === semester);
   };
 
   const getMaxSemester = () => {
     if (materiasPlan.length === 0) return 6;
-    return Math.max(...materiasPlan.map(m => m.semester));
+    return Math.max(...materiasPlan.map(m => m.semestre));
   };
 
   const getTotalHours = (semester: number) => {
-    return getSemesterMaterias(semester).reduce((sum, m) => sum + m.weekly_hours, 0);
+    return getSemesterMaterias(semester).reduce((sum, m) => sum + m.horasSemanales, 0);
   };
 
   const handleStartAdd = (semester: number) => {
@@ -154,15 +151,15 @@ export default function PlanMateriasPage() {
 
     try {
       await api.post(`/planes-estudio/${planId}/materias`, {
-        subject_id: newSubjectId,
-        semester: addingToSemester,
-        weekly_hours: newWeeklyHours,
-        prerequisite_id: newPrerequisiteId || null,
+        materiaId: newSubjectId,
+        semestre: addingToSemester,
+        horasSemanales: newWeeklyHours,
+        prerrequisitoId: newPrerequisiteId || null,
       });
       handleCancelAdd();
       fetchMateriasPlan();
     } catch (error: any) {
-      console.error('Error saving materia:', error);
+      console.error('Error al guardar la materia:', error);
       setErrors({ submit: error.response?.data?.message || 'Error al guardar materia' });
     } finally {
       setSaving(false);
@@ -183,13 +180,13 @@ export default function PlanMateriasPage() {
     setSaving(true);
     try {
       await api.patch(`/planes-estudio/${planId}/materias/${editingMateria.id}`, {
-        semester: editingMateria.semester,
-        weekly_hours: editingMateria.weekly_hours,
+        semestre: editingMateria.semestre,
+        horasSemanales: editingMateria.horasSemanales,
       });
       setEditingMateria(null);
       fetchMateriasPlan();
     } catch (error: any) {
-      console.error('Error updating materia:', error);
+      console.error('Error al actualizar la materia:', error);
       setErrors({ submit: error.response?.data?.message || 'Error al actualizar materia' });
     } finally {
       setSaving(false);
@@ -201,7 +198,7 @@ export default function PlanMateriasPage() {
       await api.delete(`/planes-estudio/${planId}/materias/${materiaPlanId}`);
       fetchMateriasPlan();
     } catch (error) {
-      console.error('Error removing materia:', error);
+      console.error('Error al eliminar la materia:', error);
     }
   };
 
@@ -222,20 +219,20 @@ export default function PlanMateriasPage() {
         <Migas items={[
           { label: 'Configuración', href: '/configuracion' },
           { label: 'Planes de Estudio', href: '/planes-estudio' },
-          { label: `${plan?.rm_number} - ${plan?.carrera?.name || 'Cargando...'}` }
+          { label: `${plan?.numeroRm} - ${plan?.carrera?.nombre || 'Cargando...'}` }
         ]} />
       </div>
 
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Plan de Estudios: {plan?.rm_number}
+            Plan de Estudios: {plan?.numeroRm}
           </h1>
           <div className="flex items-center gap-3 mt-1">
-            <Insignia variant="outline">{plan?.carrera?.code}</Insignia>
-            <span className="text-gray-500">{plan?.carrera?.name}</span>
-            <Insignia variant={plan?.status === 'vigente' ? 'exito' : 'secondary'}>
-              {plan?.status}
+            <Insignia variant="outline">{plan?.carrera?.codigo}</Insignia>
+            <span className="text-gray-500">{plan?.carrera?.nombre}</span>
+            <Insignia variant={plan?.estado === 'vigente' ? 'exito' : 'secondary'}>
+              {plan?.estado}
             </Insignia>
           </div>
         </div>
@@ -303,7 +300,7 @@ export default function PlanMateriasPage() {
                             <div className="relative">
                               <Entrada
                                 type="text"
-                                placeholder="Buscar por codigo o nombre..."
+                                placeholder="Buscar por código o nombre..."
                                 value={materiaSearch}
                                 onChange={(e) => setMateriaSearch(e.target.value)}
                                 className="w-full"
@@ -317,18 +314,18 @@ export default function PlanMateriasPage() {
                                     className="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
                                     onClick={() => {
                                       setNewSubjectId(m.id);
-                                      setMateriaSearch(`${m.code} - ${m.name}`);
+                                      setMateriaSearch(`${m.codigo} - ${m.nombre}`);
                                     }}
                                   >
-                                    <span className="font-medium text-sm">{m.code}</span>
-                                    <span className="text-gray-500 text-sm ml-2">{m.name}</span>
+                                    <span className="font-medium text-sm">{m.codigo}</span>
+                                    <span className="text-gray-500 text-sm ml-2">{m.nombre}</span>
                                   </div>
                                 ))}
                               </div>
                             )}
                             {newSubjectId && materiaSearch && (
                               <div className="mt-1 px-2 py-1 bg-green-100 rounded text-xs text-green-700">
-                                Seleccionado: {materiasDisponibles.find(m => m.id === newSubjectId)?.code} - {materiasDisponibles.find(m => m.id === newSubjectId)?.name}
+                                Seleccionado: {materiasDisponibles.find(m => m.id === newSubjectId)?.codigo} - {materiasDisponibles.find(m => m.id === newSubjectId)?.nombre}
                               </div>
                             )}
                           </div>
@@ -345,7 +342,7 @@ export default function PlanMateriasPage() {
                           </div>
 
                           <div className="flex-1">
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Prerequisito (opcional)</label>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Prerrequisito (opcional)</label>
                             <div className="relative">
                               <Entrada
                                 type="text"
@@ -363,18 +360,18 @@ export default function PlanMateriasPage() {
                                     className="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
                                     onClick={() => {
                                       setNewPrerequisiteId(p.id);
-                                      setPrerequisiteSearch(`${p.code} - ${p.name}`);
+                                      setPrerequisiteSearch(`${p.codigo} - ${p.nombre}`);
                                     }}
                                   >
-                                    <span className="font-medium text-sm">{p.code}</span>
-                                    <span className="text-gray-500 text-sm ml-2">{p.name}</span>
+                                    <span className="font-medium text-sm">{p.codigo}</span>
+                                    <span className="text-gray-500 text-sm ml-2">{p.nombre}</span>
                                   </div>
                                 ))}
                               </div>
                             )}
                             {newPrerequisiteId && (
                               <div className="mt-1 px-2 py-1 bg-purple-100 rounded text-xs text-purple-700">
-                                Prerequisito: {materiasDisponibles.find(m => m.id === newPrerequisiteId)?.code}
+                                Prerrequisito: {materiasDisponibles.find(m => m.id === newPrerequisiteId)?.codigo}
                               </div>
                             )}
                           </div>
@@ -401,22 +398,22 @@ export default function PlanMateriasPage() {
                     <Tabla>
                       <EncabezadoTabla>
                         <FilaTabla>
-                          <CeldaEncabezado>Codigo</CeldaEncabezado>
+                          <CeldaEncabezado>Código</CeldaEncabezado>
                           <CeldaEncabezado>Materia</CeldaEncabezado>
                           <CeldaEncabezado className="text-center">Horas/Sem</CeldaEncabezado>
-                          <CeldaEncabezado>Prerequisito</CeldaEncabezado>
+                          <CeldaEncabezado>Prerrequisito</CeldaEncabezado>
                           <CeldaEncabezado className="text-right w-24">Acciones</CeldaEncabezado>
                         </FilaTabla>
                       </EncabezadoTabla>
                       <CuerpoTabla>
                         {materiasSemestre.map(mp => (
                           <FilaTabla key={mp.id}>
-                            <CeldaTabla className="font-medium">{mp.materia_code || mp.subject_id}</CeldaTabla>
-                            <CeldaTabla>{mp.materia_name || '-'}</CeldaTabla>
-                            <CeldaTabla className="text-center">{mp.weekly_hours}</CeldaTabla>
+                            <CeldaTabla className="font-medium">{mp.materia?.codigo || mp.materiaId}</CeldaTabla>
+                            <CeldaTabla>{mp.materia?.nombre || '-'}</CeldaTabla>
+                            <CeldaTabla className="text-center">{mp.horasSemanales}</CeldaTabla>
                             <CeldaTabla>
-                              {mp.prerequisite_id ? (
-                                <Insignia variant="secondary">{mp.prerequisite_code || mp.prerequisite_id}</Insignia>
+                              {mp.prerrequisitoId ? (
+                                <Insignia variant="secondary">{mp.prerrequisito?.codigo || mp.prerrequisitoId}</Insignia>
                               ) : (
                                 <span className="text-gray-400 text-sm">-</span>
                               )}

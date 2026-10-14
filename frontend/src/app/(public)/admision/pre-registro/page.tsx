@@ -18,23 +18,23 @@ function PreRegistroForm() {
   const [error, setError] = useState<string | null>(null);
 
   const [form, setForm] = useState<CrearAdmisionDto>({
-    names: '',
-    lastname_paternal: '',
-    lastname_maternal: '',
+    nombre: '',
+    apellidoPaterno: '',
+    apellidoMaterno: '',
     ci: '',
-    birthdate: '',
-    birthplace: '',
-    birthplace_other: '',
-    gender: undefined,
-    marital_status: undefined,
-    nationality: 'Boliviana',
-    phone: '',
-    email: '',
-    address: '',
+    fechaNacimiento: '',
+    lugarNacimiento: '',
+    lugarNacimientoOtro: '',
+    genero: undefined,
+    estadoCivil: undefined,
+    nacionalidad: 'Boliviana',
+    telefono: '',
+    correo: '',
+    direccion: '',
     nombreTutor: '',
     ciTutor: '',
     telefonoTutor: '',
-    carrera_id: carreraPreseleccionada ? parseInt(carreraPreseleccionada) : undefined,
+    carreraId: carreraPreseleccionada ? parseInt(carreraPreseleccionada) : undefined,
     origen: 'web',
   });
 
@@ -46,7 +46,7 @@ function PreRegistroForm() {
         });
         setCareers(response.data.data);
       } catch (error) {
-        console.error('Error fetching careers:', error);
+        console.error('Error al obtener carreras:', error);
       }
     };
     fetchCareers();
@@ -54,11 +54,11 @@ function PreRegistroForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    const upperFields = ['names', 'lastname_paternal', 'lastname_maternal', 'ci', 'address', 'birthplace_other', 'nationality_other', 'nombreTutor', 'ciTutor'];
+    const upperFields = ['nombre', 'apellidoPaterno', 'apellidoMaterno', 'ci', 'direccion', 'lugarNacimientoOtro', 'nacionalidadOtra', 'nombreTutor', 'ciTutor'];
     const isUpper = upperFields.includes(name);
     setForm((prev) => ({
       ...prev,
-      [name]: name === 'carrera_id' ? (value ? parseInt(value) : undefined) : (isUpper ? value.toUpperCase() : value),
+      [name]: name === 'carreraId' ? (value ? parseInt(value) : undefined) : (isUpper ? value.toUpperCase() : value),
     }));
   };
 
@@ -158,8 +158,8 @@ function PreRegistroForm() {
                 </label>
                 <input
                   type="text"
-                  name="names"
-                  value={form.names}
+                  name="nombre"
+                  value={form.nombre}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
@@ -173,8 +173,8 @@ function PreRegistroForm() {
                 </label>
                 <input
                   type="text"
-                  name="lastname_paternal"
-                  value={form.lastname_paternal || ''}
+                  name="apellidoPaterno"
+                  value={form.apellidoPaterno || ''}
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   placeholder="Pérez"
@@ -187,8 +187,8 @@ function PreRegistroForm() {
                 </label>
                 <input
                   type="text"
-                  name="lastname_maternal"
-                  value={form.lastname_maternal || ''}
+                  name="apellidoMaterno"
+                  value={form.apellidoMaterno || ''}
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   placeholder="López"
@@ -216,8 +216,8 @@ function PreRegistroForm() {
                 </label>
                 <input
                   type="date"
-                  name="birthdate"
-                  value={form.birthdate}
+                  name="fechaNacimiento"
+                  value={form.fechaNacimiento}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
@@ -229,8 +229,8 @@ function PreRegistroForm() {
                   Lugar de nacimiento
                 </label>
                 <select
-                  name="birthplace"
-                  value={form.birthplace || ''}
+                  name="lugarNacimiento"
+                  value={form.lugarNacimiento || ''}
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                 >
@@ -247,12 +247,12 @@ function PreRegistroForm() {
                   <option value="Otra">Otra</option>
                 </select>
               </div>
-              {form.birthplace === 'Otra' && (
+              {form.lugarNacimiento === 'Otra' && (
                 <div>
                   <input
                     type="text"
-                    name="birthplace_other"
-                    value={form.birthplace_other || ''}
+                    name="lugarNacimientoOtro"
+                    value={form.lugarNacimientoOtro || ''}
                     onChange={handleChange}
                     className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                     placeholder="Especificar lugar de nacimiento"
@@ -268,9 +268,9 @@ function PreRegistroForm() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="gender"
+                      name="genero"
                       value="M"
-                      checked={form.gender === 'M'}
+                      checked={form.genero === 'M'}
                       onChange={handleChange}
                       className="w-4 h-4 text-primary-500 focus:ring-primary-500"
                     />
@@ -279,9 +279,9 @@ function PreRegistroForm() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="gender"
+                      name="genero"
                       value="F"
-                      checked={form.gender === 'F'}
+                      checked={form.genero === 'F'}
                       onChange={handleChange}
                       className="w-4 h-4 text-primary-500 focus:ring-primary-500"
                     />
@@ -298,9 +298,9 @@ function PreRegistroForm() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_status"
+                      name="estadoCivil"
                       value="Soltera(o)"
-                      checked={form.marital_status === 'Soltera(o)'}
+                      checked={form.estadoCivil === 'Soltera(o)'}
                       onChange={handleChange}
                       className="w-4 h-4 text-primary-500 focus:ring-primary-500"
                     />
@@ -309,9 +309,9 @@ function PreRegistroForm() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_status"
+                      name="estadoCivil"
                       value="Casada(o)"
-                      checked={form.marital_status === 'Casada(o)'}
+                      checked={form.estadoCivil === 'Casada(o)'}
                       onChange={handleChange}
                       className="w-4 h-4 text-primary-500 focus:ring-primary-500"
                     />
@@ -325,8 +325,8 @@ function PreRegistroForm() {
                   Nacionalidad
                 </label>
                 <select
-                  name="nationality"
-                  value={form.nationality || 'Boliviana'}
+                  name="nacionalidad"
+                  value={form.nacionalidad || 'Boliviana'}
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                 >
@@ -341,12 +341,12 @@ function PreRegistroForm() {
                   <option value="Otra">Otra</option>
                 </select>
               </div>
-              {form.nationality === 'Otra' && (
+              {form.nacionalidad === 'Otra' && (
                 <div>
                   <input
                     type="text"
-                    name="nationality_other"
-                    value={form.nationality_other || ''}
+                    name="nacionalidadOtra"
+                    value={form.nacionalidadOtra || ''}
                     onChange={handleChange}
                     className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                     placeholder="Ingrese su nacionalidad"
@@ -360,8 +360,8 @@ function PreRegistroForm() {
                 </label>
                 <input
                   type="tel"
-                  name="phone"
-                  value={form.phone || ''}
+                  name="telefono"
+                  value={form.telefono || ''}
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   placeholder="71234567"
@@ -375,8 +375,8 @@ function PreRegistroForm() {
               </label>
               <input
                 type="email"
-                name="email"
-                value={form.email}
+                name="correo"
+                value={form.correo}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
@@ -390,8 +390,8 @@ function PreRegistroForm() {
               </label>
               <input
                 type="text"
-                name="address"
-                value={form.address || ''}
+                name="direccion"
+                value={form.direccion || ''}
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                 placeholder="Zona, calle, número"
@@ -413,8 +413,8 @@ function PreRegistroForm() {
                 Carrera de interés *
               </label>
               <select
-                name="carrera_id"
-                value={form.carrera_id || ''}
+                name="carreraId"
+                value={form.carreraId || ''}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
@@ -422,7 +422,7 @@ function PreRegistroForm() {
                 <option value="">Seleccionar carrera</option>
                 {careers.map((career) => (
                   <option key={career.id} value={career.id}>
-                    {career.name}
+                    {career.nombre}
                   </option>
                 ))}
               </select>
@@ -430,9 +430,9 @@ function PreRegistroForm() {
           </div>
 
           {/* Datos del Tutor - Solo para menores de 18 años */}
-          {form.birthdate && (() => {
+          {form.fechaNacimiento && (() => {
             const hoy = new Date();
-            const nacimiento = new Date(form.birthdate);
+            const nacimiento = new Date(form.fechaNacimiento);
             const edad = hoy.getFullYear() - nacimiento.getFullYear();
             const mesDiff = hoy.getMonth() - nacimiento.getMonth();
             const diaDiff = hoy.getDate() - nacimiento.getDate();
@@ -491,7 +491,7 @@ function PreRegistroForm() {
           </div>
           )}
 
-          {/* Privacy */}
+          {/* Privacidad */}
           <div className="bg-dark-700/50 rounded-xl p-4 sm:p-6">
             <p className="text-xs sm:text-sm text-gray-400">
               Al enviar este formulario, aceptas nuestra{' '}
@@ -502,7 +502,7 @@ function PreRegistroForm() {
             </p>
           </div>
 
-          {/* Submit */}
+          {/* Enviar */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
             <Link
               href="/admision"

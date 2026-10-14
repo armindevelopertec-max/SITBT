@@ -11,37 +11,37 @@ import { ArrowLeft, Save, Loader2, Search, X } from 'lucide-react';
 
 interface Estudiante {
   id: number;
-  inscription_code: string;
-  status: string;
+  codigoInscripcion: string;
+  estado: string;
   persona?: {
     ci: string;
-    names: string;
-    lastname_paternal: string;
-    lastname_maternal: string;
+    nombres: string;
+    apellidoPaterno: string;
+    apellidoMaterno: string;
   };
   carrera?: {
-    name: string;
+    nombre: string;
   };
 }
 
 interface FormData {
-  student_id: number | null;
+  estudianteId: number | null;
   gestion: string;
-  gestion_id: number | null;
-  semester: number | null;
-  issued_date: string;
-  valid_until: string;
-  photo_url: string;
-  notes: string;
+  gestionId: number | null;
+  semestre: number | null;
+  fechaEmision: string;
+  validoHasta: string;
+  fotoUrl: string;
+  notas: string;
 }
 
 interface Gestion {
   id: number;
-  year: string;
-  period_type: string;
-  status: string;
-  is_current: boolean;
-  periodos?: { id: number; number: string; name: string }[];
+  anio: string;
+  tipoPeriodo: string;
+  estado: string;
+  esActual: boolean;
+  periodos?: { id: number; numero: string; nombre: string }[];
 }
 
 export default function NewCredentialPage() {
@@ -53,14 +53,14 @@ export default function NewCredentialPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState<FormData>({
-    student_id: null,
+    estudianteId: null,
     gestion: new Date().getFullYear().toString(),
-    gestion_id: null,
-    semester: null,
-    issued_date: new Date().toISOString().split('T')[0],
-    valid_until: `${new Date().getFullYear()}-12-31`,
-    photo_url: '',
-    notes: '',
+    gestionId: null,
+    semestre: null,
+    fechaEmision: new Date().toISOString().split('T')[0],
+    validoHasta: `${new Date().getFullYear()}-12-31`,
+    fotoUrl: '',
+    notas: '',
   });
 
   const [gestiones, setGestiones] = useState<Gestion[]>([]);
@@ -78,7 +78,7 @@ export default function NewCredentialPage() {
       const response = await api.get('/estudiantes', { params: { limit: 100 } });
       setStudents(response.data.data || []);
     } catch (error) {
-      console.error('Error fetching students:', error);
+      console.error('Error al obtener los estudiantes:', error);
     } finally {
       setLoadingStudents(false);
     }
@@ -89,12 +89,12 @@ export default function NewCredentialPage() {
       const response = await api.get('/gestiones');
       const data = response.data.data || response.data || [];
       setGestiones(data);
-      const current = data.find((g: Gestion) => g.is_current);
+      const current = data.find((g: Gestion) => g.esActual);
       if (current) {
-        setFormData(prev => ({ ...prev, gestion: current.year, gestion_id: current.id }));
+        setFormData(prev => ({ ...prev, gestion: current.anio, gestionId: current.id }));
       }
     } catch (error) {
-      console.error('Error fetching gestiones:', error);
+      console.error('Error al obtener las gestiones:', error);
     }
   };
 
@@ -104,30 +104,30 @@ export default function NewCredentialPage() {
     return students.filter((s) => {
       const person = s.persona;
       if (!person) return false;
-      const fullName = `${person.names} ${person.lastname_paternal} ${person.lastname_maternal}`.toLowerCase();
-      return fullName.includes(q) || (person.ci || '').includes(q) || s.inscription_code.toLowerCase().includes(q);
+      const fullName = `${person.nombres} ${person.apellidoPaterno} ${person.apellidoMaterno}`.toLowerCase();
+      return fullName.includes(q) || (person.ci || '').includes(q) || s.codigoInscripcion.toLowerCase().includes(q);
     }).slice(0, 10);
   }, [students, searchStudent]);
 
   const selectStudent = (student: Estudiante) => {
     setSelectedStudent(student);
-    setFormData({ ...formData, student_id: student.id });
+    setFormData({ ...formData, estudianteId: student.id });
     setSearchStudent('');
-    setErrors({ ...errors, student_id: '' });
+    setErrors({ ...errors, estudianteId: '' });
   };
 
   const clearStudent = () => {
     setSelectedStudent(null);
-    setFormData({ ...formData, student_id: null });
+    setFormData({ ...formData, estudianteId: null });
   };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.student_id) newErrors.student_id = 'Debe seleccionar un estudiante';
+    if (!formData.estudianteId) newErrors.estudianteId = 'Debe seleccionar un estudiante';
     if (!formData.gestion) newErrors.gestion = 'La gestión es requerida';
-    if (!formData.semester) newErrors.semester = 'El semestre es requerido';
-    if (!formData.issued_date) newErrors.issued_date = 'La fecha de emisión es requerida';
-    if (!formData.valid_until) newErrors.valid_until = 'La fecha de validez es requerida';
+    if (!formData.semestre) newErrors.semestre = 'El semestre es requerido';
+    if (!formData.fechaEmision) newErrors.fechaEmision = 'La fecha de emisión es requerida';
+    if (!formData.validoHasta) newErrors.validoHasta = 'La fecha de validez es requerida';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -139,23 +139,23 @@ export default function NewCredentialPage() {
     setLoading(true);
     try {
       const payload = {
-        student_id: formData.student_id,
+        estudianteId: formData.estudianteId,
         gestion: formData.gestion,
-        gestion_id: formData.gestion_id,
-        semester: formData.semester,
-        issued_date: formData.issued_date,
-        valid_until: formData.valid_until,
-        photo_url: formData.photo_url || undefined,
+        gestionId: formData.gestionId,
+        semestre: formData.semestre,
+        fechaEmision: formData.fechaEmision,
+        validoHasta: formData.validoHasta,
+        fotoUrl: formData.fotoUrl || undefined,
         estado: 'emitida',
-        issued_by: 1,
-        printed: false,
-        notes: formData.notes || undefined,
+        emitidoPor: 1,
+        impreso: false,
+        notas: formData.notas || undefined,
       };
 
       await api.post('/credenciales', payload);
       router.push('/credenciales');
     } catch (error: any) {
-      console.error('Error creating credential:', error);
+      console.error('Error al crear la credencial:', error);
       if (error.response?.data?.message) {
         setErrors({ submit: error.response.data.message });
       } else {
@@ -192,16 +192,16 @@ export default function NewCredentialPage() {
               <div className="flex items-center justify-between p-4 bg-primary-50 border border-primary-200 rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold">
-                    {selectedStudent.persona?.names?.charAt(0) || '?'}{selectedStudent.persona?.lastname_paternal?.charAt(0) || ''}
+                    {selectedStudent.persona?.nombres?.charAt(0) || '?'}{selectedStudent.persona?.apellidoPaterno?.charAt(0) || ''}
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">
-                      {selectedStudent.persona?.names} {selectedStudent.persona?.lastname_paternal} {selectedStudent.persona?.lastname_maternal}
+                      {selectedStudent.persona?.nombres} {selectedStudent.persona?.apellidoPaterno} {selectedStudent.persona?.apellidoMaterno}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {selectedStudent.persona?.ci} · {selectedStudent.inscription_code}
+                      {selectedStudent.persona?.ci} · {selectedStudent.codigoInscripcion}
                     </p>
-                    <p className="text-sm text-gray-500">{selectedStudent.carrera?.name || 'Sin carrera'}</p>
+                    <p className="text-sm text-gray-500">{selectedStudent.carrera?.nombre || 'Sin carrera'}</p>
                   </div>
                 </div>
                 <Boton type="button" variant="ghost" size="icon" onClick={clearStudent}>
@@ -219,7 +219,7 @@ export default function NewCredentialPage() {
                     onChange={(e) => setSearchStudent(e.target.value)}
                   />
                 </div>
-                {errors.student_id && <p className="text-sm text-red-600 mt-1">{errors.student_id}</p>}
+                {errors.estudianteId && <p className="text-sm text-red-600 mt-1">{errors.estudianteId}</p>}
 
                 {searchStudent && (
                   <div className="mt-2 border rounded-lg overflow-hidden shadow-lg">
@@ -240,13 +240,13 @@ export default function NewCredentialPage() {
                           className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
                         >
                           <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xs">
-                            {student.persona?.names?.charAt(0) || '?'}{student.persona?.lastname_paternal?.charAt(0) || ''}
+                            {student.persona?.nombres?.charAt(0) || '?'}{student.persona?.apellidoPaterno?.charAt(0) || ''}
                           </div>
                           <div className="flex-1">
                             <p className="font-medium text-sm">
-                              {student.persona?.names} {student.persona?.lastname_paternal} {student.persona?.lastname_maternal}
+                              {student.persona?.nombres} {student.persona?.apellidoPaterno} {student.persona?.apellidoMaterno}
                             </p>
-                            <p className="text-xs text-gray-500">{student.inscription_code}</p>
+                            <p className="text-xs text-gray-500">{student.codigoInscripcion}</p>
                           </div>
                         </div>
                       ))
@@ -270,18 +270,18 @@ export default function NewCredentialPage() {
                 </label>
 <select
                   className={`w-full h-10 px-3 border rounded-lg text-sm ${errors.gestion ? 'border-red-500' : ''}`}
-                  value={formData.gestion ? `${formData.gestion}-${formData.semester}` : ''}
+                  value={formData.gestion ? `${formData.gestion}-${formData.semestre}` : ''}
                   onChange={(e) => {
-                    const [year, sem] = e.target.value.split('-');
-                    const semester = parseInt(sem) || null;
-                    setFormData(prev => ({ ...prev, gestion: year, semester }));
+                    const [anio, sem] = e.target.value.split('-');
+                    const semestre = parseInt(sem) || null;
+                    setFormData(prev => ({ ...prev, gestion: anio, semestre }));
                   }}
                 >
                   <option value="">Seleccionar...</option>
                   {gestiones.flatMap((g) =>
                     (g.periodos || []).map((p: any) => (
-                      <option key={`${g.id}-${p.number}`} value={`${g.year}-${p.number === 'I' ? 1 : 2}`}>
-                        {p.number}/{g.year}
+                      <option key={`${g.id}-${p.numero}`} value={`${g.anio}-${p.numero === 'I' ? 1 : 2}`}>
+                        {p.numero}/{g.anio}
                       </option>
                     ))
                   )}
@@ -293,9 +293,9 @@ export default function NewCredentialPage() {
                   Semestre *
                 </label>
                 <select
-                  className={`w-full h-10 px-3 border rounded-lg text-sm ${errors.semester ? 'border-red-500' : ''}`}
-                  value={formData.semester || ''}
-                  onChange={(e) => setFormData({ ...formData, semester: e.target.value ? parseInt(e.target.value) : null })}
+                  className={`w-full h-10 px-3 border rounded-lg text-sm ${errors.semestre ? 'border-red-500' : ''}`}
+                  value={formData.semestre || ''}
+                  onChange={(e) => setFormData({ ...formData, semestre: e.target.value ? parseInt(e.target.value) : null })}
                 >
                   <option value="">Seleccionar...</option>
                   <option value="1">1° Semestre</option>
@@ -305,24 +305,24 @@ export default function NewCredentialPage() {
                   <option value="5">5° Semestre</option>
                   <option value="6">6° Semestre</option>
                 </select>
-                {errors.semester && <p className="text-sm text-red-600 mt-1">{errors.semester}</p>}
+                {errors.semestre && <p className="text-sm text-red-600 mt-1">{errors.semestre}</p>}
               </div>
               <div>
                 <Entrada
                   label="Fecha de Emisión *"
                   type="date"
-                  value={formData.issued_date}
-                  onChange={(e) => setFormData({ ...formData, issued_date: e.target.value })}
-                  error={errors.issued_date}
+                  value={formData.fechaEmision}
+                  onChange={(e) => setFormData({ ...formData, fechaEmision: e.target.value })}
+                  error={errors.fechaEmision}
                 />
               </div>
               <div>
                 <Entrada
                   label="Válida Hasta *"
                   type="date"
-                  value={formData.valid_until}
-                  onChange={(e) => setFormData({ ...formData, valid_until: e.target.value })}
-                  error={errors.valid_until}
+                  value={formData.validoHasta}
+                  onChange={(e) => setFormData({ ...formData, validoHasta: e.target.value })}
+                  error={errors.validoHasta}
                 />
               </div>
             </div>
@@ -330,8 +330,8 @@ export default function NewCredentialPage() {
             <div>
               <Entrada
                 label="URL de Foto"
-                value={formData.photo_url}
-                onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
+                value={formData.fotoUrl}
+                onChange={(e) => setFormData({ ...formData, fotoUrl: e.target.value })}
                 placeholder="https://..."
               />
             </div>
@@ -340,8 +340,8 @@ export default function NewCredentialPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Notas</label>
               <textarea
                 className="w-full h-20 px-3 py-2 border rounded-lg text-sm"
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                value={formData.notas}
+                onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
                 placeholder="Observaciones adicionales..."
               />
             </div>

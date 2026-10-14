@@ -12,8 +12,8 @@ import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
 interface Carrera {
   id: number;
-  code: string;
-  name: string;
+  codigo: string;
+  nombre: string;
 }
 
 export default function NuevoPlanPage() {
@@ -24,11 +24,11 @@ export default function NuevoPlanPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
-    career_id: '',
-    rm_number: '',
-    rm_date: '',
+    carreraId: '',
+    numeroRm: '',
+    fechaRm: '',
     estado: 'vigente',
-    notes: '',
+    notas: '',
   });
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function NuevoPlanPage() {
       const response = await api.get('/carreras/active');
       setCarreras(response.data || []);
     } catch (error) {
-      console.error('Error fetching carreras:', error);
+      console.error('Error al obtener las carreras:', error);
     } finally {
       setLoadingData(false);
     }
@@ -49,9 +49,9 @@ export default function NuevoPlanPage() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.career_id) newErrors.career_id = 'Carrera es requerida';
-    if (!formData.rm_number.trim()) newErrors.rm_number = 'Número RM es requerido';
-    if (!formData.rm_date) newErrors.rm_date = 'Fecha RM es requerida';
+    if (!formData.carreraId) newErrors.carreraId = 'Carrera es requerida';
+    if (!formData.numeroRm.trim()) newErrors.numeroRm = 'Número RM es requerido';
+    if (!formData.fechaRm) newErrors.fechaRm = 'Fecha RM es requerida';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -65,16 +65,16 @@ export default function NuevoPlanPage() {
     setLoading(true);
     try {
       await api.post('/planes-estudio', {
-        career_id: parseInt(formData.career_id),
-        rm_number: formData.rm_number.trim().toUpperCase(),
-        rm_date: formData.rm_date,
+        carreraId: parseInt(formData.carreraId),
+        numeroRm: formData.numeroRm.trim().toUpperCase(),
+        fechaRm: formData.fechaRm,
         estado: formData.estado,
-        notes: formData.notes.trim() || null,
+        notas: formData.notas.trim() || null,
       });
 
       router.push('/planes-estudio');
     } catch (error: any) {
-      console.error('Error creating plan:', error);
+      console.error('Error al crear el plan de estudio:', error);
       if (error.response?.data?.message) {
         setErrors({ submit: error.response.data.message });
       } else {
@@ -112,10 +112,10 @@ export default function NuevoPlanPage() {
               <div>
                 <Selector
                   label="Carrera *"
-                  value={formData.career_id}
-                  onChange={(e) => setFormData({ ...formData, career_id: e.target.value })}
-                  error={errors.career_id}
-                  options={carreras.map(c => ({ value: c.id.toString(), label: c.name }))}
+                  value={formData.carreraId}
+                  onChange={(e) => setFormData({ ...formData, carreraId: e.target.value })}
+                  error={errors.carreraId}
+                  options={carreras.map(c => ({ value: c.id.toString(), label: c.nombre }))}
                   placeholder={loadingData ? 'Cargando...' : 'Seleccionar carrera...'}
                   disabled={loadingData}
                 />
@@ -123,9 +123,9 @@ export default function NuevoPlanPage() {
               <div>
                 <Entrada
                   label="Número RM *"
-                  value={formData.rm_number}
-                  onChange={(e) => setFormData({ ...formData, rm_number: e.target.value.toUpperCase() })}
-                  error={errors.rm_number}
+                  value={formData.numeroRm}
+                  onChange={(e) => setFormData({ ...formData, numeroRm: e.target.value.toUpperCase() })}
+                  error={errors.numeroRm}
                   placeholder="RM 2024/001"
                 />
               </div>
@@ -136,9 +136,9 @@ export default function NuevoPlanPage() {
                 <Entrada
                   label="Fecha RM *"
                   type="date"
-                  value={formData.rm_date}
-                  onChange={(e) => setFormData({ ...formData, rm_date: e.target.value })}
-                  error={errors.rm_date}
+                  value={formData.fechaRm}
+                  onChange={(e) => setFormData({ ...formData, fechaRm: e.target.value })}
+                  error={errors.fechaRm}
                 />
               </div>
               <div>
@@ -157,8 +157,8 @@ export default function NuevoPlanPage() {
             <div>
               <Entrada
                 label="Notas"
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                value={formData.notas}
+                onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
                 placeholder="Notas adicionales..."
               />
             </div>

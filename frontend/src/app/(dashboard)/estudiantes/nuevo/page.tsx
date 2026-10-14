@@ -13,30 +13,30 @@ import { ArrowLeft, Save, Loader2, Star, User, Key } from 'lucide-react';
 
 interface Carrera {
   id: number;
-  code: string;
-  name: string;
-  title: string;
+  codigo: string;
+  nombre: string;
+  titulo: string;
 }
 
-interface StudyPlan {
+interface PlanEstudio {
   id: number;
-  career_id: number;
-  rm_number: string;
+  carreraId: number;
+  numeroRm: string;
 }
 
 interface Gestion {
   id: number;
-  year: string;
-  period_type: string;
-  status: string;
-  is_current: boolean;
-  periodos?: { id: number; number: string; name: string; status: string }[];
+  anio: string;
+  tipoPeriodo: string;
+  estado: string;
+  esActual: boolean;
+  periodos?: { id: number; numero: string; nombre: string; estado: string }[];
 }
 
 interface Periodo {
   id: number;
-  number: string;
-  name: string;
+  numero: string;
+  nombre: string;
   estado: string;
 }
 
@@ -46,38 +46,38 @@ export default function NewStudentPage() {
   const [loadingCareers, setLoadingCareers] = useState(true);
   const [loadingPlans, setLoadingPlans] = useState(false);
   const [careers, setCareers] = useState<Carrera[]>([]);
-  const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
+  const [studyPlans, setStudyPlans] = useState<PlanEstudio[]>([]);
   const [periodos, setPeriodos] = useState<{ gestion: Gestion; periodo: Periodo }[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [credentialsModal, setCredentialsModal] = useState<{ username: string; password: string } | null>(null);
+  const [credentialsModal, setCredentialsModal] = useState<{ nombreUsuario: string; password: string } | null>(null);
 
   const [personData, setPersonData] = useState({
     ci: '',
-    names: '',
-    lastname_paternal: '',
-    lastname_maternal: '',
-    birthdate: '',
-    birthplace: '',
-    birthplace_other: '',
-    gender: '',
-    marital_estado: '',
-    nationality: 'Boliviana',
-    nationality_other: '',
-    phone: '',
-    email: '',
-    address: '',
+    nombres: '',
+    apellidoPaterno: '',
+    apellidoMaterno: '',
+    fechaNacimiento: '',
+    lugarNacimiento: '',
+    lugarNacimientoOtro: '',
+    genero: '',
+    estadoCivil: '',
+    nacionalidad: 'Boliviana',
+    nacionalidadOtra: '',
+    telefono: '',
+    correo: '',
+    direccion: '',
   });
 
   const [studentData, setStudentData] = useState({
 
-    admission_gestion: new Date().getFullYear().toString(),
-    admission_date: '',
-    career_id: '',
-    study_plan_id: '',
-    folder_number: '',
-    form01_code: '',
-    bachelor_title_number: '',
-    bachelor_title_date: '',
+    gestionAdmision: new Date().getFullYear().toString(),
+    fechaAdmision: '',
+    carreraId: '',
+    planEstudioId: '',
+    numeroFolder: '',
+    codigoFormulario01: '',
+    numeroTituloBachiller: '',
+    fechaTituloBachiller: '',
   });
 
   const toUpper = (value: string) => value.toUpperCase();
@@ -88,19 +88,19 @@ export default function NewStudentPage() {
   }, []);
 
   useEffect(() => {
-    if (studentData.career_id) {
-      fetchStudyPlans(Number(studentData.career_id));
+    if (studentData.carreraId) {
+      fetchStudyPlans(Number(studentData.carreraId));
     } else {
       setStudyPlans([]);
     }
-  }, [studentData.career_id]);
+  }, [studentData.carreraId]);
 
   const fetchCareers = async () => {
     try {
       const response = await api.get('/carreras/active');
       setCareers(response.data || []);
     } catch (error) {
-      console.error('Error fetching careers:', error);
+      console.error('Error al cargar carreras:', error);
     } finally {
       setLoadingCareers(false);
     }
@@ -112,7 +112,7 @@ export default function NewStudentPage() {
       const response = await api.get(`/planes-estudio/current/${careerId}`);
       setStudyPlans(response.data || []);
     } catch (error) {
-      console.error('Error fetching study plans:', error);
+      console.error('Error al cargar planes de estudio:', error);
     } finally {
       setLoadingPlans(false);
     }
@@ -133,11 +133,11 @@ export default function NewStudentPage() {
       });
 
       setPeriodos(allPeriodos.sort((a, b) => {
-        if (a.gestion.year !== b.gestion.year) return b.gestion.year.localeCompare(a.gestion.year);
-        return a.periodo.number.localeCompare(b.periodo.number);
+        if (a.gestion.anio !== b.gestion.anio) return b.gestion.anio.localeCompare(a.gestion.anio);
+        return a.periodo.numero.localeCompare(b.periodo.numero);
       }));
     } catch (error) {
-      console.error('Error fetching gestiones:', error);
+      console.error('Error al cargar gestiones:', error);
     }
   };
 
@@ -145,15 +145,15 @@ export default function NewStudentPage() {
     const newErrors: Record<string, string> = {};
 
     if (!personData.ci) newErrors.ci = 'CI es requerido';
-    if (!personData.names) newErrors.names = 'Nombres es requerido';
-    if (!personData.lastname_paternal) newErrors.lastname_paternal = 'Apellido paterno es requerido';
-    if (!personData.birthdate) newErrors.birthdate = 'Fecha de nacimiento es requerida';
-    if (!personData.gender) newErrors.gender = 'Género es requerido';
+    if (!personData.nombres) newErrors.nombres = 'Nombres es requerido';
+    if (!personData.apellidoPaterno) newErrors.apellidoPaterno = 'Apellido paterno es requerido';
+    if (!personData.fechaNacimiento) newErrors.fechaNacimiento = 'Fecha de nacimiento es requerida';
+    if (!personData.genero) newErrors.genero = 'Género es requerido';
 
-    if (!studentData.admission_gestion) newErrors.admission_gestion = 'Gestión de ingreso es requerida';
-    if (!studentData.admission_date) newErrors.admission_date = 'Fecha de ingreso es requerida';
-    if (!studentData.career_id) newErrors.career_id = 'Carrera es requerida';
-    if (!studentData.study_plan_id) newErrors.study_plan_id = 'Plan de estudio es requerido';
+    if (!studentData.gestionAdmision) newErrors.gestionAdmision = 'Gestión de ingreso es requerida';
+    if (!studentData.fechaAdmision) newErrors.fechaAdmision = 'Fecha de ingreso es requerida';
+    if (!studentData.carreraId) newErrors.carreraId = 'Carrera es requerida';
+    if (!studentData.planEstudioId) newErrors.planEstudioId = 'Plan de estudio es requerido';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -168,7 +168,7 @@ export default function NewStudentPage() {
     try {
       const personPayload = {
         ...personData,
-        gender: personData.gender,
+        genero: personData.genero,
         estado: 'activo',
       };
 
@@ -176,15 +176,15 @@ export default function NewStudentPage() {
       const personId = personResponse.data.id;
 
       const studentPayload = {
-        person_id: personId,
-        admission_gestion: studentData.admission_gestion,
-        admission_date: studentData.admission_date,
-        career_id: Number(studentData.career_id),
-        study_plan_id: Number(studentData.study_plan_id),
-        folder_number: studentData.folder_number || undefined,
-        form01_code: studentData.form01_code || undefined,
-        bachelor_title_number: studentData.bachelor_title_number || undefined,
-        bachelor_title_date: studentData.bachelor_title_date || undefined,
+        personaId: personId,
+        gestionAdmision: studentData.gestionAdmision,
+        fechaAdmision: studentData.fechaAdmision,
+        carreraId: Number(studentData.carreraId),
+        planEstudioId: Number(studentData.planEstudioId),
+        numeroFolder: studentData.numeroFolder || undefined,
+        codigoFormulario01: studentData.codigoFormulario01 || undefined,
+        numeroTituloBachiller: studentData.numeroTituloBachiller || undefined,
+        fechaTituloBachiller: studentData.fechaTituloBachiller || undefined,
         estado: 'activo',
       };
 
@@ -196,7 +196,7 @@ export default function NewStudentPage() {
         router.push('/estudiantes');
       }
     } catch (error: any) {
-      console.error('Error creating student:', error);
+      console.error('Error al crear estudiante:', error);
       if (error.response?.data?.message) {
         setErrors({ submit: error.response.data.message });
       } else {
@@ -242,27 +242,27 @@ export default function NewStudentPage() {
               <div>
                 <Entrada
                   label="Nombres *"
-                  value={personData.names}
-                  onChange={(e) => setPersonData({ ...personData, names: toUpper(e.target.value) })}
-                  error={errors.names}
+                  value={personData.nombres}
+                  onChange={(e) => setPersonData({ ...personData, nombres: toUpper(e.target.value) })}
+                  error={errors.nombres}
                   placeholder="Juan Carlos"
                 />
               </div>
               <div>
                 <Entrada
                   label="Apellido Paterno *"
-                  value={personData.lastname_paternal}
-                  onChange={(e) => setPersonData({ ...personData, lastname_paternal: toUpper(e.target.value) })}
-                  error={errors.lastname_paternal}
+                  value={personData.apellidoPaterno}
+                  onChange={(e) => setPersonData({ ...personData, apellidoPaterno: toUpper(e.target.value) })}
+                  error={errors.apellidoPaterno}
                   placeholder="Perez"
                 />
               </div>
               <div>
                 <Entrada
                   label="Apellido Materno"
-                  value={personData.lastname_maternal}
-                  onChange={(e) => setPersonData({ ...personData, lastname_maternal: toUpper(e.target.value) })}
-                  error={errors.lastname_maternal}
+                  value={personData.apellidoMaterno}
+                  onChange={(e) => setPersonData({ ...personData, apellidoMaterno: toUpper(e.target.value) })}
+                  error={errors.apellidoMaterno}
                   placeholder="Gomez"
                 />
               </div>
@@ -270,18 +270,18 @@ export default function NewStudentPage() {
                 <Entrada
                   label="Fecha de Nacimiento *"
                   type="date"
-                  value={personData.birthdate}
-                  onChange={(e) => setPersonData({ ...personData, birthdate: e.target.value })}
-                  error={errors.birthdate}
+                  value={personData.fechaNacimiento}
+                  onChange={(e) => setPersonData({ ...personData, fechaNacimiento: e.target.value })}
+                  error={errors.fechaNacimiento}
                 />
               </div>
               <div>
                 <Selector
                   label="Lugar de Nacimiento"
-                  value={personData.birthplace}
+                  value={personData.lugarNacimiento}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setPersonData({ ...personData, birthplace: value });
+                    setPersonData({ ...personData, lugarNacimiento: value });
                   }}
                   options={[
                     { value: '', label: 'Seleccionar' },
@@ -298,12 +298,12 @@ export default function NewStudentPage() {
                   ]}
                 />
               </div>
-              {personData.birthplace === 'Otra' && (
+              {personData.lugarNacimiento === 'Otra' && (
                 <div>
                   <Entrada
                     label="Especificar lugar de nacimiento"
-                    value={personData.birthplace_other || ''}
-                    onChange={(e) => setPersonData({ ...personData, birthplace_other: toUpper(e.target.value) })}
+                    value={personData.lugarNacimientoOtro || ''}
+                    onChange={(e) => setPersonData({ ...personData, lugarNacimientoOtro: toUpper(e.target.value) })}
                     placeholder="Ingrese el lugar de nacimiento"
                   />
                 </div>
@@ -314,10 +314,10 @@ export default function NewStudentPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="gender"
+                      name="genero"
                       value="M"
-                      checked={personData.gender === 'M'}
-                      onChange={(e) => setPersonData({ ...personData, gender: e.target.value })}
+                      checked={personData.genero === 'M'}
+                      onChange={(e) => setPersonData({ ...personData, genero: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Masculino</span>
@@ -325,16 +325,16 @@ export default function NewStudentPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="gender"
+                      name="genero"
                       value="F"
-                      checked={personData.gender === 'F'}
-                      onChange={(e) => setPersonData({ ...personData, gender: e.target.value })}
+                      checked={personData.genero === 'F'}
+                      onChange={(e) => setPersonData({ ...personData, genero: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Femenino</span>
                   </label>
                 </div>
-                {errors.gender && <p className="text-xs text-red-500 mt-1">{errors.gender}</p>}
+                {errors.genero && <p className="text-xs text-red-500 mt-1">{errors.genero}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Estado Civil</label>
@@ -342,10 +342,10 @@ export default function NewStudentPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_estado"
+                      name="estadoCivil"
                       value="Soltera(o)"
-                      checked={personData.marital_estado === 'Soltera(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
+                      checked={personData.estadoCivil === 'Soltera(o)'}
+                      onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Soltero(a)</span>
@@ -353,10 +353,10 @@ export default function NewStudentPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_estado"
+                      name="estadoCivil"
                       value="Casada(o)"
-                      checked={personData.marital_estado === 'Casada(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
+                      checked={personData.estadoCivil === 'Casada(o)'}
+                      onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Casado(a)</span>
@@ -366,10 +366,10 @@ export default function NewStudentPage() {
               <div>
                 <Selector
                   label="Nacionalidad"
-                  value={personData.nationality}
+                  value={personData.nacionalidad}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setPersonData({ ...personData, nationality: value });
+                    setPersonData({ ...personData, nacionalidad: value });
                   }}
                   options={[
                     { value: 'Boliviana', label: 'Boliviana' },
@@ -384,12 +384,12 @@ export default function NewStudentPage() {
                   ]}
                 />
               </div>
-              {personData.nationality === 'Otra' && (
+              {personData.nacionalidad === 'Otra' && (
                 <div>
                   <Entrada
                     label="Especificar nacionalidad"
-                    value={personData.nationality_other || ''}
-                    onChange={(e) => setPersonData({ ...personData, nationality_other: toUpper(e.target.value) })}
+                    value={personData.nacionalidadOtra || ''}
+                    onChange={(e) => setPersonData({ ...personData, nacionalidadOtra: toUpper(e.target.value) })}
                     placeholder="Ingrese su nacionalidad"
                   />
                 </div>
@@ -397,8 +397,8 @@ export default function NewStudentPage() {
               <div>
                 <Entrada
                   label="Teléfono"
-                  value={personData.phone}
-                  onChange={(e) => setPersonData({ ...personData, phone: e.target.value })}
+                  value={personData.telefono}
+                  onChange={(e) => setPersonData({ ...personData, telefono: e.target.value })}
                   placeholder="71234567"
                 />
               </div>
@@ -406,16 +406,16 @@ export default function NewStudentPage() {
                 <Entrada
                   label="Correo Electrónico"
                   type="email"
-                  value={personData.email}
-                  onChange={(e) => setPersonData({ ...personData, email: e.target.value })}
+                  value={personData.correo}
+                  onChange={(e) => setPersonData({ ...personData, correo: e.target.value })}
                   placeholder="correo@ejemplo.com"
                 />
               </div>
               <div className="md:col-span-2 lg:col-span-3">
                 <Entrada
                   label="Dirección"
-                  value={personData.address}
-                  onChange={(e) => setPersonData({ ...personData, address: toUpper(e.target.value) })}
+                  value={personData.direccion}
+                  onChange={(e) => setPersonData({ ...personData, direccion: toUpper(e.target.value) })}
                   placeholder="Av. 16 de Julio, La Paz"
                 />
               </div>
@@ -432,12 +432,12 @@ export default function NewStudentPage() {
               <div>
                 <Selector
                   label="Gestión de Ingreso *"
-                  value={studentData.admission_gestion}
-                  onChange={(e) => setStudentData({ ...studentData, admission_gestion: e.target.value })}
-                  error={errors.admission_gestion}
+                  value={studentData.gestionAdmision}
+                  onChange={(e) => setStudentData({ ...studentData, gestionAdmision: e.target.value })}
+                  error={errors.gestionAdmision}
                   options={periodos.map(p => ({
-                    value: `${p.gestion.year}-${p.periodo.number}`,
-                    label: `${p.periodo.number}/${p.gestion.year}${p.periodo.estado === 'abierta' ? ' ★' : ''}`,
+                    value: `${p.gestion.anio}-${p.periodo.numero}`,
+                    label: `${p.periodo.numero}/${p.gestion.anio}${p.periodo.estado === 'abierta' ? ' ★' : ''}`,
                   }))}
                   placeholder="Seleccionar período..."
                 />
@@ -446,18 +446,18 @@ export default function NewStudentPage() {
                 <Entrada
                   label="Fecha de Ingreso *"
                   type="date"
-                  value={studentData.admission_date}
-                  onChange={(e) => setStudentData({ ...studentData, admission_date: e.target.value })}
-                  error={errors.admission_date}
+                  value={studentData.fechaAdmision}
+                  onChange={(e) => setStudentData({ ...studentData, fechaAdmision: e.target.value })}
+                  error={errors.fechaAdmision}
                 />
               </div>
               <div>
                 <Selector
                   label="Carrera *"
-                  value={studentData.career_id}
-                  onChange={(e) => setStudentData({ ...studentData, career_id: e.target.value, study_plan_id: '' })}
-                  error={errors.career_id}
-                  options={careers.map(c => ({ value: c.id.toString(), label: c.name }))}
+                  value={studentData.carreraId}
+                  onChange={(e) => setStudentData({ ...studentData, carreraId: e.target.value, planEstudioId: '' })}
+                  error={errors.carreraId}
+                  options={careers.map(c => ({ value: c.id.toString(), label: c.nombre }))}
                   placeholder={loadingCareers ? 'Cargando...' : 'Seleccionar carrera...'}
                   disabled={loadingCareers}
                 />
@@ -465,35 +465,35 @@ export default function NewStudentPage() {
               <div>
                 <Selector
                   label="Plan de Estudio *"
-                  value={studentData.study_plan_id}
-                  onChange={(e) => setStudentData({ ...studentData, study_plan_id: e.target.value })}
-                  error={errors.study_plan_id}
-                  options={studyPlans.map(p => ({ value: p.id.toString(), label: `${p.rm_number}` }))}
+                  value={studentData.planEstudioId}
+                  onChange={(e) => setStudentData({ ...studentData, planEstudioId: e.target.value })}
+                  error={errors.planEstudioId}
+                  options={studyPlans.map(p => ({ value: p.id.toString(), label: `${p.numeroRm}` }))}
                   placeholder={loadingPlans ? 'Cargando...' : 'Seleccionar plan...'}
-                  disabled={loadingPlans || !studentData.career_id}
+                  disabled={loadingPlans || !studentData.carreraId}
                 />
               </div>
               <div>
                 <Entrada
                   label="Número de Folder"
-                  value={studentData.folder_number}
-                  onChange={(e) => setStudentData({ ...studentData, folder_number: e.target.value })}
+                  value={studentData.numeroFolder}
+                  onChange={(e) => setStudentData({ ...studentData, numeroFolder: e.target.value })}
                   placeholder="F-001"
                 />
               </div>
               <div>
                 <Entrada
                   label="Código Formulario 01"
-                  value={studentData.form01_code}
-                  onChange={(e) => setStudentData({ ...studentData, form01_code: e.target.value })}
+                  value={studentData.codigoFormulario01}
+                  onChange={(e) => setStudentData({ ...studentData, codigoFormulario01: e.target.value })}
                   placeholder="FORM01-2024-001"
                 />
               </div>
               <div>
                 <Entrada
                   label="Número de Título de Bachiller"
-                  value={studentData.bachelor_title_number}
-                  onChange={(e) => setStudentData({ ...studentData, bachelor_title_number: e.target.value })}
+                  value={studentData.numeroTituloBachiller}
+                  onChange={(e) => setStudentData({ ...studentData, numeroTituloBachiller: e.target.value })}
                   placeholder="123456"
                 />
               </div>
@@ -501,8 +501,8 @@ export default function NewStudentPage() {
                 <Entrada
                   label="Fecha de Título de Bachiller"
                   type="date"
-                  value={studentData.bachelor_title_date}
-                  onChange={(e) => setStudentData({ ...studentData, bachelor_title_date: e.target.value })}
+                  value={studentData.fechaTituloBachiller}
+                  onChange={(e) => setStudentData({ ...studentData, fechaTituloBachiller: e.target.value })}
                 />
               </div>
             </div>
@@ -549,7 +549,7 @@ export default function NewStudentPage() {
                 <User className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Nombre de usuario</p>
-                  <p className="font-mono font-medium">{credentialsModal.username}</p>
+                  <p className="font-mono font-medium">{credentialsModal.nombreUsuario}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">

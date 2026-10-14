@@ -15,7 +15,7 @@ const nextConfig = {
       },
       {
         source: '/storage/files/:path*',
-        destination: `${backendUrl}/storage/files/:path*`,
+        destination: `${backendUrl}/api/almacenamiento/files/:path*`,
       },
     ];
   },

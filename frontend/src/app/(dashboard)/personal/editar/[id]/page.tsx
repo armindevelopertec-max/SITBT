@@ -12,25 +12,25 @@ import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
 interface DatosStaff {
   id: number;
-  person_id: number;
-  profession: string;
-  position: string;
-  hire_date: string;
+  personaId: number;
+  profesion: string;
+  cargo: string;
+  fechaContrato: string;
   estado: string;
   persona?: {
     id: number;
     ci: string;
-    names: string;
-    lastname_paternal: string;
-    lastname_maternal: string;
-    birthdate: string;
-    birthplace: string;
-    gender: string;
-    marital_estado: string;
-    nationality: string;
-    phone: string;
-    email: string;
-    address: string;
+    nombres: string;
+    apellidoPaterno: string;
+    apellidoMaterno: string;
+    fechaNacimiento: string;
+    lugarNacimiento: string;
+    genero: string;
+    estadoCivil: string;
+    nacionalidad: string;
+    telefono: string;
+    correo: string;
+    direccion: string;
   };
 }
 
@@ -51,30 +51,30 @@ export default function EditStaffPage() {
 
   const [personData, setPersonData] = useState({
     ci: '',
-    names: '',
-    lastname_paternal: '',
-    lastname_maternal: '',
-    birthdate: '',
-    birthplace: '',
-    gender: '',
-    marital_estado: '',
-    nationality: 'Boliviana',
-    phone: '',
-    email: '',
-    address: '',
+    nombres: '',
+    apellidoPaterno: '',
+    apellidoMaterno: '',
+    fechaNacimiento: '',
+    lugarNacimiento: '',
+    genero: '',
+    estadoCivil: '',
+    nacionalidad: 'Boliviana',
+    telefono: '',
+    correo: '',
+    direccion: '',
   });
 
   const [staffData, setStaffData] = useState({
-    profession: '',
-    position: '',
-    hire_date: '',
+    profesion: '',
+    cargo: '',
+    fechaContrato: '',
     estado: 'activo',
   });
 
   const toUpper = (value: string) => value.toUpperCase();
 
-  const isOtherDepartment = !DEPARTMENTS.includes(personData.birthplace);
-  const isOtherNationality = !NATIONALITIES.includes(personData.nationality);
+  const isOtherDepartment = !DEPARTMENTS.includes(personData.lugarNacimiento);
+  const isOtherNationality = !NATIONALITIES.includes(personData.nacionalidad);
 
   useEffect(() => {
     if (staffId) {
@@ -91,28 +91,28 @@ export default function EditStaffPage() {
       if (staff.persona) {
         setPersonData({
           ci: staff.persona.ci || '',
-          names: staff.persona.names || '',
-          lastname_paternal: staff.persona.lastname_paternal || '',
-          lastname_maternal: staff.persona.lastname_maternal || '',
-          birthdate: staff.persona.birthdate || '',
-          birthplace: staff.persona.birthplace || '',
-          gender: staff.persona.gender || '',
-          marital_estado: staff.persona.marital_estado || '',
-          nationality: staff.persona.nationality || 'Boliviana',
-          phone: staff.persona.phone || '',
-          email: staff.persona.email || '',
-          address: staff.persona.address || '',
+          nombres: staff.persona.nombres || '',
+          apellidoPaterno: staff.persona.apellidoPaterno || '',
+          apellidoMaterno: staff.persona.apellidoMaterno || '',
+          fechaNacimiento: staff.persona.fechaNacimiento || '',
+          lugarNacimiento: staff.persona.lugarNacimiento || '',
+          genero: staff.persona.genero || '',
+          estadoCivil: staff.persona.estadoCivil || '',
+          nacionalidad: staff.persona.nacionalidad || 'Boliviana',
+          telefono: staff.persona.telefono || '',
+          correo: staff.persona.correo || '',
+          direccion: staff.persona.direccion || '',
         });
       }
 
       setStaffData({
-        profession: staff.profession || '',
-        position: staff.position || '',
-        hire_date: staff.hire_date || '',
+        profesion: staff.profesion || '',
+        cargo: staff.cargo || '',
+        fechaContrato: staff.fechaContrato || '',
         estado: staff.estado || 'activo',
       });
     } catch (error) {
-      console.error('Error fetching staff:', error);
+      console.error('Error al cargar personal:', error);
     } finally {
       setInitialLoading(false);
     }
@@ -122,13 +122,13 @@ export default function EditStaffPage() {
     const newErrors: Record<string, string> = {};
 
     if (!personData.ci) newErrors.ci = 'CI es requerido';
-    if (!personData.names) newErrors.names = 'Nombres es requerido';
-    if (!personData.lastname_paternal) newErrors.lastname_paternal = 'Apellido paterno es requerido';
-    if (!personData.birthdate) newErrors.birthdate = 'Fecha de nacimiento es requerida';
-    if (!personData.gender) newErrors.gender = 'Género es requerido';
+    if (!personData.nombres) newErrors.nombres = 'Nombres es requerido';
+    if (!personData.apellidoPaterno) newErrors.apellidoPaterno = 'Apellido paterno es requerido';
+    if (!personData.fechaNacimiento) newErrors.fechaNacimiento = 'Fecha de nacimiento es requerida';
+    if (!personData.genero) newErrors.genero = 'Género es requerido';
 
-    if (!staffData.position) newErrors.position = 'Cargo es requerido';
-    if (!staffData.hire_date) newErrors.hire_date = 'Fecha de contrato es requerida';
+    if (!staffData.cargo) newErrors.cargo = 'Cargo es requerido';
+    if (!staffData.fechaContrato) newErrors.fechaContrato = 'Fecha de contrato es requerida';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -144,35 +144,35 @@ export default function EditStaffPage() {
       const staffResponse = await api.get(`/personal/${staffId}`);
       const staff: DatosStaff = staffResponse.data;
 
-      const finalBirthplace = isOtherDepartment ? personData.birthplace : personData.birthplace;
-      const finalNationality = isOtherNationality ? personData.nationality : personData.nationality;
+      const finalLugarNacimiento = isOtherDepartment ? personData.lugarNacimiento : personData.lugarNacimiento;
+      const finalNacionalidad = isOtherNationality ? personData.nacionalidad : personData.nacionalidad;
 
-      await api.patch(`/personas/${staff.person_id}`, {
+      await api.patch(`/personas/${staff.personaId}`, {
         ci: personData.ci,
-        names: personData.names,
-        lastname_paternal: personData.lastname_paternal,
-        lastname_maternal: personData.lastname_maternal,
-        birthdate: personData.birthdate,
-        birthplace: finalBirthplace,
-        gender: personData.gender,
-        marital_estado: personData.marital_estado || undefined,
-        nationality: finalNationality,
-        phone: personData.phone || undefined,
-        email: personData.email || undefined,
-        address: personData.address || undefined,
+        nombres: personData.nombres,
+        apellidoPaterno: personData.apellidoPaterno,
+        apellidoMaterno: personData.apellidoMaterno,
+        fechaNacimiento: personData.fechaNacimiento,
+        lugarNacimiento: finalLugarNacimiento,
+        genero: personData.genero,
+        estadoCivil: personData.estadoCivil || undefined,
+        nacionalidad: finalNacionalidad,
+        telefono: personData.telefono || undefined,
+        correo: personData.correo || undefined,
+        direccion: personData.direccion || undefined,
         estado: 'activo',
       });
 
       await api.patch(`/personal/${staffId}`, {
-        profession: staffData.profession || undefined,
-        position: staffData.position,
-        hire_date: staffData.hire_date,
+        profesion: staffData.profesion || undefined,
+        cargo: staffData.cargo,
+        fechaContrato: staffData.fechaContrato,
         estado: staffData.estado,
       });
 
       router.push('/personal');
     } catch (error: any) {
-      console.error('Error updating staff:', error);
+      console.error('Error al actualizar personal:', error);
       if (error.response?.data?.message) {
         setErrors({ submit: error.response.data.message });
       } else {
@@ -226,26 +226,26 @@ export default function EditStaffPage() {
               <div>
                 <Entrada
                   label="Nombres *"
-                  value={personData.names}
-                  onChange={(e) => setPersonData({ ...personData, names: toUpper(e.target.value) })}
-                  error={errors.names}
+                  value={personData.nombres}
+                  onChange={(e) => setPersonData({ ...personData, nombres: toUpper(e.target.value) })}
+                  error={errors.nombres}
                   placeholder="Juan Carlos"
                 />
               </div>
               <div>
                 <Entrada
                   label="Apellido Paterno *"
-                  value={personData.lastname_paternal}
-                  onChange={(e) => setPersonData({ ...personData, lastname_paternal: toUpper(e.target.value) })}
-                  error={errors.lastname_paternal}
+                  value={personData.apellidoPaterno}
+                  onChange={(e) => setPersonData({ ...personData, apellidoPaterno: toUpper(e.target.value) })}
+                  error={errors.apellidoPaterno}
                   placeholder="Perez"
                 />
               </div>
               <div>
                 <Entrada
                   label="Apellido Materno"
-                  value={personData.lastname_maternal}
-                  onChange={(e) => setPersonData({ ...personData, lastname_maternal: toUpper(e.target.value) })}
+                  value={personData.apellidoMaterno}
+                  onChange={(e) => setPersonData({ ...personData, apellidoMaterno: toUpper(e.target.value) })}
                   placeholder="Gomez"
                 />
               </div>
@@ -253,19 +253,19 @@ export default function EditStaffPage() {
                 <Entrada
                   label="Fecha de Nacimiento *"
                   type="date"
-                  value={personData.birthdate}
-                  onChange={(e) => setPersonData({ ...personData, birthdate: e.target.value })}
-                  error={errors.birthdate}
+                  value={personData.fechaNacimiento}
+                  onChange={(e) => setPersonData({ ...personData, fechaNacimiento: e.target.value })}
+                  error={errors.fechaNacimiento}
                 />
               </div>
               <div>
                 <Selector
                   label="Lugar de Nacimiento"
-                  value={isOtherDepartment ? 'Otra' : personData.birthplace}
+                  value={isOtherDepartment ? 'Otra' : personData.lugarNacimiento}
                   onChange={(e) => {
                     setPersonData({
                       ...personData,
-                      birthplace: e.target.value === 'Otra' ? '' : e.target.value
+                      lugarNacimiento: e.target.value === 'Otra' ? '' : e.target.value
                     });
                   }}
                   options={[
@@ -279,8 +279,8 @@ export default function EditStaffPage() {
                 <div>
                   <Entrada
                     label="Especificar lugar"
-                    value={personData.birthplace}
-                    onChange={(e) => setPersonData({ ...personData, birthplace: toUpper(e.target.value) })}
+                    value={personData.lugarNacimiento}
+                    onChange={(e) => setPersonData({ ...personData, lugarNacimiento: toUpper(e.target.value) })}
                     placeholder="Ingrese el lugar"
                   />
                 </div>
@@ -291,10 +291,10 @@ export default function EditStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="gender"
+                      name="genero"
                       value="M"
-                      checked={personData.gender === 'M'}
-                      onChange={(e) => setPersonData({ ...personData, gender: e.target.value })}
+                      checked={personData.genero === 'M'}
+                      onChange={(e) => setPersonData({ ...personData, genero: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Masculino</span>
@@ -302,16 +302,16 @@ export default function EditStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="gender"
+                      name="genero"
                       value="F"
-                      checked={personData.gender === 'F'}
-                      onChange={(e) => setPersonData({ ...personData, gender: e.target.value })}
+                      checked={personData.genero === 'F'}
+                      onChange={(e) => setPersonData({ ...personData, genero: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Femenino</span>
                   </label>
                 </div>
-                {errors.gender && <p className="text-xs text-red-500 mt-1">{errors.gender}</p>}
+                {errors.genero && <p className="text-xs text-red-500 mt-1">{errors.genero}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Estado Civil</label>
@@ -319,10 +319,10 @@ export default function EditStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_estado"
+                      name="estadoCivil"
                       value="Soltera(o)"
-                      checked={personData.marital_estado === 'Soltera(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
+                      checked={personData.estadoCivil === 'Soltera(o)'}
+                      onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Soltero(a)</span>
@@ -330,10 +330,10 @@ export default function EditStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_estado"
+                      name="estadoCivil"
                       value="Casada(o)"
-                      checked={personData.marital_estado === 'Casada(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
+                      checked={personData.estadoCivil === 'Casada(o)'}
+                      onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Casado(a)</span>
@@ -341,10 +341,10 @@ export default function EditStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_estado"
+                      name="estadoCivil"
                       value="Viuda(o)"
-                      checked={personData.marital_estado === 'Viuda(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
+                      checked={personData.estadoCivil === 'Viuda(o)'}
+                      onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Viudo(a)</span>
@@ -352,10 +352,10 @@ export default function EditStaffPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="marital_estado"
+                      name="estadoCivil"
                       value="Divorciada(o)"
-                      checked={personData.marital_estado === 'Divorciada(o)'}
-                      onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
+                      checked={personData.estadoCivil === 'Divorciada(o)'}
+                      onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Divorciado(a)</span>
@@ -365,11 +365,11 @@ export default function EditStaffPage() {
               <div>
                 <Selector
                   label="Nacionalidad"
-                  value={isOtherNationality ? 'Otra' : personData.nationality}
+                  value={isOtherNationality ? 'Otra' : personData.nacionalidad}
                   onChange={(e) => {
                     setPersonData({
                       ...personData,
-                      nationality: e.target.value === 'Otra' ? '' : e.target.value
+                      nacionalidad: e.target.value === 'Otra' ? '' : e.target.value
                     });
                   }}
                   options={NATIONALITIES.map(n => ({ value: n, label: n }))}
@@ -379,8 +379,8 @@ export default function EditStaffPage() {
                 <div>
                   <Entrada
                     label="Especificar nacionalidad"
-                    value={personData.nationality}
-                    onChange={(e) => setPersonData({ ...personData, nationality: toUpper(e.target.value) })}
+                    value={personData.nacionalidad}
+                    onChange={(e) => setPersonData({ ...personData, nacionalidad: toUpper(e.target.value) })}
                     placeholder="Ingrese la nacionalidad"
                   />
                 </div>
@@ -388,8 +388,8 @@ export default function EditStaffPage() {
               <div>
                 <Entrada
                   label="Teléfono"
-                  value={personData.phone}
-                  onChange={(e) => setPersonData({ ...personData, phone: e.target.value })}
+                  value={personData.telefono}
+                  onChange={(e) => setPersonData({ ...personData, telefono: e.target.value })}
                   placeholder="71234567"
                 />
               </div>
@@ -397,16 +397,16 @@ export default function EditStaffPage() {
                 <Entrada
                   label="Correo Electrónico"
                   type="email"
-                  value={personData.email}
-                  onChange={(e) => setPersonData({ ...personData, email: e.target.value })}
+                  value={personData.correo}
+                  onChange={(e) => setPersonData({ ...personData, correo: e.target.value })}
                   placeholder="correo@ejemplo.com"
                 />
               </div>
               <div className="md:col-span-2 lg:col-span-3">
                 <Entrada
                   label="Dirección"
-                  value={personData.address}
-                  onChange={(e) => setPersonData({ ...personData, address: toUpper(e.target.value) })}
+                  value={personData.direccion}
+                  onChange={(e) => setPersonData({ ...personData, direccion: toUpper(e.target.value) })}
                   placeholder="Av. 16 de Julio, La Paz"
                 />
               </div>
@@ -423,17 +423,17 @@ export default function EditStaffPage() {
               <div>
                 <Entrada
                   label="Profesión"
-                  value={staffData.profession}
-                  onChange={(e) => setStaffData({ ...staffData, profession: e.target.value })}
+                  value={staffData.profesion}
+                  onChange={(e) => setStaffData({ ...staffData, profesion: e.target.value })}
                   placeholder="Ingeniero de Sistemas"
                 />
               </div>
               <div>
                 <Selector
                   label="Cargo *"
-                  value={staffData.position}
-                  onChange={(e) => setStaffData({ ...staffData, position: e.target.value })}
-                  error={errors.position}
+                  value={staffData.cargo}
+                  onChange={(e) => setStaffData({ ...staffData, cargo: e.target.value })}
+                  error={errors.cargo}
                   options={[
                     { value: 'docente', label: 'Docente' },
                     { value: 'secretaria', label: 'Secretaria' },
@@ -449,9 +449,9 @@ export default function EditStaffPage() {
                 <Entrada
                   label="Fecha de Contrato *"
                   type="date"
-                  value={staffData.hire_date}
-                  onChange={(e) => setStaffData({ ...staffData, hire_date: e.target.value })}
-                  error={errors.hire_date}
+                  value={staffData.fechaContrato}
+                  onChange={(e) => setStaffData({ ...staffData, fechaContrato: e.target.value })}
+                  error={errors.fechaContrato}
                 />
               </div>
               <div>

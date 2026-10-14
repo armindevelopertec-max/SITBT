@@ -12,66 +12,66 @@ import { Search, Loader2, CheckCircle, AlertCircle, User, BookOpen, Calendar, Cr
 
 interface Estudiante {
   id: number;
-  inscription_code: string;
-  admission_gestion: string;
+  codigoInscripcion: string;
+  gestionAdmision: string;
   persona?: {
     ci: string;
-    names: string;
-    lastname_paternal: string;
-    lastname_maternal: string;
+    nombres: string;
+    apellidoPaterno: string;
+    apellidoMaterno: string;
   };
   carrera?: {
     id: number;
-    name: string;
+    nombre: string;
   };
   plan_estudio?: {
     id: number;
-    rm_number: string;
+    numeroRm: string;
   };
 }
 
 interface PaymentStatus {
-  canEnroll: boolean;
-  missingPayments: { type: string; concept: string; amount: number }[];
-  paidPayments: { type: string; concept: string; amount: number; paymentDate: string }[];
-  isNewStudent: boolean;
+  puedeInscribir: boolean;
+  pagosFaltantes: { tipo: string; concepto: string; monto: number }[];
+  pagosRealizados: { tipo: string; concepto: string; monto: number; fechaPago: string }[];
+  esEstudianteNuevo: boolean;
 }
 
 interface SubjectToEnroll {
   materiaPlanId: number;
-  subjectId: number;
-  subjectCode: string;
-  subjectName: string;
-  semester: number;
-  isFromFailed: boolean;
-  failedPreviousGrade?: number;
-  prerequisiteBlocked: boolean;
-  prerequisiteName?: string;
+  materiaId: number;
+  materiaCodigo: string;
+  materiaNombre: string;
+  semestre: number;
+  esReprobada: boolean;
+  notaAnteriorReprobada?: number;
+  prerrequisitoBloqueado: boolean;
+  nombrePrerrequisito?: string;
 }
 
 interface Grupo {
   id: number;
-  semester: number;
-  parallel: string;
+  semestre: number;
+  paralelo: string;
   gestion: string;
-  career_id: number;
-  shift_id: number;
-  capacity: number;
-  turno?: { id: number; code: string; name: string };
+  carreraId: number;
+  turnoId: number;
+  capacidad: number;
+  turno?: { id: number; codigo: string; nombre: string };
 }
 
 interface Gestion {
   id: number;
-  year: string;
-  status: string;
-  is_current: boolean;
-  periodos?: { id: number; number: string; name: string; status: string }[];
+  anio: string;
+  estado: string;
+  esActual: boolean;
+  periodos?: { id: number; numero: string; nombre: string; estado: string }[];
 }
 
 interface Turno {
   id: number;
-  code: string;
-  name: string;
+  codigo: string;
+  nombre: string;
 }
 
 type Step = 'search' | 'payments' | 'subjects' | 'groups' | 'confirm' | 'success';
@@ -111,7 +111,7 @@ export default function PreinscripcionPage() {
       const res = await api.get('/turnos/all');
       setTurnos(res.data || []);
     } catch (error) {
-      console.error('Error fetching turnos:', error);
+      console.error('Error al obtener los turnos:', error);
     }
   };
 
@@ -119,14 +119,14 @@ export default function PreinscripcionPage() {
     try {
       const res = await api.get('/gestiones/current');
       if (res.data) {
-        setCurrentGestion(res.data.year);
-        const openPeriodo = res.data.periodos?.find((p: any) => p.status === 'abierta');
+        setCurrentGestion(res.data.anio);
+        const openPeriodo = res.data.periodos?.find((p: any) => p.estado === 'abierta');
         if (openPeriodo) {
-          setCurrentPeriodo(openPeriodo.number);
+          setCurrentPeriodo(openPeriodo.numero);
         }
       }
     } catch (error) {
-      console.error('Error fetching gestion:', error);
+      console.error('Error al obtener la gestión:', error);
     }
   };
 
@@ -139,7 +139,7 @@ export default function PreinscripcionPage() {
       });
       setStudents(res.data.data || []);
     } catch (error) {
-      console.error('Error searching:', error);
+      console.error('Error al buscar:', error);
     } finally {
       setLoading(false);
     }
@@ -155,17 +155,17 @@ export default function PreinscripcionPage() {
     setLoading(true);
     try {
       const res = await api.post('/preinscripcion/verify-payments', {
-        studentId,
+        estudianteId: studentId,
         gestion: currentGestion,
         periodo: currentPeriodo,
       });
       setPaymentStatus(res.data);
 
-      if (res.data.canEnroll) {
+      if (res.data.puedeInscribir) {
         await calculateSubjects(studentId);
       }
     } catch (error) {
-      console.error('Error checking payments:', error);
+      console.error('Error al verificar los pagos:', error);
     } finally {
       setLoading(false);
     }
@@ -174,20 +174,20 @@ export default function PreinscripcionPage() {
   const calculateSubjects = async (studentId: number) => {
     try {
       const res = await api.post('/preinscripcion/calculate-subjects', {
-        studentId,
+        estudianteId: studentId,
         gestion: currentGestion,
         periodo: currentPeriodo,
       });
 
       const data = res.data;
-      setSubjects(data.subjects || []);
-      setSelectedSubjects(data.subjects?.filter((s: any) => !s.prerequisiteBlocked) || []);
+      setSubjects(data.materias || []);
+      setSelectedSubjects(data.materias?.filter((s: any) => !s.prerrequisitoBloqueado) || []);
 
-      if (data.subjects?.length > 0) {
-        await fetchGroups(data.subjects[0].subjectId);
+      if (data.materias?.length > 0) {
+        await fetchGroups(data.materias[0].materiaId);
       }
     } catch (error) {
-      console.error('Error calculating subjects:', error);
+      console.error('Error al calcular las materias:', error);
     }
   };
 
@@ -198,12 +198,12 @@ export default function PreinscripcionPage() {
         params: {
           careerId: selectedStudent.carrera?.id,
           gestion: currentGestion,
-          semester: subjects[0]?.semester || 1,
+          semester: subjects[0]?.semestre || 1,
         }
       });
       setGroups(res.data || []);
     } catch (error) {
-      console.error('Error fetching groups:', error);
+      console.error('Error al obtener los grupos:', error);
     }
   };
 
@@ -214,9 +214,9 @@ export default function PreinscripcionPage() {
 
   const toggleSubject = (subject: SubjectToEnroll) => {
     setSelectedSubjects(prev => {
-      const exists = prev.find(s => s.subjectId === subject.subjectId);
+      const exists = prev.find(s => s.materiaId === subject.materiaId);
       if (exists) {
-        return prev.filter(s => s.subjectId !== subject.subjectId);
+        return prev.filter(s => s.materiaId !== subject.materiaId);
       }
       return [...prev, subject];
     });
@@ -228,16 +228,16 @@ export default function PreinscripcionPage() {
     setLoading(true);
     try {
       const res = await api.post('/preinscripcion/enroll-batch', {
-        studentId: selectedStudent.id,
+        estudianteId: selectedStudent.id,
         gestion: currentGestion,
         periodo: currentPeriodo,
-        groupId: selectedGroup,
-        subjects: selectedSubjects,
+        grupoId: selectedGroup,
+        materias: selectedSubjects,
       });
       setEnrollmentResult(res.data);
       setStep('success');
     } catch (error) {
-      console.error('Error enrolling:', error);
+      console.error('Error al inscribir:', error);
     } finally {
       setLoading(false);
     }
@@ -294,21 +294,21 @@ export default function PreinscripcionPage() {
                   className="p-4 border rounded-lg cursor-pointer hover:bg-gray-50 flex items-center gap-4"
                 >
                   <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold">
-                    {student.persona?.names?.charAt(0) || '?'}
+                    {student.persona?.nombres?.charAt(0) || '?'}
                   </div>
                   <div className="flex-1">
                     <p className="font-medium">
-                      {student.persona?.names} {student.persona?.lastname_paternal} {student.persona?.lastname_maternal}
+                      {student.persona?.nombres} {student.persona?.apellidoPaterno} {student.persona?.apellidoMaterno}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {student.persona?.ci} · {student.inscription_code}
+                      {student.persona?.ci} · {student.codigoInscripcion}
                     </p>
                     <p className="text-sm text-gray-400">
-                      {student.carrera?.name} · Ingreso: {student.admission_gestion}
+                      {student.carrera?.nombre} · Ingreso: {student.gestionAdmision}
                     </p>
                   </div>
-                  <Insignia variant={student.admission_gestion === currentGestion ? 'exito' : 'secondary'}>
-                    {student.admission_gestion === currentGestion ? 'Nuevo' : 'Antiguo'}
+                  <Insignia variant={student.gestionAdmision === currentGestion ? 'exito' : 'secondary'}>
+                    {student.gestionAdmision === currentGestion ? 'Nuevo' : 'Antiguo'}
                   </Insignia>
                 </div>
               ))}
@@ -329,7 +329,7 @@ export default function PreinscripcionPage() {
         <EncabezadoTarjeta>
           <TituloTarjeta className="flex items-center gap-2">
             <User className="w-5 h-5" />
-            {selectedStudent?.persona?.names} {selectedStudent?.persona?.lastname_paternal}
+            {selectedStudent?.persona?.nombres} {selectedStudent?.persona?.apellidoPaterno}
           </TituloTarjeta>
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
@@ -340,11 +340,11 @@ export default function PreinscripcionPage() {
             </div>
             <div>
               <p className="text-gray-500">Código</p>
-              <p className="font-medium">{selectedStudent?.inscription_code}</p>
+              <p className="font-medium">{selectedStudent?.codigoInscripcion}</p>
             </div>
             <div>
               <p className="text-gray-500">Carrera</p>
-              <p className="font-medium">{selectedStudent?.carrera?.name}</p>
+              <p className="font-medium">{selectedStudent?.carrera?.nombre}</p>
             </div>
           </div>
         </ContenidoTarjeta>
@@ -364,7 +364,7 @@ export default function PreinscripcionPage() {
             </div>
           ) : paymentStatus ? (
             <>
-              {paymentStatus.canEnroll ? (
+              {paymentStatus.puedeInscribir ? (
                 <div className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
                   <CheckCircle className="w-6 h-6 text-green-600" />
                   <div>
@@ -382,33 +382,33 @@ export default function PreinscripcionPage() {
                 </div>
               )}
 
-              {paymentStatus.paidPayments.length > 0 && (
+              {paymentStatus.pagosRealizados.length > 0 && (
                 <div>
                   <h4 className="font-medium mb-2">Pagos realizados</h4>
                   <div className="space-y-2">
-                    {paymentStatus.paidPayments.map((payment, i) => (
+                    {paymentStatus.pagosRealizados.map((payment, i) => (
                       <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded">
                         <div>
-                          <p className="font-medium">{payment.concept}</p>
+                          <p className="font-medium">{payment.concepto}</p>
                           <p className="text-xs text-gray-500">
-                            {new Date(payment.paymentDate).toLocaleDateString('es-BO')}
+                            {new Date(payment.fechaPago).toLocaleDateString('es-BO')}
                           </p>
                         </div>
-                        <Insignia variant="exito">Bs. {payment.amount}</Insignia>
+                        <Insignia variant="exito">Bs. {payment.monto}</Insignia>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {paymentStatus.missingPayments.length > 0 && (
+              {paymentStatus.pagosFaltantes.length > 0 && (
                 <div>
                   <h4 className="font-medium mb-2">Pagos pendientes</h4>
                   <div className="space-y-2">
-                    {paymentStatus.missingPayments.map((payment, i) => (
+                    {paymentStatus.pagosFaltantes.map((payment, i) => (
                       <div key={i} className="flex justify-between items-center p-3 bg-red-50 rounded">
-                        <p className="font-medium">{payment.concept}</p>
-                        <Insignia variant="error">Bs. {payment.amount}</Insignia>
+                        <p className="font-medium">{payment.concepto}</p>
+                        <Insignia variant="error">Bs. {payment.monto}</Insignia>
                       </div>
                     ))}
                   </div>
@@ -421,7 +421,7 @@ export default function PreinscripcionPage() {
             <Boton variant="outline" onClick={() => setStep('search')}>
               Volver
             </Boton>
-            {paymentStatus?.canEnroll && (
+            {paymentStatus?.puedeInscribir && (
               <Boton onClick={() => setStep('subjects')}>
                 Continuar
               </Boton>
@@ -442,7 +442,7 @@ export default function PreinscripcionPage() {
           </TituloTarjeta>
         </EncabezadoTarjeta>
         <ContenidoTarjeta className="space-y-4">
-          {paymentStatus?.isNewStudent && (
+          {paymentStatus?.esEstudianteNuevo && (
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4">
               <p className="text-sm text-blue-800">
                 <strong>Estudiante nuevo:</strong> Se le asignarán las materias del primer semestre según su plan de estudio.
@@ -450,45 +450,45 @@ export default function PreinscripcionPage() {
             </div>
           )}
 
-          {subjects.filter(s => s.prerequisiteBlocked).length > 0 && (
+          {subjects.filter(s => s.prerrequisitoBloqueado).length > 0 && (
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg mb-4">
               <p className="text-sm text-amber-800">
                 <strong>Materias bloqueadas por prerrequisitos:</strong>{' '}
-                {subjects.filter(s => s.prerequisiteBlocked).map(s => s.subjectName).join(', ')}
+                {subjects.filter(s => s.prerrequisitoBloqueado).map(s => s.materiaNombre).join(', ')}
               </p>
             </div>
           )}
 
           <div className="space-y-2">
-            {subjects.filter(s => !s.prerequisiteBlocked).map((subject) => (
+            {subjects.filter(s => !s.prerrequisitoBloqueado).map((subject) => (
               <div
-                key={subject.subjectId}
+                key={subject.materiaId}
                 onClick={() => toggleSubject(subject)}
                 className={`p-4 border rounded-lg cursor-pointer flex items-center gap-4 ${
-                  selectedSubjects.find(s => s.subjectId === subject.subjectId)
+                  selectedSubjects.find(s => s.materiaId === subject.materiaId)
                     ? 'border-primary-500 bg-primary-50'
                     : 'hover:bg-gray-50'
                 }`}
               >
                 <input
                   type="checkbox"
-                  checked={!!selectedSubjects.find(s => s.subjectId === subject.subjectId)}
+                  checked={!!selectedSubjects.find(s => s.materiaId === subject.materiaId)}
                   onChange={() => {}}
                   className="w-5 h-5"
                 />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium">{subject.subjectName}</p>
-                    {subject.isFromFailed && (
+                    <p className="font-medium">{subject.materiaNombre}</p>
+                    {subject.esReprobada && (
                       <Insignia variant="advertencia">Reprobada</Insignia>
                     )}
                   </div>
                   <p className="text-sm text-gray-500">
-                    {subject.subjectCode} · Semestre {subject.semester}
+                    {subject.materiaCodigo} · Semestre {subject.semestre}
                   </p>
-                  {subject.isFromFailed && subject.failedPreviousGrade && (
+                  {subject.esReprobada && subject.notaAnteriorReprobada && (
                     <p className="text-xs text-red-500">
-                      Nota anterior: {subject.failedPreviousGrade}
+                      Nota anterior: {subject.notaAnteriorReprobada}
                     </p>
                   )}
                 </div>
@@ -537,8 +537,8 @@ export default function PreinscripcionPage() {
                     }`}
                   >
                     <div>
-                      <p className="font-medium">{turno.name}</p>
-                      <p className="text-sm text-gray-500">Código: {turno.code}</p>
+                      <p className="font-medium">{turno.nombre}</p>
+                      <p className="text-sm text-gray-500">Código: {turno.codigo}</p>
                     </div>
                     {selectedTurno === turno.id && (
                       <CheckCircle className="w-5 h-5 text-primary-600" />
@@ -550,11 +550,11 @@ export default function PreinscripcionPage() {
 
             <div>
               <h4 className="font-medium mb-3">
-                Grupos - Semestre {subjects[0]?.semester}
+                Grupos - Semestre {subjects[0]?.semestre}
               </h4>
               <div className="space-y-2 max-h-80 overflow-y-auto">
                 {groups
-                  .filter(g => !selectedTurno || g.shift_id === selectedTurno)
+                  .filter(g => !selectedTurno || g.turnoId === selectedTurno)
                   .map((group) => (
                     <div
                       key={group.id}
@@ -567,10 +567,10 @@ export default function PreinscripcionPage() {
                     >
                       <div>
                         <p className="font-medium">
-                          Paralelo {group.parallel}
+                          Paralelo {group.paralelo}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {group.turno?.name || 'Sin turno'} · Capacidad: {group.capacity}
+                          {group.turno?.nombre || 'Sin turno'} · Capacidad: {group.capacidad}
                         </p>
                       </div>
                       {selectedGroup === group.id && (
@@ -620,7 +620,7 @@ export default function PreinscripcionPage() {
               <div className="flex justify-between">
                 <span className="text-gray-600">Estudiante:</span>
                 <span className="font-medium">
-                  {selectedStudent?.persona?.names} {selectedStudent?.persona?.lastname_paternal}
+                  {selectedStudent?.persona?.nombres} {selectedStudent?.persona?.apellidoPaterno}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -630,13 +630,13 @@ export default function PreinscripcionPage() {
               <div className="flex justify-between">
                 <span className="text-gray-600">Turno:</span>
                 <span className="font-medium">
-                  {turnos.find(t => t.id === selectedTurno)?.name || '-'}
+                  {turnos.find(t => t.id === selectedTurno)?.nombre || '-'}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Grupo:</span>
                 <span className="font-medium">
-                  Paralelo {group?.parallel}
+                  Paralelo {group?.paralelo}
                 </span>
               </div>
             </div>
@@ -645,10 +645,10 @@ export default function PreinscripcionPage() {
               <h4 className="font-medium mb-2">Materias a inscribir:</h4>
               <div className="space-y-1">
                 {selectedSubjects.map((subject) => (
-                  <div key={subject.subjectId} className="flex items-center gap-2">
+                  <div key={subject.materiaId} className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span>{subject.subjectName}</span>
-                    {subject.isFromFailed && (
+                    <span>{subject.materiaNombre}</span>
+                    {subject.esReprobada && (
                       <Insignia variant="advertencia" className="text-xs">Reprobada</Insignia>
                     )}
                   </div>
@@ -688,7 +688,7 @@ export default function PreinscripcionPage() {
             ¡Inscripción exitosa!
           </h2>
           <p className="text-gray-600 mb-6">
-            Se han creado {enrollmentResult?.enrollments?.length} inscripciones para {currentPeriodo}/{currentGestion}
+            Se han creado {enrollmentResult?.inscripciones?.length} inscripciones para {currentPeriodo}/{currentGestion}
           </p>
 
           {enrollmentResult?.boletaId && (
@@ -700,10 +700,10 @@ export default function PreinscripcionPage() {
           )}
 
           <div className="space-y-2 mb-6">
-            {enrollmentResult?.enrollments?.map((e: any) => (
+            {enrollmentResult?.inscripciones?.map((e: any) => (
               <div key={e.id} className="flex items-center justify-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>{e.subjectName}</span>
+                <span>{e.materiaNombre}</span>
               </div>
             ))}
           </div>

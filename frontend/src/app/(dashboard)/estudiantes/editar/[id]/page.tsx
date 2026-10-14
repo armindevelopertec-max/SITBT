@@ -12,61 +12,61 @@ import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
 interface Carrera {
   id: number;
-  code: string;
-  name: string;
-  title: string;
+  codigo: string;
+  nombre: string;
+  titulo: string;
 }
 
-interface StudyPlan {
+interface PlanEstudio {
   id: number;
-  career_id: number;
-  rm_number: string;
+  carreraId: number;
+  numeroRm: string;
 }
 
 interface Gestion {
   id: number;
-  year: string;
-  period_type: string;
+  anio: string;
+  tipoPeriodo: string;
   estado: string;
-  is_current: boolean;
-  periodos?: { id: number; number: string; name: string; estado: string }[];
+  esActual: boolean;
+  periodos?: { id: number; numero: string; nombre: string; estado: string }[];
 }
 
 interface Periodo {
   id: number;
-  number: string;
-  name: string;
+  numero: string;
+  nombre: string;
   estado: string;
 }
 
 interface StudentData {
   id: number;
-  person_id: number;
-  inscription_code: string;
-  admission_gestion: string;
-  admission_date: string;
-  career_id: number;
-  study_plan_id: number;
-  folder_number: string;
-  form01_code: string;
-  bachelor_title_number: string;
-  bachelor_title_date: string;
+  personaId: number;
+  codigoInscripcion: string;
+  gestionAdmision: string;
+  fechaAdmision: string;
+  carreraId: number;
+  planEstudioId: number;
+  numeroFolder: string;
+  codigoFormulario01: string;
+  numeroTituloBachiller: string;
+  fechaTituloBachiller: string;
   estado: string;
   persona?: {
     id: number;
     ci: string;
     ci_issued: string;
-    names: string;
-    lastname_paternal: string;
-    lastname_maternal: string;
-    birthdate: string;
-    birthplace: string;
-    gender: string;
-    marital_estado: string;
-    nationality: string;
-    phone: string;
-    email: string;
-    address: string;
+    nombres: string;
+    apellidoPaterno: string;
+    apellidoMaterno: string;
+    fechaNacimiento: string;
+    lugarNacimiento: string;
+    genero: string;
+    estadoCivil: string;
+    nacionalidad: string;
+    telefono: string;
+    correo: string;
+    direccion: string;
   };
 }
 
@@ -80,36 +80,36 @@ export default function EditStudentPage() {
   const [loadingPlans, setLoadingPlans] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [careers, setCareers] = useState<Carrera[]>([]);
-  const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
+  const [studyPlans, setStudyPlans] = useState<PlanEstudio[]>([]);
   const [periodos, setPeriodos] = useState<{ gestion: Gestion; periodo: Periodo }[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [personData, setPersonData] = useState({
     ci: '',
     ci_issued: '',
-    names: '',
-    lastname_paternal: '',
-    lastname_maternal: '',
-    birthdate: '',
-    birthplace: '',
-    gender: '',
-    marital_estado: '',
-    nationality: 'Boliviana',
-    phone: '',
-    email: '',
-    address: '',
+    nombres: '',
+    apellidoPaterno: '',
+    apellidoMaterno: '',
+    fechaNacimiento: '',
+    lugarNacimiento: '',
+    genero: '',
+    estadoCivil: '',
+    nacionalidad: 'Boliviana',
+    telefono: '',
+    correo: '',
+    direccion: '',
   });
 
   const [studentData, setStudentData] = useState({
-    inscription_code: '',
-    admission_gestion: '',
-    admission_date: '',
-    career_id: '' as string | number,
-    study_plan_id: '' as string | number,
-    folder_number: '',
-    form01_code: '',
-    bachelor_title_number: '',
-    bachelor_title_date: '',
+    codigoInscripcion: '',
+    gestionAdmision: '',
+    fechaAdmision: '',
+    carreraId: '' as string | number,
+    planEstudioId: '' as string | number,
+    numeroFolder: '',
+    codigoFormulario01: '',
+    numeroTituloBachiller: '',
+    fechaTituloBachiller: '',
     estado: 'activo',
   });
 
@@ -122,12 +122,12 @@ export default function EditStudentPage() {
   }, [studentId]);
 
   useEffect(() => {
-    if (studentData.career_id) {
-      fetchStudyPlans(Number(studentData.career_id));
+    if (studentData.carreraId) {
+      fetchStudyPlans(Number(studentData.carreraId));
     } else {
       setStudyPlans([]);
     }
-  }, [studentData.career_id]);
+  }, [studentData.carreraId]);
 
   const fetchStudent = async () => {
     try {
@@ -139,34 +139,34 @@ export default function EditStudentPage() {
         setPersonData({
           ci: student.persona.ci || '',
           ci_issued: student.persona.ci_issued || '',
-          names: student.persona.names || '',
-          lastname_paternal: student.persona.lastname_paternal || '',
-          lastname_maternal: student.persona.lastname_maternal || '',
-          birthdate: student.persona.birthdate || '',
-          birthplace: student.persona.birthplace || '',
-          gender: student.persona.gender || '',
-          marital_estado: student.persona.marital_estado || '',
-          nationality: student.persona.nationality || 'Boliviana',
-          phone: student.persona.phone || '',
-          email: student.persona.email || '',
-          address: student.persona.address || '',
+          nombres: student.persona.nombres || '',
+          apellidoPaterno: student.persona.apellidoPaterno || '',
+          apellidoMaterno: student.persona.apellidoMaterno || '',
+          fechaNacimiento: student.persona.fechaNacimiento || '',
+          lugarNacimiento: student.persona.lugarNacimiento || '',
+          genero: student.persona.genero || '',
+          estadoCivil: student.persona.estadoCivil || '',
+          nacionalidad: student.persona.nacionalidad || 'Boliviana',
+          telefono: student.persona.telefono || '',
+          correo: student.persona.correo || '',
+          direccion: student.persona.direccion || '',
         });
       }
 
       setStudentData({
-        inscription_code: student.inscription_code || '',
-        admission_gestion: student.admission_gestion || '',
-        admission_date: student.admission_date || '',
-        career_id: student.career_id || '',
-        study_plan_id: student.study_plan_id || '',
-        folder_number: student.folder_number || '',
-        form01_code: student.form01_code || '',
-        bachelor_title_number: student.bachelor_title_number || '',
-        bachelor_title_date: student.bachelor_title_date || '',
+        codigoInscripcion: student.codigoInscripcion || '',
+        gestionAdmision: student.gestionAdmision || '',
+        fechaAdmision: student.fechaAdmision || '',
+        carreraId: student.carreraId || '',
+        planEstudioId: student.planEstudioId || '',
+        numeroFolder: student.numeroFolder || '',
+        codigoFormulario01: student.codigoFormulario01 || '',
+        numeroTituloBachiller: student.numeroTituloBachiller || '',
+        fechaTituloBachiller: student.fechaTituloBachiller || '',
         estado: student.estado || 'activo',
       });
     } catch (error) {
-      console.error('Error fetching student:', error);
+      console.error('Error al cargar estudiante:', error);
     } finally {
       setInitialLoading(false);
     }
@@ -177,7 +177,7 @@ export default function EditStudentPage() {
       const response = await api.get('/carreras/active');
       setCareers(response.data || []);
     } catch (error) {
-      console.error('Error fetching careers:', error);
+      console.error('Error al cargar carreras:', error);
     } finally {
       setLoadingCareers(false);
     }
@@ -189,7 +189,7 @@ export default function EditStudentPage() {
       const response = await api.get(`/planes-estudio/current/${careerId}`);
       setStudyPlans(response.data || []);
     } catch (error) {
-      console.error('Error fetching study plans:', error);
+      console.error('Error al cargar planes de estudio:', error);
     } finally {
       setLoadingPlans(false);
     }
@@ -210,11 +210,11 @@ export default function EditStudentPage() {
       });
 
       setPeriodos(allPeriodos.sort((a, b) => {
-        if (a.gestion.year !== b.gestion.year) return b.gestion.year.localeCompare(a.gestion.year);
-        return a.periodo.number.localeCompare(b.periodo.number);
+        if (a.gestion.anio !== b.gestion.anio) return b.gestion.anio.localeCompare(a.gestion.anio);
+        return a.periodo.numero.localeCompare(b.periodo.numero);
       }));
     } catch (error) {
-      console.error('Error fetching gestiones:', error);
+      console.error('Error al cargar gestiones:', error);
     }
   };
 
@@ -222,17 +222,17 @@ export default function EditStudentPage() {
     const newErrors: Record<string, string> = {};
 
     if (!personData.ci) newErrors.ci = 'CI es requerido';
-    if (!personData.names) newErrors.names = 'Nombres es requerido';
-    if (!personData.lastname_paternal) newErrors.lastname_paternal = 'Apellido paterno es requerido';
-    if (!personData.lastname_maternal) newErrors.lastname_maternal = 'Apellido materno es requerido';
-    if (!personData.birthdate) newErrors.birthdate = 'Fecha de nacimiento es requerida';
-    if (!personData.gender) newErrors.gender = 'Género es requerido';
+    if (!personData.nombres) newErrors.nombres = 'Nombres es requerido';
+    if (!personData.apellidoPaterno) newErrors.apellidoPaterno = 'Apellido paterno es requerido';
+    if (!personData.apellidoMaterno) newErrors.apellidoMaterno = 'Apellido materno es requerido';
+    if (!personData.fechaNacimiento) newErrors.fechaNacimiento = 'Fecha de nacimiento es requerida';
+    if (!personData.genero) newErrors.genero = 'Género es requerido';
 
-    if (!studentData.inscription_code) newErrors.inscription_code = 'Código de inscripción es requerido';
-    if (!studentData.admission_gestion) newErrors.admission_gestion = 'Gestión de ingreso es requerida';
-    if (!studentData.admission_date) newErrors.admission_date = 'Fecha de ingreso es requerida';
-    if (!studentData.career_id) newErrors.career_id = 'Carrera es requerida';
-    if (!studentData.study_plan_id) newErrors.study_plan_id = 'Plan de estudio es requerido';
+    if (!studentData.codigoInscripcion) newErrors.codigoInscripcion = 'Código de inscripción es requerido';
+    if (!studentData.gestionAdmision) newErrors.gestionAdmision = 'Gestión de ingreso es requerida';
+    if (!studentData.fechaAdmision) newErrors.fechaAdmision = 'Fecha de ingreso es requerida';
+    if (!studentData.carreraId) newErrors.carreraId = 'Carrera es requerida';
+    if (!studentData.planEstudioId) newErrors.planEstudioId = 'Plan de estudio es requerido';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -248,28 +248,28 @@ export default function EditStudentPage() {
       const studentResponse = await api.get(`/estudiantes/${studentId}`);
       const student: StudentData = studentResponse.data;
 
-      await api.patch(`/personas/${student.person_id}`, {
+      await api.patch(`/personas/${student.personaId}`, {
         ...personData,
-        gender: personData.gender,
+        genero: personData.genero,
         estado: 'activo',
       });
 
       await api.patch(`/estudiantes/${studentId}`, {
-        inscription_code: studentData.inscription_code,
-        admission_gestion: studentData.admission_gestion,
-        admission_date: studentData.admission_date,
-        career_id: Number(studentData.career_id),
-        study_plan_id: Number(studentData.study_plan_id),
-        folder_number: studentData.folder_number || undefined,
-        form01_code: studentData.form01_code || undefined,
-        bachelor_title_number: studentData.bachelor_title_number || undefined,
-        bachelor_title_date: studentData.bachelor_title_date || undefined,
+        codigoInscripcion: studentData.codigoInscripcion,
+        gestionAdmision: studentData.gestionAdmision,
+        fechaAdmision: studentData.fechaAdmision,
+        carreraId: Number(studentData.carreraId),
+        planEstudioId: Number(studentData.planEstudioId),
+        numeroFolder: studentData.numeroFolder || undefined,
+        codigoFormulario01: studentData.codigoFormulario01 || undefined,
+        numeroTituloBachiller: studentData.numeroTituloBachiller || undefined,
+        fechaTituloBachiller: studentData.fechaTituloBachiller || undefined,
         estado: studentData.estado,
       });
 
       router.push('/estudiantes');
     } catch (error: any) {
-      console.error('Error updating student:', error);
+      console.error('Error al actualizar estudiante:', error);
       if (error.response?.data?.message) {
         setErrors({ submit: error.response.data.message });
       } else {
@@ -331,27 +331,27 @@ export default function EditStudentPage() {
               <div>
                 <Entrada
                   label="Nombres *"
-                  value={personData.names}
-                  onChange={(e) => setPersonData({ ...personData, names: e.target.value })}
-                  error={errors.names}
+                  value={personData.nombres}
+                  onChange={(e) => setPersonData({ ...personData, nombres: e.target.value })}
+                  error={errors.nombres}
                   placeholder="Juan Carlos"
                 />
               </div>
               <div>
                 <Entrada
                   label="Apellido Paterno *"
-                  value={personData.lastname_paternal}
-                  onChange={(e) => setPersonData({ ...personData, lastname_paternal: e.target.value })}
-                  error={errors.lastname_paternal}
+                  value={personData.apellidoPaterno}
+                  onChange={(e) => setPersonData({ ...personData, apellidoPaterno: e.target.value })}
+                  error={errors.apellidoPaterno}
                   placeholder="Perez"
                 />
               </div>
               <div>
                 <Entrada
                   label="Apellido Materno *"
-                  value={personData.lastname_maternal}
-                  onChange={(e) => setPersonData({ ...personData, lastname_maternal: e.target.value })}
-                  error={errors.lastname_maternal}
+                  value={personData.apellidoMaterno}
+                  onChange={(e) => setPersonData({ ...personData, apellidoMaterno: e.target.value })}
+                  error={errors.apellidoMaterno}
                   placeholder="Gomez"
                 />
               </div>
@@ -359,25 +359,25 @@ export default function EditStudentPage() {
                 <Entrada
                   label="Fecha de Nacimiento *"
                   type="date"
-                  value={personData.birthdate}
-                  onChange={(e) => setPersonData({ ...personData, birthdate: e.target.value })}
-                  error={errors.birthdate}
+                  value={personData.fechaNacimiento}
+                  onChange={(e) => setPersonData({ ...personData, fechaNacimiento: e.target.value })}
+                  error={errors.fechaNacimiento}
                 />
               </div>
               <div>
                 <Entrada
                   label="Lugar de Nacimiento"
-                  value={personData.birthplace}
-                  onChange={(e) => setPersonData({ ...personData, birthplace: e.target.value })}
+                  value={personData.lugarNacimiento}
+                  onChange={(e) => setPersonData({ ...personData, lugarNacimiento: e.target.value })}
                   placeholder="La Paz"
                 />
               </div>
               <div>
                 <Selector
                   label="Género *"
-                  value={personData.gender}
-                  onChange={(e) => setPersonData({ ...personData, gender: e.target.value })}
-                  error={errors.gender}
+                  value={personData.genero}
+                  onChange={(e) => setPersonData({ ...personData, genero: e.target.value })}
+                  error={errors.genero}
                   options={[
                     { value: 'M', label: 'Masculino' },
                     { value: 'F', label: 'Femenino' },
@@ -388,8 +388,8 @@ export default function EditStudentPage() {
               <div>
                 <Selector
                   label="Estado Civil"
-                  value={personData.marital_estado}
-                  onChange={(e) => setPersonData({ ...personData, marital_estado: e.target.value })}
+                  value={personData.estadoCivil}
+                  onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
                   options={[
                     { value: 'Soltera(o)', label: 'Soltero(a)' },
                     { value: 'Casada(o)', label: 'Casado(a)' },
@@ -402,16 +402,16 @@ export default function EditStudentPage() {
               <div>
                 <Entrada
                   label="Nacionalidad"
-                  value={personData.nationality}
-                  onChange={(e) => setPersonData({ ...personData, nationality: e.target.value })}
+                  value={personData.nacionalidad}
+                  onChange={(e) => setPersonData({ ...personData, nacionalidad: e.target.value })}
                   placeholder="Boliviana"
                 />
               </div>
               <div>
                 <Entrada
                   label="Teléfono"
-                  value={personData.phone}
-                  onChange={(e) => setPersonData({ ...personData, phone: e.target.value })}
+                  value={personData.telefono}
+                  onChange={(e) => setPersonData({ ...personData, telefono: e.target.value })}
                   placeholder="71234567"
                 />
               </div>
@@ -419,16 +419,16 @@ export default function EditStudentPage() {
                 <Entrada
                   label="Correo Electrónico"
                   type="email"
-                  value={personData.email}
-                  onChange={(e) => setPersonData({ ...personData, email: e.target.value })}
+                  value={personData.correo}
+                  onChange={(e) => setPersonData({ ...personData, correo: e.target.value })}
                   placeholder="correo@ejemplo.com"
                 />
               </div>
               <div className="md:col-span-2 lg:col-span-3">
                 <Entrada
                   label="Dirección"
-                  value={personData.address}
-                  onChange={(e) => setPersonData({ ...personData, address: e.target.value })}
+                  value={personData.direccion}
+                  onChange={(e) => setPersonData({ ...personData, direccion: e.target.value })}
                   placeholder="Av. 16 de Julio, La Paz"
                 />
               </div>
@@ -445,8 +445,8 @@ export default function EditStudentPage() {
               <div>
                 <Entrada
                   label="Código de Inscripción *"
-                  value={studentData.inscription_code}
-                  error={errors.inscription_code}
+                  value={studentData.codigoInscripcion}
+                  error={errors.codigoInscripcion}
                   readOnly
                   className="bg-gray-50"
                 />
@@ -454,12 +454,12 @@ export default function EditStudentPage() {
               <div>
                 <Selector
                   label="Gestión de Ingreso *"
-                  value={studentData.admission_gestion}
-                  onChange={(e) => setStudentData({ ...studentData, admission_gestion: e.target.value })}
-                  error={errors.admission_gestion}
+                  value={studentData.gestionAdmision}
+                  onChange={(e) => setStudentData({ ...studentData, gestionAdmision: e.target.value })}
+                  error={errors.gestionAdmision}
                   options={periodos.map(p => ({
-                    value: `${p.gestion.year}-${p.periodo.number}`,
-                    label: `${p.periodo.number}/${p.gestion.year}${p.periodo.estado === 'abierta' ? ' ★' : ''}`,
+                    value: `${p.gestion.anio}-${p.periodo.numero}`,
+                    label: `${p.periodo.numero}/${p.gestion.anio}${p.periodo.estado === 'abierta' ? ' ★' : ''}`,
                   }))}
                   placeholder="Seleccionar período..."
                 />
@@ -468,18 +468,18 @@ export default function EditStudentPage() {
                 <Entrada
                   label="Fecha de Ingreso *"
                   type="date"
-                  value={studentData.admission_date}
-                  onChange={(e) => setStudentData({ ...studentData, admission_date: e.target.value })}
-                  error={errors.admission_date}
+                  value={studentData.fechaAdmision}
+                  onChange={(e) => setStudentData({ ...studentData, fechaAdmision: e.target.value })}
+                  error={errors.fechaAdmision}
                 />
               </div>
               <div>
                 <Selector
                   label="Carrera *"
-                  value={String(studentData.career_id)}
-                  onChange={(e) => setStudentData({ ...studentData, career_id: e.target.value, study_plan_id: '' })}
-                  error={errors.career_id}
-                  options={careers.map(c => ({ value: c.id.toString(), label: c.name }))}
+                  value={String(studentData.carreraId)}
+                  onChange={(e) => setStudentData({ ...studentData, carreraId: e.target.value, planEstudioId: '' })}
+                  error={errors.carreraId}
+                  options={careers.map(c => ({ value: c.id.toString(), label: c.nombre }))}
                   placeholder={loadingCareers ? 'Cargando...' : 'Seleccionar carrera...'}
                   disabled={loadingCareers}
                 />
@@ -487,12 +487,12 @@ export default function EditStudentPage() {
               <div>
                 <Selector
                   label="Plan de Estudio *"
-                  value={String(studentData.study_plan_id)}
-                  onChange={(e) => setStudentData({ ...studentData, study_plan_id: e.target.value })}
-                  error={errors.study_plan_id}
-                  options={studyPlans.map(p => ({ value: p.id.toString(), label: `${p.rm_number}` }))}
+                  value={String(studentData.planEstudioId)}
+                  onChange={(e) => setStudentData({ ...studentData, planEstudioId: e.target.value })}
+                  error={errors.planEstudioId}
+                  options={studyPlans.map(p => ({ value: p.id.toString(), label: `${p.numeroRm}` }))}
                   placeholder={loadingPlans ? 'Cargando...' : 'Seleccionar plan...'}
-                  disabled={loadingPlans || !studentData.career_id}
+                  disabled={loadingPlans || !studentData.carreraId}
                 />
               </div>
               <div>
@@ -513,24 +513,24 @@ export default function EditStudentPage() {
               <div>
                 <Entrada
                   label="Número de Folder"
-                  value={studentData.folder_number}
-                  onChange={(e) => setStudentData({ ...studentData, folder_number: e.target.value })}
+                  value={studentData.numeroFolder}
+                  onChange={(e) => setStudentData({ ...studentData, numeroFolder: e.target.value })}
                   placeholder="F-001"
                 />
               </div>
               <div>
                 <Entrada
                   label="Código Formulario 01"
-                  value={studentData.form01_code}
-                  onChange={(e) => setStudentData({ ...studentData, form01_code: e.target.value })}
+                  value={studentData.codigoFormulario01}
+                  onChange={(e) => setStudentData({ ...studentData, codigoFormulario01: e.target.value })}
                   placeholder="FORM01-2024-001"
                 />
               </div>
               <div>
                 <Entrada
                   label="Número de Título de Bachiller"
-                  value={studentData.bachelor_title_number}
-                  onChange={(e) => setStudentData({ ...studentData, bachelor_title_number: e.target.value })}
+                  value={studentData.numeroTituloBachiller}
+                  onChange={(e) => setStudentData({ ...studentData, numeroTituloBachiller: e.target.value })}
                   placeholder="123456"
                 />
               </div>
@@ -538,8 +538,8 @@ export default function EditStudentPage() {
                 <Entrada
                   label="Fecha de Título de Bachiller"
                   type="date"
-                  value={studentData.bachelor_title_date}
-                  onChange={(e) => setStudentData({ ...studentData, bachelor_title_date: e.target.value })}
+                  value={studentData.fechaTituloBachiller}
+                  onChange={(e) => setStudentData({ ...studentData, fechaTituloBachiller: e.target.value })}
                 />
               </div>
             </div>

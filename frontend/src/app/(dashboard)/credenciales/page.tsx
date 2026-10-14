@@ -15,36 +15,36 @@ type CredentialStatus = 'emitida' | 'anulada' | 'reemplazada';
 
 interface Credencial {
   id: number;
-  student_id: number;
+  estudianteId: number;
   gestion: string;
-  gestion_id?: number;
+  gestionId?: number;
   gestionEntity?: {
     id: number;
-    year: string;
-    period_type: string;
-    status: string;
+    anio: string;
+    tipoPeriodo: string;
+    estado: string;
   };
-  semester: number;
-  issued_date: string;
-  valid_until: string;
-  photo_url?: string;
-  status: CredentialStatus;
-  printed: boolean;
-  notes?: string;
+  semestre: number;
+  fechaEmision: string;
+  validoHasta: string;
+  fotoUrl?: string;
+  estado: CredentialStatus;
+  impreso: boolean;
+  notas?: string;
   estudiante?: {
     id: number;
-    inscription_code: string;
-    status: string;
+    codigoInscripcion: string;
+    estado: string;
     persona?: {
       id: number;
       ci: string;
-      names: string;
-      lastname_paternal: string;
-      lastname_maternal: string;
+      nombres: string;
+      apellidoPaterno: string;
+      apellidoMaterno: string;
     };
     carrera?: {
       id: number;
-      name: string;
+      nombre: string;
     };
   };
 }
@@ -57,7 +57,7 @@ interface Institution {
   logo_url: string;
   direccion: string;
   telefono: string;
-  email: string;
+  correo: string;
   website: string;
   ciudad: string;
   pais: string;
@@ -151,7 +151,7 @@ function Watermark({ url }: { url?: string }) {
 function CredentialCard({ credential, selected, onClick }: { credential: Credencial; selected: boolean; onClick: () => void }) {
   const student = credential.estudiante;
   const person = student?.persona;
-  const fullName = person ? `${person.names} ${person.lastname_paternal} ${person.lastname_maternal}` : 'Sin nombre';
+  const fullName = person ? `${person.nombres} ${person.apellidoPaterno} ${person.apellidoMaterno}` : 'Sin nombre';
 
   return (
     <div
@@ -160,21 +160,21 @@ function CredentialCard({ credential, selected, onClick }: { credential: Credenc
     >
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-sm flex-shrink-0">
-          {person?.names?.charAt(0) || '?'}{person?.lastname_paternal?.charAt(0) || ''}
+          {person?.nombres?.charAt(0) || '?'}{person?.apellidoPaterno?.charAt(0) || ''}
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm text-gray-900 truncate">{fullName}</p>
-          <p className="text-xs text-gray-500">{student?.inscription_code}</p>
-          <p className="text-xs text-gray-400">{student?.carrera?.name || 'Sin carrera'}</p>
+          <p className="text-xs text-gray-500">{student?.codigoInscripcion}</p>
+          <p className="text-xs text-gray-400">{student?.carrera?.nombre || 'Sin carrera'}</p>
         </div>
         <div className="text-right flex-shrink-0">
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
-              Sem {credential.semester}
+              Sem {credential.semestre}
             </span>
-            <StatusBadge status={credential.status} />
+            <StatusBadge status={credential.estado} />
           </div>
-          <p className="text-[10px] text-gray-400 mt-1">{credential.printed ? '✓ Impresa' : 'Sin imprimir'}</p>
+          <p className="text-[10px] text-gray-400 mt-1">{credential.impreso ? '✓ Impresa' : 'Sin imprimir'}</p>
         </div>
       </div>
     </div>
@@ -184,9 +184,9 @@ function CredentialCard({ credential, selected, onClick }: { credential: Credenc
 function CredentialPreview({ credential, institucion }: { credential: Credencial; institucion?: Institution }) {
   const student = credential.estudiante;
   const person = student?.persona;
-  const surnames = person ? `${person.lastname_paternal} ${person.lastname_maternal}` : '—';
-  const firstName = person?.names || '—';
-  const careerName = student?.carrera?.name || '—';
+  const surnames = person ? `${person.apellidoPaterno} ${person.apellidoMaterno}` : '—';
+  const firstName = person?.nombres || '—';
+  const careerName = student?.carrera?.nombre || '—';
   const CREAM = '#faf7f1';
 
   const instName = institucion?.nombre || 'INSTITUCIÓN EDUCATIVA';
@@ -213,18 +213,18 @@ function CredentialPreview({ credential, institucion }: { credential: Credencial
             </div>
             <div style={{ display: 'flex', gap: 14, padding: '10px 12px', flex: 1 }}>
               <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                <Row label="Código" value={student?.inscription_code || '—'} big golden />
+                <Row label="Código" value={student?.codigoInscripcion || '—'} big golden />
                 <Row label="Apellidos" value={surnames} />
                 <Row label="Nombres" value={firstName} />
                 <Row label="Carrera" value={careerName} />
-                <Row label="Nivel" value={`${credential.semester}° Semestre`} />
-                <Row label="Gestión" value={`${credential.semester === 1 ? 'I' : 'II'}/${credential.gestion}`} />
+                <Row label="Nivel" value={`${credential.semestre}° Semestre`} />
+                <Row label="Gestión" value={`${credential.semestre === 1 ? 'I' : 'II'}/${credential.gestion}`} />
               </div>
-              <PhotoBox url={credential.photo_url} />
+              <PhotoBox url={credential.fotoUrl} />
             </div>
             <div style={{ position: 'absolute', top: 31, right: 6, transform: 'translateY(-50%)', zIndex: 2, background: GOLD, color: NAVY, borderRadius: 6, padding: '4px 10px', textAlign: 'center' }}>
               <div style={{ fontSize: 6.5, fontWeight: 700, letterSpacing: 0.5 }}>GESTIÓN</div>
-              <div style={{ fontSize: 10.5, fontWeight: 800 }}>{credential.semester === 1 ? 'I' : 'II'}/{credential.gestion}</div>
+              <div style={{ fontSize: 10.5, fontWeight: 800 }}>{credential.semestre === 1 ? 'I' : 'II'}/{credential.gestion}</div>
             </div>
           </div>
         </div>
@@ -245,9 +245,9 @@ function CredentialPreview({ credential, institucion }: { credential: Credencial
                 <Row label="Apellidos" value={surnames} small />
                 <Row label="Nombres" value={firstName} small />
                 <Row label="C.I." value={person?.ci || '—'} small />
-                <Row label="Nivel" value={`${credential.semester}° Semestre`} small />
-                <Row label="Gestión" value={`${credential.semester === 1 ? 'I' : 'II'}/${credential.gestion}`} small />
-                <Row label="Válida hasta" value={formatDate(credential.valid_until)} small />
+                <Row label="Nivel" value={`${credential.semestre}° Semestre`} small />
+                <Row label="Gestión" value={`${credential.semestre === 1 ? 'I' : 'II'}/${credential.gestion}`} small />
+                <Row label="Válida hasta" value={formatDate(credential.validoHasta)} small />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0, justifyContent: 'center' }}>
                 <QRCodeSVG value={`http://localhost:3000/credenciales/verify/${credential.id}`} size={88} />
@@ -255,7 +255,7 @@ function CredentialPreview({ credential, institucion }: { credential: Credencial
               </div>
             </div>
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 17, background: 'rgba(255,255,255,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 5.5, color: '#777' }}>Válida hasta: {formatDate(credential.valid_until)}</span>
+              <span style={{ fontSize: 5.5, color: '#777' }}>Válida hasta: {formatDate(credential.validoHasta)}</span>
             </div>
           </div>
         </div>
@@ -287,7 +287,7 @@ export default function CredentialsPage() {
       const response = await api.get('/credenciales', { params: { limit: 100 } });
       setCredentials(response.data.data || []);
     } catch (error) {
-      console.error('Error fetching credentials:', error);
+      console.error('Error al obtener las credenciales:', error);
     } finally {
       setLoading(false);
     }
@@ -298,7 +298,7 @@ export default function CredentialsPage() {
       const response = await api.get('/configuracion-institucional/public');
       setInstitucion(response.data);
     } catch (error) {
-      console.error('Error fetching institucion?:', error);
+      console.error('Error al obtener la institución:', error);
     }
   };
 
@@ -306,9 +306,9 @@ export default function CredentialsPage() {
     const q = search.toLowerCase();
     return credentials.filter((cred) => {
       const person = cred.estudiante?.persona;
-      const fullName = person ? `${person.names} ${person.lastname_paternal} ${person.lastname_maternal}`.toLowerCase() : '';
-      const matchesSearch = !q || fullName.includes(q) || (person?.ci || '').includes(q) || (cred.estudiante?.inscription_code || '').toLowerCase().includes(q);
-      const matchesStatus = statusFilter === 'ALL' || cred.status === statusFilter;
+      const fullName = person ? `${person.nombres} ${person.apellidoPaterno} ${person.apellidoMaterno}`.toLowerCase() : '';
+      const matchesSearch = !q || fullName.includes(q) || (person?.ci || '').includes(q) || (cred.estudiante?.codigoInscripcion || '').toLowerCase().includes(q);
+      const matchesStatus = statusFilter === 'ALL' || cred.estado === statusFilter;
       const matchesGestion = gestionFilter === 'ALL' || cred.gestion === gestionFilter;
       return matchesSearch && matchesStatus && matchesGestion;
     });
@@ -330,7 +330,7 @@ export default function CredentialsPage() {
         setSelected(null);
       }
     } catch (error) {
-      console.error('Error cancelling credential:', error);
+      console.error('Error al anular la credencial:', error);
     } finally {
       setSaving(false);
     }
@@ -347,7 +347,7 @@ export default function CredentialsPage() {
         setSelected(null);
       }
     } catch (error) {
-      console.error('Error deleting credential:', error);
+      console.error('Error al eliminar la credencial:', error);
     } finally {
       setSaving(false);
     }
@@ -360,7 +360,7 @@ export default function CredentialsPage() {
       fetchCredentials();
       window.print();
     } catch (error) {
-      console.error('Error marking as printed:', error);
+      console.error('Error al marcar como impresa:', error);
     }
   };
 
@@ -418,9 +418,9 @@ export default function CredentialsPage() {
               onClick={() => setSelected(cred)}
               className="px-3 py-2 border rounded-lg cursor-pointer hover:bg-gray-50 text-sm flex items-center gap-2"
             >
-              <span className="font-medium">{cred.estudiante?.persona?.names?.charAt(0) || '?'}{cred.estudiante?.persona?.lastname_paternal?.charAt(0) || ''}</span>
-              <span className="text-gray-600">{cred.estudiante?.persona?.names} {cred.estudiante?.persona?.lastname_paternal}</span>
-              <span className="text-xs text-gray-400">Sem {cred.semester}</span>
+              <span className="font-medium">{cred.estudiante?.persona?.nombres?.charAt(0) || '?'}{cred.estudiante?.persona?.apellidoPaterno?.charAt(0) || ''}</span>
+              <span className="text-gray-600">{cred.estudiante?.persona?.nombres} {cred.estudiante?.persona?.apellidoPaterno}</span>
+              <span className="text-xs text-gray-400">Sem {cred.semestre}</span>
             </div>
           ))}
         </div>
@@ -436,7 +436,7 @@ export default function CredentialsPage() {
                   <Printer className="w-3 h-3 mr-1" />
                   Imprimir
                 </Boton>
-                {selected.status === 'emitida' && (
+                {selected.estado === 'emitida' && (
                   <Boton size="sm" variant="outline" className="text-red-600" onClick={() => setCancelModal(selected)}>
                     <X className="w-3 h-3 mr-1" />
                     Anular
@@ -450,7 +450,7 @@ export default function CredentialsPage() {
               <div className="mt-4 pt-4 border-t grid grid-cols-4 gap-3 text-xs">
                 <div>
                   <p className="text-gray-500">Código</p>
-                  <p className="font-medium">{selected.estudiante?.inscription_code}</p>
+                  <p className="font-medium">{selected.estudiante?.codigoInscripcion}</p>
                 </div>
                 <div>
                   <p className="text-gray-500">Gestión</p>
@@ -458,11 +458,11 @@ export default function CredentialsPage() {
                 </div>
                 <div>
                   <p className="text-gray-500">Semestre</p>
-                  <p className="font-medium">{selected.semester}°</p>
+                  <p className="font-medium">{selected.semestre}°</p>
                 </div>
                 <div>
                   <p className="text-gray-500">Fecha de emisión</p>
-                  <p className="font-medium">{formatDate(selected.issued_date)}</p>
+                  <p className="font-medium">{formatDate(selected.fechaEmision)}</p>
                 </div>
               </div>
             </ContenidoTarjeta>
@@ -483,7 +483,7 @@ export default function CredentialsPage() {
         onClose={() => setCancelModal(null)}
         onConfirm={handleCancel}
         title="Anular Credencial"
-        message={`¿Anular la credencial de "${cancelModal?.estudiante?.persona?.names} ${cancelModal?.estudiante?.persona?.lastname_paternal}" Semestre ${cancelModal?.semester}?`}
+        message={`¿Anular la credencial de "${cancelModal?.estudiante?.persona?.nombres} ${cancelModal?.estudiante?.persona?.apellidoPaterno}" Semestre ${cancelModal?.semestre}?`}
         confirmText="Anular"
         variant="destructive"
         loading={saving}
@@ -494,7 +494,7 @@ export default function CredentialsPage() {
         onClose={() => setDeleteModal(null)}
         onConfirm={handleDelete}
         title="Eliminar Credencial"
-        message={`¿Eliminar permanentemente la credencial de "${deleteModal?.estudiante?.persona?.names} ${deleteModal?.estudiante?.persona?.lastname_paternal}"?`}
+        message={`¿Eliminar permanentemente la credencial de "${deleteModal?.estudiante?.persona?.nombres} ${deleteModal?.estudiante?.persona?.apellidoPaterno}"?`}
         confirmText="Eliminar"
         variant="destructive"
         loading={saving}

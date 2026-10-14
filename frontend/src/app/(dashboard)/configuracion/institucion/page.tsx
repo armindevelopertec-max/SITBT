@@ -15,14 +15,14 @@ import api from '@/lib/api';
 
 const settingsSchema = z.object({
   nombre: z.string().min(1, 'El nombre es requerido'),
-  nombre_corto: z.string().min(1, 'El nombre corto es requerido'),
+  nombreCorto: z.string().min(1, 'El nombre corto es requerido'),
   lema: z.string().optional(),
-  logo_url: z.string().optional(),
+  logoUrl: z.string().optional(),
   direccion: z.string().optional(),
   telefono: z.string().optional(),
   departamento: z.string().optional(),
-  email: z.string().email('Email inválido').optional().or(z.literal('')),
-  website: z.string().optional(),
+  correo: z.string().email('Correo inválido').optional().or(z.literal('')),
+  sitioWeb: z.string().optional(),
   ciudad: z.string().optional(),
   pais: z.string().optional(),
   descripcion: z.string().optional(),
@@ -48,7 +48,7 @@ export default function ConfiguracionPage() {
 
   useEffect(() => {
     if (settings) {
-      setLogoUrl(settings.logo_url || '');
+      setLogoUrl(settings.logoUrl || '');
     }
   }, [settings]);
 
@@ -67,7 +67,7 @@ export default function ConfiguracionPage() {
     try {
       setSaving(true);
       setMessage(null);
-      const submitData = { ...data, logo_url: logoUrl };
+      const submitData = { ...data, logoUrl: logoUrl };
       await api.put('/configuracion-institucional', submitData);
       setMessage({ type: 'success', text: 'Configuración guardada correctamente' });
       setIsEditing(false);
@@ -84,17 +84,17 @@ export default function ConfiguracionPage() {
 
   const handleEdit = () => {
     if (settings) {
-      setLogoUrl(settings.logo_url || '');
+      setLogoUrl(settings.logoUrl || '');
       reset({
         nombre: settings.nombre || '',
-        nombre_corto: settings.nombre_corto || '',
+        nombreCorto: settings.nombreCorto || '',
         lema: settings.lema || '',
-        logo_url: settings.logo_url || '',
+        logoUrl: settings.logoUrl || '',
         direccion: settings.direccion || '',
         telefono: settings.telefono || '',
         departamento: settings.departamento || '',
-        email: settings.email || '',
-        website: settings.website || '',
+        correo: settings.correo || '',
+        sitioWeb: settings.sitioWeb || '',
         ciudad: settings.ciudad || '',
         pais: settings.pais || '',
         descripcion: '',
@@ -160,8 +160,8 @@ export default function ConfiguracionPage() {
               <Entrada
                 label="Nombre Corto / Sigla"
                 placeholder="SITBT"
-                error={errors.nombre_corto?.message}
-                {...register('nombre_corto')}
+                error={errors.nombreCorto?.message}
+                {...register('nombreCorto')}
               />
               <div className="md:col-span-2">
                 <Entrada
@@ -247,15 +247,15 @@ export default function ConfiguracionPage() {
                 {...register('departamento')}
               />
               <Entrada
-                label="Email"
+                label="Correo"
                 placeholder="contacto@sitbt.edu.bo"
-                error={errors.email?.message}
-                {...register('email')}
+                error={errors.correo?.message}
+                {...register('correo')}
               />
               <Entrada
-                label="Website"
+                label="Sitio Web"
                 placeholder="https://www.sitbt.edu.bo"
-                {...register('website')}
+                {...register('sitioWeb')}
               />
             </ContenidoTarjeta>
           </Tarjeta>
@@ -288,7 +288,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Nombre Corto / Sigla</p>
-                  <p className="text-gray-900">{settings?.nombre_corto || '-'}</p>
+                  <p className="text-gray-900">{settings?.nombreCorto || '-'}</p>
                 </div>
                 <div className="md:col-span-2">
                   <p className="text-sm font-medium text-gray-500">Lema</p>
@@ -311,9 +311,9 @@ export default function ConfiguracionPage() {
             </EncabezadoTarjeta>
             <ContenidoTarjeta>
               <div className="flex items-center gap-6">
-                {settings?.logo_url ? (
+                {settings?.logoUrl ? (
                   <img
-                    src={settings.logo_url}
+                    src={settings.logoUrl}
                     alt="Logo"
                     className="w-24 h-24 object-contain rounded-lg border border-gray-200"
                   />
@@ -325,7 +325,7 @@ export default function ConfiguracionPage() {
                 <div>
                   <p className="text-sm font-medium text-gray-500">Logo Institucional</p>
                   <p className="text-xs text-gray-400 mt-1">
-                    {settings?.logo_url ? 'Logo actual' : 'Sin logo configurado'}
+                    {settings?.logoUrl ? 'Logo actual' : 'Sin logo configurado'}
                   </p>
                 </div>
               </div>
@@ -375,12 +375,12 @@ export default function ConfiguracionPage() {
                   <p className="text-gray-900">{settings?.departamento || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Email</p>
-                  <p className="text-gray-900">{settings?.email || '-'}</p>
+                  <p className="text-sm font-medium text-gray-500">Correo</p>
+                  <p className="text-gray-900">{settings?.correo || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Website</p>
-                  <p className="text-gray-900">{settings?.website || '-'}</p>
+                  <p className="text-sm font-medium text-gray-500">Sitio Web</p>
+                  <p className="text-gray-900">{settings?.sitioWeb || '-'}</p>
                 </div>
               </div>
             </ContenidoTarjeta>

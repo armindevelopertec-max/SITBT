@@ -70,7 +70,7 @@ export function CargarImagen({
       const data = await response.json();
       onChange(data.url);
     } catch (err: any) {
-      console.error('Error uploading file:', err);
+      console.error('Error al subir el archivo:', err);
       alert(err.message || 'Error al subir la imagen');
     } finally {
       setUploading(false);

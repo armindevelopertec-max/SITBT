@@ -49,7 +49,7 @@ export default function StudentsPage() {
       const response = await api.get('/estudiantes');
       setStudents(response.data.data);
     } catch (error) {
-      console.error('Error fetching students:', error);
+      console.error('Error al cargar estudiantes:', error);
     } finally {
       setLoading(false);
     }
@@ -58,11 +58,11 @@ export default function StudentsPage() {
   const filteredStudents = students.filter((student) => {
     const persona = student.persona;
     if (!persona) return false;
-    const fullName = `${persona.names} ${persona.lastname_paternal} ${persona.lastname_maternal}`.toLowerCase();
+    const fullName = `${persona.nombres} ${persona.apellidoPaterno} ${persona.apellidoMaterno}`.toLowerCase();
     const ci = persona.ci.toLowerCase();
     const search = searchTerm.toLowerCase();
     const matchesSearch = fullName.includes(search) || ci.includes(search);
-    const matchesEstado = !estadoFilter || student.estado_matricula === estadoFilter;
+    const matchesEstado = !estadoFilter || student.estadoMatricula === estadoFilter;
     const matchesOrigen = !origenFilter || student.origen === origenFilter;
     return matchesSearch && matchesEstado && matchesOrigen;
   });
@@ -80,7 +80,7 @@ export default function StudentsPage() {
       setDeleteModal(null);
       fetchStudents();
     } catch (error) {
-      console.error('Error deleting student:', error);
+      console.error('Error al eliminar estudiante:', error);
     } finally {
       setFormLoading(false);
     }
@@ -88,21 +88,21 @@ export default function StudentsPage() {
 
   const viewCredentials = async (student: Estudiante) => {
     try {
-      const response = await api.get(`/usuarios?person_id=${student.person_id}`);
+      const response = await api.get(`/usuarios?personaId=${student.personaId}`);
       const users = response.data.data;
       const persona = student.persona;
-      const nombre = persona ? `${persona.names} ${persona.lastname_paternal}` : 'Estudiante';
+      const nombre = persona ? `${persona.nombres} ${persona.apellidoPaterno}` : 'Estudiante';
 
       if (users && users.length > 0 && persona) {
         const user = users[0];
         const newPassword = `${persona.ci}-${new Date().getFullYear()}`;
-        setCredentialsModal({ username: user.nombreUsuario, password: newPassword, nombre, studentId: student.id, personId: student.person_id });
+        setCredentialsModal({ username: user.nombreUsuario, password: newPassword, nombre, studentId: student.id, personId: student.personaId });
       } else {
-        setCredentialsModal({ username: 'No tiene usuario', password: '', nombre, studentId: student.id, personId: student.person_id });
+        setCredentialsModal({ username: 'No tiene usuario', password: '', nombre, studentId: student.id, personId: student.personaId });
       }
     } catch (error) {
-      console.error('Error fetching user:', error);
-      setCredentialsModal({ username: 'Error al cargar', password: '', nombre: student.persona?.names || '', studentId: student.id, personId: student.person_id });
+      console.error('Error al obtener usuario:', error);
+      setCredentialsModal({ username: 'Error al cargar', password: '', nombre: student.persona?.nombres || '', studentId: student.id, personId: student.personaId });
     }
   };
 
@@ -110,14 +110,14 @@ export default function StudentsPage() {
     if (!credentialsModal) return;
     setResetLoading(true);
     try {
-      const response = await api.get(`/usuarios?person_id=${credentialsModal.personId}`);
+      const response = await api.get(`/usuarios?personaId=${credentialsModal.personId}`);
       const users = response.data.data;
       if (users && users.length > 0) {
         await api.post(`/usuarios/${users[0].id}/change-password`, { newPassword: credentialsModal.password });
       }
       setCredentialsModal(null);
     } catch (error) {
-      console.error('Error resetting password:', error);
+      console.error('Error al restablecer contraseña:', error);
     } finally {
       setResetLoading(false);
     }
@@ -205,14 +205,14 @@ export default function StudentsPage() {
                     {student.persona?.ci}
                   </CeldaTabla>
                   <CeldaTabla>
-                    {student.persona?.names} {student.persona?.lastname_paternal} {student.persona?.lastname_maternal}
+                    {student.persona?.nombres} {student.persona?.apellidoPaterno} {student.persona?.apellidoMaterno}
                   </CeldaTabla>
-                  <CeldaTabla>{student.inscription_code}</CeldaTabla>
+                  <CeldaTabla>{student.codigoInscripcion}</CeldaTabla>
                   <CeldaTabla>
                     <Insignia variant="outline">{originLabels[student.origen || 'secretaria'] || '-'}</Insignia>
                   </CeldaTabla>
-                  <CeldaTabla>{getStatusBadge(student.estado_matricula || 'matriculado')}</CeldaTabla>
-                  <CeldaTabla>{new Date(student.admission_date).toLocaleDateString('es-BO')}</CeldaTabla>
+                  <CeldaTabla>{getStatusBadge(student.estadoMatricula || 'matriculado')}</CeldaTabla>
+                  <CeldaTabla>{new Date(student.fechaAdmision).toLocaleDateString('es-BO')}</CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
                       <Boton variant="ghost" size="icon" title="Ver credenciales" onClick={() => viewCredentials(student)}>
@@ -245,7 +245,7 @@ export default function StudentsPage() {
         onClose={() => setDeleteModal(null)}
         onConfirm={handleDelete}
         title="Eliminar Estudiante"
-        message={`¿Está seguro de eliminar al estudiante "${deleteModal?.persona?.names} ${deleteModal?.persona?.lastname_paternal}"? Esta acción no se puede deshacer.`}
+        message={`¿Está seguro de eliminar al estudiante "${deleteModal?.persona?.nombres} ${deleteModal?.persona?.apellidoPaterno}"? Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
         variant="destructive"
         loading={formLoading}

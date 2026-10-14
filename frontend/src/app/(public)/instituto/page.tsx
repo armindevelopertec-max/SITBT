@@ -5,22 +5,22 @@ import { GraduationCap, Users, BookOpen, Award, ArrowRight, CheckCircle, MapPin,
 import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
 const milestones = [
-  { year: '2014', event: 'Fundación del Instituto' },
-  { year: '2018', event: 'Primera R.M. aprobada' },
-  { year: '2022', event: 'Inauguración de nuevos talleres' },
-  { year: '2024', event: 'R.M. de Autotrónica aprobada' },
+  { anio: '2014', evento: 'Fundación del Instituto' },
+  { anio: '2018', evento: 'Primera R.M. aprobada' },
+  { anio: '2022', evento: 'Inauguración de nuevos talleres' },
+  { anio: '2024', evento: 'R.M. de Autotrónica aprobada' },
 ];
 
 const authorities = [
-  { name: 'Lic. Juan Pérez', role: 'Director General', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop' },
-  { name: 'Ing. María López', role: 'Jefe Académico', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop' },
-  { name: 'Lic. Carlos Mamani', role: 'Secretario Académico', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
+  { nombre: 'Lic. Juan Pérez', rol: 'Director General', imagen: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop' },
+  { nombre: 'Ing. María López', rol: 'Jefe Académico', imagen: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop' },
+  { nombre: 'Lic. Carlos Mamani', rol: 'Secretario Académico', imagen: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
 ];
 
 const values = [
-  { icon: <Target className="w-8 h-8" />, title: 'Excelencia Académica', description: 'Estándares elevados en la formación técnica' },
-  { icon: <Shield className="w-8 h-8" />, title: 'Integridad', description: 'Formación en valores éticos y profesionales' },
-  { icon: <Star className="w-8 h-8" />, title: 'Innovación', description: 'Tecnología y métodos de enseñanza actualizados' },
+  { icon: <Target className="w-8 h-8" />, titulo: 'Excelencia Académica', descripcion: 'Estándares elevados en la formación técnica' },
+  { icon: <Shield className="w-8 h-8" />, titulo: 'Integridad', descripcion: 'Formación en valores éticos y profesionales' },
+  { icon: <Star className="w-8 h-8" />, titulo: 'Innovación', descripcion: 'Tecnología y métodos de enseñanza actualizados' },
 ];
 
 export default function InstitutoPage() {
@@ -28,7 +28,7 @@ export default function InstitutoPage() {
 
   return (
     <div>
-      {/* Hero */}
+      {/* Encabezado */}
       <section className="relative h-72 sm:h-80 md:h-96 overflow-hidden bg-dark-800">
         <div className="absolute inset-0 opacity-30">
           <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80" alt="" className="w-full h-full object-cover" />
@@ -43,7 +43,7 @@ export default function InstitutoPage() {
         </div>
       </section>
 
-      {/* About */}
+      {/* Acerca de */}
       <section className="bg-dark-900 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
@@ -70,7 +70,7 @@ export default function InstitutoPage() {
         </div>
       </section>
 
-      {/* Mission & Vision */}
+      {/* Misión y Visión */}
       <section className="bg-dark-800 py-16 sm:py-24 border-y border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
@@ -100,7 +100,7 @@ export default function InstitutoPage() {
         </div>
       </section>
 
-      {/* Values */}
+      {/* Valores */}
       <section className="bg-dark-900 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 sm:mb-16">
@@ -116,15 +116,15 @@ export default function InstitutoPage() {
                 <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
                   {value.icon}
                 </div>
-                <h4 className="text-lg sm:text-xl font-bold text-gray-100 mb-2 sm:mb-3">{value.title}</h4>
-                <p className="text-gray-400 text-sm sm:text-base">{value.description}</p>
+                <h4 className="text-lg sm:text-xl font-bold text-gray-100 mb-2 sm:mb-3">{value.titulo}</h4>
+                <p className="text-gray-400 text-sm sm:text-base">{value.descripcion}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* History */}
+      {/* Historia */}
       <section className="bg-dark-800 py-16 sm:py-24 border-y border-dark-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 sm:mb-16">
@@ -140,8 +140,8 @@ export default function InstitutoPage() {
               {milestones.map((milestone, index) => (
                 <div key={index} className={`flex items-center ${index % 2 === 0 ? 'justify-start' : 'justify-end'}`}>
                   <div className={`w-[85%] sm:w-5/12 bg-dark-700 border border-dark-600 rounded-xl p-4 sm:p-6 ml-8 sm:ml-0 ${index % 2 === 0 ? 'sm:text-right' : ''} ${index % 2 !== 0 ? 'sm:mr-0' : ''}`}>
-                    <div className="text-xl sm:text-2xl font-bold text-primary-400 mb-1 sm:mb-2">{milestone.year}</div>
-                    <p className="text-gray-300 text-sm sm:text-base">{milestone.event}</p>
+                    <div className="text-xl sm:text-2xl font-bold text-primary-400 mb-1 sm:mb-2">{milestone.anio}</div>
+                    <p className="text-gray-300 text-sm sm:text-base">{milestone.evento}</p>
                   </div>
                 </div>
               ))}
@@ -150,7 +150,7 @@ export default function InstitutoPage() {
         </div>
       </section>
 
-      {/* Authorities */}
+      {/* Autoridades */}
       <section className="bg-dark-900 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 sm:mb-16">
@@ -163,16 +163,16 @@ export default function InstitutoPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-3xl mx-auto">
             {authorities.map((auth, index) => (
               <div key={index} className="text-center p-6 sm:p-8 bg-dark-700 rounded-xl border border-dark-600">
-                <img src={auth.image} alt={auth.name} className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mx-auto mb-4 object-cover border-2 border-dark-600" />
-                <h4 className="text-base sm:text-lg font-bold text-gray-100">{auth.name}</h4>
-                <p className="text-primary-400 font-medium text-sm sm:text-base">{auth.role}</p>
+                <img src={auth.imagen} alt={auth.nombre} className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mx-auto mb-4 object-cover border-2 border-dark-600" />
+                <h4 className="text-base sm:text-lg font-bold text-gray-100">{auth.nombre}</h4>
+                <p className="text-primary-400 font-medium text-sm sm:text-base">{auth.rol}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Contact CTA */}
+      {/* Contacto */}
       <section className="bg-dark-800 py-16 sm:py-24 border-t border-dark-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-4 sm:mb-6">¿Tienes preguntas?</h2>

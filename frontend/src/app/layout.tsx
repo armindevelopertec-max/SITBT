@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'SITBT - Sistema de Gestión Académica',
-  description: 'Instituto Tecnológico Boliviana de Tecnología - Sistema de Gestión Académica',
+  description: 'Instituto Tecnológico Boliviano de Tecnología - Sistema de Gestión Académica',
 };
 
 export default function RootLayout({

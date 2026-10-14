@@ -42,7 +42,7 @@ export default function DocumentDetailPage() {
         const data = await getDocument(params.id as string);
         setDocument(data);
       } catch (error) {
-        console.error('Error fetching document:', error);
+        console.error('Error al obtener el documento:', error);
       } finally {
         setLoading(false);
       }
@@ -57,7 +57,7 @@ export default function DocumentDetailPage() {
       const updated = await markAsPrinted(document.id, 1);
       setDocument(updated);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al marcar como impreso:', error);
     } finally {
       setActionLoading(false);
     }
@@ -72,7 +72,7 @@ export default function DocumentDetailPage() {
       const updated = await markAsDelivered(document.id, entregadoA);
       setDocument(updated);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al registrar la entrega:', error);
     } finally {
       setActionLoading(false);
     }
@@ -87,7 +87,7 @@ export default function DocumentDetailPage() {
       const updated = await annulDocument(document.id, observaciones);
       setDocument(updated);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al anular el documento:', error);
     } finally {
       setActionLoading(false);
     }
@@ -181,15 +181,15 @@ export default function DocumentDetailPage() {
               </EncabezadoTarjeta>
               <ContenidoTarjeta>
                 <p className="font-medium">
-                  {document.estudiante.persona?.names}{' '}
-                  {document.estudiante.persona?.lastname_paternal}{' '}
-                  {document.estudiante.persona?.lastname_maternal}
+                  {document.estudiante.persona?.nombres}{' '}
+                  {document.estudiante.persona?.apellidoPaterno}{' '}
+                  {document.estudiante.persona?.apellidoMaterno}
                 </p>
                 <p className="text-sm text-gray-500">
                   {document.estudiante.persona?.ci}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Código: {document.estudiante.inscription_code}
+                  Código: {document.estudiante.codigoInscripcion}
                 </p>
               </ContenidoTarjeta>
             </Tarjeta>

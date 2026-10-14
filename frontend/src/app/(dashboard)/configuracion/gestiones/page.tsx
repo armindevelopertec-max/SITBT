@@ -25,10 +25,10 @@ export default function GestionesPage() {
   const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
-    year: '',
-    period_type: 'semestral',
-    notes: '',
-    is_current: false,
+    anio: '',
+    tipoPeriodo: 'semestral',
+    notas: '',
+    esActual: false,
   });
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function GestionesPage() {
       const response = await api.get('/gestiones');
       setGestiones(response.data.data || []);
     } catch (error) {
-      console.error('Error fetching gestiones:', error);
+      console.error('Error al obtener las gestiones:', error);
     } finally {
       setLoading(false);
     }
@@ -68,18 +68,18 @@ export default function GestionesPage() {
     if (gestion) {
       setEditingGestion(gestion);
       setFormData({
-        year: gestion.year,
-        period_type: gestion.period_type,
-        notes: gestion.notes || '',
-        is_current: gestion.is_current,
+        anio: gestion.anio,
+        tipoPeriodo: gestion.tipoPeriodo,
+        notas: gestion.notas || '',
+        esActual: gestion.esActual,
       });
     } else {
       setEditingGestion(null);
       setFormData({
-        year: new Date().getFullYear().toString(),
-        period_type: 'semestral',
-        notes: '',
-        is_current: false,
+        anio: new Date().getFullYear().toString(),
+        tipoPeriodo: 'semestral',
+        notas: '',
+        esActual: false,
       });
     }
     setModalOpen(true);
@@ -91,7 +91,7 @@ export default function GestionesPage() {
   };
 
   const handleSave = async () => {
-    if (!formData.year) return;
+    if (!formData.anio) return;
 
     setSaving(true);
     try {
@@ -103,7 +103,7 @@ export default function GestionesPage() {
       fetchGestiones();
       handleCloseModal();
     } catch (error) {
-      console.error('Error saving gestion:', error);
+      console.error('Error al guardar la gestión:', error);
     } finally {
       setSaving(false);
     }
@@ -114,7 +114,7 @@ export default function GestionesPage() {
       type: 'openGestion',
       id: gestion.id,
       title: 'Abrir Gestión',
-      message: `¿Estás seguro de abrir la gestión ${gestion.year}?`,
+      message: `¿Estás seguro de abrir la gestión ${gestion.anio}?`,
     });
     setConfirmModalOpen(true);
   };
@@ -124,7 +124,7 @@ export default function GestionesPage() {
       type: 'closeGestion',
       id: gestion.id,
       title: 'Cerrar Gestión',
-      message: `¿Estás seguro de cerrar la gestión ${gestion.year}? Esto cerrará todos los períodos abiertos.`,
+      message: `¿Estás seguro de cerrar la gestión ${gestion.anio}? Esto cerrará todos los períodos abiertos.`,
     });
     setConfirmModalOpen(true);
   };
@@ -134,7 +134,7 @@ export default function GestionesPage() {
       type: 'setCurrent',
       id: gestion.id,
       title: 'Marcar como Actual',
-      message: `¿Estás seguro de marcar la gestión ${gestion.year} como actual?`,
+      message: `¿Estás seguro de marcar la gestión ${gestion.anio} como actual?`,
     });
     setConfirmModalOpen(true);
   };
@@ -149,7 +149,7 @@ export default function GestionesPage() {
       setDeletingGestion(null);
       fetchGestiones();
     } catch (error) {
-      console.error('Error deleting gestion:', error);
+      console.error('Error al eliminar la gestión:', error);
     } finally {
       setSaving(false);
     }
@@ -201,7 +201,7 @@ export default function GestionesPage() {
       setConfirmAction(null);
       fetchGestiones();
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al confirmar la acción:', error);
     } finally {
       setSaving(false);
     }
@@ -231,7 +231,7 @@ export default function GestionesPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[...gestiones].sort((a, b) => (b.is_current ? 1 : 0) - (a.is_current ? 1 : 0)).map((gestion) => (
+        {[...gestiones].sort((a, b) => (b.esActual ? 1 : 0) - (a.esActual ? 1 : 0)).map((gestion) => (
           <Tarjeta key={gestion.id} variant="bordered">
             <EncabezadoTarjeta className="pb-3">
               <div className="flex items-center justify-between">
@@ -241,12 +241,12 @@ export default function GestionesPage() {
                   </div>
                   <div>
                     <TituloTarjeta className="text-lg flex items-center gap-2">
-                      {gestion.year}
-                      {gestion.is_current && (
+                      {gestion.anio}
+                      {gestion.esActual && (
                         <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                       )}
                     </TituloTarjeta>
-                    <p className="text-sm text-gray-500">{gestion.period_type}</p>
+                    <p className="text-sm text-gray-500">{gestion.tipoPeriodo}</p>
                   </div>
                 </div>
                 {getStatusBadge(gestion.estado)}
@@ -256,14 +256,14 @@ export default function GestionesPage() {
               {gestion.periodos && gestion.periodos.length > 0 && (
                 <div className="space-y-2 mb-4">
                   <p className="text-sm font-medium text-gray-700">Períodos:</p>
-                  {[...gestion.periodos].sort((a, b) => a.number.localeCompare(b.number)).map((periodo) => (
+                  {[...gestion.periodos].sort((a, b) => a.numero.localeCompare(b.numero)).map((periodo) => (
                     <div
                       key={periodo.id}
                       className="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-sm"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{periodo.number}</span>
-                        <span className="text-gray-500">({periodo.name || 'Sin nombre'})</span>
+                        <span className="font-medium">{periodo.numero}</span>
+                        <span className="text-gray-500">({periodo.nombre || 'Sin nombre'})</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {getStatusBadge(periodo.estado)}
@@ -272,7 +272,7 @@ export default function GestionesPage() {
                             size="sm"
                             variant="ghost"
                             className="h-6 w-6 p-0"
-                            onClick={() => handleOpenPeriodo(periodo.id, `${periodo.number} - ${periodo.name}`)}
+                            onClick={() => handleOpenPeriodo(periodo.id, `${periodo.numero} - ${periodo.nombre}`)}
                           >
                             <Unlock className="w-3 h-3" />
                           </Boton>
@@ -282,7 +282,7 @@ export default function GestionesPage() {
                             size="sm"
                             variant="ghost"
                             className="h-6 w-6 p-0"
-                            onClick={() => handleClosePeriodo(periodo.id, `${periodo.number} - ${periodo.name}`)}
+                            onClick={() => handleClosePeriodo(periodo.id, `${periodo.numero} - ${periodo.nombre}`)}
                           >
                             <Lock className="w-3 h-3" />
                           </Boton>
@@ -292,7 +292,7 @@ export default function GestionesPage() {
                             size="sm"
                             variant="ghost"
                             className="h-6 w-6 p-0"
-                            onClick={() => handleOpenPeriodo(periodo.id, `${periodo.number} - ${periodo.name}`)}
+                            onClick={() => handleOpenPeriodo(periodo.id, `${periodo.numero} - ${periodo.nombre}`)}
                           >
                             <Unlock className="w-3 h-3" />
                           </Boton>
@@ -303,8 +303,8 @@ export default function GestionesPage() {
                 </div>
               )}
 
-              {gestion.notes && (
-                <p className="text-sm text-gray-500 mb-4">{gestion.notes}</p>
+              {gestion.notas && (
+                <p className="text-sm text-gray-500 mb-4">{gestion.notas}</p>
               )}
 
               <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
@@ -326,7 +326,7 @@ export default function GestionesPage() {
                     Reabrir
                   </Boton>
                 )}
-                {!gestion.is_current && (
+                {!gestion.esActual && (
                   <Boton
                     size="sm"
                     variant="ghost"
@@ -376,15 +376,15 @@ export default function GestionesPage() {
           <div className="grid grid-cols-2 gap-4">
             <Entrada
               label="Año *"
-              value={formData.year}
-              onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+              value={formData.anio}
+              onChange={(e) => setFormData({ ...formData, anio: e.target.value })}
               placeholder="2025"
               disabled={!!editingGestion}
             />
             <Selector
               label="Régimen *"
-              value={formData.period_type}
-              onChange={(e) => setFormData({ ...formData, period_type: e.target.value })}
+              value={formData.tipoPeriodo}
+              onChange={(e) => setFormData({ ...formData, tipoPeriodo: e.target.value })}
               options={[
                 { value: 'semestral', label: 'Semestral' },
               ]}
@@ -395,12 +395,12 @@ export default function GestionesPage() {
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
-              id="is_current"
-              checked={formData.is_current}
-              onChange={(e) => setFormData({ ...formData, is_current: e.target.checked })}
+              id="esActual"
+              checked={formData.esActual}
+              onChange={(e) => setFormData({ ...formData, esActual: e.target.checked })}
               className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
             />
-            <label htmlFor="is_current" className="text-sm text-gray-700">
+            <label htmlFor="esActual" className="text-sm text-gray-700">
               Marcar como gestión actual (se mostrará por defecto en formularios)
             </label>
           </div>
@@ -410,8 +410,8 @@ export default function GestionesPage() {
             <textarea
               className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               rows={3}
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              value={formData.notas}
+              onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
               placeholder="Observaciones adicionales..."
             />
           </div>
@@ -419,7 +419,7 @@ export default function GestionesPage() {
           {!editingGestion && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
               <p className="font-medium">Períodos que se crearán:</p>
-              {formData.period_type === 'semestral' && (
+              {formData.tipoPeriodo === 'semestral' && (
                 <>
                   <p>I - Primer Semestre (20 feb - 10 jul)</p>
                   <p>II - Segundo Semestre (20 jul - 11 dic)</p>
@@ -432,7 +432,7 @@ export default function GestionesPage() {
             <Boton variant="outline" onClick={handleCloseModal}>
               Cancelar
             </Boton>
-            <Boton onClick={handleSave} disabled={saving || !formData.year}>
+            <Boton onClick={handleSave} disabled={saving || !formData.anio}>
               {saving ? 'Guardando...' : 'Guardar'}
             </Boton>
           </div>
@@ -447,7 +447,7 @@ export default function GestionesPage() {
         }}
         onConfirm={handleDelete}
         title="Eliminar Gestión"
-        message={`¿Estás seguro de eliminar la gestión ${deletingGestion?.year}? Se eliminarán también todos sus períodos. Esta acción no se puede deshacer.`}
+        message={`¿Estás seguro de eliminar la gestión ${deletingGestion?.anio}? Se eliminarán también todos sus períodos. Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
         variant="destructive"
         loading={saving}

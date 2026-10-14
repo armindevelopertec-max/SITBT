@@ -192,21 +192,21 @@ export default function BarraLateral({ colapsada, abierta = true, onCerrar, onCo
           {!colapsada ? (
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-2">
-                {settings?.logo_url ? (
+                {settings?.logoUrl ? (
                   <img
-                    src={settings.logo_url}
+                    src={settings.logoUrl}
                     alt="Logo"
                     className="w-8 h-8 object-contain"
                   />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
                     <span className="text-sm font-bold text-primary-600">
-                      {settings?.nombre_corto?.charAt(0) || 'S'}
+                      {settings?.nombreCorto?.charAt(0) || 'S'}
                     </span>
                   </div>
                 )}
                 <span className="text-lg font-bold text-primary-600 truncate">
-                  {settings?.nombre_corto || 'SITBT'}
+                  {settings?.nombreCorto || 'SITBT'}
                 </span>
               </div>
               <span className="text-xs text-gray-500 truncate mt-0.5" title={settings?.lema || ''}>
@@ -214,16 +214,16 @@ export default function BarraLateral({ colapsada, abierta = true, onCerrar, onCo
               </span>
             </div>
           ) : (
-            settings?.logo_url ? (
+            settings?.logoUrl ? (
               <img
-                src={settings.logo_url}
+                src={settings.logoUrl}
                 alt="Logo"
                 className="w-8 h-8 object-contain"
               />
             ) : (
               <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
                 <span className="text-sm font-bold text-primary-600">
-                  {settings?.nombre_corto?.charAt(0) || 'S'}
+                  {settings?.nombreCorto?.charAt(0) || 'S'}
                 </span>
               </div>
             )

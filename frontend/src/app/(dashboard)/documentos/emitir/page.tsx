@@ -34,7 +34,7 @@ export default function EmitDocumentPage() {
       });
       setStudents(response.data.data || []);
     } catch (error) {
-      console.error('Error searching students:', error);
+      console.error('Error al buscar estudiantes:', error);
     } finally {
       setSearching(false);
     }
@@ -143,17 +143,17 @@ export default function EmitDocumentPage() {
                       onClick={() => {
                         setStudentId(student.id.toString());
                         setStudentSearch(
-                          `${student.persona?.names} ${student.persona?.lastname_paternal} - ${student.persona?.ci}`
+                          `${student.persona?.nombres} ${student.persona?.apellidoPaterno} - ${student.persona?.ci}`
                         );
                         setStudents([]);
                       }}
                       className="w-full px-4 py-2 text-left hover:bg-gray-50 border-b last:border-b-0"
                     >
                       <p className="font-medium">
-                        {student.persona?.names} {student.persona?.lastname_paternal} {student.persona?.lastname_maternal}
+                        {student.persona?.nombres} {student.persona?.apellidoPaterno} {student.persona?.apellidoMaterno}
                       </p>
                       <p className="text-sm text-gray-500">
-                        CI: {student.persona?.ci} - Código: {student.inscription_code}
+                        CI: {student.persona?.ci} - Código: {student.codigoInscripcion}
                       </p>
                     </button>
                   ))}

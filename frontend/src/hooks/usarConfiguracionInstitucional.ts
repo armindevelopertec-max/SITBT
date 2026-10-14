@@ -3,14 +3,14 @@ import api from '@/lib/api';
 
 export interface ConfiguracionInstitucional {
   nombre: string;
-  nombre_corto: string;
+  nombreCorto: string;
   lema: string | null;
-  logo_url: string | null;
+  logoUrl: string | null;
   direccion: string | null;
   telefono: string | null;
   departamento: string | null;
-  email: string | null;
-  website: string | null;
+  correo: string | null;
+  sitioWeb: string | null;
   ciudad: string | null;
   pais: string;
   descripcion: string | null;
@@ -28,18 +28,18 @@ export function usarConfiguracionInstitucional() {
       const response = await api.get('/configuracion-institucional/public');
       setSettings(response.data);
     } catch (err: any) {
-      console.error('Error fetching institucion? settings:', err);
+      console.error('Error al cargar la configuración institucional:', err);
       setError(err.response?.data?.message || 'Error al cargar configuración');
       setSettings({
         nombre: 'Instituto Tecnológico Boliviana de Tecnología',
-        nombre_corto: 'SITBT',
+        nombreCorto: 'SITBT',
         lema: null,
-        logo_url: null,
+        logoUrl: null,
         direccion: null,
         telefono: null,
         departamento: null,
-        email: null,
-        website: null,
+        correo: null,
+        sitioWeb: null,
         ciudad: null,
         pais: 'Bolivia',
         descripcion: null,
