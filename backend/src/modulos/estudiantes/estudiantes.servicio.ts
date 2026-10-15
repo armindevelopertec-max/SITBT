@@ -11,6 +11,16 @@ import { Carrera } from '../../entidades/carrera.entidad';
 import { ConfiguracionInstitucional } from '../../entidades/configuracion-institucional.entidad';
 import { PlanEstudio } from '../../entidades/plan-estudio.entidad';
 import { Credencial } from '../../entidades/credencial.entidad';
+import { Personal } from '../../entidades/personal.entidad';
+import { Inscripcion } from '../../entidades/inscripcion.entidad';
+import { Calificacion } from '../../entidades/calificacion.entidad';
+import { AuditoriaCalificacion } from '../../entidades/auditoria-calificacion.entidad';
+import { Pago } from '../../entidades/pago.entidad';
+import { DocumentoEmitido } from '../../entidades/documento-emitido.entidad';
+import { Certificado } from '../../entidades/certificado.entidad';
+import { ConvalidacionEstudiante } from '../../entidades/convalidacion-estudiante.entidad';
+import { GrupoEstudiante } from '../../entidades/grupo-estudiante.entidad';
+import { RegistroConsentimiento } from '../../entidades/registro-consentimiento.entidad';
 import { CrearEstudianteDto } from './dto/crear-estudiante.dto';
 import { ActualizarEstudianteDto } from './dto/actualizar-estudiante.dto';
 
@@ -35,8 +45,6 @@ export class ServicioEstudiantes {
     private repositorioUsuarioRol: Repository<UsuarioRol>,
     @InjectRepository(Rol)
     private repositorioRol: Repository<Rol>,
-    @InjectRepository(Credencial)
-    private repositorioCredencial: Repository<Credencial>,
   ) {}
 
   async crear(crearEstudianteDto: CrearEstudianteDto): Promise<EstudianteCreadoConUsuario> {
@@ -199,24 +207,58 @@ export class ServicioEstudiantes {
 
   async eliminar(id: number): Promise<void> {
     const estudiante = await this.obtenerUno(id);
-
-    await this.repositorioCredencial.delete({ estudianteId: id });
-
-    const usuario = await this.repositorioUsuario.findOne({
-      where: { personaId: estudiante.personaId },
-    });
-    if (usuario) {
-      await this.repositorioUsuarioRol.delete({ usuarioId: usuario.id });
-      await this.repositorioUsuario.remove(usuario);
-    }
-
     const personaId = estudiante.personaId;
-    await this.repositorioEstudiante.remove(estudiante);
 
-    const persona = await this.repositorioPersona.findOne({ where: { id: personaId } });
-    if (persona) {
-      await this.repositorioPersona.remove(persona);
-    }
+    // Se elimina en una transacción y en orden para respetar las claves foráneas.
+    await this.repositorioEstudiante.manager.transaction(async (gestor) => {
+      // Auditorías y calificaciones dependen de las inscripciones del estudiante.
+      await gestor
+        .createQueryBuilder()
+        .delete()
+        .from(AuditoriaCalificacion)
+        .where(
+          'calificacion_id IN (SELECT id FROM calificaciones WHERE inscripcion_id IN (SELECT id FROM inscripciones WHERE estudiante_id = :id))',
+          { id },
+        )
+        .execute();
+
+      await gestor
+        .createQueryBuilder()
+        .delete()
+        .from(Calificacion)
+        .where(
+          'inscripcion_id IN (SELECT id FROM inscripciones WHERE estudiante_id = :id)',
+          { id },
+        )
+        .execute();
+
+      // Registros que referencian directamente al estudiante.
+      await gestor.delete(Inscripcion, { estudianteId: id });
+      await gestor.delete(Pago, { estudianteId: id });
+      await gestor.delete(DocumentoEmitido, { estudianteId: id });
+      await gestor.delete(Certificado, { estudianteId: id });
+      await gestor.delete(ConvalidacionEstudiante, { estudianteId: id });
+      await gestor.delete(GrupoEstudiante, { estudianteId: id });
+      await gestor.delete(RegistroConsentimiento, { estudianteId: id });
+      await gestor.delete(Credencial, { estudianteId: id });
+
+      // Usuario (y sus roles) asociado a la persona del estudiante.
+      const usuario = await gestor.findOne(Usuario, { where: { personaId } });
+      if (usuario) {
+        await gestor.delete(UsuarioRol, { usuarioId: usuario.id });
+        await gestor.delete(Usuario, { id: usuario.id });
+      }
+
+      // Finalmente el estudiante.
+      await gestor.delete(Estudiante, { id });
+
+      // La persona solo se elimina si no la referencia otro registro
+      // (por ejemplo, si la misma persona también es personal de la institución).
+      const personalAsociado = await gestor.findOne(Personal, { where: { personaId } });
+      if (!personalAsociado) {
+        await gestor.delete(Persona, { id: personaId });
+      }
+    });
   }
 
   async buscarPorCarrera(carreraId: number, gestion?: string): Promise<Estudiante[]> {
