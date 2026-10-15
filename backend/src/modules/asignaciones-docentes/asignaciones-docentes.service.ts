@@ -9,96 +9,96 @@ import { ActualizarAsignacionDocenteDto } from './dto/actualizar-asignacion-doce
 export class ServicioAsignacionesDocentes {
   constructor(
     @InjectRepository(AsignacionDocente)
-    private assignmentRepository: Repository<AsignacionDocente>,
+    private repositorioAsignacion: Repository<AsignacionDocente>,
   ) {}
 
-  async create(createDto: CrearAsignacionDocenteDto): Promise<AsignacionDocente> {
-    const assignment = this.assignmentRepository.create(createDto);
-    return this.assignmentRepository.save(assignment as any) as any;
+  async crear(dtoCreacion: CrearAsignacionDocenteDto): Promise<AsignacionDocente> {
+    const asignacion = this.repositorioAsignacion.create(dtoCreacion);
+    return this.repositorioAsignacion.save(asignacion as any) as any;
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
     gestion?: string,
-    status?: EstadoAsignacionDocente,
+    estado?: EstadoAsignacionDocente,
   ): Promise<{ datos: AsignacionDocente[]; total: number; pagina: number; limite: number }> {
-    const query = this.assignmentRepository
-      .createQueryBuilder('assignment')
-      .leftJoinAndSelect('assignment.docente', 'teacher')
-      .leftJoinAndSelect('teacher.persona', 'person')
-      .leftJoinAndSelect('assignment.materia', 'subject')
-      .leftJoinAndSelect('assignment.grupo', 'group');
+    const consulta = this.repositorioAsignacion
+      .createQueryBuilder('asignacion')
+      .leftJoinAndSelect('asignacion.docente', 'docente')
+      .leftJoinAndSelect('docente.persona', 'persona')
+      .leftJoinAndSelect('asignacion.materia', 'materia')
+      .leftJoinAndSelect('asignacion.grupo', 'grupo');
 
     if (gestion) {
-      query.andWhere('assignment.gestion = :gestion', { gestion });
+      consulta.andWhere('asignacion.gestion = :gestion', { gestion });
     }
 
-    if (status) {
-      query.andWhere('assignment.estado = :estado', { estado: status });
+    if (estado) {
+      consulta.andWhere('asignacion.estado = :estado', { estado });
     }
 
-    const [data, total] = await query
-      .orderBy('assignment.gestion', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('asignacion.gestion', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<AsignacionDocente> {
-    const assignment = await this.assignmentRepository.findOne({
+  async obtenerUno(id: number): Promise<AsignacionDocente> {
+    const asignacion = await this.repositorioAsignacion.findOne({
       where: { id },
       relations: ['docente', 'docente.persona', 'materia', 'grupo'],
     });
-    if (!assignment) {
+    if (!asignacion) {
       throw new NotFoundException(`Asignación docente con ID ${id} no encontrada`);
     }
-    return assignment;
+    return asignacion;
   }
 
-  async update(id: number, updateDto: ActualizarAsignacionDocenteDto): Promise<AsignacionDocente> {
-    const assignment = await this.findOne(id);
-    Object.assign(assignment, updateDto);
-    return this.assignmentRepository.save(assignment as any) as any;
+  async actualizar(id: number, dtoActualizacion: ActualizarAsignacionDocenteDto): Promise<AsignacionDocente> {
+    const asignacion = await this.obtenerUno(id);
+    Object.assign(asignacion, dtoActualizacion);
+    return this.repositorioAsignacion.save(asignacion as any) as any;
   }
 
-  async remove(id: number): Promise<void> {
-    const assignment = await this.findOne(id);
-    await this.assignmentRepository.remove(assignment);
+  async eliminar(id: number): Promise<void> {
+    const asignacion = await this.obtenerUno(id);
+    await this.repositorioAsignacion.remove(asignacion);
   }
 
-  async findByTeacher(teacherId: number, gestion?: string): Promise<AsignacionDocente[]> {
-    const query = this.assignmentRepository
-      .createQueryBuilder('assignment')
-      .leftJoinAndSelect('assignment.materia', 'subject')
-      .leftJoinAndSelect('assignment.grupo', 'group')
-      .where('assignment.docenteId = :teacherId', { teacherId });
+  async buscarPorDocente(docenteId: number, gestion?: string): Promise<AsignacionDocente[]> {
+    const consulta = this.repositorioAsignacion
+      .createQueryBuilder('asignacion')
+      .leftJoinAndSelect('asignacion.materia', 'materia')
+      .leftJoinAndSelect('asignacion.grupo', 'grupo')
+      .where('asignacion.docenteId = :docenteId', { docenteId });
 
     if (gestion) {
-      query.andWhere('assignment.gestion = :gestion', { gestion });
+      consulta.andWhere('asignacion.gestion = :gestion', { gestion });
     }
 
-    return query.orderBy('assignment.gestion', 'DESC').getMany();
+    return consulta.orderBy('asignacion.gestion', 'DESC').getMany();
   }
 
-  async findByGroup(groupId: number, gestion: string): Promise<AsignacionDocente[]> {
-    return this.assignmentRepository.find({
-      where: { grupoId: groupId, gestion },
+  async buscarPorGrupo(grupoId: number, gestion: string): Promise<AsignacionDocente[]> {
+    return this.repositorioAsignacion.find({
+      where: { grupoId, gestion },
       relations: ['docente', 'docente.persona', 'materia'],
     });
   }
 
-  async findBySubject(subjectId: number, gestion: string): Promise<AsignacionDocente[]> {
-    return this.assignmentRepository.find({
-      where: { materiaId: subjectId, gestion },
+  async buscarPorMateria(materiaId: number, gestion: string): Promise<AsignacionDocente[]> {
+    return this.repositorioAsignacion.find({
+      where: { materiaId, gestion },
       relations: ['docente', 'docente.persona', 'grupo'],
     });
   }
 
-  async findActive(gestion: string): Promise<AsignacionDocente[]> {
-    return this.assignmentRepository.find({
+  async buscarActivos(gestion: string): Promise<AsignacionDocente[]> {
+    return this.repositorioAsignacion.find({
       where: { gestion, estado: EstadoAsignacionDocente.ACTIVO },
       relations: ['docente', 'docente.persona', 'materia', 'grupo'],
       order: { creadoEn: 'DESC' },

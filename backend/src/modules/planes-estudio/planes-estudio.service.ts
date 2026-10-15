@@ -11,97 +11,97 @@ import { ActualizarPlanEstudioDto } from './dto/actualizar-plan-estudio.dto';
 export class ServicioPlanesEstudio {
   constructor(
     @InjectRepository(PlanEstudio)
-    private planEstudioRepository: Repository<PlanEstudio>,
+    private repositorioPlanEstudio: Repository<PlanEstudio>,
     @InjectRepository(MateriaPlan)
-    private materiaPlanRepository: Repository<MateriaPlan>,
+    private repositorioMateriaPlan: Repository<MateriaPlan>,
     @InjectRepository(Materia)
-    private materiaRepository: Repository<Materia>,
+    private repositorioMateria: Repository<Materia>,
   ) {}
 
-  async create(crearPlanEstudioDto: CrearPlanEstudioDto): Promise<PlanEstudio> {
-    const studyPlan = this.planEstudioRepository.create(crearPlanEstudioDto);
-    return this.planEstudioRepository.save(studyPlan);
+  async crear(crearPlanEstudioDto: CrearPlanEstudioDto): Promise<PlanEstudio> {
+    const planEstudio = this.repositorioPlanEstudio.create(crearPlanEstudioDto);
+    return this.repositorioPlanEstudio.save(planEstudio);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
-    status?: EstadoPlanEstudio,
-    careerId?: number,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
+    estado?: EstadoPlanEstudio,
+    carreraId?: number,
   ): Promise<{ datos: PlanEstudio[]; total: number; pagina: number; limite: number }> {
-    const query = this.planEstudioRepository
-      .createQueryBuilder('study_plan')
-      .leftJoinAndSelect('study_plan.carrera', 'career');
+    const consulta = this.repositorioPlanEstudio
+      .createQueryBuilder('planEstudio')
+      .leftJoinAndSelect('planEstudio.carrera', 'carrera');
 
-    if (status) {
-      query.andWhere('study_plan.estado = :estado', { estado: status });
+    if (estado) {
+      consulta.andWhere('planEstudio.estado = :estado', { estado });
     }
 
-    if (careerId) {
-      query.andWhere('study_plan.carreraId = :careerId', { careerId });
+    if (carreraId) {
+      consulta.andWhere('planEstudio.carreraId = :carreraId', { carreraId });
     }
 
-    const [data, total] = await query
-      .orderBy('study_plan.fechaRm', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('planEstudio.fechaRm', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<PlanEstudio> {
-    const studyPlan = await this.planEstudioRepository.findOne({
+  async obtenerUno(id: number): Promise<PlanEstudio> {
+    const planEstudio = await this.repositorioPlanEstudio.findOne({
       where: { id },
       relations: ['carrera'],
     });
-    if (!studyPlan) {
+    if (!planEstudio) {
       throw new NotFoundException(`Plan de estudio con ID ${id} no encontrado`);
     }
-    return studyPlan;
+    return planEstudio;
   }
 
-  async findOneWithMaterias(id: number): Promise<any> {
-    const studyPlan = await this.findOne(id);
-    const materias = await this.getMaterias(id);
-    const materiasDisponibles = await this.getMateriasDisponibles();
+  async obtenerUnoConMaterias(id: number): Promise<any> {
+    const planEstudio = await this.obtenerUno(id);
+    const materias = await this.obtenerMaterias(id);
+    const materiasDisponibles = await this.obtenerMateriasDisponibles();
     return {
-      ...studyPlan,
+      ...planEstudio,
       materias,
       materias_disponibles: materiasDisponibles,
     };
   }
 
-  async update(id: number, actualizarPlanEstudioDto: ActualizarPlanEstudioDto): Promise<PlanEstudio> {
-    const studyPlan = await this.findOne(id);
-    Object.assign(studyPlan, actualizarPlanEstudioDto);
-    return this.planEstudioRepository.save(studyPlan);
+  async actualizar(id: number, actualizarPlanEstudioDto: ActualizarPlanEstudioDto): Promise<PlanEstudio> {
+    const planEstudio = await this.obtenerUno(id);
+    Object.assign(planEstudio, actualizarPlanEstudioDto);
+    return this.repositorioPlanEstudio.save(planEstudio);
   }
 
-  async remove(id: number): Promise<void> {
-    const studyPlan = await this.findOne(id);
-    await this.planEstudioRepository.remove(studyPlan);
+  async eliminar(id: number): Promise<void> {
+    const planEstudio = await this.obtenerUno(id);
+    await this.repositorioPlanEstudio.remove(planEstudio);
   }
 
-  async findByCareer(careerId: number): Promise<PlanEstudio[]> {
-    return this.planEstudioRepository.find({
-      where: { carreraId: careerId },
+  async buscarPorCarrera(carreraId: number): Promise<PlanEstudio[]> {
+    return this.repositorioPlanEstudio.find({
+      where: { carreraId },
       relations: ['carrera'],
       order: { fechaRm: 'DESC' },
     });
   }
 
-  async findActive(): Promise<PlanEstudio[]> {
-    return this.planEstudioRepository.find({
+  async obtenerActivos(): Promise<PlanEstudio[]> {
+    return this.repositorioPlanEstudio.find({
       where: { estado: EstadoPlanEstudio.VIGENTE },
       relations: ['carrera'],
       order: { fechaRm: 'DESC' },
     });
   }
 
-  async findCurrentByCareer(careerId: number): Promise<PlanEstudio[]> {
-    return this.planEstudioRepository.find({
-      where: { carreraId: careerId, estado: EstadoPlanEstudio.VIGENTE },
+  async buscarActualPorCarrera(carreraId: number): Promise<PlanEstudio[]> {
+    return this.repositorioPlanEstudio.find({
+      where: { carreraId, estado: EstadoPlanEstudio.VIGENTE },
       relations: ['carrera'],
       order: { fechaRm: 'DESC' },
     });
@@ -111,89 +111,89 @@ export class ServicioPlanesEstudio {
    * Devuelve el plan de estudio vigente de una carrera junto con sus materias,
    * en un formato apto para el sitio público (sin datos internos).
    */
-  async findPublicByCareer(careerId: number): Promise<{ plan: PlanEstudio | null; materias: any[] }> {
-    const planes = await this.findCurrentByCareer(careerId);
+  async buscarPublicoPorCarrera(carreraId: number): Promise<{ plan: PlanEstudio | null; materias: any[] }> {
+    const planes = await this.buscarActualPorCarrera(carreraId);
     const plan = planes.length > 0 ? planes[0] : null;
 
     if (!plan) {
       return { plan: null, materias: [] };
     }
 
-    const registros = await this.getMaterias(plan.id);
-    const materias = registros.map((mp) => ({
-      id: mp.id,
-      semestre: mp.semestre,
-      horasSemanales: mp.horasSemanales,
-      codigo: mp.materia?.codigo ?? null,
-      nombre: mp.materia?.nombre ?? null,
-      prerrequisito: mp.prerrequisito
-        ? { codigo: mp.prerrequisito.codigo, nombre: mp.prerrequisito.nombre }
+    const registros = await this.obtenerMaterias(plan.id);
+    const materias = registros.map((materiaPlan) => ({
+      id: materiaPlan.id,
+      semestre: materiaPlan.semestre,
+      horasSemanales: materiaPlan.horasSemanales,
+      codigo: materiaPlan.materia?.codigo ?? null,
+      nombre: materiaPlan.materia?.nombre ?? null,
+      prerrequisito: materiaPlan.prerrequisito
+        ? { codigo: materiaPlan.prerrequisito.codigo, nombre: materiaPlan.prerrequisito.nombre }
         : null,
     }));
 
     return { plan, materias };
   }
 
-  async addMateria(planId: number, subjectId: number, semestre: number, weeklyHours: number, prerequisiteId?: number): Promise<MateriaPlan> {
-    const existing = await this.materiaPlanRepository.findOne({
-      where: { planEstudioId: planId, materiaId: subjectId },
+  async agregarMateria(planId: number, materiaId: number, semestre: number, horasSemanales: number, prerrequisitoId?: number): Promise<MateriaPlan> {
+    const existente = await this.repositorioMateriaPlan.findOne({
+      where: { planEstudioId: planId, materiaId },
     });
-    if (existing) {
+    if (existente) {
       throw new NotFoundException('Esta materia ya existe en el plan de estudio');
     }
-    const materiaPlan = this.materiaPlanRepository.create({
+    const materiaPlan = this.repositorioMateriaPlan.create({
       planEstudioId: planId,
-      materiaId: subjectId,
+      materiaId,
       semestre,
-      horasSemanales: weeklyHours,
-      prerrequisitoId: prerequisiteId ?? null,
+      horasSemanales,
+      prerrequisitoId: prerrequisitoId ?? null,
     });
-    return this.materiaPlanRepository.save(materiaPlan);
+    return this.repositorioMateriaPlan.save(materiaPlan);
   }
 
-  async removeMateria(materiaPlanId: number): Promise<void> {
-    const materiaPlan = await this.materiaPlanRepository.findOne({
+  async eliminarMateria(materiaPlanId: number): Promise<void> {
+    const materiaPlan = await this.repositorioMateriaPlan.findOne({
       where: { id: materiaPlanId },
     });
     if (!materiaPlan) {
       throw new NotFoundException(`MateriaPlan con ID ${materiaPlanId} no encontrado`);
     }
-    await this.materiaPlanRepository.remove(materiaPlan);
+    await this.repositorioMateriaPlan.remove(materiaPlan);
   }
 
-  async updateMateria(materiaPlanId: number, semestre: number, weeklyHours: number, prerequisiteId?: number): Promise<MateriaPlan> {
-    const materiaPlan = await this.materiaPlanRepository.findOne({
+  async actualizarMateria(materiaPlanId: number, semestre: number, horasSemanales: number, prerrequisitoId?: number): Promise<MateriaPlan> {
+    const materiaPlan = await this.repositorioMateriaPlan.findOne({
       where: { id: materiaPlanId },
     });
     if (!materiaPlan) {
       throw new NotFoundException(`MateriaPlan con ID ${materiaPlanId} no encontrado`);
     }
     materiaPlan.semestre = semestre;
-    materiaPlan.horasSemanales = weeklyHours;
-    materiaPlan.prerrequisitoId = prerequisiteId ?? null;
-    return this.materiaPlanRepository.save(materiaPlan);
+    materiaPlan.horasSemanales = horasSemanales;
+    materiaPlan.prerrequisitoId = prerrequisitoId ?? null;
+    return this.repositorioMateriaPlan.save(materiaPlan);
   }
 
-  async getMaterias(planId: number): Promise<any[]> {
-    const registros = await this.materiaPlanRepository.find({
+  async obtenerMaterias(planId: number): Promise<any[]> {
+    const registros = await this.repositorioMateriaPlan.find({
       where: { planEstudioId: planId },
       relations: ['materia', 'prerrequisito'],
       order: { semestre: 'ASC' },
     });
-    return registros.map((mp) => ({
-      id: mp.id,
-      planEstudioId: mp.planEstudioId,
-      materiaId: mp.materiaId,
-      semestre: mp.semestre,
-      horasSemanales: mp.horasSemanales,
-      prerrequisitoId: mp.prerrequisitoId,
-      materia: mp.materia,
-      prerrequisito: mp.prerrequisito,
+    return registros.map((materiaPlan) => ({
+      id: materiaPlan.id,
+      planEstudioId: materiaPlan.planEstudioId,
+      materiaId: materiaPlan.materiaId,
+      semestre: materiaPlan.semestre,
+      horasSemanales: materiaPlan.horasSemanales,
+      prerrequisitoId: materiaPlan.prerrequisitoId,
+      materia: materiaPlan.materia,
+      prerrequisito: materiaPlan.prerrequisito,
     }));
   }
 
-  async getMateriasDisponibles(): Promise<Materia[]> {
-    return this.materiaRepository.find({
+  async obtenerMateriasDisponibles(): Promise<Materia[]> {
+    return this.repositorioMateria.find({
       order: { nombre: 'ASC' },
     });
   }

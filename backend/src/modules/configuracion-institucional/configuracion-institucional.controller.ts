@@ -15,39 +15,39 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 @ApiTags('Institution Settings')
 @Controller('configuracion-institucional')
 export class ControladorConfiguracionInstitucional {
-  constructor(private readonly settingsService: ServicioConfiguracionInstitucional) {}
+  constructor(private readonly servicioConfiguracion: ServicioConfiguracionInstitucional) {}
 
   @Get()
   @ApiOperation({ summary: 'Obtener configuración institucional (público)' })
-  findAll() {
-    return this.settingsService.findAll();
+  obtenerTodos() {
+    return this.servicioConfiguracion.obtenerTodos();
   }
 
   @Get('publico')
   @ApiOperation({ summary: 'Obtener datos públicos de la institución' })
-  getPublicSettings() {
-    return this.settingsService.getPublicSettings();
+  obtenerConfiguracionPublica() {
+    return this.servicioConfiguracion.obtenerConfiguracionPublica();
   }
 
   @Get('individual')
   @ApiOperation({ summary: 'Obtener configuración única' })
-  findOne() {
-    return this.settingsService.findOne();
+  obtenerUno() {
+    return this.servicioConfiguracion.obtenerUno();
   }
 
   @Post()
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Crear configuración institucional' })
-  create(@Body() createDto: CrearConfiguracionInstitucionalDto) {
-    return this.settingsService.upsert(createDto);
+  crear(@Body() crearDto: CrearConfiguracionInstitucionalDto) {
+    return this.servicioConfiguracion.crearOActualizar(crearDto);
   }
 
   @Put()
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Actualizar configuración institucional' })
-  update(@Body() updateDto: ActualizarConfiguracionInstitucionalDto) {
-    return this.settingsService.update(1, updateDto);
+  actualizar(@Body() actualizarDto: ActualizarConfiguracionInstitucionalDto) {
+    return this.servicioConfiguracion.actualizar(1, actualizarDto);
   }
 }

@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client } from 'minio';
 
-export interface UploadedFile {
+export interface ArchivoSubido {
   nombreArchivo: string;
   nombreOriginal: string;
   tipoMime: string;
@@ -12,56 +12,56 @@ export interface UploadedFile {
 
 @Injectable()
 export class ServicioAlmacenamiento {
-  private minioClient: Client;
+  private clienteMinio: Client;
   private bucket: string;
-  private useSSL: boolean;
+  private usarSSL: boolean;
 
-  constructor(private configService: ConfigService) {
-    this.bucket = this.configService.get('MINIO_BUCKET', 'sitbt-files');
-    this.useSSL = this.configService.get('MINIO_USE_SSL', 'false') === 'true';
+  constructor(private servicioConfiguracion: ConfigService) {
+    this.bucket = this.servicioConfiguracion.get('MINIO_BUCKET', 'sitbt-files');
+    this.usarSSL = this.servicioConfiguracion.get('MINIO_USE_SSL', 'false') === 'true';
 
-    const portStr = this.configService.get('MINIO_PORT', '9010');
-    const port = parseInt(portStr, 10);
+    const puertoTexto = this.servicioConfiguracion.get('MINIO_PORT', '9010');
+    const puerto = parseInt(puertoTexto, 10);
 
-    this.minioClient = new Client({
-      endPoint: this.configService.get('MINIO_ENDPOINT', 'localhost'),
-      port: isNaN(port) ? 9010 : port,
-      useSSL: this.useSSL,
-      accessKey: this.configService.get('MINIO_ACCESS_KEY', 'minioadmin'),
-      secretKey: this.configService.get('MINIO_SECRET_KEY', 'minioadmin'),
+    this.clienteMinio = new Client({
+      endPoint: this.servicioConfiguracion.get('MINIO_ENDPOINT', 'localhost'),
+      port: isNaN(puerto) ? 9010 : puerto,
+      useSSL: this.usarSSL,
+      accessKey: this.servicioConfiguracion.get('MINIO_ACCESS_KEY', 'minioadmin'),
+      secretKey: this.servicioConfiguracion.get('MINIO_SECRET_KEY', 'minioadmin'),
     });
   }
 
   async onModuleInit() {
     try {
-      const exists = await this.minioClient.bucketExists(this.bucket);
-      if (!exists) {
-        await this.minioClient.makeBucket(this.bucket);
+      const existe = await this.clienteMinio.bucketExists(this.bucket);
+      if (!existe) {
+        await this.clienteMinio.makeBucket(this.bucket);
       }
-      console.log('MinIO initialized successfully');
+      console.log('MinIO inicializado correctamente');
     } catch (error: any) {
-      console.warn('MinIO initialization warning (non-critical):', error.message);
+      console.warn('Advertencia de inicialización de MinIO (no crítica):', error.message);
     }
   }
 
-  async uploadFile(
+  async subirArchivo(
     archivo: any,
     carpeta: string = 'general',
-  ): Promise<UploadedFile> {
+  ): Promise<ArchivoSubido> {
     try {
-      const filename = `${carpeta}/${Date.now()}-${archivo.originalname}`;
-      await this.minioClient.putObject(
+      const nombreArchivo = `${carpeta}/${Date.now()}-${archivo.originalname}`;
+      await this.clienteMinio.putObject(
         this.bucket,
-        filename,
+        nombreArchivo,
         archivo.buffer,
         archivo.size,
         { 'Content-Type': archivo.mimetype },
       );
 
-      const url = `/api/almacenamiento/archivos/${filename}`;
+      const url = `/api/almacenamiento/archivos/${nombreArchivo}`;
 
       return {
-        nombreArchivo: filename,
+        nombreArchivo,
         nombreOriginal: archivo.originalname,
         tipoMime: archivo.mimetype,
         tamano: archivo.size,
@@ -72,28 +72,28 @@ export class ServicioAlmacenamiento {
     }
   }
 
-  async uploadBuffer(
+  async subirBuffer(
     buffer: Buffer,
-    filename: string,
-    mimetype: string,
+    nombreArchivo: string,
+    tipoMime: string,
     carpeta: string = 'general',
-  ): Promise<UploadedFile> {
+  ): Promise<ArchivoSubido> {
     try {
-      const fullPath = `${carpeta}/${filename}`;
-      await this.minioClient.putObject(
+      const rutaCompleta = `${carpeta}/${nombreArchivo}`;
+      await this.clienteMinio.putObject(
         this.bucket,
-        fullPath,
+        rutaCompleta,
         buffer,
         buffer.length,
-        { 'Content-Type': mimetype },
+        { 'Content-Type': tipoMime },
       );
 
-      const url = `/api/almacenamiento/archivos/${fullPath}`;
+      const url = `/api/almacenamiento/archivos/${rutaCompleta}`;
 
       return {
-        nombreArchivo: fullPath,
-        nombreOriginal: filename,
-        tipoMime: mimetype,
+        nombreArchivo: rutaCompleta,
+        nombreOriginal: nombreArchivo,
+        tipoMime,
         tamano: buffer.length,
         url,
       };
@@ -102,91 +102,91 @@ export class ServicioAlmacenamiento {
     }
   }
 
-  async getFileUrl(filename: string): Promise<string> {
+  async obtenerUrlArchivo(nombreArchivo: string): Promise<string> {
     try {
-      const endpoint = this.configService.get('MINIO_ENDPOINT', 'localhost');
-      const port = this.configService.get('MINIO_PORT', 9000);
-      const protocol = this.useSSL ? 'https' : 'http';
+      const puntoFinal = this.servicioConfiguracion.get('MINIO_ENDPOINT', 'localhost');
+      const puerto = this.servicioConfiguracion.get('MINIO_PORT', 9000);
+      const protocolo = this.usarSSL ? 'https' : 'http';
 
-      if (this.configService.get('MINIO_EXTERNAL_URL')) {
-        return `${this.configService.get('MINIO_EXTERNAL_URL')}/${filename}`;
+      if (this.servicioConfiguracion.get('MINIO_EXTERNAL_URL')) {
+        return `${this.servicioConfiguracion.get('MINIO_EXTERNAL_URL')}/${nombreArchivo}`;
       }
 
-      return `${protocol}://${endpoint}:${port}/${this.bucket}/${filename}`;
+      return `${protocolo}://${puntoFinal}:${puerto}/${this.bucket}/${nombreArchivo}`;
     } catch (error: any) {
       throw new InternalServerErrorException(`No se pudo obtener la URL del archivo: ${error.message}`);
     }
   }
 
-  async deleteFile(filename: string): Promise<void> {
+  async eliminarArchivo(nombreArchivo: string): Promise<void> {
     try {
-      await this.minioClient.removeObject(this.bucket, filename);
+      await this.clienteMinio.removeObject(this.bucket, nombreArchivo);
     } catch (error: any) {
       throw new InternalServerErrorException(`No se pudo eliminar el archivo: ${error.message}`);
     }
   }
 
-  async getFile(filename: string): Promise<Buffer> {
+  async obtenerArchivo(nombreArchivo: string): Promise<Buffer> {
     try {
-      const chunks: Buffer[] = [];
-      const stream = await this.minioClient.getObject(this.bucket, filename);
+      const fragmentos: Buffer[] = [];
+      const flujo = await this.clienteMinio.getObject(this.bucket, nombreArchivo);
 
       return new Promise((resolve, reject) => {
-        stream.on('data', (chunk) => chunks.push(chunk));
-        stream.on('end', () => resolve(Buffer.concat(chunks)));
-        stream.on('error', reject);
+        flujo.on('data', (fragmento) => fragmentos.push(fragmento));
+        flujo.on('end', () => resolve(Buffer.concat(fragmentos)));
+        flujo.on('error', reject);
       });
     } catch (error: any) {
       throw new InternalServerErrorException(`No se pudo obtener el archivo: ${error.message}`);
     }
   }
 
-  async listFiles(prefix: string = ''): Promise<string[]> {
+  async listarArchivos(prefijo: string = ''): Promise<string[]> {
     try {
-      const files: string[] = [];
-      const stream = this.minioClient.listObjects(this.bucket, prefix, true);
+      const archivos: string[] = [];
+      const flujo = this.clienteMinio.listObjects(this.bucket, prefijo, true);
 
       return new Promise((resolve, reject) => {
-        stream.on('data', (obj) => {
-          if (obj.name) files.push(obj.name);
+        flujo.on('data', (objeto) => {
+          if (objeto.name) archivos.push(objeto.name);
         });
-        stream.on('end', () => resolve(files));
-        stream.on('error', reject);
+        flujo.on('end', () => resolve(archivos));
+        flujo.on('error', reject);
       });
     } catch (error: any) {
       throw new InternalServerErrorException(`No se pudieron listar los archivos: ${error.message}`);
     }
   }
 
-  async fileExists(filename: string): Promise<boolean> {
+  async existeArchivo(nombreArchivo: string): Promise<boolean> {
     try {
-      await this.minioClient.statObject(this.bucket, filename);
+      await this.clienteMinio.statObject(this.bucket, nombreArchivo);
       return true;
     } catch {
       return false;
     }
   }
 
-  async getFileStream(filename: string): Promise<{ stream: NodeJS.ReadableStream; size: number; mimetype: string }> {
+  async obtenerFlujoArchivo(nombreArchivo: string): Promise<{ flujo: NodeJS.ReadableStream; tamano: number; tipoMime: string }> {
     try {
-      const stat = await this.minioClient.statObject(this.bucket, filename);
-      const stream = await this.minioClient.getObject(this.bucket, filename);
+      const estadistica = await this.clienteMinio.statObject(this.bucket, nombreArchivo);
+      const flujo = await this.clienteMinio.getObject(this.bucket, nombreArchivo);
       return {
-        stream,
-        size: stat.size,
-        mimetype: stat.metaData?.['content-type'] || 'application/octet-stream',
+        flujo,
+        tamano: estadistica.size,
+        tipoMime: estadistica.metaData?.['content-type'] || 'application/octet-stream',
       };
     } catch (error: any) {
       throw new InternalServerErrorException(`No se pudo obtener el flujo del archivo: ${error.message}`);
     }
   }
 
-  async getFileMetadata(filename: string): Promise<{ size: number; mimetype: string }> {
+  async obtenerMetadatosArchivo(nombreArchivo: string): Promise<{ tamano: number; tipoMime: string }> {
     try {
-      const stat = await this.minioClient.statObject(this.bucket, filename);
+      const estadistica = await this.clienteMinio.statObject(this.bucket, nombreArchivo);
       return {
-        size: stat.size,
-        mimetype: stat.metaData?.['content-type'] || 'application/octet-stream',
+        tamano: estadistica.size,
+        tipoMime: estadistica.metaData?.['content-type'] || 'application/octet-stream',
       };
     } catch (error: any) {
       throw new InternalServerErrorException(`No se pudo obtener los metadatos del archivo: ${error.message}`);

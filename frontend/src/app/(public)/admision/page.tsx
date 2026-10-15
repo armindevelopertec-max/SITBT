@@ -4,30 +4,30 @@ import Link from 'next/link';
 import { GraduationCap, CheckCircle, Users, BookOpen, CreditCard, FileText, ArrowRight, MapPin, Phone, Mail, Clock, ArrowRight as ArrowRightIcon } from 'lucide-react';
 import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
-const processSteps = [
+const pasosProceso = [
   {
-    step: 1,
+    paso: 1,
     titulo: 'Pre-registro',
     descripcion: 'Llena el formulario en línea con tus datos personales y académicos',
-    icon: <FileText className="w-5 h-5" />,
+    icono: <FileText className="w-5 h-5" />,
   },
   {
-    step: 2,
+    paso: 2,
     titulo: 'Verificación',
     descripcion: 'Presenta tus documentos originales en secretaría',
-    icon: <CheckCircle className="w-5 h-5" />,
+    icono: <CheckCircle className="w-5 h-5" />,
   },
   {
-    step: 3,
+    paso: 3,
     titulo: 'Pago',
     descripcion: 'Realiza el pago de la matrícula',
-    icon: <CreditCard className="w-5 h-5" />,
+    icono: <CreditCard className="w-5 h-5" />,
   },
   {
-    step: 4,
+    paso: 4,
     titulo: 'Formalización',
     descripcion: 'Recibe tu comprobante y carnet de estudiante',
-    icon: <Users className="w-5 h-5" />,
+    icono: <Users className="w-5 h-5" />,
   },
 ];
 
@@ -87,26 +87,26 @@ export default function AdmisionPage() {
             <div className="absolute top-16 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-emerald-500 via-purple-500 to-orange-500 hidden md:block" />
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              {processSteps.map((step, index) => {
-                const colors = [
-                  { bg: 'from-blue-500 to-cyan-500', text: 'text-blue-400', bgLight: 'bg-blue-500/10', border: 'border-blue-500/50', shadow: 'shadow-blue-500/50', cardBg: 'bg-blue-500/5' },
-                  { bg: 'from-emerald-500 to-teal-500', text: 'text-emerald-400', bgLight: 'bg-emerald-500/10', border: 'border-emerald-500/50', shadow: 'shadow-emerald-500/50', cardBg: 'bg-emerald-500/5' },
-                  { bg: 'from-purple-500 to-pink-500', text: 'text-purple-400', bgLight: 'bg-purple-500/10', border: 'border-purple-500/50', shadow: 'shadow-purple-500/50', cardBg: 'bg-purple-500/5' },
-                  { bg: 'from-orange-500 to-amber-500', text: 'text-orange-400', bgLight: 'bg-orange-500/10', border: 'border-orange-500/50', shadow: 'shadow-orange-500/50', cardBg: 'bg-orange-500/5' },
+              {pasosProceso.map((paso, indice) => {
+                const colores = [
+                  { fondo: 'from-blue-500 to-cyan-500', texto: 'text-blue-400', fondoClaro: 'bg-blue-500/10', borde: 'border-blue-500/50', sombra: 'shadow-blue-500/50', fondoTarjeta: 'bg-blue-500/5' },
+                  { fondo: 'from-emerald-500 to-teal-500', texto: 'text-emerald-400', fondoClaro: 'bg-emerald-500/10', borde: 'border-emerald-500/50', sombra: 'shadow-emerald-500/50', fondoTarjeta: 'bg-emerald-500/5' },
+                  { fondo: 'from-purple-500 to-pink-500', texto: 'text-purple-400', fondoClaro: 'bg-purple-500/10', borde: 'border-purple-500/50', sombra: 'shadow-purple-500/50', fondoTarjeta: 'bg-purple-500/5' },
+                  { fondo: 'from-orange-500 to-amber-500', texto: 'text-orange-400', fondoClaro: 'bg-orange-500/10', borde: 'border-orange-500/50', sombra: 'shadow-orange-500/50', fondoTarjeta: 'bg-orange-500/5' },
                 ];
-                const c = colors[index];
+                const c = colores[indice];
                 return (
-                  <div key={index} className="relative text-center group">
+                  <div key={indice} className="relative text-center group">
                     <div className="relative z-10 flex flex-col items-center">
-                      <div className={`w-20 h-20 bg-gradient-to-br ${c.bg} rounded-full flex items-center justify-center shadow-2xl ${c.shadow} group-hover:scale-110 transition-all duration-500 mb-6 ring-8 ring-dark-800`}>
-                        <span className="text-dark-900 font-bold text-3xl">{step.step}</span>
+                      <div className={`w-20 h-20 bg-gradient-to-br ${c.fondo} rounded-full flex items-center justify-center shadow-2xl ${c.sombra} group-hover:scale-110 transition-all duration-500 mb-6 ring-8 ring-dark-800`}>
+                        <span className="text-dark-900 font-bold text-3xl">{paso.paso}</span>
                       </div>
-                      <div className={`w-full ${c.cardBg} border ${c.border} rounded-2xl p-6 backdrop-blur-sm group-hover:-translate-y-2 transition-all duration-300`}>
-                        <div className={`w-14 h-14 ${c.bgLight} ${c.text} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                          {step.icon}
+                      <div className={`w-full ${c.fondoTarjeta} border ${c.borde} rounded-2xl p-6 backdrop-blur-sm group-hover:-translate-y-2 transition-all duration-300`}>
+                        <div className={`w-14 h-14 ${c.fondoClaro} ${c.texto} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                          {paso.icono}
                         </div>
-                        <h4 className="text-xl font-bold text-gray-100 mb-2">{step.titulo}</h4>
-                        <p className="text-gray-400 text-sm">{step.descripcion}</p>
+                        <h4 className="text-xl font-bold text-gray-100 mb-2">{paso.titulo}</h4>
+                        <p className="text-gray-400 text-sm">{paso.descripcion}</p>
                       </div>
                     </div>
                   </div>
@@ -130,10 +130,10 @@ export default function AdmisionPage() {
             <div>
               <h3 className="text-xl sm:text-2xl font-bold text-gray-100 mb-4 sm:mb-6">Requisitos</h3>
               <ul className="space-y-4">
-                {requisitos.map((req, index) => (
-                  <li key={index} className="flex items-start gap-3">
+                {requisitos.map((requisito, indice) => (
+                  <li key={indice} className="flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 text-primary-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-300">{req}</span>
+                    <span className="text-gray-300">{requisito}</span>
                   </li>
                 ))}
               </ul>
@@ -142,10 +142,10 @@ export default function AdmisionPage() {
             <div>
               <h3 className="text-xl sm:text-2xl font-bold text-gray-100 mb-4 sm:mb-6">Costos</h3>
               <div className="space-y-4">
-                {costos.map((cost, index) => (
-                  <div key={index} className="bg-dark-700 border border-dark-600 rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span className="text-gray-300">{cost.concepto}</span>
-                    <span className="text-xl sm:text-2xl font-bold text-primary-400">{cost.monto}</span>
+                {costos.map((costo, indice) => (
+                  <div key={indice} className="bg-dark-700 border border-dark-600 rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <span className="text-gray-300">{costo.concepto}</span>
+                    <span className="text-xl sm:text-2xl font-bold text-primary-400">{costo.monto}</span>
                   </div>
                 ))}
               </div>

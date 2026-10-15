@@ -22,60 +22,60 @@ import { EstadoEstudiante } from '../../entities/estudiante.entity';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorEstudiantes {
-  constructor(private readonly studentsService: ServicioEstudiantes) {}
+  constructor(private readonly servicioEstudiantes: ServicioEstudiantes) {}
 
   @Post()
-  create(@Body() crearEstudianteDto: CrearEstudianteDto) {
-    return this.studentsService.create(crearEstudianteDto);
+  crear(@Body() crearEstudianteDto: CrearEstudianteDto) {
+    return this.servicioEstudiantes.crear(crearEstudianteDto);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
-    @Query('estado') status?: EstadoEstudiante,
-    @Query('carreraId') careerId?: number,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
+    @Query('estado') estado?: EstadoEstudiante,
+    @Query('carreraId') carreraId?: number,
   ) {
-    return this.studentsService.findAll(+page, +limit, status, careerId ? +careerId : undefined);
+    return this.servicioEstudiantes.obtenerTodos(+pagina, +limite, estado, carreraId ? +carreraId : undefined);
   }
 
   @Get('estadisticas')
-  getStats() {
-    return this.studentsService.getStudentStats();
+  obtenerEstadisticas() {
+    return this.servicioEstudiantes.obtenerEstadisticasEstudiante();
   }
 
   @Get('por-carrera/:carreraId')
-  findByCareer(@Param('carreraId', ParseIntPipe) carreraId: number, @Query('gestion') gestion?: string) {
-    return this.studentsService.findByCareer(carreraId, gestion);
+  buscarPorCarrera(@Param('carreraId', ParseIntPipe) carreraId: number, @Query('gestion') gestion?: string) {
+    return this.servicioEstudiantes.buscarPorCarrera(carreraId, gestion);
   }
 
   @Get('activos')
-  findActive() {
-    return this.studentsService.findActive();
+  buscarActivos() {
+    return this.servicioEstudiantes.buscarActivos();
   }
 
   @Get('conteo-por-estado')
-  countByStatus(@Query('carreraId') careerId?: number) {
-    return this.studentsService.countByStatus(careerId ? +careerId : undefined);
+  contarPorEstado(@Query('carreraId') carreraId?: number) {
+    return this.servicioEstudiantes.contarPorEstado(carreraId ? +carreraId : undefined);
   }
 
   @Get('inscripcion/:codigo')
-  findByInscriptionCode(@Param('codigo') code: string) {
-    return this.studentsService.findByInscriptionCode(code);
+  buscarPorCodigoInscripcion(@Param('codigo') codigo: string) {
+    return this.servicioEstudiantes.buscarPorCodigoInscripcion(codigo);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.studentsService.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioEstudiantes.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() actualizarEstudianteDto: ActualizarEstudianteDto) {
-    return this.studentsService.update(id, actualizarEstudianteDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarEstudianteDto: ActualizarEstudianteDto) {
+    return this.servicioEstudiantes.actualizar(id, actualizarEstudianteDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.studentsService.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioEstudiantes.eliminar(id);
   }
 }

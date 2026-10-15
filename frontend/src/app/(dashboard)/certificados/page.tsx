@@ -8,24 +8,24 @@ import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaT
 import { Insignia } from '@/components/ui/insignia';
 import { Plus, Search, Edit2, Trash2, FileText, Download } from 'lucide-react';
 
-const certificatesData = [
+const datosCertificados = [
   { id: 1, estudiante: 'Juan Perez', tipo: 'Certificado de Inscripción', fechaEmision: '2024-01-20', estado: 'entregado' },
   { id: 2, estudiante: 'Maria Lopez', tipo: 'Certificado de Estudios', fechaEmision: '2024-03-15', estado: 'emitido' },
   { id: 3, estudiante: 'Carlos Mendez', tipo: 'Certificado de Graduación', fechaEmision: '2024-03-10', estado: 'pendiente' },
   { id: 4, estudiante: 'Ana Rodriguez', tipo: 'Certificado de Inscripción', fechaEmision: '2024-02-28', estado: 'entregado' },
 ];
 
-const estadoColors: Record<string, 'exito' | 'advertencia' | 'secondary' | 'error'> = {
+const coloresEstado: Record<string, 'exito' | 'advertencia' | 'secundario' | 'error'> = {
   entregado: 'exito',
   emitido: 'advertencia',
-  pendiente: 'secondary',
+  pendiente: 'secundario',
   anulado: 'error',
 };
 
-export default function CertificatesPage() {
+export default function PaginaCertificados() {
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Certificados' }]} />
+      <Migas elementos={[{ etiqueta: 'Certificados' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Certificados</h1>
@@ -35,7 +35,7 @@ export default function CertificatesPage() {
         </Boton>
       </div>
 
-      <Tarjeta variant="bordered">
+      <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
             <TituloTarjeta>Lista de Certificados</TituloTarjeta>
@@ -57,30 +57,30 @@ export default function CertificatesPage() {
               </FilaTabla>
             </EncabezadoTabla>
             <CuerpoTabla>
-              {certificatesData.map((cert) => (
-                <FilaTabla key={cert.id}>
-                  <CeldaTabla className="font-medium">{cert.estudiante}</CeldaTabla>
+              {datosCertificados.map((certificado) => (
+                <FilaTabla key={certificado.id}>
+                  <CeldaTabla className="font-medium">{certificado.estudiante}</CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-gray-400" />
-                      {cert.tipo}
+                      {certificado.tipo}
                     </div>
                   </CeldaTabla>
-                  <CeldaTabla>{cert.fechaEmision}</CeldaTabla>
+                  <CeldaTabla>{certificado.fechaEmision}</CeldaTabla>
                   <CeldaTabla>
-                    <Insignia variant={estadoColors[cert.estado]} className="capitalize">
-                      {cert.estado}
+                    <Insignia variante={coloresEstado[certificado.estado]} className="capitalize">
+                      {certificado.estado}
                     </Insignia>
                   </CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Boton variant="ghost" size="icon" title="Descargar">
+                      <Boton variante="fantasma" tamano="icono" title="Descargar">
                         <Download className="w-4 h-4" />
                       </Boton>
-                      <Boton variant="ghost" size="icon">
+                      <Boton variante="fantasma" tamano="icono">
                         <Edit2 className="w-4 h-4" />
                       </Boton>
-                      <Boton variant="ghost" size="icon">
+                      <Boton variante="fantasma" tamano="icono">
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </Boton>
                     </div>

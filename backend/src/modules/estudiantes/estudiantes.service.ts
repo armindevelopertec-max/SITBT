@@ -26,258 +26,258 @@ export interface EstudianteCreadoConUsuario {
 export class ServicioEstudiantes {
   constructor(
     @InjectRepository(Estudiante)
-    private estudianteRepository: Repository<Estudiante>,
+    private repositorioEstudiante: Repository<Estudiante>,
     @InjectRepository(Persona)
-    private personaRepository: Repository<Persona>,
+    private repositorioPersona: Repository<Persona>,
     @InjectRepository(Usuario)
-    private usuarioRepository: Repository<Usuario>,
+    private repositorioUsuario: Repository<Usuario>,
     @InjectRepository(UsuarioRol)
-    private usuarioRolRepository: Repository<UsuarioRol>,
+    private repositorioUsuarioRol: Repository<UsuarioRol>,
     @InjectRepository(Rol)
-    private rolRepository: Repository<Rol>,
+    private repositorioRol: Repository<Rol>,
     @InjectRepository(Credencial)
-    private credencialRepository: Repository<Credencial>,
+    private repositorioCredencial: Repository<Credencial>,
   ) {}
 
-  async create(crearEstudianteDto: CrearEstudianteDto): Promise<EstudianteCreadoConUsuario> {
-    const existingStudent = await this.estudianteRepository.findOne({
+  async crear(crearEstudianteDto: CrearEstudianteDto): Promise<EstudianteCreadoConUsuario> {
+    const estudianteExistente = await this.repositorioEstudiante.findOne({
       where: { personaId: crearEstudianteDto.personaId },
     });
-    if (existingStudent) {
+    if (estudianteExistente) {
       throw new ConflictException('Esta persona ya tiene un estudiante asociado');
     }
 
-    const persona = await this.personaRepository.findOne({ where: { id: crearEstudianteDto.personaId } });
+    const persona = await this.repositorioPersona.findOne({ where: { id: crearEstudianteDto.personaId } });
     if (!persona) {
       throw new NotFoundException('Persona no encontrada');
     }
 
     if (crearEstudianteDto.numeroTituloBachiller) {
-      const existingTitle = await this.estudianteRepository.findOne({
+      const tituloExistente = await this.repositorioEstudiante.findOne({
         where: { numeroTituloBachiller: crearEstudianteDto.numeroTituloBachiller },
       });
-      if (existingTitle) {
+      if (tituloExistente) {
         throw new ConflictException('Ya existe un estudiante con este número de título de bachiller');
       }
     }
 
     if (crearEstudianteDto.numeroFolder) {
-      const existingFolder = await this.estudianteRepository.findOne({
+      const folderExistente = await this.repositorioEstudiante.findOne({
         where: { numeroFolder: crearEstudianteDto.numeroFolder },
       });
-      if (existingFolder) {
+      if (folderExistente) {
         throw new ConflictException('Ya existe un estudiante con este número de folder');
       }
     }
 
-    let inscriptionCode = crearEstudianteDto.codigoInscripcion;
-    if (!inscriptionCode) {
-      inscriptionCode = await this.generateInscriptionCode(
+    let codigoInscripcion = crearEstudianteDto.codigoInscripcion;
+    if (!codigoInscripcion) {
+      codigoInscripcion = await this.generarCodigoInscripcion(
         persona,
         crearEstudianteDto.carreraId
       );
     } else {
-      const existingCode = await this.estudianteRepository.findOne({
-        where: { codigoInscripcion: inscriptionCode },
+      const codigoExistente = await this.repositorioEstudiante.findOne({
+        where: { codigoInscripcion },
       });
-      if (existingCode) {
+      if (codigoExistente) {
         throw new ConflictException('El código de inscripción ya existe');
       }
     }
 
-    const studentData = { ...crearEstudianteDto, inscription_code: inscriptionCode };
-    const student = this.estudianteRepository.create(studentData);
-    const savedStudent = await this.estudianteRepository.save(student);
+    const datosEstudiante = { ...crearEstudianteDto, inscription_code: codigoInscripcion };
+    const estudiante = this.repositorioEstudiante.create(datosEstudiante);
+    const estudianteGuardado = await this.repositorioEstudiante.save(estudiante);
 
-    const currentYear = new Date().getFullYear().toString();
+    const anioActual = new Date().getFullYear().toString();
 
-    const username = `est_${savedStudent.codigoInscripcion.replace(/[^a-zA-Z0-9]/g, '_')}`;
-    const password = `${persona.ci}-${currentYear}`;
+    const nombreUsuario = `est_${estudianteGuardado.codigoInscripcion.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const contrasena = `${persona.ci}-${anioActual}`;
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    const usuario = this.usuarioRepository.create({
-      personaId: savedStudent.personaId,
-      nombreUsuario: username,
-      contrasenaHash: passwordHash,
+    const hashContrasena = await bcrypt.hash(contrasena, 10);
+    const usuario = this.repositorioUsuario.create({
+      personaId: estudianteGuardado.personaId,
+      nombreUsuario,
+      contrasenaHash: hashContrasena,
       estado: 'activo' as any,
     });
-    const savedUsuario = await this.usuarioRepository.save(usuario);
+    const usuarioGuardado = await this.repositorioUsuario.save(usuario);
 
-    const rolEstudiante = await this.rolRepository.findOne({ where: { codigo: 'estudiante' } });
+    const rolEstudiante = await this.repositorioRol.findOne({ where: { codigo: 'estudiante' } });
     if (rolEstudiante) {
-      const usuarioRol = this.usuarioRolRepository.create({
-        usuarioId: savedUsuario.id,
+      const usuarioRol = this.repositorioUsuarioRol.create({
+        usuarioId: usuarioGuardado.id,
         rolId: rolEstudiante.id,
       });
-      await this.usuarioRolRepository.save(usuarioRol);
+      await this.repositorioUsuarioRol.save(usuarioRol);
     }
 
     return {
-      estudiante: savedStudent,
+      estudiante: estudianteGuardado,
       usuario: {
-        nombreUsuario: username,
-        contrasena: password,
+        nombreUsuario,
+        contrasena,
       },
     } as any;
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
-    status?: EstadoEstudiante,
-    careerId?: number,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
+    estado?: EstadoEstudiante,
+    carreraId?: number,
   ): Promise<any> {
-    const query = this.estudianteRepository
-      .createQueryBuilder('student')
-      .leftJoinAndSelect('student.persona', 'persona')
-      .leftJoinAndSelect('student.carrera', 'carrera')
-      .leftJoinAndSelect('student.plan_estudio', 'plan_estudio');
+    const consulta = this.repositorioEstudiante
+      .createQueryBuilder('estudiante')
+      .leftJoinAndSelect('estudiante.persona', 'persona')
+      .leftJoinAndSelect('estudiante.carrera', 'carrera')
+      .leftJoinAndSelect('estudiante.plan_estudio', 'plan_estudio');
 
-    if (status) {
-      query.andWhere('student.estado = :status', { status });
+    if (estado) {
+      consulta.andWhere('estudiante.estado = :estado', { estado });
     }
 
-    if (careerId) {
-      query.andWhere('student.carreraId = :careerId', { careerId });
+    if (carreraId) {
+      consulta.andWhere('estudiante.carreraId = :carreraId', { carreraId });
     }
 
-    const [data, total] = await query
-      .orderBy('student.codigoInscripcion', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('estudiante.codigoInscripcion', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Estudiante> {
-    const student = await this.estudianteRepository.findOne({
+  async obtenerUno(id: number): Promise<Estudiante> {
+    const estudiante = await this.repositorioEstudiante.findOne({
       where: { id },
       relations: ['persona', 'carrera', 'plan_estudio'],
     });
-    if (!student) {
+    if (!estudiante) {
       throw new NotFoundException(`Estudiante con ID ${id} no encontrado`);
     }
-    return student;
+    return estudiante;
   }
 
-  async findByInscriptionCode(code: string): Promise<Estudiante> {
-    const student = await this.estudianteRepository.findOne({
-      where: { codigoInscripcion: code },
+  async buscarPorCodigoInscripcion(codigo: string): Promise<Estudiante> {
+    const estudiante = await this.repositorioEstudiante.findOne({
+      where: { codigoInscripcion: codigo },
       relations: ['persona', 'carrera', 'plan_estudio'],
     });
-    if (!student) {
-      throw new NotFoundException(`Estudiante con código de inscripción ${code} no encontrado`);
+    if (!estudiante) {
+      throw new NotFoundException(`Estudiante con código de inscripción ${codigo} no encontrado`);
     }
-    return student;
+    return estudiante;
   }
 
-  async update(id: number, actualizarEstudianteDto: ActualizarEstudianteDto): Promise<Estudiante> {
-    const student = await this.findOne(id);
+  async actualizar(id: number, actualizarEstudianteDto: ActualizarEstudianteDto): Promise<Estudiante> {
+    const estudiante = await this.obtenerUno(id);
 
     if (actualizarEstudianteDto.numeroTituloBachiller) {
-      const existingTitle = await this.estudianteRepository.findOne({
+      const tituloExistente = await this.repositorioEstudiante.findOne({
         where: { numeroTituloBachiller: actualizarEstudianteDto.numeroTituloBachiller },
       });
-      if (existingTitle && existingTitle.id !== id) {
+      if (tituloExistente && tituloExistente.id !== id) {
         throw new ConflictException('Ya existe otro estudiante con este número de título de bachiller');
       }
     }
 
     if (actualizarEstudianteDto.numeroFolder) {
-      const existingFolder = await this.estudianteRepository.findOne({
+      const folderExistente = await this.repositorioEstudiante.findOne({
         where: { numeroFolder: actualizarEstudianteDto.numeroFolder },
       });
-      if (existingFolder && existingFolder.id !== id) {
+      if (folderExistente && folderExistente.id !== id) {
         throw new ConflictException('Ya existe otro estudiante con este número de folder');
       }
     }
 
-    Object.assign(student, actualizarEstudianteDto);
-    return this.estudianteRepository.save(student as any) as any;
+    Object.assign(estudiante, actualizarEstudianteDto);
+    return this.repositorioEstudiante.save(estudiante as any) as any;
   }
 
-  async remove(id: number): Promise<void> {
-    const student = await this.findOne(id);
+  async eliminar(id: number): Promise<void> {
+    const estudiante = await this.obtenerUno(id);
 
-    await this.credencialRepository.delete({ estudianteId: id });
+    await this.repositorioCredencial.delete({ estudianteId: id });
 
-    const usuario = await this.usuarioRepository.findOne({
-      where: { personaId: student.personaId },
+    const usuario = await this.repositorioUsuario.findOne({
+      where: { personaId: estudiante.personaId },
     });
     if (usuario) {
-      await this.usuarioRolRepository.delete({ usuarioId: usuario.id });
-      await this.usuarioRepository.remove(usuario);
+      await this.repositorioUsuarioRol.delete({ usuarioId: usuario.id });
+      await this.repositorioUsuario.remove(usuario);
     }
 
-    const personaId = student.personaId;
-    await this.estudianteRepository.remove(student);
+    const personaId = estudiante.personaId;
+    await this.repositorioEstudiante.remove(estudiante);
 
-    const persona = await this.personaRepository.findOne({ where: { id: personaId } });
+    const persona = await this.repositorioPersona.findOne({ where: { id: personaId } });
     if (persona) {
-      await this.personaRepository.remove(persona);
+      await this.repositorioPersona.remove(persona);
     }
   }
 
-  async findByCareer(careerId: number, gestion?: string): Promise<Estudiante[]> {
-    const query = this.estudianteRepository
-      .createQueryBuilder('student')
-      .leftJoinAndSelect('student.persona', 'persona')
-      .where('student.carreraId = :careerId', { careerId });
+  async buscarPorCarrera(carreraId: number, gestion?: string): Promise<Estudiante[]> {
+    const consulta = this.repositorioEstudiante
+      .createQueryBuilder('estudiante')
+      .leftJoinAndSelect('estudiante.persona', 'persona')
+      .where('estudiante.carreraId = :carreraId', { carreraId });
 
     if (gestion) {
-      query.andWhere('student.gestionAdmision = :gestion', { gestion });
+      consulta.andWhere('estudiante.gestionAdmision = :gestion', { gestion });
     }
 
-    return query.orderBy('student.codigoInscripcion', 'ASC').getMany();
+    return consulta.orderBy('estudiante.codigoInscripcion', 'ASC').getMany();
   }
 
-  async findActive(): Promise<Estudiante[]> {
-    return this.estudianteRepository.find({
+  async buscarActivos(): Promise<Estudiante[]> {
+    return this.repositorioEstudiante.find({
       where: { estado: EstadoEstudiante.ACTIVO },
       relations: ['persona', 'carrera'],
       order: { codigoInscripcion: 'ASC' },
     });
   }
 
-  async countByStatus(careerId?: number): Promise<{ estado: string; cantidad: number }[]> {
-    const query = this.estudianteRepository
-      .createQueryBuilder('student')
-      .select('student.estado', 'estado')
+  async contarPorEstado(carreraId?: number): Promise<{ estado: string; cantidad: number }[]> {
+    const consulta = this.repositorioEstudiante
+      .createQueryBuilder('estudiante')
+      .select('estudiante.estado', 'estado')
       .addSelect('COUNT(*)', 'cantidad')
-      .groupBy('student.estado');
+      .groupBy('estudiante.estado');
 
-    if (careerId) {
-      query.where('student.carreraId = :careerId', { careerId });
+    if (carreraId) {
+      consulta.where('estudiante.carreraId = :carreraId', { carreraId });
     }
 
-    return query.getRawMany();
+    return consulta.getRawMany();
   }
 
-  async getStudentStats(): Promise<any> {
-    const stats = await this.estudianteRepository
+  async obtenerEstadisticasEstudiante(): Promise<any> {
+    const estadisticas = await this.repositorioEstudiante
       .createQueryBuilder('estudiante')
       .select('estudiante.estado', 'estado')
       .addSelect('COUNT(*)', 'cantidad')
       .groupBy('estudiante.estado')
       .getRawMany();
 
-    const result = { total: 0, activos: 0, egresados: 0, congelados: 0 };
-    stats.forEach((s) => {
-      const cantidad = parseInt(s.cantidad);
-      result.total += cantidad;
-      if (s.estado === EstadoEstudiante.ACTIVO) result.activos = cantidad;
-      if (s.estado === EstadoEstudiante.EGRESADO || s.estado === EstadoEstudiante.TITULADO) result.egresados += cantidad;
-      if (s.estado === EstadoEstudiante.CONGELADO) result.congelados = cantidad;
+    const resultado = { total: 0, activos: 0, egresados: 0, congelados: 0 };
+    estadisticas.forEach((fila) => {
+      const cantidad = parseInt(fila.cantidad);
+      resultado.total += cantidad;
+      if (fila.estado === EstadoEstudiante.ACTIVO) resultado.activos = cantidad;
+      if (fila.estado === EstadoEstudiante.EGRESADO || fila.estado === EstadoEstudiante.TITULADO) resultado.egresados += cantidad;
+      if (fila.estado === EstadoEstudiante.CONGELADO) resultado.congelados = cantidad;
     });
 
-    return result;
+    return resultado;
   }
 
-  private async generateInscriptionCode(persona: Persona, careerId: number): Promise<string> {
-    const carrera = await this.estudianteRepository.manager.findOne(
+  private async generarCodigoInscripcion(persona: Persona, carreraId: number): Promise<string> {
+    const carrera = await this.repositorioEstudiante.manager.findOne(
       Carrera,
-      { where: { id: careerId } }
+      { where: { id: carreraId } }
     ) as Carrera | null;
 
     if (!carrera) {
@@ -285,26 +285,26 @@ export class ServicioEstudiantes {
     }
 
     const gestion = new Date().getFullYear().toString();
-    const yearSuffix = gestion.slice(-2);
+    const sufijoAnio = gestion.slice(-2);
 
-    const initials = (
+    const iniciales = (
       (persona.apellidoPaterno?.[0] || '') +
       (persona.apellidoMaterno?.[0] || '') +
       (persona.nombres?.[0] || '')
     ).toUpperCase();
 
-    const careerCode = carrera.nombre.substring(0, 2).toUpperCase();
+    const codigoCarrera = carrera.nombre.substring(0, 2).toUpperCase();
 
-    const ciLast2 = persona.ci.slice(-2);
+    const ciUltimos2 = persona.ci.slice(-2);
 
-    let code = `${initials}-${careerCode}${yearSuffix}${ciLast2}`;
+    let codigo = `${iniciales}-${codigoCarrera}${sufijoAnio}${ciUltimos2}`;
 
-    let counter = 1;
-    while (await this.estudianteRepository.findOne({ where: { codigoInscripcion: code } })) {
-      code = `${initials}-${careerCode}${yearSuffix}${ciLast2}-${counter}`;
-      counter++;
+    let contador = 1;
+    while (await this.repositorioEstudiante.findOne({ where: { codigoInscripcion: codigo } })) {
+      codigo = `${iniciales}-${codigoCarrera}${sufijoAnio}${ciUltimos2}-${contador}`;
+      contador++;
     }
 
-    return code;
+    return codigo;
   }
 }

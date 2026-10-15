@@ -7,37 +7,37 @@ import { TipoPeriodo } from '../../entities/enums/tipo-periodo.enum';
 import { Periodo } from '../../entities/periodo.entity';
 import { CrearGestionDto } from './dto/create-gestion.dto';
 import { ActualizarGestionDto } from './dto/update-gestion.dto';
-import { CreatePeriodoDto, UpdatePeriodoDto } from './dto/periodo.dto';
+import { CrearPeriodoDto, ActualizarPeriodoDto } from './dto/periodo.dto';
 
 @Injectable()
-export class GestionesService {
+export class ServicioGestiones {
   constructor(
     @InjectRepository(Gestion)
-    private readonly gestionRepository: Repository<Gestion>,
+    private readonly repositorioGestion: Repository<Gestion>,
     @InjectRepository(Periodo)
-    private readonly periodoRepository: Repository<Periodo>,
-    private readonly dataSource: DataSource,
+    private readonly repositorioPeriodo: Repository<Periodo>,
+    private readonly fuenteDatos: DataSource,
   ) {}
 
-  async create(crearGestionDto: CrearGestionDto): Promise<Gestion> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+  async crear(crearGestionDto: CrearGestionDto): Promise<Gestion> {
+    const ejecutorConsultas = this.fuenteDatos.createQueryRunner();
+    await ejecutorConsultas.connect();
+    await ejecutorConsultas.startTransaction();
 
     try {
-      const existing = await this.gestionRepository.findOne({
+      const existente = await this.repositorioGestion.findOne({
         where: { anio: crearGestionDto.anio },
       });
 
-      if (existing) {
+      if (existente) {
         throw new BadRequestException(`La gestión ${crearGestionDto.anio} ya existe`);
       }
 
       if (crearGestionDto.esActual) {
-        await this.clearCurrentGestion();
+        await this.limpiarGestionActual();
       }
 
-      const gestion = this.gestionRepository.create({
+      const gestion = this.repositorioGestion.create({
         anio: crearGestionDto.anio,
         tipoPeriodo: crearGestionDto.tipoPeriodo || TipoPeriodo.SEMESTRAL,
         estado: crearGestionDto.estado || EstadoGestion.PENDIENTE,
@@ -45,46 +45,46 @@ export class GestionesService {
         notas: crearGestionDto.notas,
       });
 
-      const savedGestion = await queryRunner.manager.save(gestion);
+      const gestionCreada = await ejecutorConsultas.manager.save(gestion);
 
-      await this.createPeriodosForGestion(queryRunner.manager, savedGestion, crearGestionDto.tipoPeriodo || TipoPeriodo.SEMESTRAL);
+      await this.crearPeriodosParaGestion(ejecutorConsultas.manager, gestionCreada, crearGestionDto.tipoPeriodo || TipoPeriodo.SEMESTRAL);
 
-      await queryRunner.commitTransaction();
-      const gestionGuardada = Array.isArray(savedGestion) ? savedGestion[0] : savedGestion;
-      return this.findOne(gestionGuardada.id);
+      await ejecutorConsultas.commitTransaction();
+      const gestionGuardada = Array.isArray(gestionCreada) ? gestionCreada[0] : gestionCreada;
+      return this.obtenerUno(gestionGuardada.id);
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      await ejecutorConsultas.rollbackTransaction();
       throw error;
     } finally {
-      await queryRunner.release();
+      await ejecutorConsultas.release();
     }
   }
 
-  private async createPeriodosForGestion(
+  private async crearPeriodosParaGestion(
     manager: any,
     gestion: Gestion,
-    periodType: TipoPeriodo,
+    tipoPeriodo: TipoPeriodo,
   ): Promise<void> {
-    const year = parseInt(gestion.anio);
+    const anio = parseInt(gestion.anio);
     const periodos: Partial<Periodo>[] = [];
 
-    switch (periodType) {
+    switch (tipoPeriodo) {
       case TipoPeriodo.SEMESTRAL:
         periodos.push(
           {
             gestionId: gestion.id,
             numero: 'I',
             nombre: 'Primer Semestre',
-            fechaInicio: new Date(year, 1, 20),
-            fechaFin: new Date(year, 6, 10),
+            fechaInicio: new Date(anio, 1, 20),
+            fechaFin: new Date(anio, 6, 10),
             estado: EstadoGestion.PENDIENTE,
           },
           {
             gestionId: gestion.id,
             numero: 'II',
             nombre: 'Segundo Semestre',
-            fechaInicio: new Date(year, 6, 20),
-            fechaFin: new Date(year, 11, 11),
+            fechaInicio: new Date(anio, 6, 20),
+            fechaFin: new Date(anio, 11, 11),
             estado: EstadoGestion.PENDIENTE,
           },
         );
@@ -96,28 +96,28 @@ export class GestionesService {
     }
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
-    status?: EstadoGestion,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
+    estado?: EstadoGestion,
   ): Promise<{ datos: Gestion[]; total: number; pagina: number; limite: number }> {
-    const query = this.gestionRepository.createQueryBuilder('gestion');
+    const consulta = this.repositorioGestion.createQueryBuilder('gestion');
 
-    if (status) {
-      query.andWhere('gestion.estado = :estado', { estado: status });
+    if (estado) {
+      consulta.andWhere('gestion.estado = :estado', { estado });
     }
 
-    query.orderBy('gestion.anio', 'DESC');
-    query.skip((page - 1) * limit).take(limit);
-    query.leftJoinAndSelect('gestion.periodos', 'periodos');
+    consulta.orderBy('gestion.anio', 'DESC');
+    consulta.skip((pagina - 1) * limite).take(limite);
+    consulta.leftJoinAndSelect('gestion.periodos', 'periodos');
 
-    const [data, total] = await query.getManyAndCount();
+    const [datos, total] = await consulta.getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Gestion> {
-    const gestion = await this.gestionRepository.findOne({
+  async obtenerUno(id: number): Promise<Gestion> {
+    const gestion = await this.repositorioGestion.findOne({
       where: { id },
       relations: ['periodos'],
     });
@@ -127,8 +127,8 @@ export class GestionesService {
     return gestion;
   }
 
-  async findByAnio(anio: string): Promise<Gestion> {
-    const gestion = await this.gestionRepository.findOne({
+  async buscarPorAnio(anio: string): Promise<Gestion> {
+    const gestion = await this.repositorioGestion.findOne({
       where: { anio },
       relations: ['periodos'],
     });
@@ -138,108 +138,108 @@ export class GestionesService {
     return gestion;
   }
 
-  async findActive(): Promise<Gestion[]> {
-    return this.gestionRepository.find({
+  async obtenerActivos(): Promise<Gestion[]> {
+    return this.repositorioGestion.find({
       where: { estado: EstadoGestion.ABIERTA },
       relations: ['periodos'],
       order: { anio: 'DESC' },
     });
   }
 
-  async findCurrent(): Promise<Gestion | null> {
-    const gestion = await this.gestionRepository.findOne({
+  async obtenerActual(): Promise<Gestion | null> {
+    const gestion = await this.repositorioGestion.findOne({
       where: { esActual: true },
       relations: ['periodos'],
     });
     return gestion;
   }
 
-  async update(id: number, updateGestionDto: ActualizarGestionDto): Promise<Gestion> {
-    const gestion = await this.findOne(id);
+  async actualizar(id: number, actualizarGestionDto: ActualizarGestionDto): Promise<Gestion> {
+    const gestion = await this.obtenerUno(id);
 
-    if (updateGestionDto.anio && updateGestionDto.anio !== gestion.anio) {
-      const existing = await this.gestionRepository.findOne({
-        where: { anio: updateGestionDto.anio },
+    if (actualizarGestionDto.anio && actualizarGestionDto.anio !== gestion.anio) {
+      const existente = await this.repositorioGestion.findOne({
+        where: { anio: actualizarGestionDto.anio },
       });
-      if (existing) {
-        throw new BadRequestException(`La gestión ${updateGestionDto.anio} ya existe`);
+      if (existente) {
+        throw new BadRequestException(`La gestión ${actualizarGestionDto.anio} ya existe`);
       }
     }
 
-    if (updateGestionDto.esActual) {
-      await this.clearCurrentGestion();
+    if (actualizarGestionDto.esActual) {
+      await this.limpiarGestionActual();
     }
 
-    Object.assign(gestion, updateGestionDto);
-    return this.gestionRepository.save(gestion);
+    Object.assign(gestion, actualizarGestionDto);
+    return this.repositorioGestion.save(gestion);
   }
 
-  async remove(id: number): Promise<void> {
-    const gestion = await this.findOne(id);
-    await this.periodoRepository.delete({ gestionId: id });
-    await this.gestionRepository.remove(gestion);
+  async eliminar(id: number): Promise<void> {
+    const gestion = await this.obtenerUno(id);
+    await this.repositorioPeriodo.delete({ gestionId: id });
+    await this.repositorioGestion.remove(gestion);
   }
 
-  async open(id: number): Promise<Gestion> {
-    const gestion = await this.findOne(id);
+  async abrir(id: number): Promise<Gestion> {
+    const gestion = await this.obtenerUno(id);
     gestion.estado = EstadoGestion.ABIERTA;
-    return this.gestionRepository.save(gestion);
+    return this.repositorioGestion.save(gestion);
   }
 
-  async close(id: number): Promise<Gestion> {
-    const gestion = await this.findOne(id);
+  async cerrar(id: number): Promise<Gestion> {
+    const gestion = await this.obtenerUno(id);
     gestion.estado = EstadoGestion.CERRADA;
     for (const periodo of gestion.periodos) {
       if (periodo.estado === EstadoGestion.ABIERTA) {
         periodo.estado = EstadoGestion.CERRADA;
-        await this.periodoRepository.save(periodo);
+        await this.repositorioPeriodo.save(periodo);
       }
     }
-    return this.gestionRepository.save(gestion);
+    return this.repositorioGestion.save(gestion);
   }
 
-  async setCurrent(id: number): Promise<Gestion> {
-    await this.clearCurrentGestion();
-    const gestion = await this.findOne(id);
+  async establecerActual(id: number): Promise<Gestion> {
+    await this.limpiarGestionActual();
+    const gestion = await this.obtenerUno(id);
     gestion.esActual = true;
-    return this.gestionRepository.save(gestion);
+    return this.repositorioGestion.save(gestion);
   }
 
-  private async clearCurrentGestion(): Promise<void> {
-    await this.gestionRepository.update(
+  private async limpiarGestionActual(): Promise<void> {
+    await this.repositorioGestion.update(
       { esActual: true },
       { esActual: false },
     );
   }
 
-  async createPeriodo(gestionId: number, createPeriodoDto: CreatePeriodoDto): Promise<Periodo> {
-    const gestion = await this.findOne(gestionId);
-    const periodo = this.periodoRepository.create({
-      ...createPeriodoDto,
+  async crearPeriodo(gestionId: number, crearPeriodoDto: CrearPeriodoDto): Promise<Periodo> {
+    const gestion = await this.obtenerUno(gestionId);
+    const periodo = this.repositorioPeriodo.create({
+      ...crearPeriodoDto,
       gestionId: gestion.id,
     });
-    return this.periodoRepository.save(periodo);
+    return this.repositorioPeriodo.save(periodo);
   }
 
-  async updatePeriodo(periodoId: number, updatePeriodoDto: UpdatePeriodoDto): Promise<Periodo> {
-    const periodo = await this.periodoRepository.findOne({ where: { id: periodoId } });
+  async actualizarPeriodo(periodoId: number, actualizarPeriodoDto: ActualizarPeriodoDto): Promise<Periodo> {
+    const periodo = await this.repositorioPeriodo.findOne({ where: { id: periodoId } });
     if (!periodo) {
       throw new NotFoundException(`Período con ID ${periodoId} no encontrado`);
     }
-    Object.assign(periodo, updatePeriodoDto);
-    return this.periodoRepository.save(periodo);
+    Object.assign(periodo, actualizarPeriodoDto);
+    return this.repositorioPeriodo.save(periodo);
   }
 
-  async deletePeriodo(periodoId: number): Promise<void> {
-    const periodo = await this.periodoRepository.findOne({ where: { id: periodoId } });
+  async eliminarPeriodo(periodoId: number): Promise<void> {
+    const periodo = await this.repositorioPeriodo.findOne({ where: { id: periodoId } });
     if (!periodo) {
       throw new NotFoundException(`Período con ID ${periodoId} no encontrado`);
     }
-    await this.periodoRepository.remove(periodo);
+    await this.repositorioPeriodo.remove(periodo);
   }
 
-  async openPeriodo(periodoId: number): Promise<Periodo> {
-    const periodo = await this.periodoRepository.findOne({
+  async abrirPeriodo(periodoId: number): Promise<Periodo> {
+    const periodo = await this.repositorioPeriodo.findOne({
       where: { id: periodoId },
       relations: ['gestion'],
     });
@@ -247,21 +247,21 @@ export class GestionesService {
       throw new NotFoundException(`Período con ID ${periodoId} no encontrado`);
     }
 
-    await this.periodoRepository.update(
+    await this.repositorioPeriodo.update(
       { gestionId: periodo.gestionId, estado: EstadoGestion.ABIERTA },
       { estado: EstadoGestion.CERRADA },
     );
 
     periodo.estado = EstadoGestion.ABIERTA;
-    return this.periodoRepository.save(periodo);
+    return this.repositorioPeriodo.save(periodo);
   }
 
-  async closePeriodo(periodoId: number): Promise<Periodo> {
-    const periodo = await this.periodoRepository.findOne({ where: { id: periodoId } });
+  async cerrarPeriodo(periodoId: number): Promise<Periodo> {
+    const periodo = await this.repositorioPeriodo.findOne({ where: { id: periodoId } });
     if (!periodo) {
       throw new NotFoundException(`Período con ID ${periodoId} no encontrado`);
     }
     periodo.estado = EstadoGestion.CERRADA;
-    return this.periodoRepository.save(periodo);
+    return this.repositorioPeriodo.save(periodo);
   }
 }

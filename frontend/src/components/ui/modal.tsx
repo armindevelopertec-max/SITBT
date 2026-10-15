@@ -1,37 +1,37 @@
 'use client';
 
-import { Fragment, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { cn } from '@/lib/utilidades';
 import { X } from 'lucide-react';
 import { Boton } from './boton';
 
-interface ModalProps {
-  open: boolean;
-  onClose: () => void;
-  title?: string;
-  description?: string;
+interface PropsModal {
+  abierto: boolean;
+  alCerrar: () => void;
+  titulo?: string;
+  descripcion?: string;
   children: ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
-  showCloseButton?: boolean;
+  tamano?: 'pequeno' | 'mediano' | 'grande' | 'extragrande' | 'completo';
+  mostrarBotonCerrar?: boolean;
 }
 
 export function Modal({
-  open,
-  onClose,
-  title,
-  description,
+  abierto,
+  alCerrar,
+  titulo,
+  descripcion,
   children,
-  size = 'md',
-  showCloseButton = true,
-}: ModalProps) {
-  if (!open) return null;
+  tamano = 'mediano',
+  mostrarBotonCerrar = true,
+}: PropsModal) {
+  if (!abierto) return null;
 
-  const sizes = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
-    full: 'max-w-full mx-4',
+  const tamanos = {
+    pequeno: 'max-w-md',
+    mediano: 'max-w-lg',
+    grande: 'max-w-2xl',
+    extragrande: 'max-w-4xl',
+    completo: 'max-w-full mx-4',
   };
 
   return (
@@ -39,29 +39,29 @@ export function Modal({
       <div className="flex min-h-full items-center justify-center p-4">
         <div
           className="fixed inset-0 bg-black/50 transition-opacity"
-          onClick={onClose}
+          onClick={alCerrar}
         />
 
         <div
           className={cn(
             'relative w-full bg-white rounded-lg shadow-xl',
-            sizes[size],
+            tamanos[tamano],
             'animate-in fade-in zoom-in-95 duration-200'
           )}
         >
-          {(title || showCloseButton) && (
+          {(titulo || mostrarBotonCerrar) && (
             <div className="flex items-start justify-between p-4 border-b border-gray-200">
               <div>
-                {title && (
-                  <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+                {titulo && (
+                  <h3 className="text-lg font-semibold text-gray-900">{titulo}</h3>
                 )}
-                {description && (
-                  <p className="mt-1 text-sm text-gray-500">{description}</p>
+                {descripcion && (
+                  <p className="mt-1 text-sm text-gray-500">{descripcion}</p>
                 )}
               </div>
-              {showCloseButton && (
+              {mostrarBotonCerrar && (
                 <button
-                  onClick={onClose}
+                  onClick={alCerrar}
                   className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   <X className="w-5 h-5 text-gray-500" />
@@ -77,44 +77,44 @@ export function Modal({
   );
 }
 
-interface ConfirmModalProps {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  message?: string;
-  confirmText?: string;
-  cancelText?: string;
-  variant?: 'default' | 'destructive';
-  loading?: boolean;
+interface PropsModalConfirmacion {
+  abierto: boolean;
+  alCerrar: () => void;
+  alConfirmar: () => void;
+  titulo: string;
+  mensaje?: string;
+  textoConfirmar?: string;
+  textoCancelar?: string;
+  variante?: 'predeterminado' | 'destructivo';
+  cargando?: boolean;
   children?: React.ReactNode;
 }
 
-export function ConfirmModal({
-  open,
-  onClose,
-  onConfirm,
-  title,
-  message,
-  confirmText = 'Confirmar',
-  cancelText = 'Cancelar',
-  variant = 'default',
-  loading = false,
+export function ModalConfirmacion({
+  abierto,
+  alCerrar,
+  alConfirmar,
+  titulo,
+  mensaje,
+  textoConfirmar = 'Confirmar',
+  textoCancelar = 'Cancelar',
+  variante = 'predeterminado',
+  cargando = false,
   children,
-}: ConfirmModalProps) {
+}: PropsModalConfirmacion) {
   return (
-    <Modal open={open} onClose={onClose} title={title} description={message} size="sm">
+    <Modal abierto={abierto} alCerrar={alCerrar} titulo={titulo} descripcion={mensaje} tamano="pequeno">
       {children}
       <div className="flex justify-end gap-3 mt-6">
-        <Boton variant="outline" onClick={onClose} disabled={loading}>
-          {cancelText}
+        <Boton variante="contorno" onClick={alCerrar} disabled={cargando}>
+          {textoCancelar}
         </Boton>
         <Boton
-          variant={variant === 'destructive' ? 'destructive' : 'primary'}
-          onClick={onConfirm}
-          isLoading={loading}
+          variante={variante === 'destructivo' ? 'destructivo' : 'primario'}
+          onClick={alConfirmar}
+          cargando={cargando}
         >
-          {confirmText}
+          {textoConfirmar}
         </Boton>
       </div>
     </Modal>

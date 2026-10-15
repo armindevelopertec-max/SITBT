@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { PreinscripcionService } from './preinscripcion.service';
+import { ServicioPreinscripcion } from './preinscripcion.service';
 import { VerificarPagosDto } from './dto/verify-payments.dto';
 import { CalcularMateriasDto } from './dto/calculate-subjects.dto';
 import { CrearInscripcionLoteDto } from './dto/create-enrollment-batch.dto';
@@ -17,45 +17,45 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 @Controller('preinscripcion')
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
-export class PreinscripcionController {
-  constructor(private readonly service: PreinscripcionService) {}
+export class ControladorPreinscripcion {
+  constructor(private readonly servicio: ServicioPreinscripcion) {}
 
   @Post('verificar-pagos')
-  verifyPayments(@Body() dto: VerificarPagosDto) {
-    return this.service.verifyPayments(dto);
+  verificarPagos(@Body() dto: VerificarPagosDto) {
+    return this.servicio.verificarPagos(dto);
   }
 
   @Post('calcular-materias')
-  calculateSubjects(@Body() dto: CalcularMateriasDto) {
-    return this.service.calculateSubjects(dto);
+  calcularMaterias(@Body() dto: CalcularMateriasDto) {
+    return this.servicio.calcularMaterias(dto);
   }
 
   @Post('inscribir-lote')
-  createEnrollmentBatch(@Body() dto: CrearInscripcionLoteDto) {
-    return this.service.createEnrollmentBatch(dto);
+  crearInscripcionLote(@Body() dto: CrearInscripcionLoteDto) {
+    return this.servicio.crearInscripcionLote(dto);
   }
 
   @Get('boleta')
-  getEnrollmentBoleta(
+  obtenerBoletaInscripcion(
     @Query('estudianteId') estudianteId: number,
     @Query('gestion') gestion: string,
     @Query('periodo') periodo?: string,
   ) {
-    return this.service.getEnrollmentBoleta(estudianteId, gestion, periodo);
+    return this.servicio.obtenerBoletaInscripcion(estudianteId, gestion, periodo);
   }
 
   @Get('grupos')
-  getGroupsByCareerAndSemester(
-    @Query('carreraId') careerId: number,
+  obtenerGruposPorCarreraYSemestre(
+    @Query('carreraId') carreraId: number,
     @Query('gestion') gestion: string,
-    @Query('semestre') semester: number,
-    @Query('turnoId') shiftId?: number,
+    @Query('semestre') semestre: number,
+    @Query('turnoId') turnoId?: number,
   ) {
-    return this.service.getGroupsByCareerAndSemester(careerId, gestion, semester, shiftId ? +shiftId : undefined);
+    return this.servicio.obtenerGruposPorCarreraYSemestre(carreraId, gestion, semestre, turnoId ? +turnoId : undefined);
   }
 
   @Get('abrir-periodo')
-  getOpenPeriodo(@Query('gestion') gestion: string) {
-    return this.service.getOpenPeriodo(gestion);
+  obtenerPeriodoAbierto(@Query('gestion') gestion: string) {
+    return this.servicio.obtenerPeriodoAbierto(gestion);
   }
 }

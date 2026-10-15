@@ -13,6 +13,6 @@ export class ControladorPlanesEstudioPublico {
 
   @Get('carrera/:carreraId')
   porCarrera(@Param('carreraId', ParseIntPipe) carreraId: number) {
-    return this.servicioPlanesEstudio.findPublicByCareer(carreraId);
+    return this.servicioPlanesEstudio.buscarPublicoPorCarrera(carreraId);
   }
 }

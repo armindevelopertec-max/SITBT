@@ -2,25 +2,25 @@ import { cn } from '@/lib/utilidades';
 import { HTMLAttributes, InputHTMLAttributes, TextareaHTMLAttributes, forwardRef } from 'react';
 
 interface PropsEntrada extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+  etiqueta?: string;
   error?: string;
-  helperText?: string;
+  textoAyuda?: string;
 }
 
 const Entrada = forwardRef<HTMLInputElement, PropsEntrada>(
-  ({ className, label, error, helperText, type = 'text', id, ...props }, ref) => {
-    const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
+  ({ className, etiqueta, error, textoAyuda, type = 'text', id, ...props }, ref) => {
+    const idEntrada = id || etiqueta?.toLowerCase().replace(/\s+/g, '-');
 
     return (
       <div className="w-full">
-        {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 mb-1">
-            {label}
+        {etiqueta && (
+          <label htmlFor={idEntrada} className="block text-sm font-medium text-gray-700 mb-1">
+            {etiqueta}
           </label>
         )}
         <input
           ref={ref}
-          id={inputId}
+          id={idEntrada}
           type={type}
           className={cn(
             'block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 sm:text-sm',
@@ -30,7 +30,7 @@ const Entrada = forwardRef<HTMLInputElement, PropsEntrada>(
           {...props}
         />
         {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-        {helperText && !error && <p className="mt-1 text-sm text-gray-500">{helperText}</p>}
+        {textoAyuda && !error && <p className="mt-1 text-sm text-gray-500">{textoAyuda}</p>}
       </div>
     );
   }

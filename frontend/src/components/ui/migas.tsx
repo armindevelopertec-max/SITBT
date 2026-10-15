@@ -5,15 +5,15 @@ import { ChevronRight, Home } from 'lucide-react';
 import { cn } from '@/lib/utilidades';
 
 interface ElementoMigas {
-  label: string;
+  etiqueta: string;
   href?: string;
 }
 
-interface BreadcrumbProps {
-  items: ElementoMigas[];
+interface PropsMigas {
+  elementos: ElementoMigas[];
 }
 
-export function Migas({ items }: BreadcrumbProps) {
+export function Migas({ elementos }: PropsMigas) {
   return (
     <nav className="flex" aria-label="Migas">
       <ol className="flex items-center gap-2">
@@ -25,19 +25,19 @@ export function Migas({ items }: BreadcrumbProps) {
             <Home className="w-4 h-4" />
           </Link>
         </li>
-        {items.map((item, index) => (
-          <li key={index} className="flex items-center gap-2">
+        {elementos.map((elemento, indice) => (
+          <li key={indice} className="flex items-center gap-2">
             <ChevronRight className="w-4 h-4 text-gray-400" />
-            {item.href ? (
+            {elemento.href ? (
               <Link
-                href={item.href}
+                href={elemento.href}
                 className="text-gray-500 hover:text-gray-700 transition-colors"
               >
-                {item.label}
+                {elemento.etiqueta}
               </Link>
             ) : (
-              <span className={cn('text-sm', item.href ? 'text-gray-500' : 'text-gray-900 font-medium')}>
-                {item.label}
+              <span className={cn('text-sm', elemento.href ? 'text-gray-500' : 'text-gray-900 font-medium')}>
+                {elemento.etiqueta}
               </span>
             )}
           </li>

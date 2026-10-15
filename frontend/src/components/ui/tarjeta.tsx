@@ -2,15 +2,15 @@ import { cn } from '@/lib/utilidades';
 import { HTMLAttributes, forwardRef } from 'react';
 
 interface PropsTarjeta extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'bordered' | 'elevated';
+  variante?: 'predeterminado' | 'conBorde' | 'elevada';
 }
 
 const Tarjeta = forwardRef<HTMLDivElement, PropsTarjeta>(
-  ({ className, variant = 'default', ...props }, ref) => {
-    const variants = {
-      default: 'bg-white',
-      bordered: 'bg-white border border-gray-200',
-      elevated: 'bg-white shadow-lg',
+  ({ className, variante = 'predeterminado', ...props }, ref) => {
+    const variantes = {
+      predeterminado: 'bg-white',
+      conBorde: 'bg-white border border-gray-200',
+      elevada: 'bg-white shadow-lg',
     };
 
     return (
@@ -18,7 +18,7 @@ const Tarjeta = forwardRef<HTMLDivElement, PropsTarjeta>(
         ref={ref}
         className={cn(
           'rounded-lg overflow-hidden',
-          variants[variant],
+          variantes[variante],
           className
         )}
         {...props}

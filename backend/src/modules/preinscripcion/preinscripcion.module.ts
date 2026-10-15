@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PreinscripcionService } from './preinscripcion.service';
-import { PreinscripcionController } from './preinscripcion.controller';
+import { ServicioPreinscripcion } from './preinscripcion.service';
+import { ControladorPreinscripcion } from './preinscripcion.controller';
 import { Estudiante } from '../../entities/estudiante.entity';
 import { Pago } from '../../entities/pago.entity';
 import { ConceptoPago } from '../../entities/concepto-pago.entity';
@@ -32,8 +32,8 @@ import { DocumentoEmitido } from '../../entities/emitted-document.entity';
       DocumentoEmitido,
     ]),
   ],
-  controllers: [PreinscripcionController],
-  providers: [PreinscripcionService],
-  exports: [PreinscripcionService],
+  controllers: [ControladorPreinscripcion],
+  providers: [ServicioPreinscripcion],
+  exports: [ServicioPreinscripcion],
 })
-export class PreinscripcionModule {}
+export class ModuloPreinscripcion {}

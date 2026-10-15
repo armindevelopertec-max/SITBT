@@ -6,7 +6,7 @@ import { Migas } from '@/components/ui/migas';
 import { Tarjeta, ContenidoTarjeta } from '@/components/ui/tarjeta';
 import { Boton } from '@/components/ui/boton';
 import { Entrada } from '@/components/ui/entrada';
-import { ConfirmModal } from '@/components/ui/modal';
+import { ModalConfirmacion } from '@/components/ui/modal';
 import { api } from '@/lib/api';
 import { Search, Plus, Edit2, Trash2, Loader2 } from 'lucide-react';
 
@@ -16,52 +16,52 @@ interface Materia {
   nombre: string;
 }
 
-export default function MateriasPage() {
+export default function PaginaMaterias() {
   const router = useRouter();
   const [materias, setMaterias] = useState<Materia[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [deletingMateria, setDeletingMateria] = useState<Materia | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [cargando, setCargando] = useState(true);
+  const [consultaBusqueda, setConsultaBusqueda] = useState('');
+  const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false);
+  const [materiaEliminando, setMateriaEliminando] = useState<Materia | null>(null);
+  const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
-    fetchMaterias();
+    obtenerMaterias();
   }, []);
 
-  const fetchMaterias = async () => {
+  const obtenerMaterias = async () => {
     try {
-      const response = await api.get('/materias/todos');
-      setMaterias(response.data || []);
+      const respuesta = await api.get('/materias/todos');
+      setMaterias(respuesta.data || []);
     } catch (error) {
       console.error('Error al obtener las materias:', error);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const handleDelete = async () => {
-    if (!deletingMateria) return;
-    setSaving(true);
+  const eliminar = async () => {
+    if (!materiaEliminando) return;
+    setGuardando(true);
     try {
-      await api.delete(`/materias/${deletingMateria.id}`);
-      setDeleteModalOpen(false);
-      setDeletingMateria(null);
-      fetchMaterias();
+      await api.delete(`/materias/${materiaEliminando.id}`);
+      setModalEliminarAbierto(false);
+      setMateriaEliminando(null);
+      obtenerMaterias();
     } catch (error) {
       console.error('Error al eliminar la materia:', error);
       alert('Error al eliminar la materia');
     } finally {
-      setSaving(false);
+      setGuardando(false);
     }
   };
 
-  const filteredMaterias = materias.filter(m =>
-    m.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    m.codigo.toLowerCase().includes(searchQuery.toLowerCase())
+  const materiasFiltradas = materias.filter(materia =>
+    materia.nombre.toLowerCase().includes(consultaBusqueda.toLowerCase()) ||
+    materia.codigo.toLowerCase().includes(consultaBusqueda.toLowerCase())
   );
 
-  if (loading) {
+  if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
@@ -71,11 +71,11 @@ export default function MateriasPage() {
 
   return (
     <div className="space-y-4">
-      <Migas items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Materias' }]} />
+      <Migas elementos={[{ etiqueta: 'Configuración', href: '/configuracion' }, { etiqueta: 'Materias' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">Materias</h1>
-        <Boton size="sm" onClick={() => router.push('/materias/nuevo')}>
+        <Boton tamano="pequeno" onClick={() => router.push('/materias/nuevo')}>
           <Plus className="w-3 h-3 mr-1" />
           Nueva
         </Boton>
@@ -86,18 +86,18 @@ export default function MateriasPage() {
         <Entrada
           placeholder="Buscar..."
           className="pl-7 h-8 text-sm"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={consultaBusqueda}
+          onChange={(e) => setConsultaBusqueda(e.target.value)}
         />
       </div>
 
-      {filteredMaterias.length === 0 ? (
+      {materiasFiltradas.length === 0 ? (
         <p className="text-center text-sm text-gray-500 py-8">
-          {searchQuery ? 'Sin resultados' : 'Sin materias registradas'}
+          {consultaBusqueda ? 'Sin resultados' : 'Sin materias registradas'}
         </p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-          {filteredMaterias.map((materia) => (
+          {materiasFiltradas.map((materia) => (
             <div
               key={materia.id}
               className="flex items-center justify-between p-2 border rounded hover:bg-gray-50 group"
@@ -107,10 +107,10 @@ export default function MateriasPage() {
                 <p className="text-sm font-medium break-words">{materia.nombre}</p>
               </div>
               <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Boton variant="ghost" size="icon" className="h-6 w-6" onClick={() => router.push(`/materias/${materia.id}`)}>
+                <Boton variante="fantasma" tamano="icono" className="h-6 w-6" onClick={() => router.push(`/materias/${materia.id}`)}>
                   <Edit2 className="w-3 h-3" />
                 </Boton>
-                <Boton variant="ghost" size="icon" className="h-6 w-6" onClick={() => { setDeletingMateria(materia); setDeleteModalOpen(true); }}>
+                <Boton variante="fantasma" tamano="icono" className="h-6 w-6" onClick={() => { setMateriaEliminando(materia); setModalEliminarAbierto(true); }}>
                   <Trash2 className="w-3 h-3 text-red-500" />
                 </Boton>
               </div>
@@ -119,15 +119,15 @@ export default function MateriasPage() {
         </div>
       )}
 
-      <ConfirmModal
-        open={deleteModalOpen}
-        onClose={() => { setDeleteModalOpen(false); setDeletingMateria(null); }}
-        onConfirm={handleDelete}
-        title="Eliminar Materia"
-        message={`¿Eliminar "${deletingMateria?.nombre}"?`}
-        confirmText="Eliminar"
-        variant="destructive"
-        loading={saving}
+      <ModalConfirmacion
+        abierto={modalEliminarAbierto}
+        alCerrar={() => { setModalEliminarAbierto(false); setMateriaEliminando(null); }}
+        alConfirmar={eliminar}
+        titulo="Eliminar Materia"
+        mensaje={`¿Eliminar "${materiaEliminando?.nombre}"?`}
+        textoConfirmar="Eliminar"
+        variante="destructivo"
+        cargando={guardando}
       />
     </div>
   );

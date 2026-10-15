@@ -11,130 +11,130 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { GestionesService } from './gestiones.service';
+import { ServicioGestiones } from './gestiones.service';
 import { CrearGestionDto } from './dto/create-gestion.dto';
 import { ActualizarGestionDto } from './dto/update-gestion.dto';
-import { CreatePeriodoDto, UpdatePeriodoDto } from './dto/periodo.dto';
+import { CrearPeriodoDto, ActualizarPeriodoDto } from './dto/periodo.dto';
 import { EstadoGestion } from '../../entities/enums/estado-gestion.enum';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Gestiones')
 @Controller('gestiones')
-export class GestionesController {
-  constructor(private readonly gestionesService: GestionesService) {}
+export class ControladorGestiones {
+  constructor(private readonly servicioGestiones: ServicioGestiones) {}
 
   @Post()
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   crear(@Body() crearGestionDto: CrearGestionDto) {
-    return this.gestionesService.create(crearGestionDto);
+    return this.servicioGestiones.crear(crearGestionDto);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
-    @Query('estado') status?: EstadoGestion,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
+    @Query('estado') estado?: EstadoGestion,
   ) {
-    return this.gestionesService.findAll(+page, +limit, status);
+    return this.servicioGestiones.obtenerTodos(+pagina, +limite, estado);
   }
 
   @Get('activos')
-  findActive() {
-    return this.gestionesService.findActive();
+  obtenerActivos() {
+    return this.servicioGestiones.obtenerActivos();
   }
 
   @Get('actual')
-  findCurrent() {
-    return this.gestionesService.findCurrent();
+  obtenerActual() {
+    return this.servicioGestiones.obtenerActual();
   }
 
   @Get('anio/:anio')
-  findByAnio(@Param('anio') year: string) {
-    return this.gestionesService.findByAnio(year);
+  buscarPorAnio(@Param('anio') anio: string) {
+    return this.servicioGestiones.buscarPorAnio(anio);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.gestionesService.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioGestiones.obtenerUno(id);
   }
 
   @Patch(':id')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  update(
+  actualizar(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateGestionDto: ActualizarGestionDto,
+    @Body() actualizarGestionDto: ActualizarGestionDto,
   ) {
-    return this.gestionesService.update(id, updateGestionDto);
+    return this.servicioGestiones.actualizar(id, actualizarGestionDto);
   }
 
   @Post(':id/abrir')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  open(@Param('id', ParseIntPipe) id: number) {
-    return this.gestionesService.open(id);
+  abrir(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioGestiones.abrir(id);
   }
 
   @Post(':id/cerrar')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  close(@Param('id', ParseIntPipe) id: number) {
-    return this.gestionesService.close(id);
+  cerrar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioGestiones.cerrar(id);
   }
 
   @Post(':id/establecer-actual')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  setCurrent(@Param('id', ParseIntPipe) id: number) {
-    return this.gestionesService.setCurrent(id);
+  establecerActual(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioGestiones.establecerActual(id);
   }
 
   @Delete(':id')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.gestionesService.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioGestiones.eliminar(id);
   }
 
   @Post(':gestionId/periodos')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  createPeriodo(
+  crearPeriodo(
     @Param('gestionId', ParseIntPipe) gestionId: number,
-    @Body() createPeriodoDto: CreatePeriodoDto,
+    @Body() crearPeriodoDto: CrearPeriodoDto,
   ) {
-    return this.gestionesService.createPeriodo(gestionId, createPeriodoDto);
+    return this.servicioGestiones.crearPeriodo(gestionId, crearPeriodoDto);
   }
 
   @Patch('periodos/:periodoId')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  updatePeriodo(
+  actualizarPeriodo(
     @Param('periodoId', ParseIntPipe) periodoId: number,
-    @Body() updatePeriodoDto: UpdatePeriodoDto,
+    @Body() actualizarPeriodoDto: ActualizarPeriodoDto,
   ) {
-    return this.gestionesService.updatePeriodo(periodoId, updatePeriodoDto);
+    return this.servicioGestiones.actualizarPeriodo(periodoId, actualizarPeriodoDto);
   }
 
   @Delete('periodos/:periodoId')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  deletePeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
-    return this.gestionesService.deletePeriodo(periodoId);
+  eliminarPeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
+    return this.servicioGestiones.eliminarPeriodo(periodoId);
   }
 
   @Post('periodos/:periodoId/abrir')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  openPeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
-    return this.gestionesService.openPeriodo(periodoId);
+  abrirPeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
+    return this.servicioGestiones.abrirPeriodo(periodoId);
   }
 
   @Post('periodos/:periodoId/cerrar')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  closePeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
-    return this.gestionesService.closePeriodo(periodoId);
+  cerrarPeriodo(@Param('periodoId', ParseIntPipe) periodoId: number) {
+    return this.servicioGestiones.cerrarPeriodo(periodoId);
   }
 }

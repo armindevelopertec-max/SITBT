@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { GraduationCap, Users, BookOpen, ArrowRight, Wrench, Zap, MapPin, Phone, Mail, Clock, ChevronLeft, ChevronRight, Target, Eye, Heart, Globe, Shield, Briefcase, Laptop, Home, Info, HeartHandshake, GraduationCap as GraduationCapIcon, Lightbulb, MapPin as MapPinIcon, User } from 'lucide-react';
 import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
-const heroImages = [
+const imagenesHeroe = [
   {
     url: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80',
     titulo: 'Formación Técnica de Excelencia',
@@ -23,13 +23,13 @@ const heroImages = [
   }
 ];
 
-const careers = [
+const carreras = [
   {
     nombre: 'Autotrónica',
     titulo: 'Técnico Superior en Autotrónica',
     codigo: 'R.M. 1049/2024',
     area: 'Electrónica y Electricidad',
-    icon: <Zap className="w-8 h-8" />,
+    icono: <Zap className="w-8 h-8" />,
     color: 'bg-primary-500/10 text-primary-400',
     descripcion: 'Especialización en sistemas electrónicos automotrices, diagnóstico computarizado y tecnologías híbridas.'
   },
@@ -38,27 +38,27 @@ const careers = [
     titulo: 'Técnico Superior en Mecánica Automotriz',
     codigo: 'R.M. 0210/2024',
     area: 'Mecánica',
-    icon: <Wrench className="w-8 h-8" />,
+    icono: <Wrench className="w-8 h-8" />,
     color: 'bg-primary-500/10 text-primary-400',
     descripcion: 'Diagnóstico, mantenimiento y reparación de vehículos automotores con tecnología de punta.'
   }
 ];
 
-const values = [
-  { icon: <Target className="w-6 h-6" />, titulo: 'Excelencia', descripcion: 'Formación de calidad con estándares internacionales' },
-  { icon: <Heart className="w-6 h-6" />, titulo: 'Compromiso', descripcion: 'Dedicación total con cada estudiante' },
-  { icon: <Globe className="w-6 h-6" />, titulo: 'Innovación', descripcion: 'Tecnología de vanguardia en enseñanza' },
-  { icon: <Shield className="w-6 h-6" />, titulo: 'Ética', descripcion: 'Valores sólidos en cada profesional' },
+const valores = [
+  { icono: <Target className="w-6 h-6" />, titulo: 'Excelencia', descripcion: 'Formación de calidad con estándares internacionales' },
+  { icono: <Heart className="w-6 h-6" />, titulo: 'Compromiso', descripcion: 'Dedicación total con cada estudiante' },
+  { icono: <Globe className="w-6 h-6" />, titulo: 'Innovación', descripcion: 'Tecnología de vanguardia en enseñanza' },
+  { icono: <Shield className="w-6 h-6" />, titulo: 'Ética', descripcion: 'Valores sólidos en cada profesional' },
 ];
 
-const methodology = [
-  { icon: <BookOpen className="w-8 h-8" />, titulo: 'Clases Teóricas', descripcion: 'Fundamentos técnicos y conceptos fundamentales impartidos por profesores especializados.' },
-  { icon: <Laptop className="w-8 h-8" />, titulo: 'Prácticas en Talleres', descripcion: 'Experiencia hands-on con equipos y tecnología de última generación.' },
-  { icon: <Users className="w-8 h-8" />, titulo: 'Tutorías', descripcion: 'Seguimiento personalizado para asegurar tu éxito académico.' },
-  { icon: <Briefcase className="w-8 h-8" />, titulo: 'Prácticas Profesionales', descripcion: 'Conexión con empresas del sector para tu inserción laboral.' },
+const metodologia = [
+  { icono: <BookOpen className="w-8 h-8" />, titulo: 'Clases Teóricas', descripcion: 'Fundamentos técnicos y conceptos fundamentales impartidos por profesores especializados.' },
+  { icono: <Laptop className="w-8 h-8" />, titulo: 'Prácticas en Talleres', descripcion: 'Experiencia hands-on con equipos y tecnología de última generación.' },
+  { icono: <Users className="w-8 h-8" />, titulo: 'Tutorías', descripcion: 'Seguimiento personalizado para asegurar tu éxito académico.' },
+  { icono: <Briefcase className="w-8 h-8" />, titulo: 'Prácticas Profesionales', descripcion: 'Conexión con empresas del sector para tu inserción laboral.' },
 ];
 
-const authorities = [
+const autoridades = [
   { nombre: 'Lic. Juan Pérez', rol: 'Director General', imagen: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop' },
   { nombre: 'Ing. María López', rol: 'Jefe Académico', imagen: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop' },
   { nombre: 'Lic. Carlos Mamani', rol: 'Secretario Académico', imagen: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
@@ -66,51 +66,51 @@ const authorities = [
 
 export default function HomePage() {
   const { institucion } = usarInstitucion();
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [activeSection, setActiveSection] = useState('inicio');
+  const [diapositivaActual, setDiapositivaActual] = useState(0);
+  const [seccionActiva, setSeccionActiva] = useState('inicio');
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    const temporizador = setInterval(() => {
+      setDiapositivaActual((anterior) => (anterior + 1) % imagenesHeroe.length);
     }, 5000);
-    return () => clearInterval(timer);
+    return () => clearInterval(temporizador);
   }, []);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        entradas.forEach((entrada) => {
+          if (entrada.isIntersecting) {
+            setSeccionActiva(entrada.target.id);
           }
         });
       },
       { threshold: 0.5, rootMargin: '-20% 0px -30% 0px' }
     );
 
-    const sections = document.querySelectorAll('[data-section]');
-    sections.forEach((section) => observer.observe(section));
+    const secciones = document.querySelectorAll('[data-section]');
+    secciones.forEach((seccion) => observador.observe(seccion));
 
-    return () => observer.disconnect();
+    return () => observador.disconnect();
   }, []);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroImages.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+  const siguienteDiapositiva = () => setDiapositivaActual((anterior) => (anterior + 1) % imagenesHeroe.length);
+  const diapositivaAnterior = () => setDiapositivaActual((anterior) => (anterior - 1 + imagenesHeroe.length) % imagenesHeroe.length);
 
-  const navItems = [
-    { id: 'inicio', label: 'Inicio', icon: <Home className="w-5 h-5" /> },
-    { id: 'nosotros', label: 'Nosotros', icon: <Info className="w-5 h-5" /> },
-    { id: 'valores', label: 'Valores', icon: <HeartHandshake className="w-5 h-5" /> },
-    { id: 'carreras', label: 'Carreras', icon: <GraduationCapIcon className="w-5 h-5" /> },
-    { id: 'metodologia', label: 'Metodología', icon: <Lightbulb className="w-5 h-5" /> },
-    { id: 'autoridades', label: 'Autoridades', icon: <User className="w-5 h-5" /> },
-    { id: 'ubicacion', label: 'Ubicación', icon: <MapPinIcon className="w-5 h-5" /> },
+  const elementosNavegacion = [
+    { id: 'inicio', etiqueta: 'Inicio', icono: <Home className="w-5 h-5" /> },
+    { id: 'nosotros', etiqueta: 'Nosotros', icono: <Info className="w-5 h-5" /> },
+    { id: 'valores', etiqueta: 'Valores', icono: <HeartHandshake className="w-5 h-5" /> },
+    { id: 'carreras', etiqueta: 'Carreras', icono: <GraduationCapIcon className="w-5 h-5" /> },
+    { id: 'metodologia', etiqueta: 'Metodología', icono: <Lightbulb className="w-5 h-5" /> },
+    { id: 'autoridades', etiqueta: 'Autoridades', icono: <User className="w-5 h-5" /> },
+    { id: 'ubicacion', etiqueta: 'Ubicación', icono: <MapPinIcon className="w-5 h-5" /> },
   ];
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+  const desplazarASeccion = (id: string) => {
+    const elemento = document.getElementById(id);
+    if (elemento) {
+      elemento.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -118,20 +118,20 @@ export default function HomePage() {
     <div className="bg-dark-900">
       {/* Navegación lateral */}
       <nav className="fixed right-6 top-1/2 -translate-y-1/2 z-50 hidden lg:flex flex-col gap-3">
-        {navItems.map((item) => (
+        {elementosNavegacion.map((elemento) => (
           <button
-            key={item.id}
-            onClick={() => scrollToSection(item.id)}
+            key={elemento.id}
+            onClick={() => desplazarASeccion(elemento.id)}
             className={`group relative w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 ${
-              activeSection === item.id
+              seccionActiva === elemento.id
                 ? 'bg-primary-500 text-dark-900'
                 : 'bg-dark-700/80 text-gray-400 hover:bg-dark-600 hover:text-primary-400'
             }`}
-            title={item.label}
+            title={elemento.etiqueta}
           >
-            {item.icon}
+            {elemento.icono}
             <span className="absolute right-full mr-3 px-3 py-1.5 bg-dark-700 text-gray-100 text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-              {item.label}
+              {elemento.etiqueta}
             </span>
           </button>
         ))}
@@ -139,23 +139,23 @@ export default function HomePage() {
 
       {/* Carrusel principal */}
       <section id="inicio" data-section className="relative h-[65vh] min-h-[500px] overflow-hidden">
-        {heroImages.map((slide, index) => (
+        {imagenesHeroe.map((imagen, indice) => (
           <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
+            key={indice}
+            className={`absolute inset-0 transition-opacity duration-1000 ${indice === diapositivaActual ? 'opacity-100' : 'opacity-0'}`}
           >
             <div className="absolute inset-0 z-10">
-              <img src={slide.url} alt="" className="w-full h-full object-cover" />
+              <img src={imagen.url} alt="" className="w-full h-full object-cover" />
             </div>
             <div className="absolute inset-0 bg-dark-900/75 z-10" />
 
             <div className="relative z-20 h-full flex items-center justify-center text-center">
               <div className="max-w-4xl px-4 sm:px-6">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-100 mb-4 sm:mb-6 tracking-tight leading-tight">
-                  {slide.titulo}
+                  {imagen.titulo}
                 </h1>
                 <p className="text-lg sm:text-xl md:text-2xl text-primary-400 mb-6 sm:mb-10 max-w-2xl mx-auto">
-                  {slide.subtitulo}
+                  {imagen.subtitulo}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                   <Link href="/admision/pre-registro" className="px-6 sm:px-8 lg:px-10 py-3 sm:py-4 bg-primary-500 text-dark-900 font-bold rounded-lg hover:bg-primary-400 transition-all text-base sm:text-lg">
@@ -170,19 +170,19 @@ export default function HomePage() {
           </div>
         ))}
 
-        <button onClick={prevSlide} className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-dark-700/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-dark-600 transition-all">
+        <button onClick={diapositivaAnterior} className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-dark-700/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-dark-600 transition-all">
           <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-primary-400" />
         </button>
-        <button onClick={nextSlide} className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-dark-700/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-dark-600 transition-all">
+        <button onClick={siguienteDiapositiva} className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-dark-700/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-dark-600 transition-all">
           <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-primary-400" />
         </button>
 
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2">
-          {heroImages.map((_, index) => (
+          {imagenesHeroe.map((_, indice) => (
             <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all ${index === currentSlide ? 'bg-primary-400 w-8' : 'bg-gray-500'}`}
+              key={indice}
+              onClick={() => setDiapositivaActual(indice)}
+              className={`w-3 h-3 rounded-full transition-all ${indice === diapositivaActual ? 'bg-primary-400 w-8' : 'bg-gray-500'}`}
             />
           ))}
         </div>
@@ -236,10 +236,10 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {values.map((value, index) => (
-              <div key={index} className="text-center p-6 bg-dark-700 rounded-xl border border-dark-600 hover:border-primary-500/50 transition-colors">
+            {valores.map((value, indice) => (
+              <div key={indice} className="text-center p-6 bg-dark-700 rounded-xl border border-dark-600 hover:border-primary-500/50 transition-colors">
                 <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  {value.icon}
+                  {value.icono}
                 </div>
                 <h4 className="text-lg font-bold text-gray-100 mb-2">{value.titulo}</h4>
                 <p className="text-gray-400 text-sm">{value.descripcion}</p>
@@ -260,16 +260,16 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {careers.map((career, index) => (
-              <div key={index} className="bg-dark-700 border border-dark-600 rounded-xl p-8 hover:border-primary-500/50 transition-all">
-                <div className={`inline-flex p-4 rounded-xl mb-4 ${career.color}`}>
-                  {career.icon}
+            {carreras.map((carrera, indice) => (
+              <div key={indice} className="bg-dark-700 border border-dark-600 rounded-xl p-8 hover:border-primary-500/50 transition-all">
+                <div className={`inline-flex p-4 rounded-xl mb-4 ${carrera.color}`}>
+                  {carrera.icono}
                 </div>
-                <h3 className="text-2xl font-bold text-gray-100 mb-2">{career.nombre}</h3>
-                <p className="text-primary-400 font-medium mb-4">{career.titulo}</p>
-                <p className="text-gray-400 mb-6">{career.descripcion}</p>
+                <h3 className="text-2xl font-bold text-gray-100 mb-2">{carrera.nombre}</h3>
+                <p className="text-primary-400 font-medium mb-4">{carrera.titulo}</p>
+                <p className="text-gray-400 mb-6">{carrera.descripcion}</p>
                 <div className="flex items-center justify-between pt-4 border-t border-dark-600">
-                  <span className="text-sm text-gray-500">{career.codigo}</span>
+                  <span className="text-sm text-gray-500">{carrera.codigo}</span>
                   <Link href="/carreras" className="text-primary-400 font-medium text-sm hover:text-primary-300 flex items-center gap-1">
                     Ver plan <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -291,13 +291,13 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {methodology.map((item, index) => (
-              <div key={index} className="bg-dark-700 rounded-xl p-6 border border-dark-600 hover:border-primary-500/50 transition-colors">
+            {metodologia.map((elemento, indice) => (
+              <div key={indice} className="bg-dark-700 rounded-xl p-6 border border-dark-600 hover:border-primary-500/50 transition-colors">
                 <div className="w-14 h-14 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center mb-4">
-                  {item.icon}
+                  {elemento.icono}
                 </div>
-                <h4 className="text-lg font-bold text-gray-100 mb-2">{item.titulo}</h4>
-                <p className="text-gray-400 text-sm">{item.descripcion}</p>
+                <h4 className="text-lg font-bold text-gray-100 mb-2">{elemento.titulo}</h4>
+                <p className="text-gray-400 text-sm">{elemento.descripcion}</p>
               </div>
             ))}
           </div>
@@ -345,11 +345,11 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-3xl mx-auto">
-            {authorities.map((auth, index) => (
-              <div key={index} className="text-center">
-                <img src={auth.imagen} alt={auth.nombre} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-2 border-dark-600" />
-                <h4 className="text-lg font-bold text-gray-100">{auth.nombre}</h4>
-                <p className="text-primary-400 font-medium">{auth.rol}</p>
+            {autoridades.map((autoridad, indice) => (
+              <div key={indice} className="text-center">
+                <img src={autoridad.imagen} alt={autoridad.nombre} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-2 border-dark-600" />
+                <h4 className="text-lg font-bold text-gray-100">{autoridad.nombre}</h4>
+                <p className="text-primary-400 font-medium">{autoridad.rol}</p>
               </div>
             ))}
           </div>

@@ -22,40 +22,40 @@ import { EstadoRol } from '../../entities/rol.entity';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorRoles {
-  constructor(private readonly rolesService: ServicioRoles) {}
+  constructor(private readonly servicioRoles: ServicioRoles) {}
 
   @Post()
-  create(@Body() crearRolDto: CrearRolDto) {
-    return this.rolesService.create(crearRolDto);
+  crear(@Body() crearRolDto: CrearRolDto) {
+    return this.servicioRoles.crear(crearRolDto);
   }
 
   @Get()
-  findAll(@Query('pagina') page = 1, @Query('limite') limit = 20, @Query('estado') estado?: EstadoRol) {
-    return this.rolesService.findAll(+page, +limit, estado);
+  obtenerTodos(@Query('pagina') pagina = 1, @Query('limite') limite = 20, @Query('estado') estado?: EstadoRol) {
+    return this.servicioRoles.obtenerTodos(+pagina, +limite, estado);
   }
 
   @Get('activos')
-  findActive() {
-    return this.rolesService.findActive();
+  obtenerActivos() {
+    return this.servicioRoles.obtenerActivos();
   }
 
   @Get('codigo/:codigo')
-  findByCodigo(@Param('codigo') codigo: string) {
-    return this.rolesService.findByCodigo(codigo);
+  buscarPorCodigo(@Param('codigo') codigo: string) {
+    return this.servicioRoles.buscarPorCodigo(codigo);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.rolesService.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioRoles.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() actualizarRolDto: ActualizarRolDto) {
-    return this.rolesService.update(id, actualizarRolDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarRolDto: ActualizarRolDto) {
+    return this.servicioRoles.actualizar(id, actualizarRolDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.rolesService.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioRoles.eliminar(id);
   }
 }

@@ -12,132 +12,132 @@ import { Rol } from '../../entities/rol.entity';
 export class AutenticacionServicio {
   constructor(
     @InjectRepository(Usuario)
-    private userRepository: Repository<Usuario>,
+    private repositorioUsuario: Repository<Usuario>,
     @InjectRepository(Persona)
-    private personRepository: Repository<Persona>,
+    private repositorioPersona: Repository<Persona>,
     @InjectRepository(UsuarioRol)
-    private userRoleRepository: Repository<UsuarioRol>,
+    private repositorioUsuarioRol: Repository<UsuarioRol>,
     @InjectRepository(Rol)
-    private roleRepository: Repository<Rol>,
-    private jwtService: JwtService,
+    private repositorioRol: Repository<Rol>,
+    private servicioJwt: JwtService,
   ) {}
 
-  async register(data: {
+  async registrar(datos: {
     nombreUsuario: string;
     contrasena: string;
     personaId: number;
   }) {
-    const existingUser = await (this.userRepository.findOne as any)({
-      where: { nombreUsuario: data.nombreUsuario } as any,
+    const usuarioExistente = await (this.repositorioUsuario.findOne as any)({
+      where: { nombreUsuario: datos.nombreUsuario } as any,
     });
 
-    if (existingUser) {
+    if (usuarioExistente) {
       throw new ConflictException('El nombre de usuario ya existe');
     }
 
-    const passwordHash = await bcrypt.hash(data.contrasena, 10);
+    const hashContrasena = await bcrypt.hash(datos.contrasena, 10);
 
-    const user = this.userRepository.create({
-      nombreUsuario: data.nombreUsuario,
-      contrasenaHash: passwordHash,
-      personaId: data.personaId,
+    const usuario = this.repositorioUsuario.create({
+      nombreUsuario: datos.nombreUsuario,
+      contrasenaHash: hashContrasena,
+      personaId: datos.personaId,
     } as any);
 
-    await this.userRepository.save(user);
+    await this.repositorioUsuario.save(usuario);
 
-    const defaultRole = await this.roleRepository.findOne({
+    const rolPredeterminado = await this.repositorioRol.findOne({
       where: { codigo: 'estudiante' },
     });
 
-    if (defaultRole) {
-      const userRole = this.userRoleRepository.create({
-        usuarioId: (user as any).id,
-        rolId: defaultRole.id,
+    if (rolPredeterminado) {
+      const usuarioRol = this.repositorioUsuarioRol.create({
+        usuarioId: (usuario as any).id,
+        rolId: rolPredeterminado.id,
       });
-      await this.userRoleRepository.save(userRole);
+      await this.repositorioUsuarioRol.save(usuarioRol);
     }
 
-    return { mensaje: 'Usuario registrado exitosamente', usuarioId: (user as any).id };
+    return { mensaje: 'Usuario registrado exitosamente', usuarioId: (usuario as any).id };
   }
 
-  async login(nombreUsuario: string, contrasena: string) {
-    const user = await (this.userRepository.findOne as any)({
+  async iniciarSesion(nombreUsuario: string, contrasena: string) {
+    const usuario = await (this.repositorioUsuario.findOne as any)({
       where: { nombreUsuario: nombreUsuario },
       relations: ['persona'],
     });
 
-    if (!user) {
+    if (!usuario) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const isPasswordValid = await bcrypt.compare(contrasena, user.contrasenaHash);
+    const contrasenaValida = await bcrypt.compare(contrasena, usuario.contrasenaHash);
 
-    if (!isPasswordValid) {
+    if (!contrasenaValida) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    if (user.estado !== 'activo') {
+    if (usuario.estado !== 'activo') {
       throw new UnauthorizedException('Usuario inactivo o bloqueado');
     }
 
-    user.ultimoAcceso = new Date();
-    await this.userRepository.save(user);
+    usuario.ultimoAcceso = new Date();
+    await this.repositorioUsuario.save(usuario);
 
-    const roles = await this.userRoleRepository.find({
-      where: { usuarioId: user.id },
+    const roles = await this.repositorioUsuarioRol.find({
+      where: { usuarioId: usuario.id },
       relations: ['rol'],
     });
 
-    const payload = {
-      usuarioId: user.id,
-      nombreUsuario: user.nombreUsuario as any,
-      personaId: user.personaId,
-      roles: roles.map((ur) => ur.rol.codigo),
+    const cargaUtil = {
+      usuarioId: usuario.id,
+      nombreUsuario: usuario.nombreUsuario as any,
+      personaId: usuario.personaId,
+      roles: roles.map((usuarioRol) => usuarioRol.rol.codigo),
     };
 
     return {
-      tokenAcceso: this.jwtService.sign(payload),
+      tokenAcceso: this.servicioJwt.sign(cargaUtil),
       usuario: {
-        id: user.id,
-        nombreUsuario: user.nombreUsuario as any,
-        personaId: user.personaId,
-        persona: user.persona,
-        roles: roles.map((ur) => ur.rol),
+        id: usuario.id,
+        nombreUsuario: usuario.nombreUsuario as any,
+        personaId: usuario.personaId,
+        persona: usuario.persona,
+        roles: roles.map((usuarioRol) => usuarioRol.rol),
       },
     };
   }
 
-  async getProfile(userId: number) {
-    const user = await (this.userRepository.findOne as any)({
-      where: { id: userId },
+  async obtenerPerfil(usuarioId: number) {
+    const usuario = await (this.repositorioUsuario.findOne as any)({
+      where: { id: usuarioId },
       relations: ['persona'],
     });
 
-    if (!user) {
+    if (!usuario) {
       throw new UnauthorizedException('Usuario no encontrado');
     }
 
-    const roles = await this.userRoleRepository.find({
-      where: { usuarioId: user.id },
+    const roles = await this.repositorioUsuarioRol.find({
+      where: { usuarioId: usuario.id },
       relations: ['rol'],
     });
 
     return {
-      id: user.id,
-      nombreUsuario: user.nombreUsuario as any,
-      personaId: user.personaId,
-      persona: user.persona,
-      roles: roles.map((ur) => ur.rol),
+      id: usuario.id,
+      nombreUsuario: usuario.nombreUsuario as any,
+      personaId: usuario.personaId,
+      persona: usuario.persona,
+      roles: roles.map((usuarioRol) => usuarioRol.rol),
     };
   }
 
-  async validateUser(userId: number): Promise<Usuario> {
-    const user = await (this.userRepository.findOne as any)({
-      where: { id: userId },
+  async validarUsuario(usuarioId: number): Promise<Usuario> {
+    const usuario = await (this.repositorioUsuario.findOne as any)({
+      where: { id: usuarioId },
     });
-    if (!user || user.estado !== 'activo') {
+    if (!usuario || usuario.estado !== 'activo') {
       throw new UnauthorizedException('Usuario no válido');
     }
-    return user;
+    return usuario;
   }
 }

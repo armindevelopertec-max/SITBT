@@ -26,43 +26,43 @@ export class ControladorCarreras {
   @Post()
   @UseGuards(GuardaJwt)
   crear(@Body() crearCarreraDto: CrearCarreraDto) {
-    return this.servicioCarreras.create(crearCarreraDto);
+    return this.servicioCarreras.crear(crearCarreraDto);
   }
 
   @Get()
-  listar(@Query('pagina') page = 1, @Query('limite') limit = 20, @Query('estado') estado?: EstadoCarrera) {
-    return this.servicioCarreras.findAll(+page, +limit, estado);
+  listar(@Query('pagina') pagina = 1, @Query('limite') limite = 20, @Query('estado') estado?: EstadoCarrera) {
+    return this.servicioCarreras.obtenerTodos(+pagina, +limite, estado);
   }
 
   @Get('activos')
   listarActivas() {
-    return this.servicioCarreras.findActive();
+    return this.servicioCarreras.obtenerActivos();
   }
 
   @Get('area/:area')
   buscarPorArea(@Param('area') area: string) {
-    return this.servicioCarreras.findByArea(area);
+    return this.servicioCarreras.buscarPorArea(area);
   }
 
   @Get('codigo/:codigo')
-  buscarPorCodigo(@Param('codigo') code: string) {
-    return this.servicioCarreras.findByCode(code);
+  buscarPorCodigo(@Param('codigo') codigo: string) {
+    return this.servicioCarreras.buscarPorCodigo(codigo);
   }
 
   @Get(':id')
   obtenerUna(@Param('id', ParseIntPipe) id: number) {
-    return this.servicioCarreras.findOne(id);
+    return this.servicioCarreras.obtenerUno(id);
   }
 
   @Patch(':id')
   @UseGuards(GuardaJwt)
   actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarCarreraDto: ActualizarCarreraDto) {
-    return this.servicioCarreras.update(id, actualizarCarreraDto);
+    return this.servicioCarreras.actualizar(id, actualizarCarreraDto);
   }
 
   @Delete(':id')
   @UseGuards(GuardaJwt)
   eliminar(@Param('id', ParseIntPipe) id: number) {
-    return this.servicioCarreras.remove(id);
+    return this.servicioCarreras.eliminar(id);
   }
 }

@@ -1,24 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './app.module';
+import { ModuloAplicacion } from './app.module';
 import { FiltroExcepcionesEspanol } from './common/filtro-excepciones-espanol';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+async function iniciar() {
+  const aplicacion = await NestFactory.create(ModuloAplicacion);
 
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const urlFrontend = process.env.FRONTEND_URL || 'http://localhost:3000';
 
-  app.enableCors({
-    origin: [frontendUrl, 'http://localhost:3000', 'http://localhost:3001'],
+  aplicacion.enableCors({
+    origin: [urlFrontend, 'http://localhost:3000', 'http://localhost:3001'],
     credentials: true,
   });
 
-  app.setGlobalPrefix('api');
+  aplicacion.setGlobalPrefix('api');
 
-  app.useGlobalFilters(new FiltroExcepcionesEspanol());
+  aplicacion.useGlobalFilters(new FiltroExcepcionesEspanol());
 
-  app.useGlobalPipes(
+  aplicacion.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
@@ -37,19 +37,19 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder()
+  const configuracion = new DocumentBuilder()
     .setTitle('API del SITBT')
     .setDescription('Sistema Académico Instituto Tecnológico Boliviana de Tecnología')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/documentacion', app, document);
+  const documento = SwaggerModule.createDocument(aplicacion, configuracion);
+  SwaggerModule.setup('api/documentacion', aplicacion, documento);
 
-  const port = process.env.PORT || 4000;
-  await app.listen(port);
-  console.log(`🚀 Servidor ejecutándose en http://localhost:${port}`);
-  console.log(`📚 Documentación de la API en http://localhost:${port}/api/documentacion`);
+  const puerto = process.env.PORT || 4000;
+  await aplicacion.listen(puerto);
+  console.log(`🚀 Servidor ejecutándose en http://localhost:${puerto}`);
+  console.log(`📚 Documentación de la API en http://localhost:${puerto}/api/documentacion`);
 }
-bootstrap();
+iniciar();

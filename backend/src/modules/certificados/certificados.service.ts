@@ -9,93 +9,93 @@ import { ActualizarCertificadoDto } from './dto/actualizar-certificado.dto';
 export class ServicioCertificados {
   constructor(
     @InjectRepository(Certificado)
-    private certificadoRepository: Repository<Certificado>,
+    private repositorioCertificado: Repository<Certificado>,
   ) {}
 
-  async create(createDto: CrearCertificadoDto): Promise<Certificado> {
-    const certificate = this.certificadoRepository.create(createDto);
-    return this.certificadoRepository.save(certificate);
+  async crear(dtoCreacion: CrearCertificadoDto): Promise<Certificado> {
+    const certificado = this.repositorioCertificado.create(dtoCreacion);
+    return this.repositorioCertificado.save(certificado);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
     gestion?: string,
-    type?: string,
-    studentId?: number,
+    tipo?: string,
+    estudianteId?: number,
   ): Promise<{ datos: Certificado[]; total: number; pagina: number; limite: number }> {
-    const query = this.certificadoRepository
-      .createQueryBuilder('certificate')
-      .leftJoinAndSelect('certificate.estudiante', 'student')
-      .leftJoinAndSelect('student.persona', 'person')
-      .leftJoinAndSelect('certificate.emisor', 'issuer');
+    const consulta = this.repositorioCertificado
+      .createQueryBuilder('certificado')
+      .leftJoinAndSelect('certificado.estudiante', 'estudiante')
+      .leftJoinAndSelect('estudiante.persona', 'persona')
+      .leftJoinAndSelect('certificado.emisor', 'emisor');
 
     if (gestion) {
-      query.andWhere('EXTRACT(YEAR FROM certificate.fecha) = :gestion', { gestion });
+      consulta.andWhere('EXTRACT(YEAR FROM certificado.fecha) = :gestion', { gestion });
     }
 
-    if (type) {
-      query.andWhere('certificate.tipo = :tipo', { tipo: type });
+    if (tipo) {
+      consulta.andWhere('certificado.tipo = :tipo', { tipo });
     }
 
-    if (studentId) {
-      query.andWhere('certificate.estudianteId = :studentId', { studentId });
+    if (estudianteId) {
+      consulta.andWhere('certificado.estudianteId = :estudianteId', { estudianteId });
     }
 
-    const [data, total] = await query
-      .orderBy('certificate.fecha', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('certificado.fecha', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Certificado> {
-    const certificate = await this.certificadoRepository.findOne({
+  async obtenerUno(id: number): Promise<Certificado> {
+    const certificado = await this.repositorioCertificado.findOne({
       where: { id },
       relations: ['estudiante', 'estudiante.persona', 'emisor'],
     });
-    if (!certificate) {
+    if (!certificado) {
       throw new NotFoundException(`Certificado con ID ${id} no encontrado`);
     }
-    return certificate;
+    return certificado;
   }
 
-  async findByCode(code: string): Promise<Certificado> {
-    const certificate = await this.certificadoRepository.findOne({
-      where: { codigo: code },
+  async buscarPorCodigo(codigo: string): Promise<Certificado> {
+    const certificado = await this.repositorioCertificado.findOne({
+      where: { codigo },
       relations: ['estudiante', 'estudiante.persona', 'emisor'],
     });
-    if (!certificate) {
-      throw new NotFoundException(`Certificado con código ${code} no encontrado`);
+    if (!certificado) {
+      throw new NotFoundException(`Certificado con código ${codigo} no encontrado`);
     }
-    return certificate;
+    return certificado;
   }
 
-  async update(id: number, updateDto: ActualizarCertificadoDto): Promise<Certificado> {
-    const certificate = await this.findOne(id);
-    Object.assign(certificate, updateDto);
-    return this.certificadoRepository.save(certificate);
+  async actualizar(id: number, dtoActualizacion: ActualizarCertificadoDto): Promise<Certificado> {
+    const certificado = await this.obtenerUno(id);
+    Object.assign(certificado, dtoActualizacion);
+    return this.repositorioCertificado.save(certificado);
   }
 
-  async remove(id: number): Promise<void> {
-    const certificate = await this.findOne(id);
-    await this.certificadoRepository.remove(certificate);
+  async eliminar(id: number): Promise<void> {
+    const certificado = await this.obtenerUno(id);
+    await this.repositorioCertificado.remove(certificado);
   }
 
-  async findByStudent(studentId: number): Promise<Certificado[]> {
-    return this.certificadoRepository.find({
-      where: { estudianteId: studentId },
+  async buscarPorEstudiante(estudianteId: number): Promise<Certificado[]> {
+    return this.repositorioCertificado.find({
+      where: { estudianteId },
       relations: ['emisor'],
       order: { fecha: 'DESC' },
     });
   }
 
-  async verifyCertificate(code: string): Promise<{ valido: boolean; certificado?: Certificado }> {
-    const certificate = await this.findByCode(code);
-    if (certificate) {
-      return { valido: true, certificado: certificate };
+  async verificarCertificado(codigo: string): Promise<{ valido: boolean; certificado?: Certificado }> {
+    const certificado = await this.buscarPorCodigo(codigo);
+    if (certificado) {
+      return { valido: true, certificado };
     }
     return { valido: false };
   }

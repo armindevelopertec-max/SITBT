@@ -9,93 +9,93 @@ import { ActualizarConsentimientoDto } from './dto/actualizar-consentimiento.dto
 export class ServicioConsentimiento {
   constructor(
     @InjectRepository(RegistroConsentimiento)
-    private consentimientoRepository: Repository<RegistroConsentimiento>,
+    private repositorioConsentimiento: Repository<RegistroConsentimiento>,
   ) {}
 
-  async create(createDto: CrearConsentimientoDto): Promise<RegistroConsentimiento> {
-    const consent = this.consentimientoRepository.create({
-      ...createDto,
+  async crear(crearDto: CrearConsentimientoDto): Promise<RegistroConsentimiento> {
+    const consentimiento = this.repositorioConsentimiento.create({
+      ...crearDto,
       fechaConsentimiento: new Date(),
     } as Partial<RegistroConsentimiento>);
-    return this.consentimientoRepository.save(consent);
+    return this.repositorioConsentimiento.save(consentimiento);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
     estudianteId?: number,
   ): Promise<{ datos: RegistroConsentimiento[]; total: number; pagina: number; limite: number }> {
-    const query = this.consentimientoRepository
-      .createQueryBuilder('consent')
-      .leftJoinAndSelect('consent.estudiante', 'estudiante')
-      .leftJoinAndSelect('estudiante.persona', 'person');
+    const consulta = this.repositorioConsentimiento
+      .createQueryBuilder('consentimiento')
+      .leftJoinAndSelect('consentimiento.estudiante', 'estudiante')
+      .leftJoinAndSelect('estudiante.persona', 'persona');
 
     if (estudianteId) {
-      query.andWhere('consent.estudianteId = :estudianteId', { estudianteId });
+      consulta.andWhere('consentimiento.estudianteId = :estudianteId', { estudianteId });
     }
 
-    const [data, total] = await query
-      .orderBy('consent.fechaConsentimiento', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('consentimiento.fechaConsentimiento', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: string): Promise<RegistroConsentimiento> {
-    const consent = await this.consentimientoRepository.findOne({
+  async obtenerUno(id: string): Promise<RegistroConsentimiento> {
+    const consentimiento = await this.repositorioConsentimiento.findOne({
       where: { id },
       relations: ['estudiante', 'estudiante.persona'],
     });
-    if (!consent) {
+    if (!consentimiento) {
       throw new NotFoundException(`Consent record with ID ${id} no encontrado`);
     }
-    return consent;
+    return consentimiento;
   }
 
-  async findByStudent(estudianteId: number): Promise<RegistroConsentimiento[]> {
-    return this.consentimientoRepository.find({
+  async buscarPorEstudiante(estudianteId: number): Promise<RegistroConsentimiento[]> {
+    return this.repositorioConsentimiento.find({
       where: { estudianteId: estudianteId },
       order: { fechaConsentimiento: 'DESC' },
     });
   }
 
-  async getLatestConsent(estudianteId: number): Promise<RegistroConsentimiento | null> {
-    return this.consentimientoRepository.findOne({
+  async obtenerUltimoConsentimiento(estudianteId: number): Promise<RegistroConsentimiento | null> {
+    return this.repositorioConsentimiento.findOne({
       where: { estudianteId: estudianteId },
       order: { fechaConsentimiento: 'DESC' },
     });
   }
 
-  async update(id: string, updateDto: ActualizarConsentimientoDto): Promise<RegistroConsentimiento> {
-    const consent = await this.findOne(id);
-    Object.assign(consent, updateDto);
-    return this.consentimientoRepository.save(consent);
+  async actualizar(id: string, actualizarDto: ActualizarConsentimientoDto): Promise<RegistroConsentimiento> {
+    const consentimiento = await this.obtenerUno(id);
+    Object.assign(consentimiento, actualizarDto);
+    return this.repositorioConsentimiento.save(consentimiento);
   }
 
-  async exerciseRight(id: string, derecho: TipoConsentimiento, registradoPor?: number): Promise<RegistroConsentimiento> {
-    const consent = await this.findOne(id);
-    consent.derechoEjercido = derecho;
-    consent.derechoFecha = new Date();
+  async ejercerDerecho(id: string, derecho: TipoConsentimiento, registradoPor?: number): Promise<RegistroConsentimiento> {
+    const consentimiento = await this.obtenerUno(id);
+    consentimiento.derechoEjercido = derecho;
+    consentimiento.derechoFecha = new Date();
     if (registradoPor) {
-      consent.registradoPor = registradoPor;
+      consentimiento.registradoPor = registradoPor;
     }
-    return this.consentimientoRepository.save(consent);
+    return this.repositorioConsentimiento.save(consentimiento);
   }
 
-  async hasValidConsent(estudianteId: number, versionPolitica: string): Promise<boolean> {
-    const consent = await this.consentimientoRepository.findOne({
+  async tieneConsentimientoValido(estudianteId: number, versionPolitica: string): Promise<boolean> {
+    const consentimiento = await this.repositorioConsentimiento.findOne({
       where: {
         estudianteId: estudianteId,
         versionPolitica,
       },
     });
-    return !!consent;
+    return !!consentimiento;
   }
 
-  async remove(id: string): Promise<void> {
-    const consent = await this.findOne(id);
-    await this.consentimientoRepository.remove(consent);
+  async eliminar(id: string): Promise<void> {
+    const consentimiento = await this.obtenerUno(id);
+    await this.repositorioConsentimiento.remove(consentimiento);
   }
 }

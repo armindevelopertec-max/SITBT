@@ -18,36 +18,36 @@ import { CalcularMateriasDto, ResultadoCalcularMaterias, MateriaAInscribir } fro
 import { CrearInscripcionLoteDto, ResultadoCrearInscripcion } from './dto/create-enrollment-batch.dto';
 
 @Injectable()
-export class PreinscripcionService {
+export class ServicioPreinscripcion {
   constructor(
     @InjectRepository(Estudiante)
-    private estudianteRepository: Repository<Estudiante>,
+    private repositorioEstudiante: Repository<Estudiante>,
     @InjectRepository(Pago)
-    private paymentRepository: Repository<Pago>,
+    private repositorioPago: Repository<Pago>,
     @InjectRepository(ConceptoPago)
-    private conceptRepository: Repository<ConceptoPago>,
+    private repositorioConcepto: Repository<ConceptoPago>,
     @InjectRepository(Inscripcion)
-    private inscripcionRepository: Repository<Inscripcion>,
+    private repositorioInscripcion: Repository<Inscripcion>,
     @InjectRepository(MateriaPlan)
-    private materiaPlanRepository: Repository<MateriaPlan>,
+    private repositorioMateriaPlan: Repository<MateriaPlan>,
     @InjectRepository(Materia)
-    private materiaRepository: Repository<Materia>,
+    private repositorioMateria: Repository<Materia>,
     @InjectRepository(Grupo)
-    private groupRepository: Repository<Grupo>,
+    private repositorioGrupo: Repository<Grupo>,
     @InjectRepository(Turno)
-    private shiftRepository: Repository<Turno>,
+    private repositorioTurno: Repository<Turno>,
     @InjectRepository(Periodo)
-    private periodoRepository: Repository<Periodo>,
+    private repositorioPeriodo: Repository<Periodo>,
     @InjectRepository(Gestion)
-    private gestionRepository: Repository<Gestion>,
+    private repositorioGestion: Repository<Gestion>,
     @InjectRepository(Calificacion)
-    private calificacionRepository: Repository<Calificacion>,
+    private repositorioCalificacion: Repository<Calificacion>,
     @InjectRepository(DocumentoEmitido)
-    private documentRepository: Repository<DocumentoEmitido>,
+    private repositorioDocumento: Repository<DocumentoEmitido>,
   ) {}
 
-  async verifyPayments(dto: VerificarPagosDto): Promise<ResultadoVerificarPagos> {
-    const estudiante = await this.estudianteRepository.findOne({
+  async verificarPagos(dto: VerificarPagosDto): Promise<ResultadoVerificarPagos> {
+    const estudiante = await this.repositorioEstudiante.findOne({
       where: { id: dto.estudianteId },
       relations: ['persona'],
     });
@@ -56,7 +56,7 @@ export class PreinscripcionService {
       throw new NotFoundException('Estudiante no encontrado');
     }
 
-    const gestion = await this.gestionRepository.findOne({
+    const gestion = await this.repositorioGestion.findOne({
       where: { anio: dto.gestion },
       relations: ['periodos'],
     });
@@ -65,15 +65,15 @@ export class PreinscripcionService {
       throw new NotFoundException(`Gestión ${dto.gestion} no encontrada`);
     }
 
-    const periodoNumero = dto.periodo || this.getCurrentPeriodoNumero(gestion);
-    const periodo = gestion.periodos?.find(p => p.numero === periodoNumero);
+    const periodoNumero = dto.periodo || this.obtenerNumeroPeriodoActual(gestion);
+    const periodo = gestion.periodos?.find((periodoEncontrado) => periodoEncontrado.numero === periodoNumero);
 
     if (!periodo) {
       throw new NotFoundException(`Período ${periodoNumero} no encontrado`);
     }
 
     const esEstudianteNuevo = estudiante.gestionAdmision === dto.gestion;
-    const payments = await this.paymentRepository.find({
+    const pagos = await this.repositorioPago.find({
       where: {
         estudianteId: dto.estudianteId,
         gestion: dto.gestion,
@@ -82,48 +82,48 @@ export class PreinscripcionService {
       relations: ['concepto'],
     });
 
-    const concepts = await this.conceptRepository.find({
+    const conceptos = await this.repositorioConcepto.find({
       where: { estado: 'activo' as any },
     });
 
     const pagosRealizados: ResultadoVerificarPagos['pagosRealizados'] = [];
     const pagosFaltantes: ResultadoVerificarPagos['pagosFaltantes'] = [];
 
-    for (const payment of payments) {
+    for (const pago of pagos) {
       pagosRealizados.push({
-        tipo: payment.concepto?.tipo || 'unknown',
-        concepto: payment.concepto?.nombre || 'Desconocido',
-        monto: Number(payment.monto),
-        fechaPago: payment.fechaPago,
+        tipo: pago.concepto?.tipo || 'unknown',
+        concepto: pago.concepto?.nombre || 'Desconocido',
+        monto: Number(pago.monto),
+        fechaPago: pago.fechaPago,
       });
     }
 
     if (esEstudianteNuevo) {
-      const hasUnico = payments.some(p => p.concepto?.tipo === TipoConceptoPago.UNICO);
-      if (!hasUnico) {
-        const unicoConcept = concepts.find(c => c.tipo === TipoConceptoPago.UNICO);
-        if (unicoConcept) {
+      const tieneUnico = pagos.some(pago => pago.concepto?.tipo === TipoConceptoPago.UNICO);
+      if (!tieneUnico) {
+        const conceptoUnico = conceptos.find(concepto => concepto.tipo === TipoConceptoPago.UNICO);
+        if (conceptoUnico) {
           pagosFaltantes.push({
             tipo: TipoConceptoPago.UNICO,
-            concepto: unicoConcept.nombre,
-            monto: Number(unicoConcept.montoPredeterminado),
+            concepto: conceptoUnico.nombre,
+            monto: Number(conceptoUnico.montoPredeterminado),
           });
         }
       }
     }
 
-    const hasSemestral = payments.some(p =>
-      p.concepto?.tipo === TipoConceptoPago.SEMESTRAL &&
-      p.concepto?.nombre?.toLowerCase().includes(periodoNumero.toLowerCase())
+    const tieneSemestral = pagos.some(pago =>
+      pago.concepto?.tipo === TipoConceptoPago.SEMESTRAL &&
+      pago.concepto?.nombre?.toLowerCase().includes(periodoNumero.toLowerCase())
     );
 
-    if (!hasSemestral) {
-      const semestralConcept = concepts.find(c => c.tipo === TipoConceptoPago.SEMESTRAL);
-      if (semestralConcept) {
+    if (!tieneSemestral) {
+      const conceptoSemestral = conceptos.find(concepto => concepto.tipo === TipoConceptoPago.SEMESTRAL);
+      if (conceptoSemestral) {
         pagosFaltantes.push({
           tipo: TipoConceptoPago.SEMESTRAL,
-          concepto: `${semestralConcept.nombre} - ${periodoNumero}/${dto.gestion}`,
-          monto: Number(semestralConcept.montoPredeterminado),
+          concepto: `${conceptoSemestral.nombre} - ${periodoNumero}/${dto.gestion}`,
+          monto: Number(conceptoSemestral.montoPredeterminado),
         });
       }
     }
@@ -136,8 +136,8 @@ export class PreinscripcionService {
     };
   }
 
-  async calculateSubjects(dto: CalcularMateriasDto): Promise<ResultadoCalcularMaterias> {
-    const estudiante = await this.estudianteRepository.findOne({
+  async calcularMaterias(dto: CalcularMateriasDto): Promise<ResultadoCalcularMaterias> {
+    const estudiante = await this.repositorioEstudiante.findOne({
       where: { id: dto.estudianteId },
       relations: ['plan_estudio', 'carrera'],
     });
@@ -146,7 +146,7 @@ export class PreinscripcionService {
       throw new NotFoundException('Estudiante no encontrado');
     }
 
-    const gestion = await this.gestionRepository.findOne({
+    const gestion = await this.repositorioGestion.findOne({
       where: { anio: dto.gestion },
       relations: ['periodos'],
     });
@@ -155,8 +155,8 @@ export class PreinscripcionService {
       throw new NotFoundException(`Gestión ${dto.gestion} no encontrada`);
     }
 
-    const periodoNumero = dto.periodo || this.getCurrentPeriodoNumero(gestion);
-    const periodo = gestion.periodos?.find(p => p.numero === periodoNumero);
+    const periodoNumero = dto.periodo || this.obtenerNumeroPeriodoActual(gestion);
+    const periodo = gestion.periodos?.find((periodoEncontrado) => periodoEncontrado.numero === periodoNumero);
 
     if (!periodo) {
       throw new NotFoundException(`Período ${periodoNumero} no encontrado`);
@@ -165,31 +165,31 @@ export class PreinscripcionService {
     const esEstudianteNuevo = estudiante.gestionAdmision === dto.gestion;
 
     if (esEstudianteNuevo) {
-      return this.calculateNewStudentSubjects(estudiante, dto, periodoNumero);
+      return this.calcularMateriasEstudianteNuevo(estudiante, dto, periodoNumero);
     }
 
-    return this.calculateOldStudentSubjects(estudiante, dto, gestion, periodoNumero);
+    return this.calcularMateriasEstudianteAntiguo(estudiante, dto, gestion, periodoNumero);
   }
 
-  private async calculateNewStudentSubjects(
+  private async calcularMateriasEstudianteNuevo(
     estudiante: Estudiante,
     dto: CalcularMateriasDto,
     periodoNumero: string,
   ): Promise<ResultadoCalcularMaterias> {
-    const materiasPlan = await this.materiaPlanRepository.find({
+    const materiasPlan = await this.repositorioMateriaPlan.find({
       where: { planEstudioId: estudiante.planEstudioId },
       relations: ['materia', 'prerrequisito'],
       order: { semestre: 'ASC' },
     });
 
-    const firstSemesterMaterias = materiasPlan.filter(m => m.semestre === 1);
+    const materiasPrimerSemestre = materiasPlan.filter(materiaPlan => materiaPlan.semestre === 1);
 
-    const materias: MateriaAInscribir[] = firstSemesterMaterias.map(m => ({
-      materiaPlanId: m.id,
-      materiaId: m.materiaId,
-      materiaCodigo: m.materia?.codigo || '',
-      materiaNombre: m.materia?.nombre || '',
-      semestre: m.semestre,
+    const materias: MateriaAInscribir[] = materiasPrimerSemestre.map(materiaPlan => ({
+      materiaPlanId: materiaPlan.id,
+      materiaId: materiaPlan.materiaId,
+      materiaCodigo: materiaPlan.materia?.codigo || '',
+      materiaNombre: materiaPlan.materia?.nombre || '',
+      semestre: materiaPlan.semestre,
       esReprobada: false,
       prerrequisitoBloqueado: false,
     }));
@@ -205,21 +205,21 @@ export class PreinscripcionService {
     };
   }
 
-  private async calculateOldStudentSubjects(
+  private async calcularMateriasEstudianteAntiguo(
     estudiante: Estudiante,
     dto: CalcularMateriasDto,
     gestion: Gestion,
     periodoNumero: string,
   ): Promise<ResultadoCalcularMaterias> {
-    const previousPeriodoNumero = periodoNumero === 'II' ? 'I' : null;
-    const gestionAnterior = previousPeriodoNumero ? gestion.anio : String(parseInt(gestion.anio) - 1);
+    const numeroPeriodoAnterior = periodoNumero === 'II' ? 'I' : null;
+    const gestionAnterior = numeroPeriodoAnterior ? gestion.anio : String(parseInt(gestion.anio) - 1);
 
     const materiasReprobadas: ResultadoCalcularMaterias['materiasReprobadas'] = [];
     let totalReprobadas = 0;
     let semestreActual = 1;
 
-    if (previousPeriodoNumero) {
-      const previousEnrollments = await this.inscripcionRepository.find({
+    if (numeroPeriodoAnterior) {
+      const inscripcionesAnteriores = await this.repositorioInscripcion.find({
         where: {
           estudianteId: estudiante.id,
           gestion: gestionAnterior,
@@ -227,7 +227,7 @@ export class PreinscripcionService {
         relations: ['materia', 'materiaPlan'],
       });
 
-      for (const inscripcion of previousEnrollments) {
+      for (const inscripcion of inscripcionesAnteriores) {
         if (inscripcion.estado === EstadoInscripcion.REPROBADO) {
           materiasReprobadas.push({
             materiaId: inscripcion.materiaId,
@@ -243,7 +243,7 @@ export class PreinscripcionService {
       }
     }
 
-    const materiasPlan = await this.materiaPlanRepository.find({
+    const materiasPlan = await this.repositorioMateriaPlan.find({
       where: { planEstudioId: estudiante.planEstudioId },
       relations: ['materia', 'prerrequisito'],
       order: { semestre: 'ASC' },
@@ -252,20 +252,20 @@ export class PreinscripcionService {
     const materias: MateriaAInscribir[] = [];
     const materiasBloqueadas: ResultadoCalcularMaterias['materiasBloqueadas'] = [];
 
-    const failedSubjectIds = materiasReprobadas.map(f => f.materiaId);
+    const idsMateriasReprobadas = materiasReprobadas.map(reprobada => reprobada.materiaId);
 
     if (totalReprobadas >= 3) {
-      for (const failed of materiasReprobadas) {
-        const materiaPlan = materiasPlan.find(m => m.materiaId === failed.materiaId);
-        if (materiaPlan) {
+      for (const reprobada of materiasReprobadas) {
+        const materiaDelPlan = materiasPlan.find(materiaPlan => materiaPlan.materiaId === reprobada.materiaId);
+        if (materiaDelPlan) {
           materias.push({
-            materiaPlanId: materiaPlan.id,
-            materiaId: failed.materiaId,
-            materiaCodigo: materiaPlan.materia?.codigo || '',
-            materiaNombre: materiaPlan.materia?.nombre || '',
-            semestre: materiaPlan.semestre,
+            materiaPlanId: materiaDelPlan.id,
+            materiaId: reprobada.materiaId,
+            materiaCodigo: materiaDelPlan.materia?.codigo || '',
+            materiaNombre: materiaDelPlan.materia?.nombre || '',
+            semestre: materiaDelPlan.semestre,
             esReprobada: true,
-            notaAnteriorReprobada: failed.nota,
+            notaAnteriorReprobada: reprobada.nota,
             prerrequisitoBloqueado: false,
           });
         }
@@ -282,34 +282,34 @@ export class PreinscripcionService {
       };
     }
 
-    const approvedSubjectIds: number[] = [];
-    if (previousPeriodoNumero) {
-      const previousEnrollments = await this.inscripcionRepository.find({
+    const idsMateriasAprobadas: number[] = [];
+    if (numeroPeriodoAnterior) {
+      const inscripcionesAnteriores = await this.repositorioInscripcion.find({
         where: {
           estudianteId: estudiante.id,
           gestion: gestionAnterior,
         },
       });
 
-      for (const inscripcion of previousEnrollments) {
+      for (const inscripcion of inscripcionesAnteriores) {
         if (inscripcion.estado === EstadoInscripcion.APROBADO) {
-          approvedSubjectIds.push(inscripcion.materiaId);
+          idsMateriasAprobadas.push(inscripcion.materiaId);
         }
       }
     }
 
-    const semestresCursados = await this.inscripcionRepository
+    const semestresCursados = await this.repositorioInscripcion
       .createQueryBuilder('inscripcion')
-      .select('DISTINCT inscripcion.semestre', 'semester')
+      .select('DISTINCT inscripcion.semestre', 'semestre')
       .where('inscripcion.estudianteId = :estudianteId', { estudianteId: estudiante.id })
       .getRawOne();
 
-    const semesterToEnroll = materiasReprobadas.length > 0 ? semestreActual - 1 : semestreActual;
+    const semestreAInscribir = materiasReprobadas.length > 0 ? semestreActual - 1 : semestreActual;
 
-    const materiasSemestre = materiasPlan.filter(m => m.semestre === semesterToEnroll);
+    const materiasSemestre = materiasPlan.filter(materiaPlan => materiaPlan.semestre === semestreAInscribir);
 
     for (const materia of materiasSemestre) {
-      if (failedSubjectIds.includes(materia.materiaId)) {
+      if (idsMateriasReprobadas.includes(materia.materiaId)) {
         continue;
       }
 
@@ -317,31 +317,31 @@ export class PreinscripcionService {
       let nombrePrerrequisito: string | undefined;
 
       if (materia.prerrequisitoId) {
-        const prerequisiteApproved = approvedSubjectIds.includes(materia.prerrequisitoId);
-        const prerequisiteFailed = failedSubjectIds.includes(materia.prerrequisitoId);
+        const prerrequisitoAprobado = idsMateriasAprobadas.includes(materia.prerrequisitoId);
+        const prerrequisitoReprobado = idsMateriasReprobadas.includes(materia.prerrequisitoId);
 
-        if (!prerequisiteApproved && !prerequisiteFailed) {
-          const prerequisite = await this.materiaRepository.findOne({
+        if (!prerrequisitoAprobado && !prerrequisitoReprobado) {
+          const prerrequisito = await this.repositorioMateria.findOne({
             where: { id: materia.prerrequisitoId },
           });
           prerrequisitoBloqueado = true;
-          nombrePrerrequisito = prerequisite?.nombre || 'Prerrequisito';
+          nombrePrerrequisito = prerrequisito?.nombre || 'Prerrequisito';
 
           materiasBloqueadas.push({
             materiaId: materia.materiaId,
             materiaNombre: materia.materia?.nombre || '',
-            razon: `Prerrequisito no aprobado: ${prerequisite?.nombre}`,
+            razon: `Prerrequisito no aprobado: ${prerrequisito?.nombre}`,
           });
 
           continue;
         }
 
-        if (prerequisiteFailed) {
-          const prerequisite = await this.materiaRepository.findOne({
+        if (prerrequisitoReprobado) {
+          const prerrequisito = await this.repositorioMateria.findOne({
             where: { id: materia.prerrequisitoId },
           });
           prerrequisitoBloqueado = true;
-          nombrePrerrequisito = prerequisite?.nombre || 'Prerrequisito';
+          nombrePrerrequisito = prerrequisito?.nombre || 'Prerrequisito';
         }
       }
 
@@ -357,27 +357,27 @@ export class PreinscripcionService {
       });
     }
 
-    for (const failed of materiasReprobadas) {
-      const materiaPlan = materiasPlan.find(m => m.materiaId === failed.materiaId);
-      if (materiaPlan) {
+    for (const reprobada of materiasReprobadas) {
+      const materiaDelPlan = materiasPlan.find(materiaPlan => materiaPlan.materiaId === reprobada.materiaId);
+      if (materiaDelPlan) {
         materias.push({
-          materiaPlanId: materiaPlan.id,
-          materiaId: failed.materiaId,
-          materiaCodigo: materiaPlan.materia?.codigo || '',
-          materiaNombre: materiaPlan.materia?.nombre || '',
-          semestre: materiaPlan.semestre,
+          materiaPlanId: materiaDelPlan.id,
+          materiaId: reprobada.materiaId,
+          materiaCodigo: materiaDelPlan.materia?.codigo || '',
+          materiaNombre: materiaDelPlan.materia?.nombre || '',
+          semestre: materiaDelPlan.semestre,
           esReprobada: true,
-          notaAnteriorReprobada: failed.nota,
+          notaAnteriorReprobada: reprobada.nota,
           prerrequisitoBloqueado: false,
         });
       }
     }
 
-    materias.sort((a, b) => a.semestre - b.semestre);
+    materias.sort((materiaA, materiaB) => materiaA.semestre - materiaB.semestre);
 
     return {
       puedeInscribir: true,
-      semestreActual: semesterToEnroll,
+      semestreActual: semestreAInscribir,
       materias,
       materiasReprobadas,
       materiasBloqueadas,
@@ -388,8 +388,8 @@ export class PreinscripcionService {
     };
   }
 
-  async createEnrollmentBatch(dto: CrearInscripcionLoteDto): Promise<ResultadoCrearInscripcion> {
-    const estudiante = await this.estudianteRepository.findOne({
+  async crearInscripcionLote(dto: CrearInscripcionLoteDto): Promise<ResultadoCrearInscripcion> {
+    const estudiante = await this.repositorioEstudiante.findOne({
       where: { id: dto.estudianteId },
       relations: ['persona', 'carrera', 'plan_estudio'],
     });
@@ -398,7 +398,7 @@ export class PreinscripcionService {
       throw new NotFoundException('Estudiante no encontrado');
     }
 
-    const gestion = await this.gestionRepository.findOne({
+    const gestion = await this.repositorioGestion.findOne({
       where: { anio: dto.gestion },
       relations: ['periodos'],
     });
@@ -407,14 +407,14 @@ export class PreinscripcionService {
       throw new NotFoundException(`Gestión ${dto.gestion} no encontrada`);
     }
 
-    const periodoNumero = dto.periodo || this.getCurrentPeriodoNumero(gestion);
-    const periodo = gestion.periodos?.find(p => p.numero === periodoNumero);
+    const periodoNumero = dto.periodo || this.obtenerNumeroPeriodoActual(gestion);
+    const periodo = gestion.periodos?.find((periodoEncontrado) => periodoEncontrado.numero === periodoNumero);
 
     if (!periodo) {
       throw new NotFoundException(`Período ${periodoNumero} no encontrado`);
     }
 
-    const grupo = await this.groupRepository.findOne({
+    const grupo = await this.repositorioGrupo.findOne({
       where: { id: dto.grupoId },
       relations: ['turno', 'carrera'],
     });
@@ -426,7 +426,7 @@ export class PreinscripcionService {
     const inscripciones: { id: number; materiaNombre: string; nombreGrupo: string }[] = [];
 
     for (const materia of dto.materias) {
-      const existing = await this.inscripcionRepository.findOne({
+      const existente = await this.repositorioInscripcion.findOne({
         where: {
           estudianteId: dto.estudianteId,
           materiaId: materia.materiaId,
@@ -434,11 +434,11 @@ export class PreinscripcionService {
         },
       });
 
-      if (existing) {
+      if (existente) {
         continue;
       }
 
-      const inscripcion = this.inscripcionRepository.create({
+      const inscripcion = this.repositorioInscripcion.create({
         estudianteId: dto.estudianteId,
         materiaId: materia.materiaId,
         grupoId: dto.grupoId,
@@ -447,7 +447,7 @@ export class PreinscripcionService {
         estado: EstadoInscripcion.CURSANDO,
       });
 
-      const guardada = await this.inscripcionRepository.save(inscripcion);
+      const guardada = await this.repositorioInscripcion.save(inscripcion);
       inscripciones.push({
         id: guardada.id,
         materiaNombre: materia.materiaNombre,
@@ -457,7 +457,7 @@ export class PreinscripcionService {
 
     const numDocumento = `BOL-INS-${dto.gestion}-${periodoNumero}-${estudiante.codigoInscripcion}-${Date.now()}`;
 
-    const boleta = this.documentRepository.create({
+    const boleta = this.repositorioDocumento.create({
       estudianteId: dto.estudianteId,
       tipo: TipoDocumento.BOLETA_INSCRIPCION,
       numeroDocumento: numDocumento,
@@ -465,18 +465,18 @@ export class PreinscripcionService {
       gestionId: gestion.id,
     });
 
-    const savedBoleta = await this.documentRepository.save(boleta);
+    const boletaGuardada = await this.repositorioDocumento.save(boleta);
 
     return {
       exito: true,
       inscripciones,
-      boletaId: savedBoleta.id,
+      boletaId: boletaGuardada.id,
       mensaje: `Se crearon ${inscripciones.length} inscripciones para ${periodoNumero}/${dto.gestion}`,
     };
   }
 
-  async getEnrollmentBoleta(estudianteId: number, gestion: string, periodo?: string): Promise<any> {
-    const estudiante = await this.estudianteRepository.findOne({
+  async obtenerBoletaInscripcion(estudianteId: number, gestion: string, periodo?: string): Promise<any> {
+    const estudiante = await this.repositorioEstudiante.findOne({
       where: { id: estudianteId },
       relations: ['persona', 'carrera', 'plan_estudio'],
     });
@@ -485,19 +485,19 @@ export class PreinscripcionService {
       throw new NotFoundException('Estudiante no encontrado');
     }
 
-    const gestionEntity = await this.gestionRepository.findOne({
+    const gestionEntidad = await this.repositorioGestion.findOne({
       where: { anio: gestion },
       relations: ['periodos'],
     });
 
-    if (!gestionEntity) {
+    if (!gestionEntidad) {
       throw new NotFoundException(`Gestión ${gestion} no encontrada`);
     }
 
-    const periodoNumero = periodo || this.getCurrentPeriodoNumero(gestionEntity);
-    const periodoEntity = gestionEntity.periodos?.find(p => p.numero === periodoNumero);
+    const periodoNumero = periodo || this.obtenerNumeroPeriodoActual(gestionEntidad);
+    const periodoEntidad = gestionEntidad.periodos?.find((periodoEncontrado) => periodoEncontrado.numero === periodoNumero);
 
-      const inscripciones = await this.inscripcionRepository.find({
+      const inscripciones = await this.repositorioInscripcion.find({
       where: {
         estudianteId: estudianteId,
         gestion: gestion,
@@ -505,7 +505,7 @@ export class PreinscripcionService {
       relations: ['materia', 'grupo', 'grupo.turno'],
     });
 
-    const boleta = await this.documentRepository.findOne({
+    const boleta = await this.repositorioDocumento.findOne({
       where: {
         estudianteId: estudianteId,
         gestion: gestion,
@@ -526,60 +526,60 @@ export class PreinscripcionService {
       gestion: {
         anio: gestion,
         periodo: periodoNumero,
-        periodoNombre: periodoEntity?.nombre,
+        periodoNombre: periodoEntidad?.nombre,
       },
       boleta: boleta ? {
         numero: boleta.numeroDocumento,
         fechaEmision: boleta.fechaEmision,
         estado: boleta.estado,
       } : null,
-      materias: inscripciones.map(e => ({
-        id: e.id,
-        codigo: e.materia?.codigo,
-        nombre: e.materia?.nombre,
-        turno: e.grupo?.turno?.codigo,
-        turnoNombre: e.grupo?.turno?.nombre,
-        paralelo: e.grupo?.paralelo,
-        grupo: `${e.grupo?.paralelo}-${gestion}`,
-        estado: e.estado,
+      materias: inscripciones.map(inscripcion => ({
+        id: inscripcion.id,
+        codigo: inscripcion.materia?.codigo,
+        nombre: inscripcion.materia?.nombre,
+        turno: inscripcion.grupo?.turno?.codigo,
+        turnoNombre: inscripcion.grupo?.turno?.nombre,
+        paralelo: inscripcion.grupo?.paralelo,
+        grupo: `${inscripcion.grupo?.paralelo}-${gestion}`,
+        estado: inscripcion.estado,
       })),
       totalMaterias: inscripciones.length,
     };
   }
 
-  private getCurrentPeriodoNumero(gestion: Gestion): string {
-    const now = new Date();
-    const periodo = gestion.periodos?.find(p => {
-      const start = new Date(p.fechaInicio);
-      const end = new Date(p.fechaFin);
-      return now >= start && now <= end;
+  private obtenerNumeroPeriodoActual(gestion: Gestion): string {
+    const ahora = new Date();
+    const periodo = gestion.periodos?.find((periodoEncontrado) => {
+      const inicio = new Date(periodoEncontrado.fechaInicio);
+      const fin = new Date(periodoEncontrado.fechaFin);
+      return ahora >= inicio && ahora <= fin;
     });
     return periodo?.numero || 'I';
   }
 
-  async getGroupsByCareerAndSemester(
+  async obtenerGruposPorCarreraYSemestre(
     carreraId: number,
     gestion: string,
     semestre: number,
     turnoId?: number,
   ): Promise<Grupo[]> {
-    const query = this.groupRepository
+    const consulta = this.repositorioGrupo
       .createQueryBuilder('grupo')
       .leftJoinAndSelect('grupo.turno', 'turno')
       .leftJoinAndSelect('grupo.carrera', 'carrera')
       .where('grupo.carreraId = :carreraId', { carreraId })
       .andWhere('grupo.gestion = :gestion', { gestion })
-      .andWhere('grupo.semestre = :semestre', { semestre: semestre });
+      .andWhere('grupo.semestre = :semestre', { semestre });
 
     if (turnoId) {
-      query.andWhere('grupo.turnoId = :turnoId', { turnoId });
+      consulta.andWhere('grupo.turnoId = :turnoId', { turnoId });
     }
 
-    return query.getMany();
+    return consulta.getMany();
   }
 
-  async getOpenPeriodo(anioGestion: string): Promise<Periodo | null> {
-    const gestion = await this.gestionRepository.findOne({
+  async obtenerPeriodoAbierto(anioGestion: string): Promise<Periodo | null> {
+    const gestion = await this.repositorioGestion.findOne({
       where: { anio: anioGestion },
       relations: ['periodos'],
     });
@@ -588,6 +588,6 @@ export class PreinscripcionService {
       return null;
     }
 
-    return gestion.periodos?.find(p => p.estado === EstadoGestion.ABIERTA) || null;
+    return gestion.periodos?.find(periodo => periodo.estado === EstadoGestion.ABIERTA) || null;
   }
 }

@@ -36,173 +36,173 @@ interface PlanEstudio {
   carrera?: { id: number; nombre: string; codigo: string };
 }
 
-export default function PlanMateriasPage() {
+export default function PaginaMateriasPlan() {
   const router = useRouter();
-  const params = useParams();
-  const planId = params.id as string;
+  const parametros = useParams();
+  const idPlan = parametros.id as string;
 
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [cargando, setCargando] = useState(true);
+  const [guardando, setGuardando] = useState(false);
   const [plan, setPlan] = useState<PlanEstudio | null>(null);
   const [materiasPlan, setMateriasPlan] = useState<MateriaPlan[]>([]);
   const [materiasDisponibles, setMateriasDisponibles] = useState<Materia[]>([]);
-  const [editingMateria, setEditingMateria] = useState<MateriaPlan | null>(null);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [materiaEditando, setMateriaEditando] = useState<MateriaPlan | null>(null);
+  const [errores, setErrores] = useState<Record<string, string>>({});
 
-  const [addingToSemester, setAddingToSemester] = useState<number | null>(null);
-  const [materiaSearch, setMateriaSearch] = useState('');
-  const [prerequisiteSearch, setPrerequisiteSearch] = useState('');
-  const [newSubjectId, setNewSubjectId] = useState<number | null>(null);
-  const [newWeeklyHours, setNewWeeklyHours] = useState<number>(0);
-  const [newPrerequisiteId, setNewPrerequisiteId] = useState<number | null>(null);
+  const [agregandoASemestre, setAgregandoASemestre] = useState<number | null>(null);
+  const [busquedaMateria, setBusquedaMateria] = useState('');
+  const [busquedaPrerrequisito, setBusquedaPrerrequisito] = useState('');
+  const [idMateriaNueva, setIdMateriaNueva] = useState<number | null>(null);
+  const [horasSemanalesNuevas, setHorasSemanalesNuevas] = useState<number>(0);
+  const [idPrerrequisitoNuevo, setIdPrerrequisitoNuevo] = useState<number | null>(null);
 
-  const filteredMaterias = materiasDisponibles.filter(m => {
-    if (!materiaSearch) return true;
-    const search = materiaSearch.toLowerCase();
-    return m.codigo.toLowerCase().includes(search) || m.nombre.toLowerCase().includes(search);
+  const materiasFiltradas = materiasDisponibles.filter(materia => {
+    if (!busquedaMateria) return true;
+    const busqueda = busquedaMateria.toLowerCase();
+    return materia.codigo.toLowerCase().includes(busqueda) || materia.nombre.toLowerCase().includes(busqueda);
   });
 
-  const filteredPrerequisites = materiasDisponibles.filter(m => {
-    if (!prerequisiteSearch) return true;
-    const search = prerequisiteSearch.toLowerCase();
-    return m.codigo.toLowerCase().includes(search) || m.nombre.toLowerCase().includes(search);
+  const prerrequisitosFiltrados = materiasDisponibles.filter(materia => {
+    if (!busquedaPrerrequisito) return true;
+    const busqueda = busquedaPrerrequisito.toLowerCase();
+    return materia.codigo.toLowerCase().includes(busqueda) || materia.nombre.toLowerCase().includes(busqueda);
   });
 
   useEffect(() => {
-    fetchPlan();
-    fetchMateriasDisponibles();
-  }, [planId]);
+    obtenerPlan();
+    obtenerMateriasDisponibles();
+  }, [idPlan]);
 
   useEffect(() => {
     if (plan) {
-      fetchMateriasPlan();
+      obtenerMateriasPlan();
     }
   }, [plan]);
 
-  const fetchPlan = async () => {
+  const obtenerPlan = async () => {
     try {
-      const response = await api.get(`/planes-estudio/${planId}`);
-      setPlan(response.data);
+      const respuesta = await api.get(`/planes-estudio/${idPlan}`);
+      setPlan(respuesta.data);
     } catch (error) {
       console.error('Error al obtener el plan:', error);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const fetchMateriasPlan = async () => {
+  const obtenerMateriasPlan = async () => {
     try {
-      const response = await api.get(`/planes-estudio/${planId}/materias`);
-      setMateriasPlan(response.data || []);
+      const respuesta = await api.get(`/planes-estudio/${idPlan}/materias`);
+      setMateriasPlan(respuesta.data || []);
     } catch (error) {
       console.error('Error al obtener las materias del plan:', error);
     }
   };
 
-  const fetchMateriasDisponibles = async () => {
+  const obtenerMateriasDisponibles = async () => {
     try {
-      const response = await api.get('/materias/todos');
-      setMateriasDisponibles(response.data || []);
+      const respuesta = await api.get('/materias/todos');
+      setMateriasDisponibles(respuesta.data || []);
     } catch (error) {
       console.error('Error al obtener las materias:', error);
     }
   };
 
-  const getSemesterMaterias = (semester: number) => {
-    return materiasPlan.filter(m => m.semestre === semester);
+  const obtenerMateriasSemestre = (semestre: number) => {
+    return materiasPlan.filter(materiaPlan => materiaPlan.semestre === semestre);
   };
 
-  const getMaxSemester = () => {
+  const obtenerMaxSemestre = () => {
     if (materiasPlan.length === 0) return 6;
-    return Math.max(...materiasPlan.map(m => m.semestre));
+    return Math.max(...materiasPlan.map(materiaPlan => materiaPlan.semestre));
   };
 
-  const getTotalHours = (semester: number) => {
-    return getSemesterMaterias(semester).reduce((sum, m) => sum + m.horasSemanales, 0);
+  const obtenerTotalHoras = (semestre: number) => {
+    return obtenerMateriasSemestre(semestre).reduce((suma, materiaPlan) => suma + materiaPlan.horasSemanales, 0);
   };
 
-  const handleStartAdd = (semester: number) => {
-    setAddingToSemester(semester);
-    setMateriaSearch('');
-    setPrerequisiteSearch('');
-    setNewSubjectId(null);
-    setNewWeeklyHours(0);
-    setNewPrerequisiteId(null);
-    setErrors({});
+  const iniciarAgregar = (semestre: number) => {
+    setAgregandoASemestre(semestre);
+    setBusquedaMateria('');
+    setBusquedaPrerrequisito('');
+    setIdMateriaNueva(null);
+    setHorasSemanalesNuevas(0);
+    setIdPrerrequisitoNuevo(null);
+    setErrores({});
   };
 
-  const handleCancelAdd = () => {
-    setAddingToSemester(null);
-    setMateriaSearch('');
-    setPrerequisiteSearch('');
-    setNewSubjectId(null);
-    setNewWeeklyHours(0);
-    setNewPrerequisiteId(null);
+  const cancelarAgregar = () => {
+    setAgregandoASemestre(null);
+    setBusquedaMateria('');
+    setBusquedaPrerrequisito('');
+    setIdMateriaNueva(null);
+    setHorasSemanalesNuevas(0);
+    setIdPrerrequisitoNuevo(null);
   };
 
-  const handleSaveNewMateria = async () => {
-    if (!newSubjectId || !newWeeklyHours) {
-      setErrors({ submit: 'Selecciona una materia e ingresa las horas' });
+  const guardarNuevaMateria = async () => {
+    if (!idMateriaNueva || !horasSemanalesNuevas) {
+      setErrores({ submit: 'Selecciona una materia e ingresa las horas' });
       return;
     }
 
-    setSaving(true);
-    setErrors({});
+    setGuardando(true);
+    setErrores({});
 
     try {
-      await api.post(`/planes-estudio/${planId}/materias`, {
-        materiaId: newSubjectId,
-        semestre: addingToSemester,
-        horasSemanales: newWeeklyHours,
-        prerrequisitoId: newPrerequisiteId || null,
+      await api.post(`/planes-estudio/${idPlan}/materias`, {
+        materiaId: idMateriaNueva,
+        semestre: agregandoASemestre,
+        horasSemanales: horasSemanalesNuevas,
+        prerrequisitoId: idPrerrequisitoNuevo || null,
       });
-      handleCancelAdd();
-      fetchMateriasPlan();
+      cancelarAgregar();
+      obtenerMateriasPlan();
     } catch (error: any) {
       console.error('Error al guardar la materia:', error);
-      setErrors({ submit: error.response?.data?.mensaje || 'Error al guardar materia' });
+      setErrores({ submit: error.response?.data?.mensaje || 'Error al guardar materia' });
     } finally {
-      setSaving(false);
+      setGuardando(false);
     }
   };
 
-  const handleStartEditMateria = (materiaPlan: MateriaPlan) => {
-    setEditingMateria({ ...materiaPlan });
+  const iniciarEdicionMateria = (materiaPlan: MateriaPlan) => {
+    setMateriaEditando({ ...materiaPlan });
   };
 
-  const handleCancelEditMateria = () => {
-    setEditingMateria(null);
+  const cancelarEdicionMateria = () => {
+    setMateriaEditando(null);
   };
 
-  const handleSaveEditMateria = async () => {
-    if (!editingMateria) return;
+  const guardarEdicionMateria = async () => {
+    if (!materiaEditando) return;
 
-    setSaving(true);
+    setGuardando(true);
     try {
-      await api.patch(`/planes-estudio/${planId}/materias/${editingMateria.id}`, {
-        semestre: editingMateria.semestre,
-        horasSemanales: editingMateria.horasSemanales,
+      await api.patch(`/planes-estudio/${idPlan}/materias/${materiaEditando.id}`, {
+        semestre: materiaEditando.semestre,
+        horasSemanales: materiaEditando.horasSemanales,
       });
-      setEditingMateria(null);
-      fetchMateriasPlan();
+      setMateriaEditando(null);
+      obtenerMateriasPlan();
     } catch (error: any) {
       console.error('Error al actualizar la materia:', error);
-      setErrors({ submit: error.response?.data?.mensaje || 'Error al actualizar materia' });
+      setErrores({ submit: error.response?.data?.mensaje || 'Error al actualizar materia' });
     } finally {
-      setSaving(false);
+      setGuardando(false);
     }
   };
 
-  const handleRemoveMateria = async (materiaPlanId: number) => {
+  const eliminarMateria = async (idMateriaPlan: number) => {
     try {
-      await api.delete(`/planes-estudio/${planId}/materias/${materiaPlanId}`);
-      fetchMateriasPlan();
+      await api.delete(`/planes-estudio/${idPlan}/materias/${idMateriaPlan}`);
+      obtenerMateriasPlan();
     } catch (error) {
       console.error('Error al eliminar la materia:', error);
     }
   };
 
-  if (loading) {
+  if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
@@ -213,13 +213,13 @@ export default function PlanMateriasPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variante="fantasma" tamano="icono" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
         </Boton>
-        <Migas items={[
-          { label: 'Configuración', href: '/configuracion' },
-          { label: 'Planes de Estudio', href: '/planes-estudio' },
-          { label: `${plan?.numeroRm} - ${plan?.carrera?.nombre || 'Cargando...'}` }
+        <Migas elementos={[
+          { etiqueta: 'Configuración', href: '/configuracion' },
+          { etiqueta: 'Planes de Estudio', href: '/planes-estudio' },
+          { etiqueta: `${plan?.numeroRm} - ${plan?.carrera?.nombre || 'Cargando...'}` }
         ]} />
       </div>
 
@@ -229,54 +229,54 @@ export default function PlanMateriasPage() {
             Plan de Estudios: {plan?.numeroRm}
           </h1>
           <div className="flex items-center gap-3 mt-1">
-            <Insignia variant="outline">{plan?.carrera?.codigo}</Insignia>
+            <Insignia variante="contorno">{plan?.carrera?.codigo}</Insignia>
             <span className="text-gray-500">{plan?.carrera?.nombre}</span>
-            <Insignia variant={plan?.estado === 'vigente' ? 'exito' : 'secondary'}>
+            <Insignia variante={plan?.estado === 'vigente' ? 'exito' : 'secundario'}>
               {plan?.estado}
             </Insignia>
           </div>
         </div>
       </div>
 
-      {errors.submit && (
+      {errores.submit && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-          {errors.submit}
+          {errores.submit}
         </div>
       )}
 
       <div className="space-y-6">
-        {materiasPlan.length === 0 && addingToSemester === null ? (
-          <Tarjeta variant="bordered">
+        {materiasPlan.length === 0 && agregandoASemestre === null ? (
+          <Tarjeta variante="conBorde">
             <ContenidoTarjeta className="py-12 text-center text-gray-500">
               <BookOpen className="w-12 h-12 mx-auto mb-4 text-gray-300" />
               <p className="text-lg font-medium mb-2">No hay materias asignadas</p>
               <p className="text-sm mb-4">
                 Comienza agregando materias a los semestres.
               </p>
-              <Boton onClick={() => handleStartAdd(1)}>
+              <Boton onClick={() => iniciarAgregar(1)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Agregar Materias al Semestre 1
               </Boton>
             </ContenidoTarjeta>
           </Tarjeta>
         ) : (
-          Array.from({ length: getMaxSemester() }, (_, i) => i + 1).map(semester => {
-            const materiasSemestre = getSemesterMaterias(semester);
-            const totalHoras = getTotalHours(semester);
-            const isAdding = addingToSemester === semester;
+          Array.from({ length: obtenerMaxSemestre() }, (_, indice) => indice + 1).map(semestre => {
+            const materiasSemestre = obtenerMateriasSemestre(semestre);
+            const totalHoras = obtenerTotalHoras(semestre);
+            const estaAgregando = agregandoASemestre === semestre;
 
             return (
-              <Tarjeta key={semester} variant="bordered">
+              <Tarjeta key={semestre} variante="conBorde">
                 <EncabezadoTarjeta className="bg-gray-50 py-3">
                   <div className="flex items-center justify-between">
-                    <TituloTarjeta className="text-lg">Semestre {semester}</TituloTarjeta>
+                    <TituloTarjeta className="text-lg">Semestre {semestre}</TituloTarjeta>
                     <div className="flex items-center gap-4">
                       <span className="text-sm text-gray-500">
                         {materiasSemestre.length} materia{materiasSemestre.length !== 1 ? 's' : ''}
                       </span>
-                      <Insignia variant="outline">{totalHoras} horas/semana</Insignia>
-                      {!isAdding && (
-                        <Boton size="sm" variant="outline" onClick={() => handleStartAdd(semester)}>
+                      <Insignia variante="contorno">{totalHoras} horas/semana</Insignia>
+                      {!estaAgregando && (
+                        <Boton tamano="pequeno" variante="contorno" onClick={() => iniciarAgregar(semestre)}>
                           <Plus className="w-4 h-4 mr-1" />
                           Agregar
                         </Boton>
@@ -286,7 +286,7 @@ export default function PlanMateriasPage() {
                 </EncabezadoTarjeta>
 
                 <ContenidoTarjeta className="p-4">
-                  {isAdding && (
+                  {estaAgregando && (
                     <div className="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
                       <div className="flex items-center gap-2 mb-3">
                         <Search className="w-4 h-4 text-green-600" />
@@ -301,31 +301,31 @@ export default function PlanMateriasPage() {
                               <Entrada
                                 type="text"
                                 placeholder="Buscar por código o nombre..."
-                                value={materiaSearch}
-                                onChange={(e) => setMateriaSearch(e.target.value)}
+                                value={busquedaMateria}
+                                onChange={(e) => setBusquedaMateria(e.target.value)}
                                 className="w-full"
                               />
                             </div>
-                            {materiaSearch && filteredMaterias.length > 0 && (
+                            {busquedaMateria && materiasFiltradas.length > 0 && (
                               <div className="absolute z-10 mt-1 w-64 bg-white rounded-lg border shadow-lg max-h-40 overflow-y-auto">
-                                {filteredMaterias.map(m => (
+                                {materiasFiltradas.map(materia => (
                                   <div
-                                    key={m.id}
+                                    key={materia.id}
                                     className="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
                                     onClick={() => {
-                                      setNewSubjectId(m.id);
-                                      setMateriaSearch(`${m.codigo} - ${m.nombre}`);
+                                      setIdMateriaNueva(materia.id);
+                                      setBusquedaMateria(`${materia.codigo} - ${materia.nombre}`);
                                     }}
                                   >
-                                    <span className="font-medium text-sm">{m.codigo}</span>
-                                    <span className="text-gray-500 text-sm ml-2">{m.nombre}</span>
+                                    <span className="font-medium text-sm">{materia.codigo}</span>
+                                    <span className="text-gray-500 text-sm ml-2">{materia.nombre}</span>
                                   </div>
                                 ))}
                               </div>
                             )}
-                            {newSubjectId && materiaSearch && (
+                            {idMateriaNueva && busquedaMateria && (
                               <div className="mt-1 px-2 py-1 bg-green-100 rounded text-xs text-green-700">
-                                Seleccionado: {materiasDisponibles.find(m => m.id === newSubjectId)?.codigo} - {materiasDisponibles.find(m => m.id === newSubjectId)?.nombre}
+                                Seleccionado: {materiasDisponibles.find(materia => materia.id === idMateriaNueva)?.codigo} - {materiasDisponibles.find(materia => materia.id === idMateriaNueva)?.nombre}
                               </div>
                             )}
                           </div>
@@ -334,8 +334,8 @@ export default function PlanMateriasPage() {
                             <label className="block text-xs font-medium text-gray-600 mb-1">Horas/Sem</label>
                             <Entrada
                               type="number"
-                              value={newWeeklyHours || ''}
-                              onChange={(e) => setNewWeeklyHours(parseInt(e.target.value) || 0)}
+                              value={horasSemanalesNuevas || ''}
+                              onChange={(e) => setHorasSemanalesNuevas(parseInt(e.target.value) || 0)}
                               placeholder="4"
                               min="1"
                             />
@@ -347,42 +347,42 @@ export default function PlanMateriasPage() {
                               <Entrada
                                 type="text"
                                 placeholder="Buscar..."
-                                value={prerequisiteSearch}
-                                onChange={(e) => setPrerequisiteSearch(e.target.value)}
+                                value={busquedaPrerrequisito}
+                                onChange={(e) => setBusquedaPrerrequisito(e.target.value)}
                                 className="w-full"
                               />
                             </div>
-                            {prerequisiteSearch && filteredPrerequisites.length > 0 && (
+                            {busquedaPrerrequisito && prerrequisitosFiltrados.length > 0 && (
                               <div className="absolute z-10 mt-1 w-64 bg-white rounded-lg border shadow-lg max-h-40 overflow-y-auto">
-                                {filteredPrerequisites.filter(p => p.id !== newSubjectId).map(p => (
+                                {prerrequisitosFiltrados.filter(prerrequisito => prerrequisito.id !== idMateriaNueva).map(prerrequisito => (
                                   <div
-                                    key={p.id}
+                                    key={prerrequisito.id}
                                     className="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
                                     onClick={() => {
-                                      setNewPrerequisiteId(p.id);
-                                      setPrerequisiteSearch(`${p.codigo} - ${p.nombre}`);
+                                      setIdPrerrequisitoNuevo(prerrequisito.id);
+                                      setBusquedaPrerrequisito(`${prerrequisito.codigo} - ${prerrequisito.nombre}`);
                                     }}
                                   >
-                                    <span className="font-medium text-sm">{p.codigo}</span>
-                                    <span className="text-gray-500 text-sm ml-2">{p.nombre}</span>
+                                    <span className="font-medium text-sm">{prerrequisito.codigo}</span>
+                                    <span className="text-gray-500 text-sm ml-2">{prerrequisito.nombre}</span>
                                   </div>
                                 ))}
                               </div>
                             )}
-                            {newPrerequisiteId && (
+                            {idPrerrequisitoNuevo && (
                               <div className="mt-1 px-2 py-1 bg-purple-100 rounded text-xs text-purple-700">
-                                Prerrequisito: {materiasDisponibles.find(m => m.id === newPrerequisiteId)?.codigo}
+                                Prerrequisito: {materiasDisponibles.find(materia => materia.id === idPrerrequisitoNuevo)?.codigo}
                               </div>
                             )}
                           </div>
                         </div>
 
                         <div className="flex justify-end gap-2">
-                          <Boton variant="outline" size="sm" onClick={handleCancelAdd}>
+                          <Boton variante="contorno" tamano="pequeno" onClick={cancelarAgregar}>
                             Cancelar
                           </Boton>
-                          <Boton size="sm" onClick={handleSaveNewMateria} disabled={saving}>
-                            {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Plus className="w-4 h-4 mr-1" />}
+                          <Boton tamano="pequeno" onClick={guardarNuevaMateria} disabled={guardando}>
+                            {guardando ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Plus className="w-4 h-4 mr-1" />}
                             Agregar
                           </Boton>
                         </div>
@@ -390,7 +390,7 @@ export default function PlanMateriasPage() {
                     </div>
                   )}
 
-                  {materiasSemestre.length === 0 && !isAdding ? (
+                  {materiasSemestre.length === 0 && !estaAgregando ? (
                     <div className="py-6 text-center text-gray-400 text-sm">
                       Sin materias en este semestre
                     </div>
@@ -406,24 +406,24 @@ export default function PlanMateriasPage() {
                         </FilaTabla>
                       </EncabezadoTabla>
                       <CuerpoTabla>
-                        {materiasSemestre.map(mp => (
-                          <FilaTabla key={mp.id}>
-                            <CeldaTabla className="font-medium">{mp.materia?.codigo || mp.materiaId}</CeldaTabla>
-                            <CeldaTabla>{mp.materia?.nombre || '-'}</CeldaTabla>
-                            <CeldaTabla className="text-center">{mp.horasSemanales}</CeldaTabla>
+                        {materiasSemestre.map(materiaPlan => (
+                          <FilaTabla key={materiaPlan.id}>
+                            <CeldaTabla className="font-medium">{materiaPlan.materia?.codigo || materiaPlan.materiaId}</CeldaTabla>
+                            <CeldaTabla>{materiaPlan.materia?.nombre || '-'}</CeldaTabla>
+                            <CeldaTabla className="text-center">{materiaPlan.horasSemanales}</CeldaTabla>
                             <CeldaTabla>
-                              {mp.prerrequisitoId ? (
-                                <Insignia variant="secondary">{mp.prerrequisito?.codigo || mp.prerrequisitoId}</Insignia>
+                              {materiaPlan.prerrequisitoId ? (
+                                <Insignia variante="secundario">{materiaPlan.prerrequisito?.codigo || materiaPlan.prerrequisitoId}</Insignia>
                               ) : (
                                 <span className="text-gray-400 text-sm">-</span>
                               )}
                             </CeldaTabla>
                             <CeldaTabla className="text-right">
                               <div className="flex items-center justify-end gap-1">
-                                <Boton variant="ghost" size="icon" onClick={() => handleStartEditMateria(mp)}>
+                                <Boton variante="fantasma" tamano="icono" onClick={() => iniciarEdicionMateria(materiaPlan)}>
                                   <Edit2 className="w-4 h-4" />
                                 </Boton>
-                                <Boton variant="ghost" size="icon" onClick={() => handleRemoveMateria(mp.id)}>
+                                <Boton variante="fantasma" tamano="icono" onClick={() => eliminarMateria(materiaPlan.id)}>
                                   <Trash2 className="w-4 h-4 text-red-500" />
                                 </Boton>
                               </div>

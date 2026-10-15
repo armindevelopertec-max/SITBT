@@ -16,88 +16,88 @@ interface Materia {
   area: string | null;
 }
 
-export default function EditarMateriaPage() {
+export default function PaginaEditarMateria() {
   const router = useRouter();
-  const params = useParams();
-  const materiaId = params.id as string;
+  const parametros = useParams();
+  const materiaId = parametros.id as string;
 
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [notFound, setNotFound] = useState(false);
+  const [cargando, setCargando] = useState(true);
+  const [guardando, setGuardando] = useState(false);
+  const [errores, setErrores] = useState<Record<string, string>>({});
+  const [noEncontrado, setNoEncontrado] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [datosFormulario, setDatosFormulario] = useState({
     codigo: '',
     nombre: '',
   });
 
   useEffect(() => {
-    fetchMateria();
+    obtenerMateria();
   }, [materiaId]);
 
-  const fetchMateria = async () => {
+  const obtenerMateria = async () => {
     try {
-      const response = await api.get(`/materias/${materiaId}`);
-      const materia: Materia = response.data;
-      setFormData({
+      const respuesta = await api.get(`/materias/${materiaId}`);
+      const materia: Materia = respuesta.data;
+      setDatosFormulario({
         codigo: materia.codigo,
         nombre: materia.nombre,
       });
     } catch (error) {
       console.error('Error al obtener la materia:', error);
-      setNotFound(true);
+      setNoEncontrado(true);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const validarFormulario = () => {
+    const nuevosErrores: Record<string, string> = {};
 
-    if (!formData.codigo.trim()) {
-      newErrors.codigo = 'Código es requerido';
-    } else if (formData.codigo.length < 3) {
-      newErrors.codigo = 'Código debe tener al menos 3 caracteres';
+    if (!datosFormulario.codigo.trim()) {
+      nuevosErrores.codigo = 'Código es requerido';
+    } else if (datosFormulario.codigo.length < 3) {
+      nuevosErrores.codigo = 'Código debe tener al menos 3 caracteres';
     }
 
-    if (!formData.nombre.trim()) {
-      newErrors.nombre = 'Nombre es requerido';
-    } else if (formData.nombre.length < 3) {
-      newErrors.nombre = 'Nombre debe tener al menos 3 caracteres';
+    if (!datosFormulario.nombre.trim()) {
+      nuevosErrores.nombre = 'Nombre es requerido';
+    } else if (datosFormulario.nombre.length < 3) {
+      nuevosErrores.nombre = 'Nombre debe tener al menos 3 caracteres';
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const enviarFormulario = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validarFormulario()) return;
 
-    setSaving(true);
+    setGuardando(true);
     try {
       await api.patch(`/materias/${materiaId}`, {
-        codigo: formData.codigo.trim().toUpperCase(),
-        nombre: formData.nombre.trim(),
+        codigo: datosFormulario.codigo.trim().toUpperCase(),
+        nombre: datosFormulario.nombre.trim(),
       });
 
       router.push('/materias');
     } catch (error: any) {
       console.error('Error al actualizar la materia:', error);
       if (error.response?.data?.mensaje) {
-        setErrors({ submit: error.response.data.mensaje });
+        setErrores({ submit: error.response.data.mensaje });
       } else if (error.response?.data?.error?.code === '23505') {
-        setErrors({ submit: 'Ya existe una materia con este código' });
+        setErrores({ submit: 'Ya existe una materia con este código' });
       } else {
-        setErrors({ submit: 'Error al actualizar la materia' });
+        setErrores({ submit: 'Error al actualizar la materia' });
       }
     } finally {
-      setSaving(false);
+      setGuardando(false);
     }
   };
 
-  if (loading) {
+  if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
@@ -105,17 +105,17 @@ export default function EditarMateriaPage() {
     );
   }
 
-  if (notFound) {
+  if (noEncontrado) {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Boton variant="ghost" size="icon" onClick={() => router.back()}>
+          <Boton variante="fantasma" tamano="icono" onClick={() => router.back()}>
             <ArrowLeft className="w-5 h-5" />
           </Boton>
-          <Migas items={[
-            { label: 'Configuración', href: '/configuracion' },
-            { label: 'Materias', href: '/materias' },
-            { label: 'Editar Materia' }
+          <Migas elementos={[
+            { etiqueta: 'Configuración', href: '/configuracion' },
+            { etiqueta: 'Materias', href: '/materias' },
+            { etiqueta: 'Editar Materia' }
           ]} />
         </div>
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -128,13 +128,13 @@ export default function EditarMateriaPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variante="fantasma" tamano="icono" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
         </Boton>
-        <Migas items={[
-          { label: 'Configuración', href: '/configuracion' },
-          { label: 'Materias', href: '/materias' },
-          { label: 'Editar Materia' }
+        <Migas elementos={[
+          { etiqueta: 'Configuración', href: '/configuracion' },
+          { etiqueta: 'Materias', href: '/materias' },
+          { etiqueta: 'Editar Materia' }
         ]} />
       </div>
 
@@ -142,8 +142,8 @@ export default function EditarMateriaPage() {
         <h1 className="text-2xl font-bold text-gray-900">Editar Materia</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Tarjeta variant="bordered">
+      <form onSubmit={enviarFormulario} className="space-y-6">
+        <Tarjeta variante="conBorde">
           <EncabezadoTarjeta>
             <TituloTarjeta>Datos de la Materia</TituloTarjeta>
           </EncabezadoTarjeta>
@@ -151,19 +151,19 @@ export default function EditarMateriaPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Entrada
-                  label="Código *"
-                  value={formData.codigo}
-                  onChange={(e) => setFormData({ ...formData, codigo: e.target.value.toUpperCase() })}
-                  error={errors.codigo}
+                  etiqueta="Código *"
+                  value={datosFormulario.codigo}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, codigo: e.target.value.toUpperCase() })}
+                  error={errores.codigo}
                   placeholder="MAT-101"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Nombre *"
-                  value={formData.nombre}
-                  onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                  error={errors.nombre}
+                  etiqueta="Nombre *"
+                  value={datosFormulario.nombre}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, nombre: e.target.value })}
+                  error={errores.nombre}
                   placeholder="Matemáticas I"
                 />
               </div>
@@ -171,18 +171,18 @@ export default function EditarMateriaPage() {
           </ContenidoTarjeta>
         </Tarjeta>
 
-        {errors.submit && (
+        {errores.submit && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            {errors.submit}
+            {errores.submit}
           </div>
         )}
 
         <div className="flex justify-end gap-3">
-          <Boton variant="outline" type="button" onClick={() => router.back()}>
+          <Boton variante="contorno" type="button" onClick={() => router.back()}>
             Cancelar
           </Boton>
-          <Boton type="submit" disabled={saving}>
-            {saving ? (
+          <Boton type="submit" disabled={guardando}>
+            {guardando ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Guardando...

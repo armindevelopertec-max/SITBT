@@ -21,62 +21,62 @@ import { TipoConsentimiento } from '../../entities/consent-record.entity';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorConsentimiento {
-  constructor(private readonly service: ServicioConsentimiento) {}
+  constructor(private readonly servicio: ServicioConsentimiento) {}
 
   @Post()
-  create(@Body() createDto: CrearConsentimientoDto) {
-    return this.service.create(createDto);
+  crear(@Body() crearDto: CrearConsentimientoDto) {
+    return this.servicio.crear(crearDto);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
     @Query('estudianteId') estudianteId?: number,
   ) {
-    return this.service.findAll(+page, +limit, estudianteId ? +estudianteId : undefined);
+    return this.servicio.obtenerTodos(+pagina, +limite, estudianteId ? +estudianteId : undefined);
   }
 
   @Get('estudiante/:estudianteId')
-  findByStudent(@Param('estudianteId') estudianteId: string) {
-    return this.service.findByStudent(+estudianteId);
+  buscarPorEstudiante(@Param('estudianteId') estudianteId: string) {
+    return this.servicio.buscarPorEstudiante(+estudianteId);
   }
 
   @Get('estudiante/:estudianteId/ultimo')
-  getLatestConsent(@Param('estudianteId') estudianteId: string) {
-    return this.service.getLatestConsent(+estudianteId);
+  obtenerUltimoConsentimiento(@Param('estudianteId') estudianteId: string) {
+    return this.servicio.obtenerUltimoConsentimiento(+estudianteId);
   }
 
   @Get('verificar/:estudianteId/:version')
-  checkValidConsent(
+  verificarConsentimientoValido(
     @Param('estudianteId') estudianteId: string,
     @Param('version') version: string,
   ) {
-    return this.service.hasValidConsent(+estudianteId, version);
+    return this.servicio.tieneConsentimientoValido(+estudianteId, version);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.service.findOne(id);
+  obtenerUno(@Param('id') id: string) {
+    return this.servicio.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDto: ActualizarConsentimientoDto) {
-    return this.service.update(id, updateDto);
+  actualizar(@Param('id') id: string, @Body() actualizarDto: ActualizarConsentimientoDto) {
+    return this.servicio.actualizar(id, actualizarDto);
   }
 
   @Post(':id/ejercer-derecho')
   @HttpCode(200)
-  exerciseRight(
+  ejercerDerecho(
     @Param('id') id: string,
     @Body('derecho') derecho: TipoConsentimiento,
     @Body('registradoPor') registradoPor?: number,
   ) {
-    return this.service.exerciseRight(id, derecho, registradoPor);
+    return this.servicio.ejercerDerecho(id, derecho, registradoPor);
   }
 
   @Post(':id')
-  remove(@Param('id') id: string) {
-    return this.service.remove(id);
+  eliminar(@Param('id') id: string) {
+    return this.servicio.eliminar(id);
   }
 }

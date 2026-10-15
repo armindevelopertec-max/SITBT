@@ -8,129 +8,129 @@ import { Boton } from '@/components/ui/boton';
 import { Entrada } from '@/components/ui/entrada';
 import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
 import { Insignia } from '@/components/ui/insignia';
-import { Modal, ConfirmModal } from '@/components/ui/modal';
+import { Modal, ModalConfirmacion } from '@/components/ui/modal';
 import { Plus, Search, Edit2, Trash2, Loader2, User, Eye, Key } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Personal } from '@/types';
 
-const POSITION_OPTIONS = [
-  { value: 'docente', label: 'Docente' },
-  { value: 'secretaria', label: 'Secretaría' },
-  { value: 'director_academico', label: 'Director Académico' },
-  { value: 'rector', label: 'Rector' },
-  { value: 'apoyo', label: 'Personal de Apoyo' },
-  { value: 'bibliotecario', label: 'Bibliotecario' },
+const OPCIONES_CARGO = [
+  { value: 'docente', etiqueta: 'Docente' },
+  { value: 'secretaria', etiqueta: 'Secretaría' },
+  { value: 'director_academico', etiqueta: 'Director Académico' },
+  { value: 'rector', etiqueta: 'Rector' },
+  { value: 'apoyo', etiqueta: 'Personal de Apoyo' },
+  { value: 'bibliotecario', etiqueta: 'Bibliotecario' },
 ];
 
-export default function StaffPage() {
+export default function PaginaPersonal() {
   const router = useRouter();
-  const [staff, setStaff] = useState<Personal[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [personal, setPersonal] = useState<Personal[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [terminoBusqueda, setTerminoBusqueda] = useState('');
 
-  const [deleteModal, setDeleteModal] = useState<Personal | null>(null);
-  const [credentialsModal, setCredentialsModal] = useState<{ nombreUsuario: string; contrasena: string; nombre: string; personalId: number; personaId: number } | null>(null);
+  const [personalEliminando, setPersonalEliminando] = useState<Personal | null>(null);
+  const [modalCredenciales, setModalCredenciales] = useState<{ nombreUsuario: string; contrasena: string; nombre: string; personalId: number; personaId: number } | null>(null);
 
-  const [formLoading, setFormLoading] = useState(false);
-  const [resetLoading, setResetLoading] = useState(false);
+  const [cargandoFormulario, setCargandoFormulario] = useState(false);
+  const [cargandoRestablecer, setCargandoRestablecer] = useState(false);
 
   useEffect(() => {
-    fetchStaff();
+    obtenerPersonal();
   }, []);
 
-  const fetchStaff = async () => {
+  const obtenerPersonal = async () => {
     try {
-      const response = await api.get('/personal');
-      setStaff(response.data.datos);
+      const respuesta = await api.get('/personal');
+      setPersonal(respuesta.data.datos);
     } catch (error) {
       console.error('Error al cargar personal:', error);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const filteredStaff = staff.filter((s) => {
-    const person = s.persona;
-    if (!person) return false;
-    const fullName = `${person.nombres} ${person.apellidoPaterno} ${person.apellidoMaterno}`.toLowerCase();
-    const ci = person.ci.toLowerCase();
-    const search = searchTerm.toLowerCase();
-    return fullName.includes(search) || ci.includes(search);
+  const personalFiltrado = personal.filter((elemento) => {
+    const persona = elemento.persona;
+    if (!persona) return false;
+    const nombreCompleto = `${persona.nombres} ${persona.apellidoPaterno} ${persona.apellidoMaterno}`.toLowerCase();
+    const ci = persona.ci.toLowerCase();
+    const busqueda = terminoBusqueda.toLowerCase();
+    return nombreCompleto.includes(busqueda) || ci.includes(busqueda);
   });
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'exito' | 'error' | 'advertencia' | 'secondary'> = {
+  const obtenerInsigniaEstado = (estado: string) => {
+    const variantes: Record<string, 'exito' | 'error' | 'advertencia' | 'secundario'> = {
       activo: 'exito',
       inactivo: 'error',
       licencia: 'advertencia',
     };
-    return <Insignia variant={variants[status] || 'secondary'}>{status}</Insignia>;
+    return <Insignia variante={variantes[estado] || 'secundario'}>{estado}</Insignia>;
   };
 
-  const getRolBadge = (position: string) => {
-    const variants: Record<string, 'primary' | 'secondary' | 'advertencia' | 'exito'> = {
-      docente: 'primary',
+  const obtenerInsigniaCargo = (cargo: string) => {
+    const variantes: Record<string, 'primario' | 'secundario' | 'advertencia' | 'exito'> = {
+      docente: 'primario',
       rector: 'advertencia',
-      secretaria: 'secondary',
+      secretaria: 'secundario',
       director_academico: 'exito',
-      apoyo: 'secondary',
-      bibliotecario: 'secondary',
+      apoyo: 'secundario',
+      bibliotecario: 'secundario',
     };
-    return <Insignia variant={variants[position] || 'secondary'}>{position.replace('_', ' ')}</Insignia>;
+    return <Insignia variante={variantes[cargo] || 'secundario'}>{cargo.replace('_', ' ')}</Insignia>;
   };
 
-  const handleDelete = async () => {
-    if (!deleteModal) return;
-    setFormLoading(true);
+  const eliminar = async () => {
+    if (!personalEliminando) return;
+    setCargandoFormulario(true);
     try {
-      await api.delete(`/personal/${deleteModal.id}`);
-      setDeleteModal(null);
-      fetchStaff();
+      await api.delete(`/personal/${personalEliminando.id}`);
+      setPersonalEliminando(null);
+      obtenerPersonal();
     } catch (error) {
       console.error('Error al eliminar personal:', error);
     } finally {
-      setFormLoading(false);
+      setCargandoFormulario(false);
     }
   };
 
-  const viewCredentials = async (s: Personal) => {
+  const verCredenciales = async (elemento: Personal) => {
     try {
-      const response = await api.get(`/usuarios?personaId=${s.personaId}`);
-      const users = response.data.datos;
-      const persona = s.persona;
+      const respuesta = await api.get(`/usuarios?personaId=${elemento.personaId}`);
+      const usuarios = respuesta.data.datos;
+      const persona = elemento.persona;
       const nombre = persona ? `${persona.nombres} ${persona.apellidoPaterno}` : 'Personal';
 
-      if (users && users.length > 0 && persona) {
-        const user = users[0];
-        const newPassword = `${persona.ci}-${new Date().getFullYear()}`;
-        setCredentialsModal({ nombreUsuario: user.nombreUsuario, contrasena: newPassword, nombre, personalId: s.id, personaId: s.personaId });
+      if (usuarios && usuarios.length > 0 && persona) {
+        const usuario = usuarios[0];
+        const nuevaContrasena = `${persona.ci}-${new Date().getFullYear()}`;
+        setModalCredenciales({ nombreUsuario: usuario.nombreUsuario, contrasena: nuevaContrasena, nombre, personalId: elemento.id, personaId: elemento.personaId });
       } else {
-        setCredentialsModal({ nombreUsuario: 'No tiene usuario', contrasena: '', nombre, personalId: s.id, personaId: s.personaId });
+        setModalCredenciales({ nombreUsuario: 'No tiene usuario', contrasena: '', nombre, personalId: elemento.id, personaId: elemento.personaId });
       }
     } catch (error) {
       console.error('Error al obtener usuario:', error);
-      setCredentialsModal({ nombreUsuario: 'Error al cargar', contrasena: '', nombre: s.persona?.nombres || '', personalId: s.id, personaId: s.personaId });
+      setModalCredenciales({ nombreUsuario: 'Error al cargar', contrasena: '', nombre: elemento.persona?.nombres || '', personalId: elemento.id, personaId: elemento.personaId });
     }
   };
 
-  const handleResetPassword = async () => {
-    if (!credentialsModal) return;
-    setResetLoading(true);
+  const restablecerContrasena = async () => {
+    if (!modalCredenciales) return;
+    setCargandoRestablecer(true);
     try {
-      const response = await api.get(`/usuarios?personaId=${credentialsModal.personaId}`);
-      const users = response.data.datos;
-      if (users && users.length > 0) {
-        await api.post(`/usuarios/${users[0].id}/cambiar-contrasena`, { nuevaContrasena: credentialsModal.contrasena });
+      const respuesta = await api.get(`/usuarios?personaId=${modalCredenciales.personaId}`);
+      const usuarios = respuesta.data.datos;
+      if (usuarios && usuarios.length > 0) {
+        await api.post(`/usuarios/${usuarios[0].id}/cambiar-contrasena`, { nuevaContrasena: modalCredenciales.contrasena });
       }
-      setCredentialsModal(null);
+      setModalCredenciales(null);
     } catch (error) {
       console.error('Error al restablecer contraseña:', error);
     } finally {
-      setResetLoading(false);
+      setCargandoRestablecer(false);
     }
   };
 
-  if (loading) {
+  if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
@@ -140,7 +140,7 @@ export default function StaffPage() {
 
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Personal' }]} />
+      <Migas elementos={[{ etiqueta: 'Personal' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Personal</h1>
@@ -150,17 +150,17 @@ export default function StaffPage() {
         </Boton>
       </div>
 
-      <Tarjeta variant="bordered">
+      <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
-            <TituloTarjeta>Lista de Personal ({staff.length})</TituloTarjeta>
+            <TituloTarjeta>Lista de Personal ({personal.length})</TituloTarjeta>
             <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Entrada
                 placeholder="Buscar por nombre o CI..."
                 className="pl-10"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={terminoBusqueda}
+                onChange={(e) => setTerminoBusqueda(e.target.value)}
               />
             </div>
           </div>
@@ -178,36 +178,36 @@ export default function StaffPage() {
               </FilaTabla>
             </EncabezadoTabla>
             <CuerpoTabla>
-              {filteredStaff.map((s) => (
-                <FilaTabla key={s.id}>
+              {personalFiltrado.map((elemento) => (
+                <FilaTabla key={elemento.id}>
                   <CeldaTabla className="font-medium">
-                    {s.persona?.ci}
+                    {elemento.persona?.ci}
                   </CeldaTabla>
                   <CeldaTabla>
-                    {s.persona?.nombres} {s.persona?.apellidoPaterno} {s.persona?.apellidoMaterno}
+                    {elemento.persona?.nombres} {elemento.persona?.apellidoPaterno} {elemento.persona?.apellidoMaterno}
                   </CeldaTabla>
-                  <CeldaTabla>{getRolBadge(s.cargo)}</CeldaTabla>
-                  <CeldaTabla>{s.profesion || '-'}</CeldaTabla>
-                  <CeldaTabla>{getStatusBadge(s.estado)}</CeldaTabla>
+                  <CeldaTabla>{obtenerInsigniaCargo(elemento.cargo)}</CeldaTabla>
+                  <CeldaTabla>{elemento.profesion || '-'}</CeldaTabla>
+                  <CeldaTabla>{obtenerInsigniaEstado(elemento.estado)}</CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Boton variant="ghost" size="icon" title="Ver credenciales" onClick={() => viewCredentials(s)}>
+                      <Boton variante="fantasma" tamano="icono" title="Ver credenciales" onClick={() => verCredenciales(elemento)}>
                         <Eye className="w-4 h-4" />
                       </Boton>
-                      <Boton variant="ghost" size="icon" title="Editar" onClick={() => router.push(`/personal/editar/${s.id}`)}>
+                      <Boton variante="fantasma" tamano="icono" title="Editar" onClick={() => router.push(`/personal/editar/${elemento.id}`)}>
                         <Edit2 className="w-4 h-4" />
                       </Boton>
-                      <Boton variant="ghost" size="icon" title="Eliminar" onClick={() => setDeleteModal(s)}>
+                      <Boton variante="fantasma" tamano="icono" title="Eliminar" onClick={() => setPersonalEliminando(elemento)}>
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </Boton>
                     </div>
                   </CeldaTabla>
                 </FilaTabla>
               ))}
-              {filteredStaff.length === 0 && (
+              {personalFiltrado.length === 0 && (
                 <FilaTabla>
                   <CeldaTabla colSpan={6} className="text-center py-8 text-gray-500">
-                    {searchTerm ? 'No se encontró personal' : 'No hay personal registrado'}
+                    {terminoBusqueda ? 'No se encontró personal' : 'No hay personal registrado'}
                   </CeldaTabla>
                 </FilaTabla>
               )}
@@ -216,36 +216,36 @@ export default function StaffPage() {
         </ContenidoTarjeta>
       </Tarjeta>
 
-      <ConfirmModal
-        open={!!deleteModal}
-        onClose={() => setDeleteModal(null)}
-        onConfirm={handleDelete}
-        title="Eliminar Personal"
-        message={`¿Está seguro de eliminar a "${deleteModal?.persona?.nombres} ${deleteModal?.persona?.apellidoPaterno}"? Esta acción no se puede deshacer.`}
-        confirmText="Eliminar"
-        variant="destructive"
-        loading={formLoading}
+      <ModalConfirmacion
+        abierto={!!personalEliminando}
+        alCerrar={() => setPersonalEliminando(null)}
+        alConfirmar={eliminar}
+        titulo="Eliminar Personal"
+        mensaje={`¿Está seguro de eliminar a "${personalEliminando?.persona?.nombres} ${personalEliminando?.persona?.apellidoPaterno}"? Esta acción no se puede deshacer.`}
+        textoConfirmar="Eliminar"
+        variante="destructivo"
+        cargando={cargandoFormulario}
       />
 
-      <Modal open={!!credentialsModal} onClose={() => setCredentialsModal(null)} title="Credenciales del Personal" size="md">
-        {credentialsModal && (
+      <Modal abierto={!!modalCredenciales} alCerrar={() => setModalCredenciales(null)} titulo="Credenciales del Personal" tamano="mediano">
+        {modalCredenciales && (
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              Credenciales de acceso para <strong>{credentialsModal.nombre}</strong>:
+              Credenciales de acceso para <strong>{modalCredenciales.nombre}</strong>:
             </p>
             <div className="bg-gray-50 p-4 rounded-lg space-y-3">
               <div className="flex items-center gap-3">
                 <User className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Nombre de usuario</p>
-                  <p className="font-mono font-medium">{credentialsModal.nombreUsuario}</p>
+                  <p className="font-mono font-medium">{modalCredenciales.nombreUsuario}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Key className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Contraseña temporal</p>
-                  <p className="font-mono font-medium text-green-600">{credentialsModal.contrasena}</p>
+                  <p className="font-mono font-medium text-green-600">{modalCredenciales.contrasena}</p>
                 </div>
               </div>
             </div>
@@ -253,8 +253,8 @@ export default function StaffPage() {
               ⚠️ Esta contraseña es temporal. El usuario debe cambiarla después de iniciar sesión.
             </p>
             <div className="flex justify-end gap-3">
-              <Boton variant="outline" onClick={() => setCredentialsModal(null)}>Cerrar</Boton>
-              <Boton onClick={handleResetPassword} isLoading={resetLoading} disabled={credentialsModal.nombreUsuario === 'No tiene usuario' || credentialsModal.nombreUsuario === 'Error al cargar'}>
+              <Boton variante="contorno" onClick={() => setModalCredenciales(null)}>Cerrar</Boton>
+              <Boton onClick={restablecerContrasena} cargando={cargandoRestablecer} disabled={modalCredenciales.nombreUsuario === 'No tiene usuario' || modalCredenciales.nombreUsuario === 'Error al cargar'}>
                 Restablecer Contraseña
               </Boton>
             </div>

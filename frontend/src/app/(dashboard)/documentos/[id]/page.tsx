@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const tipoLabels: Record<string, string> = {
+const etiquetasTipo: Record<string, string> = {
   boleta_inscripcion: 'Boleta de Inscripción',
   recibo_pago: 'Recibo de Pago',
   carnet: 'Carnet de Estudiante',
@@ -20,80 +20,80 @@ const tipoLabels: Record<string, string> = {
   record_academico: 'Record Académico',
 };
 
-const estadoLabels: Record<string, { label: string; color: string }> = {
-  generado: { label: 'Generado', color: 'bg-gray-100 text-gray-800' },
-  impreso: { label: 'Impreso', color: 'bg-blue-100 text-blue-800' },
-  entregado: { label: 'Entregado', color: 'bg-green-100 text-green-800' },
-  anulado: { label: 'Anulado', color: 'bg-red-100 text-red-800' },
+const etiquetasEstado: Record<string, { etiqueta: string; color: string }> = {
+  generado: { etiqueta: 'Generado', color: 'bg-gray-100 text-gray-800' },
+  impreso: { etiqueta: 'Impreso', color: 'bg-blue-100 text-blue-800' },
+  entregado: { etiqueta: 'Entregado', color: 'bg-green-100 text-green-800' },
+  anulado: { etiqueta: 'Anulado', color: 'bg-red-100 text-red-800' },
 };
 
-export default function DocumentDetailPage() {
-  const params = useParams();
+export default function PaginaDetalleDocumento() {
+  const parametros = useParams();
   const router = useRouter();
-  const { getDocument, markAsPrinted, markAsDelivered, annulDocument } = usarDocumentos();
+  const { obtenerDocumento, marcarComoImpreso, marcarComoEntregado, anularDocumento } = usarDocumentos();
 
-  const [document, setDocument] = useState<DocumentoEmitido | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [documento, setDocumento] = useState<DocumentoEmitido | null>(null);
+  const [cargando, setCargando] = useState(true);
+  const [cargandoAccion, setCargandoAccion] = useState(false);
 
   useEffect(() => {
-    const fetch = async () => {
+    const cargarDocumento = async () => {
       try {
-        const data = await getDocument(params.id as string);
-        setDocument(data);
+        const datos = await obtenerDocumento(parametros.id as string);
+        setDocumento(datos);
       } catch (error) {
         console.error('Error al obtener el documento:', error);
       } finally {
-        setLoading(false);
+        setCargando(false);
       }
     };
-    fetch();
-  }, [params.id]);
+    cargarDocumento();
+  }, [parametros.id]);
 
-  const handlePrint = async () => {
-    if (!document) return;
-    setActionLoading(true);
+  const imprimir = async () => {
+    if (!documento) return;
+    setCargandoAccion(true);
     try {
-      const updated = await markAsPrinted(document.id, 1);
-      setDocument(updated);
+      const actualizado = await marcarComoImpreso(documento.id, 1);
+      setDocumento(actualizado);
     } catch (error) {
       console.error('Error al marcar como impreso:', error);
     } finally {
-      setActionLoading(false);
+      setCargandoAccion(false);
     }
   };
 
-  const handleDeliver = async () => {
-    if (!document) return;
+  const entregar = async () => {
+    if (!documento) return;
     const entregadoA = prompt('Nombre de quien recibe:');
     if (!entregadoA) return;
-    setActionLoading(true);
+    setCargandoAccion(true);
     try {
-      const updated = await markAsDelivered(document.id, entregadoA);
-      setDocument(updated);
+      const actualizado = await marcarComoEntregado(documento.id, entregadoA);
+      setDocumento(actualizado);
     } catch (error) {
       console.error('Error al registrar la entrega:', error);
     } finally {
-      setActionLoading(false);
+      setCargandoAccion(false);
     }
   };
 
-  const handleAnnul = async () => {
-    if (!document) return;
+  const anular = async () => {
+    if (!documento) return;
     const observaciones = prompt('Motivo de anulación:');
     if (!observaciones) return;
-    setActionLoading(true);
+    setCargandoAccion(true);
     try {
-      const updated = await annulDocument(document.id, observaciones);
-      setDocument(updated);
+      const actualizado = await anularDocumento(documento.id, observaciones);
+      setDocumento(actualizado);
     } catch (error) {
       console.error('Error al anular el documento:', error);
     } finally {
-      setActionLoading(false);
+      setCargandoAccion(false);
     }
   };
 
-  if (loading) {
+  if (cargando) {
     return (
       <div className="flex justify-center items-center min-h-96">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
@@ -101,7 +101,7 @@ export default function DocumentDetailPage() {
     );
   }
 
-  if (!document) {
+  if (!documento) {
     return (
       <div className="p-6">
         <p className="text-center text-gray-500">Documento no encontrado</p>
@@ -109,23 +109,23 @@ export default function DocumentDetailPage() {
     );
   }
 
-  const estado = estadoLabels[document.estado];
+  const estado = etiquetasEstado[documento.estado];
 
   return (
     <div className="p-6">
       <div className="flex items-center gap-4 mb-6">
         <Link href="/documentos">
-          <Boton variant="ghost" size="sm">
+          <Boton variante="fantasma" tamano="pequeno">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver
           </Boton>
         </Link>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-gray-900">Detalle de Documento</h1>
-          <p className="text-gray-500">ID: {document.id.slice(0, 8)}...</p>
+          <p className="text-gray-500">ID: {documento.id.slice(0, 8)}...</p>
         </div>
         <Insignia className={estado?.color}>
-          {estado?.label}
+          {estado?.etiqueta}
         </Insignia>
       </div>
 
@@ -135,43 +135,43 @@ export default function DocumentDetailPage() {
             <EncabezadoTarjeta>
               <TituloTarjeta className="flex items-center gap-2">
                 <FileText className="w-5 h-5" />
-                {tipoLabels[document.tipo] || document.tipo}
+                {etiquetasTipo[documento.tipo] || documento.tipo}
               </TituloTarjeta>
             </EncabezadoTarjeta>
             <ContenidoTarjeta className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Número de documento</p>
-                  <p className="font-semibold">{document.numeroDocumento}</p>
+                  <p className="font-semibold">{documento.numeroDocumento}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Gestión</p>
-                  <p className="font-semibold">{document.gestion}</p>
+                  <p className="font-semibold">{documento.gestion}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Fecha de emisión</p>
                   <p className="font-semibold">
-                    {document.fechaEmision
-                      ? format(new Date(document.fechaEmision), "d 'de' MMMM 'de' yyyy HH:mm", { locale: es })
+                    {documento.fechaEmision
+                      ? format(new Date(documento.fechaEmision), "d 'de' MMMM 'de' yyyy HH:mm", { locale: es })
                       : '-'}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Tipo</p>
-                  <p className="font-semibold">{tipoLabels[document.tipo] || document.tipo}</p>
+                  <p className="font-semibold">{etiquetasTipo[documento.tipo] || documento.tipo}</p>
                 </div>
               </div>
 
-              {document.observaciones && (
+              {documento.observaciones && (
                 <div>
                   <p className="text-sm text-gray-500">Observaciones</p>
-                  <p className="font-medium">{document.observaciones}</p>
+                  <p className="font-medium">{documento.observaciones}</p>
                 </div>
               )}
             </ContenidoTarjeta>
           </Tarjeta>
 
-          {document.estudiante && (
+          {documento.estudiante && (
             <Tarjeta>
               <EncabezadoTarjeta>
                 <TituloTarjeta className="flex items-center gap-2">
@@ -181,29 +181,29 @@ export default function DocumentDetailPage() {
               </EncabezadoTarjeta>
               <ContenidoTarjeta>
                 <p className="font-medium">
-                  {document.estudiante.persona?.nombres}{' '}
-                  {document.estudiante.persona?.apellidoPaterno}{' '}
-                  {document.estudiante.persona?.apellidoMaterno}
+                  {documento.estudiante.persona?.nombres}{' '}
+                  {documento.estudiante.persona?.apellidoPaterno}{' '}
+                  {documento.estudiante.persona?.apellidoMaterno}
                 </p>
                 <p className="text-sm text-gray-500">
-                  {document.estudiante.persona?.ci}
+                  {documento.estudiante.persona?.ci}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Código: {document.estudiante.codigoInscripcion}
+                  Código: {documento.estudiante.codigoInscripcion}
                 </p>
               </ContenidoTarjeta>
             </Tarjeta>
           )}
 
-          {document.fechaEntrega && (
+          {documento.fechaEntrega && (
             <Tarjeta>
               <EncabezadoTarjeta>
                 <TituloTarjeta>Entrega</TituloTarjeta>
               </EncabezadoTarjeta>
               <ContenidoTarjeta>
-                <p className="font-medium">Entregado a: {document.entregadoA}</p>
+                <p className="font-medium">Entregado a: {documento.entregadoA}</p>
                 <p className="text-sm text-gray-500">
-                  Fecha: {format(new Date(document.fechaEntrega), "d 'de' MMMM 'de' yyyy HH:mm", { locale: es })}
+                  Fecha: {format(new Date(documento.fechaEntrega), "d 'de' MMMM 'de' yyyy HH:mm", { locale: es })}
                 </p>
               </ContenidoTarjeta>
             </Tarjeta>
@@ -216,41 +216,41 @@ export default function DocumentDetailPage() {
               <TituloTarjeta>Acciones</TituloTarjeta>
             </EncabezadoTarjeta>
             <ContenidoTarjeta className="space-y-3">
-              {document.estado === 'generado' && (
+              {documento.estado === 'generado' && (
                 <Boton
                   className="w-full"
-                  onClick={handlePrint}
-                  disabled={actionLoading}
+                  onClick={imprimir}
+                  disabled={cargandoAccion}
                 >
                   <Printer className="w-4 h-4 mr-2" />
                   Marcar como impreso
                 </Boton>
               )}
 
-              {document.estado === 'impreso' && (
+              {documento.estado === 'impreso' && (
                 <Boton
                   className="w-full bg-green-600 hover:bg-green-700"
-                  onClick={handleDeliver}
-                  disabled={actionLoading}
+                  onClick={entregar}
+                  disabled={cargandoAccion}
                 >
                   <CheckCircle className="w-4 h-4 mr-2" />
                   Registrar entrega
                 </Boton>
               )}
 
-              {(document.estado === 'generado' || document.estado === 'impreso') && (
+              {(documento.estado === 'generado' || documento.estado === 'impreso') && (
                 <Boton
-                  variant="destructive"
+                  variante="destructivo"
                   className="w-full"
-                  onClick={handleAnnul}
-                  disabled={actionLoading}
+                  onClick={anular}
+                  disabled={cargandoAccion}
                 >
                   <XCircle className="w-4 h-4 mr-2" />
                   Anular documento
                 </Boton>
               )}
 
-              <Boton variant="outline" className="w-full" disabled={!document.rutaPdf}>
+              <Boton variante="contorno" className="w-full" disabled={!documento.rutaPdf}>
                 <FileText className="w-4 h-4 mr-2" />
                 Descargar PDF
               </Boton>

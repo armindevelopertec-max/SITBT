@@ -7,19 +7,19 @@ import { Boton } from '@/components/ui/boton';
 import { Entrada } from '@/components/ui/entrada';
 import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
 import { Insignia } from '@/components/ui/insignia';
-import { Modal, ConfirmModal } from '@/components/ui/modal';
+import { Modal, ModalConfirmacion } from '@/components/ui/modal';
 import { usarUsuarios, UsuarioRespuesta } from '@/hooks/usarUsuarios';
 import { Rol } from '@/types';
 import { Plus, Search, Edit2, Trash2, Shield, Key, X, Loader2 } from 'lucide-react';
 
-const rolColors: Record<string, 'default' | 'primary' | 'secondary' | 'exito' | 'advertencia' | 'error'> = {
+const coloresRol: Record<string, 'predeterminado' | 'primario' | 'secundario' | 'exito' | 'advertencia' | 'error'> = {
   administrador: 'error',
-  rector: 'default',
-  director_academico: 'primary',
-  secretaria: 'secondary',
+  rector: 'predeterminado',
+  director_academico: 'primario',
+  secretaria: 'secundario',
   docente: 'exito',
   estudiante: 'advertencia',
-  apoyo: 'default',
+  apoyo: 'predeterminado',
 };
 
 const ROLES = [
@@ -32,100 +32,100 @@ const ROLES = [
   { codigo: 'apoyo', nombre: 'Apoyo' },
 ];
 
-export default function UsersPage() {
+export default function PaginaUsuarios() {
   const { usuarios, cargando, error, paginacion, recargar, crearUsuario, actualizarUsuario, eliminarUsuario, cambiarContrasena } = usarUsuarios();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [terminoBusqueda, setTerminoBusqueda] = useState('');
 
-  const [resetModal, setResetModal] = useState({ open: false, user: null as UsuarioRespuesta | null });
-  const [deleteModal, setDeleteModal] = useState({ open: false, user: null as UsuarioRespuesta | null });
-  const [createModal, setCreateModal] = useState(false);
-  const [editModal, setEditModal] = useState<UsuarioRespuesta | null>(null);
+  const [modalRestablecer, setModalRestablecer] = useState({ abierto: false, usuario: null as UsuarioRespuesta | null });
+  const [modalEliminar, setModalEliminar] = useState({ abierto: false, usuario: null as UsuarioRespuesta | null });
+  const [modalCrear, setModalCrear] = useState(false);
+  const [modalEditar, setModalEditar] = useState<UsuarioRespuesta | null>(null);
 
-  const [formData, setFormData] = useState({ nombreUsuario: '', contrasena: '', personaId: 1, codigoRol: 'estudiante' });
-  const [formLoading, setFormLoading] = useState(false);
+  const [datosFormulario, setDatosFormulario] = useState({ nombreUsuario: '', contrasena: '', personaId: 1, codigoRol: 'estudiante' });
+  const [cargandoFormulario, setCargandoFormulario] = useState(false);
 
-  const [newPassword, setNewPassword] = useState('');
-  const [resetPasswordModal, setResetPasswordModal] = useState({ open: false, user: null as UsuarioRespuesta | null });
-  const [resetLoading, setResetLoading] = useState(false);
+  const [nuevaContrasena, setNuevaContrasena] = useState('');
+  const [modalRestablecerContrasena, setModalRestablecerContrasena] = useState({ abierto: false, usuario: null as UsuarioRespuesta | null });
+  const [cargandoRestablecer, setCargandoRestablecer] = useState(false);
 
-  const filteredUsers = usuarios.filter(user =>
-    user.nombreUsuario.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.persona?.correo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.persona?.nombres?.toLowerCase().includes(searchTerm.toLowerCase())
+  const usuariosFiltrados = usuarios.filter(usuario =>
+    usuario.nombreUsuario.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+    usuario.persona?.correo?.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+    usuario.persona?.nombres?.toLowerCase().includes(terminoBusqueda.toLowerCase())
   );
 
-  const getRoleBadge = (roles: UsuarioRespuesta['roles']) => {
-    if (!roles || roles.length === 0) return <Insignia variant="default">Sin rol</Insignia>;
-    const primaryRole = roles[0];
+  const obtenerInsigniaRol = (roles: UsuarioRespuesta['roles']) => {
+    if (!roles || roles.length === 0) return <Insignia variante="predeterminado">Sin rol</Insignia>;
+    const rolPrincipal = roles[0];
     return (
-      <Insignia variant={rolColors[primaryRole.codigo] || 'default'} className="capitalize">
-        {primaryRole.nombre}
+      <Insignia variante={coloresRol[rolPrincipal.codigo] || 'predeterminado'} className="capitalize">
+        {rolPrincipal.nombre}
       </Insignia>
     );
   };
 
-  const handleCreate = async () => {
+  const crear = async () => {
     try {
-      setFormLoading(true);
-      await crearUsuario({ ...formData, codigoRol: formData.codigoRol as Rol });
-      setCreateModal(false);
-      setFormData({ nombreUsuario: '', contrasena: '', personaId: 1, codigoRol: 'estudiante' });
-    } catch (err) {
-      console.error('Error al crear usuario:', err);
+      setCargandoFormulario(true);
+      await crearUsuario({ ...datosFormulario, codigoRol: datosFormulario.codigoRol as Rol });
+      setModalCrear(false);
+      setDatosFormulario({ nombreUsuario: '', contrasena: '', personaId: 1, codigoRol: 'estudiante' });
+    } catch (error) {
+      console.error('Error al crear usuario:', error);
     } finally {
-      setFormLoading(false);
+      setCargandoFormulario(false);
     }
   };
 
-  const handleEdit = async () => {
-    if (!editModal) return;
+  const editar = async () => {
+    if (!modalEditar) return;
     try {
-      setFormLoading(true);
-      await actualizarUsuario(editModal.id, { nombreUsuario: formData.nombreUsuario });
-      setEditModal(null);
-    } catch (err) {
-      console.error('Error al actualizar usuario:', err);
+      setCargandoFormulario(true);
+      await actualizarUsuario(modalEditar.id, { nombreUsuario: datosFormulario.nombreUsuario });
+      setModalEditar(null);
+    } catch (error) {
+      console.error('Error al actualizar usuario:', error);
     } finally {
-      setFormLoading(false);
+      setCargandoFormulario(false);
     }
   };
 
-  const handleDelete = async () => {
-    if (!deleteModal.user) return;
+  const eliminar = async () => {
+    if (!modalEliminar.usuario) return;
     try {
-      setFormLoading(true);
-      await eliminarUsuario(deleteModal.user.id);
-      setDeleteModal({ open: false, user: null });
-    } catch (err) {
-      console.error('Error al eliminar usuario:', err);
+      setCargandoFormulario(true);
+      await eliminarUsuario(modalEliminar.usuario.id);
+      setModalEliminar({ abierto: false, usuario: null });
+    } catch (error) {
+      console.error('Error al eliminar usuario:', error);
     } finally {
-      setFormLoading(false);
+      setCargandoFormulario(false);
     }
   };
 
-  const handleResetPassword = async () => {
-    if (!resetPasswordModal.user) return;
+  const restablecerContrasena = async () => {
+    if (!modalRestablecerContrasena.usuario) return;
     try {
-      setResetLoading(true);
-      await cambiarContrasena(resetPasswordModal.user.id, newPassword);
-      setResetPasswordModal({ open: false, user: null });
-      setNewPassword('');
-    } catch (err) {
-      console.error('Error al restablecer contraseña:', err);
+      setCargandoRestablecer(true);
+      await cambiarContrasena(modalRestablecerContrasena.usuario.id, nuevaContrasena);
+      setModalRestablecerContrasena({ abierto: false, usuario: null });
+      setNuevaContrasena('');
+    } catch (error) {
+      console.error('Error al restablecer contraseña:', error);
     } finally {
-      setResetLoading(false);
+      setCargandoRestablecer(false);
     }
   };
 
-  const openEditModal = (user: UsuarioRespuesta) => {
-    setFormData({ ...formData, nombreUsuario: user.nombreUsuario });
-    setEditModal(user);
+  const abrirModalEdicion = (usuario: UsuarioRespuesta) => {
+    setDatosFormulario({ ...datosFormulario, nombreUsuario: usuario.nombreUsuario });
+    setModalEditar(usuario);
   };
 
   if (error) {
     return (
       <div className="space-y-6">
-        <Migas items={[{ label: 'Usuarios' }]} />
+        <Migas elementos={[{ etiqueta: 'Usuarios' }]} />
         <div className="p-4 text-red-500">Error: {error}</div>
         <Boton onClick={recargar}>Reintentar</Boton>
       </div>
@@ -134,17 +134,17 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Usuarios' }]} />
+      <Migas elementos={[{ etiqueta: 'Usuarios' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
-        <Boton onClick={() => setCreateModal(true)}>
+        <Boton onClick={() => setModalCrear(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Usuario
         </Boton>
       </div>
 
-      <Tarjeta variant="bordered">
+      <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
             <TituloTarjeta>Lista de Usuarios del Sistema</TituloTarjeta>
@@ -153,8 +153,8 @@ export default function UsersPage() {
               <Entrada
                 placeholder="Buscar usuario..."
                 className="pl-10"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={terminoBusqueda}
+                onChange={(e) => setTerminoBusqueda(e.target.value)}
               />
             </div>
           </div>
@@ -176,39 +176,39 @@ export default function UsersPage() {
                 </FilaTabla>
               </EncabezadoTabla>
               <CuerpoTabla>
-                {filteredUsers.map((user) => (
-                  <FilaTabla key={user.id}>
+                {usuariosFiltrados.map((usuario) => (
+                  <FilaTabla key={usuario.id}>
                     <CeldaTabla>
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
                           <Shield className="w-4 h-4 text-primary-600" />
                         </div>
-                        <span className="font-medium">{user.nombreUsuario}</span>
+                        <span className="font-medium">{usuario.nombreUsuario}</span>
                       </div>
                     </CeldaTabla>
-                    <CeldaTabla>{user.persona?.correo || '-'}</CeldaTabla>
-                    <CeldaTabla>{getRoleBadge(user.roles)}</CeldaTabla>
+                    <CeldaTabla>{usuario.persona?.correo || '-'}</CeldaTabla>
+                    <CeldaTabla>{obtenerInsigniaRol(usuario.roles)}</CeldaTabla>
                     <CeldaTabla>
-                      <Insignia variant={user.estado === 'activo' ? 'exito' : 'error'} className="capitalize">
-                        {user.estado}
+                      <Insignia variante={usuario.estado === 'activo' ? 'exito' : 'error'} className="capitalize">
+                        {usuario.estado}
                       </Insignia>
                     </CeldaTabla>
                     <CeldaTabla>
                       <div className="flex items-center gap-2">
-                        <Boton variant="ghost" size="icon" title="Restablecer contraseña" onClick={() => setResetPasswordModal({ open: true, user })}>
+                        <Boton variante="fantasma" tamano="icono" title="Restablecer contraseña" onClick={() => setModalRestablecerContrasena({ abierto: true, usuario })}>
                           <Key className="w-4 h-4" />
                         </Boton>
-                        <Boton variant="ghost" size="icon" title="Editar" onClick={() => openEditModal(user)}>
+                        <Boton variante="fantasma" tamano="icono" title="Editar" onClick={() => abrirModalEdicion(usuario)}>
                           <Edit2 className="w-4 h-4" />
                         </Boton>
-                        <Boton variant="ghost" size="icon" title="Eliminar" onClick={() => setDeleteModal({ open: true, user })}>
+                        <Boton variante="fantasma" tamano="icono" title="Eliminar" onClick={() => setModalEliminar({ abierto: true, usuario })}>
                           <Trash2 className="w-4 h-4 text-red-500" />
                         </Boton>
                       </div>
                     </CeldaTabla>
                   </FilaTabla>
                 ))}
-                {filteredUsers.length === 0 && (
+                {usuariosFiltrados.length === 0 && (
                   <FilaTabla>
                     <CeldaTabla colSpan={5} className="text-center py-8 text-gray-500">
                       No se encontraron usuarios
@@ -221,13 +221,13 @@ export default function UsersPage() {
         </ContenidoTarjeta>
       </Tarjeta>
 
-      <Modal open={createModal} onClose={() => setCreateModal(false)} title="Nuevo Usuario" size="md">
+      <Modal abierto={modalCrear} alCerrar={() => setModalCrear(false)} titulo="Nuevo Usuario" tamano="mediano">
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Nombre de usuario</label>
             <Entrada
-              value={formData.nombreUsuario}
-              onChange={(e) => setFormData({ ...formData, nombreUsuario: e.target.value })}
+              value={datosFormulario.nombreUsuario}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, nombreUsuario: e.target.value })}
               placeholder="juan.perez"
             />
           </div>
@@ -235,8 +235,8 @@ export default function UsersPage() {
             <label className="block text-sm font-medium mb-1">Contraseña</label>
             <Entrada
               type="password"
-              value={formData.contrasena}
-              onChange={(e) => setFormData({ ...formData, contrasena: e.target.value })}
+              value={datosFormulario.contrasena}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, contrasena: e.target.value })}
               placeholder="Contraseña segura"
             />
           </div>
@@ -244,8 +244,8 @@ export default function UsersPage() {
             <label className="block text-sm font-medium mb-1">Rol</label>
             <select
               className="w-full p-2 border rounded-md"
-              value={formData.codigoRol}
-              onChange={(e) => setFormData({ ...formData, codigoRol: e.target.value })}
+              value={datosFormulario.codigoRol}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, codigoRol: e.target.value })}
             >
               {ROLES.map((role) => (
                 <option key={role.codigo} value={role.codigo}>{role.nombre}</option>
@@ -253,57 +253,57 @@ export default function UsersPage() {
             </select>
           </div>
           <div className="flex justify-end gap-3 pt-4">
-            <Boton variant="outline" onClick={() => setCreateModal(false)}>Cancelar</Boton>
-            <Boton onClick={handleCreate} isLoading={formLoading}>Crear Usuario</Boton>
+            <Boton variante="contorno" onClick={() => setModalCrear(false)}>Cancelar</Boton>
+            <Boton onClick={crear} cargando={cargandoFormulario}>Crear Usuario</Boton>
           </div>
         </div>
       </Modal>
 
-      <Modal open={!!editModal} onClose={() => setEditModal(null)} title="Editar Usuario" size="md">
+      <Modal abierto={!!modalEditar} alCerrar={() => setModalEditar(null)} titulo="Editar Usuario" tamano="mediano">
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Nombre de usuario</label>
             <Entrada
-              value={formData.nombreUsuario}
-              onChange={(e) => setFormData({ ...formData, nombreUsuario: e.target.value })}
+              value={datosFormulario.nombreUsuario}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, nombreUsuario: e.target.value })}
               placeholder="juan.perez"
             />
           </div>
           <div className="flex justify-end gap-3 pt-4">
-            <Boton variant="outline" onClick={() => setEditModal(null)}>Cancelar</Boton>
-            <Boton onClick={handleEdit} isLoading={formLoading}>Guardar Cambios</Boton>
+            <Boton variante="contorno" onClick={() => setModalEditar(null)}>Cancelar</Boton>
+            <Boton onClick={editar} cargando={cargandoFormulario}>Guardar Cambios</Boton>
           </div>
         </div>
       </Modal>
 
-      <ConfirmModal
-        open={deleteModal.open}
-        onClose={() => setDeleteModal({ open: false, user: null })}
-        onConfirm={handleDelete}
-        title="Eliminar Usuario"
-        message={`¿Está seguro de eliminar el usuario "${deleteModal.user?.nombreUsuario}"? Esta acción no se puede deshacer.`}
-        confirmText="Eliminar"
-        variant="destructive"
-        loading={formLoading}
+      <ModalConfirmacion
+        abierto={modalEliminar.abierto}
+        alCerrar={() => setModalEliminar({ abierto: false, usuario: null })}
+        alConfirmar={eliminar}
+        titulo="Eliminar Usuario"
+        mensaje={`¿Está seguro de eliminar el usuario "${modalEliminar.usuario?.nombreUsuario}"? Esta acción no se puede deshacer.`}
+        textoConfirmar="Eliminar"
+        variante="destructivo"
+        cargando={cargandoFormulario}
       />
 
-      <Modal open={resetPasswordModal.open} onClose={() => setResetPasswordModal({ open: false, user: null })} title="Restablecer Contraseña" size="sm">
+      <Modal abierto={modalRestablecerContrasena.abierto} alCerrar={() => setModalRestablecerContrasena({ abierto: false, usuario: null })} titulo="Restablecer Contraseña" tamano="pequeno">
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            Ingrese la nueva contraseña para el usuario &quot;{resetPasswordModal.user?.nombreUsuario}&quot;:
+            Ingrese la nueva contraseña para el usuario &quot;{modalRestablecerContrasena.usuario?.nombreUsuario}&quot;:
           </p>
           <div>
             <label className="block text-sm font-medium mb-1">Nueva contraseña</label>
             <Entrada
               type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              value={nuevaContrasena}
+              onChange={(e) => setNuevaContrasena(e.target.value)}
               placeholder="Nueva contraseña"
             />
           </div>
           <div className="flex justify-end gap-3 pt-4">
-            <Boton variant="outline" onClick={() => setResetPasswordModal({ open: false, user: null })}>Cancelar</Boton>
-            <Boton onClick={handleResetPassword} isLoading={resetLoading}>Restablecer</Boton>
+            <Boton variante="contorno" onClick={() => setModalRestablecerContrasena({ abierto: false, usuario: null })}>Cancelar</Boton>
+            <Boton onClick={restablecerContrasena} cargando={cargandoRestablecer}>Restablecer</Boton>
           </div>
         </div>
       </Modal>

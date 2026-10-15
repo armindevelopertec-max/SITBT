@@ -8,23 +8,23 @@ import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaT
 import { Insignia } from '@/components/ui/insignia';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 
-const gradesData = [
+const datosCalificaciones = [
   { id: 1, estudiante: 'Juan Perez', materia: 'Programación I', tipo: 'Examen Parcial', nota: 85, fecha: '2024-03-15' },
   { id: 2, estudiante: 'Maria Lopez', materia: 'Matemáticas I', tipo: 'Práctica', nota: 92, fecha: '2024-03-16' },
   { id: 3, estudiante: 'Carlos Mendez', materia: 'Física I', tipo: 'Examen Final', nota: 78, fecha: '2024-03-17' },
   { id: 4, estudiante: 'Ana Rodriguez', materia: 'Contabilidad', tipo: 'Trabajo', nota: 88, fecha: '2024-03-18' },
 ];
 
-const getNotaColor = (nota: number) => {
+const obtenerColorNota = (nota: number) => {
   if (nota >= 80) return 'exito';
   if (nota >= 60) return 'advertencia';
   return 'error';
 };
 
-export default function GradesPage() {
+export default function PaginaCalificaciones() {
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Calificaciones' }]} />
+      <Migas elementos={[{ etiqueta: 'Calificaciones' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Calificaciones</h1>
@@ -34,7 +34,7 @@ export default function GradesPage() {
         </Boton>
       </div>
 
-      <Tarjeta variant="bordered">
+      <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
             <TituloTarjeta>Lista de Calificaciones</TituloTarjeta>
@@ -57,23 +57,23 @@ export default function GradesPage() {
               </FilaTabla>
             </EncabezadoTabla>
             <CuerpoTabla>
-              {gradesData.map((grade) => (
-                <FilaTabla key={grade.id}>
-                  <CeldaTabla className="font-medium">{grade.estudiante}</CeldaTabla>
-                  <CeldaTabla>{grade.materia}</CeldaTabla>
+              {datosCalificaciones.map((calificacion) => (
+                <FilaTabla key={calificacion.id}>
+                  <CeldaTabla className="font-medium">{calificacion.estudiante}</CeldaTabla>
+                  <CeldaTabla>{calificacion.materia}</CeldaTabla>
                   <CeldaTabla>
-                    <Insignia variant="outline">{grade.tipo}</Insignia>
+                    <Insignia variante="contorno">{calificacion.tipo}</Insignia>
                   </CeldaTabla>
                   <CeldaTabla>
-                    <Insignia variant={getNotaColor(grade.nota)}>{grade.nota}</Insignia>
+                    <Insignia variante={obtenerColorNota(calificacion.nota)}>{calificacion.nota}</Insignia>
                   </CeldaTabla>
-                  <CeldaTabla>{grade.fecha}</CeldaTabla>
+                  <CeldaTabla>{calificacion.fecha}</CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Boton variant="ghost" size="icon">
+                      <Boton variante="fantasma" tamano="icono">
                         <Edit2 className="w-4 h-4" />
                       </Boton>
-                      <Boton variant="ghost" size="icon">
+                      <Boton variante="fantasma" tamano="icono">
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </Boton>
                     </div>

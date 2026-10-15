@@ -16,7 +16,7 @@ export class ServicioUsuarios {
     private usuarioRolRepository: Repository<UsuarioRol>,
   ) {}
 
-  async create(crearUsuarioDto: CrearUsuarioDto & { codigoRol?: string }): Promise<Usuario> {
+  async crear(crearUsuarioDto: CrearUsuarioDto & { codigoRol?: string }): Promise<Usuario> {
     const contrasenaHash = await bcrypt.hash(crearUsuarioDto.contrasena, 10);
     const usuario = this.usuarioRepository.create({
       ...crearUsuarioDto,
@@ -25,8 +25,8 @@ export class ServicioUsuarios {
     const usuarioGuardado = await this.usuarioRepository.save(usuario);
 
     if (crearUsuarioDto.codigoRol) {
-      const rolRepository = this.usuarioRolRepository.manager.getRepository('Rol');
-      const rol = await rolRepository.findOne({ where: { codigo: crearUsuarioDto.codigoRol } });
+      const repositorioRol = this.usuarioRolRepository.manager.getRepository('Rol');
+      const rol = await repositorioRol.findOne({ where: { codigo: crearUsuarioDto.codigoRol } });
       if (rol) {
         const usuarioRol = this.usuarioRolRepository.create({
           usuarioId: usuarioGuardado.id,
@@ -36,39 +36,39 @@ export class ServicioUsuarios {
       }
     }
 
-    return this.findOne(usuarioGuardado.id);
+    return this.obtenerUno(usuarioGuardado.id);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
     estado?: EstadoUsuario,
   ): Promise<{ datos: Usuario[]; total: number; pagina: number; limite: number }> {
-    const query = this.usuarioRepository
+    const consulta = this.usuarioRepository
       .createQueryBuilder('usuario')
       .leftJoinAndSelect('usuario.persona', 'persona')
       .leftJoinAndSelect('usuario.usuarioRoles', 'usuarioRol')
       .leftJoinAndSelect('usuarioRol.rol', 'rol');
 
     if (estado) {
-      query.andWhere('usuario.estado = :estado', { estado: estado });
+      consulta.andWhere('usuario.estado = :estado', { estado: estado });
     }
 
-    const [data, total] = await query
+    const [datos, total] = await consulta
       .orderBy('usuario.creadoEn', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    const usuariosConRoles = data.map(({ contrasenaHash, usuarioRoles, ...usuario }) => ({
+    const usuariosConRoles = datos.map(({ contrasenaHash, usuarioRoles, ...usuario }) => ({
       ...usuario,
       roles: usuarioRoles?.map((ur: UsuarioRol) => ur.rol).filter(Boolean) || [],
     }));
 
-    return { datos: usuariosConRoles as any, total, pagina: page, limite: limit };
+    return { datos: usuariosConRoles as any, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<any> {
+  async obtenerUno(id: number): Promise<any> {
     const usuario = await this.usuarioRepository.findOne({
       where: { id },
       relations: ['persona', 'usuarioRoles', 'usuarioRoles.rol'],
@@ -83,7 +83,7 @@ export class ServicioUsuarios {
     };
   }
 
-  async findByNombreUsuario(nombreUsuario: string): Promise<any> {
+  async buscarPorNombreUsuario(nombreUsuario: string): Promise<any> {
     const usuario = await this.usuarioRepository.findOne({
       where: { nombreUsuario },
       relations: ['persona', 'usuarioRoles', 'usuarioRoles.rol'],
@@ -98,8 +98,8 @@ export class ServicioUsuarios {
     };
   }
 
-  async update(id: number, actualizarUsuarioDto: ActualizarUsuarioDto): Promise<Usuario> {
-    const usuario = await this.findOne(id);
+  async actualizar(id: number, actualizarUsuarioDto: ActualizarUsuarioDto): Promise<Usuario> {
+    const usuario = await this.obtenerUno(id);
 
     if (actualizarUsuarioDto.contrasena) {
       actualizarUsuarioDto.contrasena = await bcrypt.hash(actualizarUsuarioDto.contrasena, 10);
@@ -111,25 +111,25 @@ export class ServicioUsuarios {
     return this.usuarioRepository.save(usuario as any) as any;
   }
 
-  async remove(id: number): Promise<void> {
-    const usuario = await this.findOne(id);
+  async eliminar(id: number): Promise<void> {
+    const usuario = await this.obtenerUno(id);
     usuario.estado = EstadoUsuario.INACTIVO;
     await this.usuarioRepository.save(usuario);
   }
 
   async cambiarContrasena(id: number, nuevaContrasena: string): Promise<void> {
-    const usuario = await this.findOne(id);
+    const usuario = await this.obtenerUno(id);
     usuario.contrasenaHash = await bcrypt.hash(nuevaContrasena, 10);
     await this.usuarioRepository.save(usuario);
   }
 
   async asignarRol(usuarioId: number, rolId: number): Promise<UsuarioRol> {
-    const existing = await this.usuarioRolRepository.findOne({
+    const existente = await this.usuarioRolRepository.findOne({
       where: { usuarioId: usuarioId, rolId: rolId },
     });
 
-    if (existing) {
-      return existing;
+    if (existente) {
+      return existente;
     }
 
     const usuarioRol = this.usuarioRolRepository.create({
@@ -155,7 +155,7 @@ export class ServicioUsuarios {
     });
   }
 
-  async findActive(): Promise<any[]> {
+  async obtenerActivos(): Promise<any[]> {
     const usuarios = await this.usuarioRepository.find({
       where: { estado: EstadoUsuario.ACTIVO },
       relations: ['persona', 'usuarioRoles', 'usuarioRoles.rol'],

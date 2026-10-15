@@ -19,7 +19,7 @@ export default function AccederPage() {
     }
   }, [_hidratado, estaAutenticado, router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const enviarFormulario = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setCargando(true);
@@ -54,7 +54,7 @@ export default function AccederPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={enviarFormulario} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Usuario

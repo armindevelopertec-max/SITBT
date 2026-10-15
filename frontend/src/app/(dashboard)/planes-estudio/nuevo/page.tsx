@@ -16,14 +16,14 @@ interface Carrera {
   nombre: string;
 }
 
-export default function NuevoPlanPage() {
+export default function PaginaNuevoPlan() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [loadingData, setLoadingData] = useState(true);
+  const [guardando, setGuardando] = useState(false);
+  const [cargandoDatos, setCargandoDatos] = useState(true);
   const [carreras, setCarreras] = useState<Carrera[]>([]);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errores, setErrores] = useState<Record<string, string>>({});
 
-  const [formData, setFormData] = useState({
+  const [datosFormulario, setDatosFormulario] = useState({
     carreraId: '',
     numeroRm: '',
     fechaRm: '',
@@ -32,69 +32,69 @@ export default function NuevoPlanPage() {
   });
 
   useEffect(() => {
-    fetchCarreras();
+    obtenerCarreras();
   }, []);
 
-  const fetchCarreras = async () => {
+  const obtenerCarreras = async () => {
     try {
-      const response = await api.get('/carreras/activos');
-      setCarreras(response.data || []);
+      const respuesta = await api.get('/carreras/activos');
+      setCarreras(respuesta.data || []);
     } catch (error) {
       console.error('Error al obtener las carreras:', error);
     } finally {
-      setLoadingData(false);
+      setCargandoDatos(false);
     }
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const validarFormulario = () => {
+    const nuevosErrores: Record<string, string> = {};
 
-    if (!formData.carreraId) newErrors.carreraId = 'Carrera es requerida';
-    if (!formData.numeroRm.trim()) newErrors.numeroRm = 'Número RM es requerido';
-    if (!formData.fechaRm) newErrors.fechaRm = 'Fecha RM es requerida';
+    if (!datosFormulario.carreraId) nuevosErrores.carreraId = 'Carrera es requerida';
+    if (!datosFormulario.numeroRm.trim()) nuevosErrores.numeroRm = 'Número RM es requerido';
+    if (!datosFormulario.fechaRm) nuevosErrores.fechaRm = 'Fecha RM es requerida';
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const enviarFormulario = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validarFormulario()) return;
 
-    setLoading(true);
+    setGuardando(true);
     try {
       await api.post('/planes-estudio', {
-        carreraId: parseInt(formData.carreraId),
-        numeroRm: formData.numeroRm.trim().toUpperCase(),
-        fechaRm: formData.fechaRm,
-        estado: formData.estado,
-        notas: formData.notas.trim() || null,
+        carreraId: parseInt(datosFormulario.carreraId),
+        numeroRm: datosFormulario.numeroRm.trim().toUpperCase(),
+        fechaRm: datosFormulario.fechaRm,
+        estado: datosFormulario.estado,
+        notas: datosFormulario.notas.trim() || null,
       });
 
       router.push('/planes-estudio');
     } catch (error: any) {
       console.error('Error al crear el plan de estudio:', error);
       if (error.response?.data?.mensaje) {
-        setErrors({ submit: error.response.data.mensaje });
+        setErrores({ submit: error.response.data.mensaje });
       } else {
-        setErrors({ submit: 'Error al crear el plan de estudio' });
+        setErrores({ submit: 'Error al crear el plan de estudio' });
       }
     } finally {
-      setLoading(false);
+      setGuardando(false);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variante="fantasma" tamano="icono" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
         </Boton>
-        <Migas items={[
-          { label: 'Configuración', href: '/configuracion' },
-          { label: 'Planes de Estudio', href: '/planes-estudio' },
-          { label: 'Nuevo Plan' }
+        <Migas elementos={[
+          { etiqueta: 'Configuración', href: '/configuracion' },
+          { etiqueta: 'Planes de Estudio', href: '/planes-estudio' },
+          { etiqueta: 'Nuevo Plan' }
         ]} />
       </div>
 
@@ -102,8 +102,8 @@ export default function NuevoPlanPage() {
         <h1 className="text-2xl font-bold text-gray-900">Nuevo Plan de Estudio</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Tarjeta variant="bordered">
+      <form onSubmit={enviarFormulario} className="space-y-6">
+        <Tarjeta variante="conBorde">
           <EncabezadoTarjeta>
             <TituloTarjeta>Datos del Plan de Estudio</TituloTarjeta>
           </EncabezadoTarjeta>
@@ -111,21 +111,21 @@ export default function NuevoPlanPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Selector
-                  label="Carrera *"
-                  value={formData.carreraId}
-                  onChange={(e) => setFormData({ ...formData, carreraId: e.target.value })}
-                  error={errors.carreraId}
-                  options={carreras.map(c => ({ value: c.id.toString(), label: c.nombre }))}
-                  placeholder={loadingData ? 'Cargando...' : 'Seleccionar carrera...'}
-                  disabled={loadingData}
+                  etiqueta="Carrera *"
+                  value={datosFormulario.carreraId}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, carreraId: e.target.value })}
+                  error={errores.carreraId}
+                  opciones={carreras.map(c => ({ value: c.id.toString(), etiqueta: c.nombre }))}
+                  placeholder={cargandoDatos ? 'Cargando...' : 'Seleccionar carrera...'}
+                  disabled={cargandoDatos}
                 />
               </div>
               <div>
                 <Entrada
-                  label="Número RM *"
-                  value={formData.numeroRm}
-                  onChange={(e) => setFormData({ ...formData, numeroRm: e.target.value.toUpperCase() })}
-                  error={errors.numeroRm}
+                  etiqueta="Número RM *"
+                  value={datosFormulario.numeroRm}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, numeroRm: e.target.value.toUpperCase() })}
+                  error={errores.numeroRm}
                   placeholder="RM 2024/001"
                 />
               </div>
@@ -134,21 +134,21 @@ export default function NuevoPlanPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Entrada
-                  label="Fecha RM *"
+                  etiqueta="Fecha RM *"
                   type="date"
-                  value={formData.fechaRm}
-                  onChange={(e) => setFormData({ ...formData, fechaRm: e.target.value })}
-                  error={errors.fechaRm}
+                  value={datosFormulario.fechaRm}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, fechaRm: e.target.value })}
+                  error={errores.fechaRm}
                 />
               </div>
               <div>
                 <Selector
-                  label="Estado"
-                  value={formData.estado}
-                  onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-                  options={[
-                    { value: 'vigente', label: 'Vigente' },
-                    { value: 'historico', label: 'Histórico' },
+                  etiqueta="Estado"
+                  value={datosFormulario.estado}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, estado: e.target.value })}
+                  opciones={[
+                    { value: 'vigente', etiqueta: 'Vigente' },
+                    { value: 'historico', etiqueta: 'Histórico' },
                   ]}
                 />
               </div>
@@ -156,27 +156,27 @@ export default function NuevoPlanPage() {
 
             <div>
               <Entrada
-                label="Notas"
-                value={formData.notas}
-                onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+                etiqueta="Notas"
+                value={datosFormulario.notas}
+                onChange={(e) => setDatosFormulario({ ...datosFormulario, notas: e.target.value })}
                 placeholder="Notas adicionales..."
               />
             </div>
           </ContenidoTarjeta>
         </Tarjeta>
 
-        {errors.submit && (
+        {errores.submit && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            {errors.submit}
+            {errores.submit}
           </div>
         )}
 
         <div className="flex justify-end gap-3">
-          <Boton variant="outline" type="button" onClick={() => router.back()}>
+          <Boton variante="contorno" type="button" onClick={() => router.back()}>
             Cancelar
           </Boton>
-          <Boton type="submit" disabled={loading}>
-            {loading ? (
+          <Boton type="submit" disabled={guardando}>
+            {guardando ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Guardando...

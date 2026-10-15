@@ -9,73 +9,73 @@ import { ActualizarMateriaDto } from './dto/actualizar-materia.dto';
 export class ServicioMaterias {
   constructor(
     @InjectRepository(Materia)
-    private materiaRepository: Repository<Materia>,
+    private repositorioMateria: Repository<Materia>,
   ) {}
 
-  async create(crearMateriaDto: CrearMateriaDto): Promise<Materia> {
-    const existing = await this.materiaRepository.findOne({
+  async crear(crearMateriaDto: CrearMateriaDto): Promise<Materia> {
+    const existente = await this.repositorioMateria.findOne({
       where: { codigo: crearMateriaDto.codigo },
     });
-    if (existing) {
+    if (existente) {
       throw new ConflictException(`Materia con código ${crearMateriaDto.codigo} ya existe`);
     }
-    const subject = this.materiaRepository.create(crearMateriaDto);
-    return this.materiaRepository.save(subject);
+    const materia = this.repositorioMateria.create(crearMateriaDto);
+    return this.repositorioMateria.save(materia);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
   ): Promise<{ datos: Materia[]; total: number; pagina: number; limite: number }> {
-    const [data, total] = await this.materiaRepository
-      .createQueryBuilder('subject')
-      .orderBy('subject.nombre', 'ASC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await this.repositorioMateria
+      .createQueryBuilder('materia')
+      .orderBy('materia.nombre', 'ASC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findAllSubjects(): Promise<Materia[]> {
-    return this.materiaRepository.find({
+  async obtenerTodosMaterias(): Promise<Materia[]> {
+    return this.repositorioMateria.find({
       order: { nombre: 'ASC' },
     });
   }
 
-  async findOne(id: number): Promise<Materia> {
-    const subject = await this.materiaRepository.findOne({ where: { id } });
-    if (!subject) {
+  async obtenerUno(id: number): Promise<Materia> {
+    const materia = await this.repositorioMateria.findOne({ where: { id } });
+    if (!materia) {
       throw new NotFoundException(`Materia con ID ${id} no encontrada`);
     }
-    return subject;
+    return materia;
   }
 
-  async findByCodigo(codigo: string): Promise<Materia> {
-    const materia = await this.materiaRepository.findOne({ where: { codigo } });
+  async buscarPorCodigo(codigo: string): Promise<Materia> {
+    const materia = await this.repositorioMateria.findOne({ where: { codigo } });
     if (!materia) {
       throw new NotFoundException(`Materia con código ${codigo} no encontrada`);
     }
     return materia;
   }
 
-  async update(id: number, actualizarMateriaDto: ActualizarMateriaDto): Promise<Materia> {
-    const subject = await this.findOne(id);
-    Object.assign(subject, actualizarMateriaDto);
-    return this.materiaRepository.save(subject);
+  async actualizar(id: number, actualizarMateriaDto: ActualizarMateriaDto): Promise<Materia> {
+    const materia = await this.obtenerUno(id);
+    Object.assign(materia, actualizarMateriaDto);
+    return this.repositorioMateria.save(materia);
   }
 
-  async remove(id: number): Promise<void> {
-    const subject = await this.findOne(id);
-    await this.materiaRepository.remove(subject);
+  async eliminar(id: number): Promise<void> {
+    const materia = await this.obtenerUno(id);
+    await this.repositorioMateria.remove(materia);
   }
 
-  async search(query: string): Promise<Materia[]> {
-    return this.materiaRepository
-      .createQueryBuilder('subject')
-      .where('subject.nombre ILIKE :query', { query: `%${query}%` })
-      .orWhere('subject.codigo ILIKE :query', { query: `%${query}%` })
-      .orderBy('subject.nombre', 'ASC')
+  async buscar(consulta: string): Promise<Materia[]> {
+    return this.repositorioMateria
+      .createQueryBuilder('materia')
+      .where('materia.nombre ILIKE :consulta', { consulta: `%${consulta}%` })
+      .orWhere('materia.codigo ILIKE :consulta', { consulta: `%${consulta}%` })
+      .orderBy('materia.nombre', 'ASC')
       .getMany();
   }
 }

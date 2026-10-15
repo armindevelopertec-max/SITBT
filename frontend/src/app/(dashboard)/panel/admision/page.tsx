@@ -7,19 +7,19 @@ import { Boton } from '@/components/ui/boton';
 import { Entrada } from '@/components/ui/entrada';
 import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
 import { Insignia } from '@/components/ui/insignia';
-import { Modal, ConfirmModal } from '@/components/ui/modal';
+import { Modal, ModalConfirmacion } from '@/components/ui/modal';
 import { Search, Loader2, Eye, CheckCircle, XCircle, UserPlus, FileText } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Selector } from '@/components/ui/selector';
 
-const statusLabels: Record<string, { label: string; color: string }> = {
-  pendiente: { label: 'Pendiente', color: 'bg-yellow-100 text-yellow-800' },
-  verificado: { label: 'Verificado', color: 'bg-blue-100 text-blue-800' },
-  rechazado: { label: 'Rechazado', color: 'bg-red-100 text-red-800' },
-  convertido: { label: 'Convertido', color: 'bg-green-100 text-green-800' },
+const etiquetasEstado: Record<string, { etiqueta: string; color: string }> = {
+  pendiente: { etiqueta: 'Pendiente', color: 'bg-yellow-100 text-yellow-800' },
+  verificado: { etiqueta: 'Verificado', color: 'bg-blue-100 text-blue-800' },
+  rechazado: { etiqueta: 'Rechazado', color: 'bg-red-100 text-red-800' },
+  convertido: { etiqueta: 'Convertido', color: 'bg-green-100 text-green-800' },
 };
 
-const originLabels: Record<string, string> = {
+const etiquetasOrigen: Record<string, string> = {
   web: 'Web',
   secretaria: 'Secretaría',
 };
@@ -59,13 +59,13 @@ interface Carrera {
   codigo: string;
 }
 
-interface StudyPlan {
+interface PlanEstudio {
   id: number;
   carreraId: number;
   numeroRm: string;
 }
 
-interface EditFormData {
+interface DatosFormularioEdicion {
   nombre: string;
   apellidoPaterno: string;
   apellidoMaterno: string;
@@ -84,13 +84,13 @@ interface EditFormData {
   carreraId: number;
 }
 
-interface DetalleModalData {
-  request: SolicitudAdmision;
-  showConvert: boolean;
-  editMode?: boolean;
+interface DatosModalDetalle {
+  solicitud: SolicitudAdmision;
+  mostrarConvertir: boolean;
+  modoEdicion?: boolean;
 }
 
-interface ConvertFormData {
+interface DatosFormularioConversion {
   gestionAdmision: string;
   fechaAdmision: string;
   carreraId: number;
@@ -101,27 +101,27 @@ interface ConvertFormData {
   fechaTituloBachiller: string;
 }
 
-export default function AdmisionPage() {
-  const [admissions, setAdmissions] = useState<SolicitudAdmision[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [estadoFilter, setEstadoFilter] = useState<string>('');
-  const [origenFilter, setOrigenFilter] = useState<string>('');
+export default function PaginaAdmision() {
+  const [solicitudes, setSolicitudes] = useState<SolicitudAdmision[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [terminoBusqueda, setTerminoBusqueda] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState<string>('');
+  const [filtroOrigen, setFiltroOrigen] = useState<string>('');
 
-  const [detalleModal, setDetalleModal] = useState<DetalleModalData | null>(null);
-  const [verificarModal, setVerificarModal] = useState<SolicitudAdmision | null>(null);
-  const [rechazarModal, setRechazarModal] = useState<SolicitudAdmision | null>(null);
-  const [convertirModal, setConvertirModal] = useState<SolicitudAdmision | null>(null);
-  const [deleteModal, setDeleteModal] = useState<SolicitudAdmision | null>(null);
+  const [modalDetalle, setModalDetalle] = useState<DatosModalDetalle | null>(null);
+  const [modalVerificar, setModalVerificar] = useState<SolicitudAdmision | null>(null);
+  const [modalRechazar, setModalRechazar] = useState<SolicitudAdmision | null>(null);
+  const [modalConvertir, setModalConvertir] = useState<SolicitudAdmision | null>(null);
+  const [solicitudEliminando, setSolicitudEliminando] = useState<SolicitudAdmision | null>(null);
 
   const [observaciones, setObservaciones] = useState('');
-  const [formLoading, setFormLoading] = useState(false);
-  const [editForm, setEditForm] = useState<EditFormData | null>(null);
+  const [cargandoFormulario, setCargandoFormulario] = useState(false);
+  const [formularioEdicion, setFormularioEdicion] = useState<DatosFormularioEdicion | null>(null);
 
-  const [careers, setCareers] = useState<Carrera[]>([]);
-  const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
+  const [carreras, setCarreras] = useState<Carrera[]>([]);
+  const [planesEstudio, setPlanesEstudio] = useState<PlanEstudio[]>([]);
   const [gestiones, setGestiones] = useState<string[]>([]);
-  const [convertForm, setConvertForm] = useState<ConvertFormData>({
+  const [formularioConversion, setFormularioConversion] = useState<DatosFormularioConversion>({
     gestionAdmision: new Date().getFullYear().toString(),
     fechaAdmision: new Date().toISOString().split('T')[0],
     carreraId: 0,
@@ -133,39 +133,39 @@ export default function AdmisionPage() {
   });
 
   useEffect(() => {
-    fetchAdmissions();
-    fetchCareers();
-    fetchGestiones();
+    obtenerSolicitudes();
+    obtenerCarreras();
+    obtenerGestiones();
   }, []);
 
-  const fetchAdmissions = async () => {
+  const obtenerSolicitudes = async () => {
     try {
-      const response = await api.get('/admision');
-      setAdmissions(response.data.datos);
+      const respuesta = await api.get('/admision');
+      setSolicitudes(respuesta.data.datos);
     } catch (error) {
       console.error('Error al obtener las admisiones:', error);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const fetchCareers = async () => {
+  const obtenerCarreras = async () => {
     try {
-      const response = await api.get('/carreras/activos');
-      setCareers(response.data || []);
+      const respuesta = await api.get('/carreras/activos');
+      setCarreras(respuesta.data || []);
     } catch (error) {
       console.error('Error al obtener las carreras:', error);
     }
   };
 
-  const fetchGestiones = async () => {
+  const obtenerGestiones = async () => {
     try {
-      const response = await api.get('/gestiones');
-      const data = response.data;
-      if (Array.isArray(data)) {
-        setGestiones(data.map((g: any) => g.anio || g.gestion || g));
-      } else if (data.data) {
-        setGestiones(data.data.map((g: any) => g.anio || g.gestion || g));
+      const respuesta = await api.get('/gestiones');
+      const datos = respuesta.data;
+      if (Array.isArray(datos)) {
+        setGestiones(datos.map((g: any) => g.anio || g.gestion || g));
+      } else if (datos.data) {
+        setGestiones(datos.data.map((g: any) => g.anio || g.gestion || g));
       }
     } catch (error) {
       console.error('Error al obtener las gestiones:', error);
@@ -173,67 +173,67 @@ export default function AdmisionPage() {
     }
   };
 
-  const fetchStudyPlans = async (careerId: number) => {
+  const obtenerPlanesEstudio = async (idCarrera: number) => {
     try {
-      const response = await api.get(`/planes-estudio/actual/${careerId}`);
-      setStudyPlans(response.data || []);
+      const respuesta = await api.get(`/planes-estudio/actual/${idCarrera}`);
+      setPlanesEstudio(respuesta.data || []);
     } catch (error) {
       console.error('Error al obtener los planes de estudio:', error);
-      setStudyPlans([]);
+      setPlanesEstudio([]);
     }
   };
 
-  const handleOpenConvert = (request: SolicitudAdmision) => {
-    setConvertirModal(request);
-    setConvertForm({
+  const abrirConversion = (solicitud: SolicitudAdmision) => {
+    setModalConvertir(solicitud);
+    setFormularioConversion({
       gestionAdmision: new Date().getFullYear().toString(),
       fechaAdmision: new Date().toISOString().split('T')[0],
-      carreraId: request.carreraId || 0,
+      carreraId: solicitud.carreraId || 0,
       planEstudioId: 0,
       numeroFolder: '',
       codigoFormulario01: '',
       numeroTituloBachiller: '',
       fechaTituloBachiller: '',
     });
-    if (request.carreraId) {
-      fetchStudyPlans(request.carreraId);
+    if (solicitud.carreraId) {
+      obtenerPlanesEstudio(solicitud.carreraId);
     }
   };
 
-  const handleConvert = async () => {
-    if (!convertirModal) return;
-    setFormLoading(true);
+  const convertir = async () => {
+    if (!modalConvertir) return;
+    setCargandoFormulario(true);
     try {
-      await api.post(`/admision/${convertirModal.id}/convertir-estudiante`, {
-        gestionAdmision: convertForm.gestionAdmision,
+      await api.post(`/admision/${modalConvertir.id}/convertir-estudiante`, {
+        gestionAdmision: formularioConversion.gestionAdmision,
       });
 
-      setConvertirModal(null);
-      fetchAdmissions();
+      setModalConvertir(null);
+      obtenerSolicitudes();
     } catch (error: any) {
       console.error('Error al convertir:', error);
       alert(error.response?.data?.mensaje || 'Error al convertir a estudiante');
     } finally {
-      setFormLoading(false);
+      setCargandoFormulario(false);
     }
   };
 
-  const filteredAdmissions = admissions.filter((admission) => {
-    const fullName = `${admission.nombre} ${admission.apellidoPaterno || ''} ${admission.apellidoMaterno || ''}`.toLowerCase();
-    const ci = admission.ci.toLowerCase();
-    const search = searchTerm.toLowerCase();
-    const matchesSearch = fullName.includes(search) || ci.includes(search);
-    const matchesEstado = !estadoFilter || admission.estado === estadoFilter;
-    const matchesOrigen = !origenFilter || admission.origen === origenFilter;
-    return matchesSearch && matchesEstado && matchesOrigen;
+  const solicitudesFiltradas = solicitudes.filter((solicitud) => {
+    const nombreCompleto = `${solicitud.nombre} ${solicitud.apellidoPaterno || ''} ${solicitud.apellidoMaterno || ''}`.toLowerCase();
+    const ci = solicitud.ci.toLowerCase();
+    const busqueda = terminoBusqueda.toLowerCase();
+    const coincideBusqueda = nombreCompleto.includes(busqueda) || ci.includes(busqueda);
+    const coincideEstado = !filtroEstado || solicitud.estado === filtroEstado;
+    const coincideOrigen = !filtroOrigen || solicitud.origen === filtroOrigen;
+    return coincideBusqueda && coincideEstado && coincideOrigen;
   });
 
-  const getStatusBadge = (status: string) => {
-    const config = statusLabels[status] || { label: status, color: 'bg-gray-100 text-gray-800' };
-    return <Insignia className={config.color}>{config.label}</Insignia>;
+  const obtenerInsigniaEstado = (estado: string) => {
+    const config = etiquetasEstado[estado] || { etiqueta: estado, color: 'bg-gray-100 text-gray-800' };
+    return <Insignia className={config.color}>{config.etiqueta}</Insignia>;
   };
 
-  const isMinor = (fechaNacimiento: string): boolean => {
+  const esMenor = (fechaNacimiento: string): boolean => {
     if (!fechaNacimiento) return false;
     const hoy = new Date();
     const nacimiento = new Date(fechaNacimiento);
@@ -244,102 +244,102 @@ export default function AdmisionPage() {
     return edadReal < 18;
   };
 
-  const handleVerificar = async () => {
-    if (!verificarModal) return;
-    setFormLoading(true);
+  const verificar = async () => {
+    if (!modalVerificar) return;
+    setCargandoFormulario(true);
     try {
-      await api.post(`/admision/${verificarModal.id}/verificar`, {
+      await api.post(`/admision/${modalVerificar.id}/verificar`, {
         verificadoPor: 1,
         observaciones,
       });
-      setVerificarModal(null);
+      setModalVerificar(null);
       setObservaciones('');
-      fetchAdmissions();
+      obtenerSolicitudes();
     } catch (error) {
       console.error('Error al verificar:', error);
     } finally {
-      setFormLoading(false);
+      setCargandoFormulario(false);
     }
   };
 
-  const handleRechazar = async () => {
-    if (!rechazarModal) return;
-    setFormLoading(true);
+  const rechazar = async () => {
+    if (!modalRechazar) return;
+    setCargandoFormulario(true);
     try {
-      await api.post(`/admision/${rechazarModal.id}/rechazar`, {
+      await api.post(`/admision/${modalRechazar.id}/rechazar`, {
         verificadoPor: 1,
         observaciones,
       });
-      setRechazarModal(null);
+      setModalRechazar(null);
       setObservaciones('');
-      fetchAdmissions();
+      obtenerSolicitudes();
     } catch (error) {
       console.error('Error al rechazar:', error);
     } finally {
-      setFormLoading(false);
+      setCargandoFormulario(false);
     }
   };
 
-  const handleDelete = async () => {
-    if (!deleteModal) return;
-    setFormLoading(true);
+  const eliminar = async () => {
+    if (!solicitudEliminando) return;
+    setCargandoFormulario(true);
     try {
-      await api.delete(`/admision/${deleteModal.id}`);
-      setDeleteModal(null);
-      fetchAdmissions();
+      await api.delete(`/admision/${solicitudEliminando.id}`);
+      setSolicitudEliminando(null);
+      obtenerSolicitudes();
     } catch (error) {
       console.error('Error al eliminar:', error);
     } finally {
-      setFormLoading(false);
+      setCargandoFormulario(false);
     }
   };
 
-  const handleEnableEdit = (request: SolicitudAdmision) => {
-    setEditForm({
-      nombre: request.nombre,
-      apellidoPaterno: request.apellidoPaterno || '',
-      apellidoMaterno: request.apellidoMaterno || '',
-      ci: request.ci,
-      fechaNacimiento: request.fechaNacimiento,
-      lugarNacimiento: request.lugarNacimiento || '',
-      genero: request.genero || '',
-      estadoCivil: request.estadoCivil || '',
-      nacionalidad: request.nacionalidad || '',
-      telefono: request.telefono || '',
-      correo: request.correo,
-      direccion: request.direccion || '',
-      nombreTutor: request.nombreTutor || '',
-      ciTutor: request.ciTutor || '',
-      telefonoTutor: request.telefonoTutor || '',
-      carreraId: request.carreraId,
+  const habilitarEdicion = (solicitud: SolicitudAdmision) => {
+    setFormularioEdicion({
+      nombre: solicitud.nombre,
+      apellidoPaterno: solicitud.apellidoPaterno || '',
+      apellidoMaterno: solicitud.apellidoMaterno || '',
+      ci: solicitud.ci,
+      fechaNacimiento: solicitud.fechaNacimiento,
+      lugarNacimiento: solicitud.lugarNacimiento || '',
+      genero: solicitud.genero || '',
+      estadoCivil: solicitud.estadoCivil || '',
+      nacionalidad: solicitud.nacionalidad || '',
+      telefono: solicitud.telefono || '',
+      correo: solicitud.correo,
+      direccion: solicitud.direccion || '',
+      nombreTutor: solicitud.nombreTutor || '',
+      ciTutor: solicitud.ciTutor || '',
+      telefonoTutor: solicitud.telefonoTutor || '',
+      carreraId: solicitud.carreraId,
     });
-    setDetalleModal({ request, showConvert: request.estado === 'verificado', editMode: true });
+    setModalDetalle({ solicitud, mostrarConvertir: solicitud.estado === 'verificado', modoEdicion: true });
   };
 
-  const handleCancelEdit = () => {
-    setEditForm(null);
-    if (detalleModal) {
-      setDetalleModal({ ...detalleModal, editMode: false });
+  const cancelarEdicion = () => {
+    setFormularioEdicion(null);
+    if (modalDetalle) {
+      setModalDetalle({ ...modalDetalle, modoEdicion: false });
     }
   };
 
-  const handleSaveEdit = async () => {
-    if (!detalleModal || !editForm) return;
-    setFormLoading(true);
+  const guardarEdicion = async () => {
+    if (!modalDetalle || !formularioEdicion) return;
+    setCargandoFormulario(true);
     try {
-      await api.patch(`/admision/${detalleModal.request.id}`, editForm);
-      setDetalleModal(null);
-      setEditForm(null);
-      fetchAdmissions();
+      await api.patch(`/admision/${modalDetalle.solicitud.id}`, formularioEdicion);
+      setModalDetalle(null);
+      setFormularioEdicion(null);
+      obtenerSolicitudes();
     } catch (error) {
       console.error('Error al actualizar:', error);
       alert('Error al actualizar los datos');
     } finally {
-      setFormLoading(false);
+      setCargandoFormulario(false);
     }
   };
 
-  if (loading) {
+  if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
@@ -349,37 +349,37 @@ export default function AdmisionPage() {
 
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Admisión' }]} />
+      <Migas elementos={[{ etiqueta: 'Admisión' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Admisión</h1>
       </div>
 
-      <Tarjeta variant="bordered">
+      <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <TituloTarjeta>Pre-registros ({filteredAdmissions.length})</TituloTarjeta>
+            <TituloTarjeta>Pre-registros ({solicitudesFiltradas.length})</TituloTarjeta>
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex gap-2">
                 <Selector
-                  value={estadoFilter}
-                  onChange={(e) => setEstadoFilter(e.target.value)}
-                  options={[
-                    { value: '', label: 'Todos' },
-                    { value: 'pendiente', label: 'Pendiente' },
-                    { value: 'verificado', label: 'Verificado' },
-                    { value: 'rechazado', label: 'Rechazado' },
-                    { value: 'convertido', label: 'Convertido' },
+                  value={filtroEstado}
+                  onChange={(e) => setFiltroEstado(e.target.value)}
+                  opciones={[
+                    { value: '', etiqueta: 'Todos' },
+                    { value: 'pendiente', etiqueta: 'Pendiente' },
+                    { value: 'verificado', etiqueta: 'Verificado' },
+                    { value: 'rechazado', etiqueta: 'Rechazado' },
+                    { value: 'convertido', etiqueta: 'Convertido' },
                   ]}
                   placeholder="Estado"
                 />
                 <Selector
-                  value={origenFilter}
-                  onChange={(e) => setOrigenFilter(e.target.value)}
-                  options={[
-                    { value: '', label: 'Todos' },
-                    { value: 'web', label: 'Web' },
-                    { value: 'secretaria', label: 'Secretaría' },
+                  value={filtroOrigen}
+                  onChange={(e) => setFiltroOrigen(e.target.value)}
+                  opciones={[
+                    { value: '', etiqueta: 'Todos' },
+                    { value: 'web', etiqueta: 'Web' },
+                    { value: 'secretaria', etiqueta: 'Secretaría' },
                   ]}
                   placeholder="Origen"
                 />
@@ -389,8 +389,8 @@ export default function AdmisionPage() {
                 <Entrada
                   placeholder="Buscar por nombre o CI..."
                   className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={terminoBusqueda}
+                  onChange={(e) => setTerminoBusqueda(e.target.value)}
                 />
               </div>
             </div>
@@ -410,51 +410,51 @@ export default function AdmisionPage() {
               </FilaTabla>
             </EncabezadoTabla>
             <CuerpoTabla>
-              {filteredAdmissions.map((admission) => (
-                <FilaTabla key={admission.id}>
+              {solicitudesFiltradas.map((solicitud) => (
+                <FilaTabla key={solicitud.id}>
                   <CeldaTabla className="font-medium">
-                    {admission.ci} {admission.ciExpedido && `- ${admission.ciExpedido}`}
+                    {solicitud.ci} {solicitud.ciExpedido && `- ${solicitud.ciExpedido}`}
                   </CeldaTabla>
                   <CeldaTabla>
-                    {admission.nombre} {admission.apellidoPaterno} {admission.apellidoMaterno}
+                    {solicitud.nombre} {solicitud.apellidoPaterno} {solicitud.apellidoMaterno}
                   </CeldaTabla>
-                  <CeldaTabla>{admission.carrera?.nombre || '-'}</CeldaTabla>
+                  <CeldaTabla>{solicitud.carrera?.nombre || '-'}</CeldaTabla>
                   <CeldaTabla>
-                    <Insignia variant="outline">{originLabels[admission.origen] || '-'}</Insignia>
+                    <Insignia variante="contorno">{etiquetasOrigen[solicitud.origen] || '-'}</Insignia>
                   </CeldaTabla>
-                  <CeldaTabla>{getStatusBadge(admission.estado)}</CeldaTabla>
-                  <CeldaTabla>{new Date(admission.creadoEn).toLocaleString('es-BO', { hour12: false })}</CeldaTabla>
+                  <CeldaTabla>{obtenerInsigniaEstado(solicitud.estado)}</CeldaTabla>
+                  <CeldaTabla>{new Date(solicitud.creadoEn).toLocaleString('es-BO', { hour12: false })}</CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Boton variant="ghost" size="icon" title="Ver detalles" onClick={() => setDetalleModal({ request: admission, showConvert: admission.estado === 'verificado' })}>
+                      <Boton variante="fantasma" tamano="icono" title="Ver detalles" onClick={() => setModalDetalle({ solicitud, mostrarConvertir: solicitud.estado === 'verificado' })}>
                         <Eye className="w-4 h-4" />
                       </Boton>
-                      {admission.estado === 'pendiente' && (
+                      {solicitud.estado === 'pendiente' && (
                         <>
-                          <Boton variant="ghost" size="icon" title="Verificar" onClick={() => setVerificarModal(admission)}>
+                          <Boton variante="fantasma" tamano="icono" title="Verificar" onClick={() => setModalVerificar(solicitud)}>
                             <CheckCircle className="w-4 h-4 text-green-500" />
                           </Boton>
-                          <Boton variant="ghost" size="icon" title="Rechazar" onClick={() => setRechazarModal(admission)}>
+                          <Boton variante="fantasma" tamano="icono" title="Rechazar" onClick={() => setModalRechazar(solicitud)}>
                             <XCircle className="w-4 h-4 text-red-500" />
                           </Boton>
                         </>
                       )}
-                      {admission.estado === 'verificado' && (
-                        <Boton variant="ghost" size="icon" title="Convertir a estudiante" onClick={() => handleOpenConvert(admission)}>
+                      {solicitud.estado === 'verificado' && (
+                        <Boton variante="fantasma" tamano="icono" title="Convertir a estudiante" onClick={() => abrirConversion(solicitud)}>
                           <UserPlus className="w-4 h-4 text-blue-500" />
                         </Boton>
                       )}
-                      <Boton variant="ghost" size="icon" title="Eliminar" onClick={() => setDeleteModal(admission)}>
+                      <Boton variante="fantasma" tamano="icono" title="Eliminar" onClick={() => setSolicitudEliminando(solicitud)}>
                         <FileText className="w-4 h-4 text-red-500" />
                       </Boton>
                     </div>
                   </CeldaTabla>
                 </FilaTabla>
               ))}
-              {filteredAdmissions.length === 0 && (
+              {solicitudesFiltradas.length === 0 && (
                 <FilaTabla>
                   <CeldaTabla colSpan={7} className="text-center py-8 text-gray-500">
-                    {searchTerm || estadoFilter || origenFilter ? 'No se encontraron registros' : 'No hay pre-registros'}
+                    {terminoBusqueda || filtroEstado || filtroOrigen ? 'No se encontraron registros' : 'No hay pre-registros'}
                   </CeldaTabla>
                 </FilaTabla>
               )}
@@ -464,51 +464,51 @@ export default function AdmisionPage() {
       </Tarjeta>
 
       {/* Modal Detalle */}
-      <Modal open={!!detalleModal} onClose={() => { setDetalleModal(null); setEditForm(null); }} title="Detalle del Pre-registro" size="lg">
-        {detalleModal && (
+      <Modal abierto={!!modalDetalle} alCerrar={() => { setModalDetalle(null); setFormularioEdicion(null); }} titulo="Detalle del Pre-registro" tamano="grande">
+        {modalDetalle && (
           <div className="space-y-4">
             <div className="flex justify-end gap-2 mb-4">
-              {detalleModal.request.estado !== 'convertido' && !detalleModal.editMode && (
-                <Boton variant="outline" size="sm" onClick={() => handleEnableEdit(detalleModal.request)}>
+              {modalDetalle.solicitud.estado !== 'convertido' && !modalDetalle.modoEdicion && (
+                <Boton variante="contorno" tamano="pequeno" onClick={() => habilitarEdicion(modalDetalle.solicitud)}>
                   Editar datos
                 </Boton>
               )}
             </div>
-            {detalleModal.editMode && editForm ? (
+            {modalDetalle.modoEdicion && formularioEdicion ? (
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-gray-500">Nombres</label>
-                  <Entrada value={editForm.nombre} onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })} />
+                  <Entrada value={formularioEdicion.nombre} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, nombre: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Apellido Paterno</label>
-                  <Entrada value={editForm.apellidoPaterno} onChange={(e) => setEditForm({ ...editForm, apellidoPaterno: e.target.value })} />
+                  <Entrada value={formularioEdicion.apellidoPaterno} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, apellidoPaterno: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Apellido Materno</label>
-                  <Entrada value={editForm.apellidoMaterno} onChange={(e) => setEditForm({ ...editForm, apellidoMaterno: e.target.value })} />
+                  <Entrada value={formularioEdicion.apellidoMaterno} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, apellidoMaterno: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">CI</label>
-                  <Entrada value={editForm.ci} onChange={(e) => setEditForm({ ...editForm, ci: e.target.value })} />
+                  <Entrada value={formularioEdicion.ci} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, ci: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Fecha de nacimiento</label>
-                  <Entrada type="date" value={editForm.fechaNacimiento} onChange={(e) => setEditForm({ ...editForm, fechaNacimiento: e.target.value })} />
+                  <Entrada type="date" value={formularioEdicion.fechaNacimiento} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, fechaNacimiento: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Lugar de nacimiento</label>
-                  <Entrada value={editForm.lugarNacimiento} onChange={(e) => setEditForm({ ...editForm, lugarNacimiento: e.target.value })} />
+                  <Entrada value={formularioEdicion.lugarNacimiento} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, lugarNacimiento: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500 block mb-2">Género</label>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="genero" value="M" checked={editForm.genero === 'M'} onChange={(e) => setEditForm({ ...editForm, genero: e.target.value })} />
+                      <input type="radio" name="genero" value="M" checked={formularioEdicion.genero === 'M'} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, genero: e.target.value })} />
                       <span className="text-sm">Masculino</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="genero" value="F" checked={editForm.genero === 'F'} onChange={(e) => setEditForm({ ...editForm, genero: e.target.value })} />
+                      <input type="radio" name="genero" value="F" checked={formularioEdicion.genero === 'F'} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, genero: e.target.value })} />
                       <span className="text-sm">Femenino</span>
                     </label>
                   </div>
@@ -517,126 +517,126 @@ export default function AdmisionPage() {
                   <label className="text-sm text-gray-500 block mb-2">Estado civil</label>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="estadoCivil" value="Soltera(o)" checked={editForm.estadoCivil === 'Soltera(o)'} onChange={(e) => setEditForm({ ...editForm, estadoCivil: e.target.value })} />
+                      <input type="radio" name="estadoCivil" value="Soltera(o)" checked={formularioEdicion.estadoCivil === 'Soltera(o)'} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, estadoCivil: e.target.value })} />
                       <span className="text-sm">Soltero(a)</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="radio" name="estadoCivil" value="Casada(o)" checked={editForm.estadoCivil === 'Casada(o)'} onChange={(e) => setEditForm({ ...editForm, estadoCivil: e.target.value })} />
+                      <input type="radio" name="estadoCivil" value="Casada(o)" checked={formularioEdicion.estadoCivil === 'Casada(o)'} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, estadoCivil: e.target.value })} />
                       <span className="text-sm">Casado(a)</span>
                     </label>
                   </div>
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Nacionalidad</label>
-                  <Entrada value={editForm.nacionalidad} onChange={(e) => setEditForm({ ...editForm, nacionalidad: e.target.value })} />
+                  <Entrada value={formularioEdicion.nacionalidad} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, nacionalidad: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Teléfono</label>
-                  <Entrada value={editForm.telefono} onChange={(e) => setEditForm({ ...editForm, telefono: e.target.value })} />
+                  <Entrada value={formularioEdicion.telefono} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, telefono: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Correo</label>
-                  <Entrada type="email" value={editForm.correo} onChange={(e) => setEditForm({ ...editForm, correo: e.target.value })} />
+                  <Entrada type="email" value={formularioEdicion.correo} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, correo: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Dirección</label>
-                  <Entrada value={editForm.direccion} onChange={(e) => setEditForm({ ...editForm, direccion: e.target.value })} />
+                  <Entrada value={formularioEdicion.direccion} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, direccion: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Carrera</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg" value={editForm.carreraId} onChange={(e) => setEditForm({ ...editForm, carreraId: parseInt(e.target.value) })}>
+                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg" value={formularioEdicion.carreraId} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, carreraId: parseInt(e.target.value) })}>
                     <option value={0}>Seleccionar carrera</option>
-                    {careers.map((c) => (
+                    {carreras.map((c) => (
                       <option key={c.id} value={c.id}>{c.nombre}</option>
                     ))}
                   </select>
                 </div>
-                {isMinor(editForm.fechaNacimiento) && (
+                {esMenor(formularioEdicion.fechaNacimiento) && (
                   <>
                     <div className="col-span-2 border-t pt-4 mt-2">
                       <p className="text-sm font-semibold text-gray-700">Datos del Tutor</p>
                     </div>
                     <div>
                       <label className="text-sm text-gray-500">Nombre del tutor</label>
-                      <Entrada value={editForm.nombreTutor} onChange={(e) => setEditForm({ ...editForm, nombreTutor: e.target.value })} />
+                      <Entrada value={formularioEdicion.nombreTutor} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, nombreTutor: e.target.value })} />
                     </div>
                     <div>
                       <label className="text-sm text-gray-500">CI del tutor</label>
-                      <Entrada value={editForm.ciTutor} onChange={(e) => setEditForm({ ...editForm, ciTutor: e.target.value })} />
+                      <Entrada value={formularioEdicion.ciTutor} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, ciTutor: e.target.value })} />
                     </div>
                     <div>
                       <label className="text-sm text-gray-500">Teléfono del tutor</label>
-                      <Entrada value={editForm.telefonoTutor} onChange={(e) => setEditForm({ ...editForm, telefonoTutor: e.target.value })} />
+                      <Entrada value={formularioEdicion.telefonoTutor} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, telefonoTutor: e.target.value })} />
                     </div>
                   </>
                 )}
                 <div className="col-span-2 flex justify-end gap-2 mt-4">
-                  <Boton variant="outline" onClick={handleCancelEdit} disabled={formLoading}>Cancelar</Boton>
-                  <Boton onClick={handleSaveEdit} disabled={formLoading}>{formLoading ? 'Guardando...' : 'Guardar cambios'}</Boton>
+                  <Boton variante="contorno" onClick={cancelarEdicion} disabled={cargandoFormulario}>Cancelar</Boton>
+                  <Boton onClick={guardarEdicion} disabled={cargandoFormulario}>{cargandoFormulario ? 'Guardando...' : 'Guardar cambios'}</Boton>
                 </div>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Nombre completo</p>
-                  <p className="font-medium">{detalleModal.request.nombre} {detalleModal.request.apellidoPaterno} {detalleModal.request.apellidoMaterno}</p>
+                  <p className="font-medium">{modalDetalle.solicitud.nombre} {modalDetalle.solicitud.apellidoPaterno} {modalDetalle.solicitud.apellidoMaterno}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">CI</p>
-                  <p className="font-medium">{detalleModal.request.ci} {detalleModal.request.ciExpedido && `- ${detalleModal.request.ciExpedido}`}</p>
+                  <p className="font-medium">{modalDetalle.solicitud.ci} {modalDetalle.solicitud.ciExpedido && `- ${modalDetalle.solicitud.ciExpedido}`}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Fecha de nacimiento</p>
-                  <p className="font-medium">{new Date(detalleModal.request.fechaNacimiento).toLocaleDateString('es-BO')}</p>
+                  <p className="font-medium">{new Date(modalDetalle.solicitud.fechaNacimiento).toLocaleDateString('es-BO')}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Lugar de nacimiento</p>
-                  <p className="font-medium">{detalleModal.request.lugarNacimiento || '-'}</p>
+                  <p className="font-medium">{modalDetalle.solicitud.lugarNacimiento || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Género</p>
-                  <p className="font-medium">{detalleModal.request.genero === 'M' ? 'Masculino' : detalleModal.request.genero === 'F' ? 'Femenino' : '-'}</p>
+                  <p className="font-medium">{modalDetalle.solicitud.genero === 'M' ? 'Masculino' : modalDetalle.solicitud.genero === 'F' ? 'Femenino' : '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Estado civil</p>
-                  <p className="font-medium">{detalleModal.request.estadoCivil || '-'}</p>
+                  <p className="font-medium">{modalDetalle.solicitud.estadoCivil || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Nacionalidad</p>
-                  <p className="font-medium">{detalleModal.request.nacionalidad || '-'}</p>
+                  <p className="font-medium">{modalDetalle.solicitud.nacionalidad || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Teléfono</p>
-                  <p className="font-medium">{detalleModal.request.telefono || '-'}</p>
+                  <p className="font-medium">{modalDetalle.solicitud.telefono || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Correo</p>
-                  <p className="font-medium">{detalleModal.request.correo}</p>
+                  <p className="font-medium">{modalDetalle.solicitud.correo}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Dirección</p>
-                  <p className="font-medium">{detalleModal.request.direccion || '-'}</p>
+                  <p className="font-medium">{modalDetalle.solicitud.direccion || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Carrera</p>
-                  <p className="font-medium">{detalleModal.request.carrera?.nombre || '-'}</p>
+                  <p className="font-medium">{modalDetalle.solicitud.carrera?.nombre || '-'}</p>
                 </div>
-                {isMinor(detalleModal.request.fechaNacimiento) && detalleModal.request.nombreTutor && (
+                {esMenor(modalDetalle.solicitud.fechaNacimiento) && modalDetalle.solicitud.nombreTutor && (
                   <>
                     <div className="col-span-2 border-t pt-4 mt-2">
                       <p className="text-sm font-semibold text-gray-700">Datos del Tutor (menor de edad)</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Nombre del tutor</p>
-                      <p className="font-medium">{detalleModal.request.nombreTutor}</p>
+                      <p className="font-medium">{modalDetalle.solicitud.nombreTutor}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">CI del tutor</p>
-                      <p className="font-medium">{detalleModal.request.ciTutor || '-'}</p>
+                      <p className="font-medium">{modalDetalle.solicitud.ciTutor || '-'}</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Teléfono del tutor</p>
-                      <p className="font-medium">{detalleModal.request.telefonoTutor || '-'}</p>
+                      <p className="font-medium">{modalDetalle.solicitud.telefonoTutor || '-'}</p>
                     </div>
                   </>
                 )}
@@ -647,17 +647,17 @@ export default function AdmisionPage() {
       </Modal>
 
       {/* Modal Verificar */}
-      <ConfirmModal
-        open={!!verificarModal}
-        onClose={() => { setVerificarModal(null); setObservaciones(''); }}
-        onConfirm={handleVerificar}
-        title="Verificar Pre-registro"
-        confirmText="Verificar"
-        loading={formLoading}
+      <ModalConfirmacion
+        abierto={!!modalVerificar}
+        alCerrar={() => { setModalVerificar(null); setObservaciones(''); }}
+        alConfirmar={verificar}
+        titulo="Verificar Pre-registro"
+        textoConfirmar="Verificar"
+        cargando={cargandoFormulario}
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            ¿Está seguro de verificar el pre-registro de <strong>{verificarModal?.nombre} {verificarModal?.apellidoPaterno}</strong>?
+            ¿Está seguro de verificar el pre-registro de <strong>{modalVerificar?.nombre} {modalVerificar?.apellidoPaterno}</strong>?
           </p>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones (opcional)</label>
@@ -670,21 +670,21 @@ export default function AdmisionPage() {
             />
           </div>
         </div>
-      </ConfirmModal>
+      </ModalConfirmacion>
 
       {/* Modal Rechazar */}
-      <ConfirmModal
-        open={!!rechazarModal}
-        onClose={() => { setRechazarModal(null); setObservaciones(''); }}
-        onConfirm={handleRechazar}
-        title="Rechazar Pre-registro"
-        confirmText="Rechazar"
-        variant="destructive"
-        loading={formLoading}
+      <ModalConfirmacion
+        abierto={!!modalRechazar}
+        alCerrar={() => { setModalRechazar(null); setObservaciones(''); }}
+        alConfirmar={rechazar}
+        titulo="Rechazar Pre-registro"
+        textoConfirmar="Rechazar"
+        variante="destructivo"
+        cargando={cargandoFormulario}
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            ¿Está seguro de rechazar el pre-registro de <strong>{rechazarModal?.nombre} {rechazarModal?.apellidoPaterno}</strong>?
+            ¿Está seguro de rechazar el pre-registro de <strong>{modalRechazar?.nombre} {modalRechazar?.apellidoPaterno}</strong>?
           </p>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Motivo del rechazo *</label>
@@ -698,16 +698,16 @@ export default function AdmisionPage() {
             />
           </div>
         </div>
-      </ConfirmModal>
+      </ModalConfirmacion>
 
       {/* Modal Convertir - Formulario completo */}
-      <Modal open={!!convertirModal} onClose={() => setConvertirModal(null)} title="Crear Estudiante" size="lg">
-        {convertirModal && (
+      <Modal abierto={!!modalConvertir} alCerrar={() => setModalConvertir(null)} titulo="Crear Estudiante" tamano="grande">
+        {modalConvertir && (
           <div className="space-y-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm text-blue-800">
-                <strong>Datos del pre-registro:</strong> {convertirModal.nombre} {convertirModal.apellidoPaterno} {convertirModal.apellidoMaterno}<br />
-                CI: {convertirModal.ci} {convertirModal.ciExpedido && `- ${convertirModal.ciExpedido}`}
+                <strong>Datos del pre-registro:</strong> {modalConvertir.nombre} {modalConvertir.apellidoPaterno} {modalConvertir.apellidoMaterno}<br />
+                CI: {modalConvertir.ci} {modalConvertir.ciExpedido && `- ${modalConvertir.ciExpedido}`}
               </p>
             </div>
 
@@ -715,61 +715,61 @@ export default function AdmisionPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Gestión de ingreso *</label>
                 <Selector
-                  value={convertForm.gestionAdmision}
-                  onChange={(e) => setConvertForm({ ...convertForm, gestionAdmision: e.target.value })}
-                  options={gestiones.map(g => ({ value: g, label: g }))}
+                  value={formularioConversion.gestionAdmision}
+                  onChange={(e) => setFormularioConversion({ ...formularioConversion, gestionAdmision: e.target.value })}
+                  opciones={gestiones.map(g => ({ value: g, etiqueta: g }))}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de ingreso *</label>
                 <Entrada
                   type="date"
-                  value={convertForm.fechaAdmision}
-                  onChange={(e) => setConvertForm({ ...convertForm, fechaAdmision: e.target.value })}
+                  value={formularioConversion.fechaAdmision}
+                  onChange={(e) => setFormularioConversion({ ...formularioConversion, fechaAdmision: e.target.value })}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Carrera *</label>
                 <Selector
-                  value={convertForm.carreraId.toString()}
+                  value={formularioConversion.carreraId.toString()}
                   onChange={(e) => {
-                    const careerId = parseInt(e.target.value);
-                    setConvertForm({ ...convertForm, carreraId: careerId, planEstudioId: 0 });
-                    fetchStudyPlans(careerId);
+                    const idCarrera = parseInt(e.target.value);
+                    setFormularioConversion({ ...formularioConversion, carreraId: idCarrera, planEstudioId: 0 });
+                    obtenerPlanesEstudio(idCarrera);
                   }}
-                  options={careers.map(c => ({ value: c.id.toString(), label: c.nombre }))}
+                  opciones={carreras.map(c => ({ value: c.id.toString(), etiqueta: c.nombre }))}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Plan de estudio *</label>
                 <Selector
-                  value={convertForm.planEstudioId.toString()}
-                  onChange={(e) => setConvertForm({ ...convertForm, planEstudioId: parseInt(e.target.value) })}
-                  options={studyPlans.map(sp => ({ value: sp.id.toString(), label: sp.numeroRm }))}
+                  value={formularioConversion.planEstudioId.toString()}
+                  onChange={(e) => setFormularioConversion({ ...formularioConversion, planEstudioId: parseInt(e.target.value) })}
+                  opciones={planesEstudio.map(sp => ({ value: sp.id.toString(), etiqueta: sp.numeroRm }))}
                   placeholder="Seleccionar plan..."
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Número de carpeta</label>
                 <Entrada
-                  value={convertForm.numeroFolder}
-                  onChange={(e) => setConvertForm({ ...convertForm, numeroFolder: e.target.value })}
+                  value={formularioConversion.numeroFolder}
+                  onChange={(e) => setFormularioConversion({ ...formularioConversion, numeroFolder: e.target.value })}
                   placeholder="Opcional"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Código Formulario 01</label>
                 <Entrada
-                  value={convertForm.codigoFormulario01}
-                  onChange={(e) => setConvertForm({ ...convertForm, codigoFormulario01: e.target.value })}
+                  value={formularioConversion.codigoFormulario01}
+                  onChange={(e) => setFormularioConversion({ ...formularioConversion, codigoFormulario01: e.target.value })}
                   placeholder="Opcional"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Número de Título Bachiller</label>
                 <Entrada
-                  value={convertForm.numeroTituloBachiller}
-                  onChange={(e) => setConvertForm({ ...convertForm, numeroTituloBachiller: e.target.value })}
+                  value={formularioConversion.numeroTituloBachiller}
+                  onChange={(e) => setFormularioConversion({ ...formularioConversion, numeroTituloBachiller: e.target.value })}
                   placeholder="Opcional"
                 />
               </div>
@@ -777,17 +777,17 @@ export default function AdmisionPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Título Bachiller</label>
                 <Entrada
                   type="date"
-                  value={convertForm.fechaTituloBachiller}
-                  onChange={(e) => setConvertForm({ ...convertForm, fechaTituloBachiller: e.target.value })}
+                  value={formularioConversion.fechaTituloBachiller}
+                  onChange={(e) => setFormularioConversion({ ...formularioConversion, fechaTituloBachiller: e.target.value })}
                 />
               </div>
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t">
-              <Boton variant="outline" onClick={() => setConvertirModal(null)}>
+              <Boton variante="contorno" onClick={() => setModalConvertir(null)}>
                 Cancelar
               </Boton>
-              <Boton onClick={handleConvert} isLoading={formLoading}>
+              <Boton onClick={convertir} cargando={cargandoFormulario}>
                 Crear Estudiante
               </Boton>
             </div>
@@ -796,15 +796,15 @@ export default function AdmisionPage() {
       </Modal>
 
       {/* Modal Eliminar */}
-      <ConfirmModal
-        open={!!deleteModal}
-        onClose={() => setDeleteModal(null)}
-        onConfirm={handleDelete}
-        title="Eliminar Pre-registro"
-        message={`¿Está seguro de eliminar el pre-registro de "${deleteModal?.nombre} ${deleteModal?.apellidoPaterno}"? Esta acción no se puede deshacer.`}
-        confirmText="Eliminar"
-        variant="destructive"
-        loading={formLoading}
+      <ModalConfirmacion
+        abierto={!!solicitudEliminando}
+        alCerrar={() => setSolicitudEliminando(null)}
+        alConfirmar={eliminar}
+        titulo="Eliminar Pre-registro"
+        mensaje={`¿Está seguro de eliminar el pre-registro de "${solicitudEliminando?.nombre} ${solicitudEliminando?.apellidoPaterno}"? Esta acción no se puede deshacer.`}
+        textoConfirmar="Eliminar"
+        variante="destructivo"
+        cargando={cargandoFormulario}
       />
     </div>
   );

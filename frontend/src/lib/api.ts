@@ -1,14 +1,14 @@
 import axios from 'axios';
 import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
+const URL_API = process.env.NEXT_PUBLIC_API_URL;
+const BASE_API = process.env.NEXT_PUBLIC_API_BASE || '';
 
 const obtenerUrlBase = () => {
-  if (API_URL) {
-    return API_URL;
+  if (URL_API) {
+    return URL_API;
   }
-  return `${API_BASE}/api`;
+  return `${BASE_API}/api`;
 };
 
 export const api = axios.create({
@@ -19,12 +19,12 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use(
-  (config) => {
-    let token = usarAlmacenAutenticacion.getState().tokenAcceso;
+  (configuracion) => {
+    const token = usarAlmacenAutenticacion.getState().tokenAcceso;
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      configuracion.headers.Authorization = `Bearer ${token}`;
     }
-    return config;
+    return configuracion;
   },
   (error) => {
     return Promise.reject(error);
@@ -32,7 +32,7 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  (respuesta) => respuesta,
   (error) => {
     if (error.response?.status === 401) {
       usarAlmacenAutenticacion.getState().cerrarSesion();
@@ -44,7 +44,7 @@ api.interceptors.response.use(
   }
 );
 
-export const publicApi = axios.create({
+export const apiPublica = axios.create({
   baseURL: `${obtenerUrlBase()}`,
   headers: {
     'Content-Type': 'application/json',

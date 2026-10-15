@@ -24,7 +24,7 @@ interface Estudiante {
   };
 }
 
-interface FormData {
+interface DatosFormulario {
   estudianteId: number | null;
   gestion: string;
   gestionId: number | null;
@@ -44,15 +44,15 @@ interface Gestion {
   periodos?: { id: number; numero: string; nombre: string }[];
 }
 
-export default function NewCredentialPage() {
+export default function PaginaNuevaCredencial() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [searchStudent, setSearchStudent] = useState('');
-  const [students, setStudents] = useState<Estudiante[]>([]);
-  const [loadingStudents, setLoadingStudents] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [cargando, setCargando] = useState(false);
+  const [busquedaEstudiante, setBusquedaEstudiante] = useState('');
+  const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
+  const [cargandoEstudiantes, setCargandoEstudiantes] = useState(false);
+  const [errores, setErrores] = useState<Record<string, string>>({});
 
-  const [formData, setFormData] = useState<FormData>({
+  const [datosFormulario, setDatosFormulario] = useState<DatosFormulario>({
     estudianteId: null,
     gestion: new Date().getFullYear().toString(),
     gestionId: null,
@@ -65,116 +65,116 @@ export default function NewCredentialPage() {
 
   const [gestiones, setGestiones] = useState<Gestion[]>([]);
 
-  const [selectedStudent, setSelectedStudent] = useState<Estudiante | null>(null);
+  const [estudianteSeleccionado, setEstudianteSeleccionado] = useState<Estudiante | null>(null);
 
   useEffect(() => {
-    fetchStudents();
-    fetchGestiones();
+    obtenerEstudiantes();
+    obtenerGestiones();
   }, []);
 
-  const fetchStudents = async () => {
+  const obtenerEstudiantes = async () => {
     try {
-      setLoadingStudents(true);
-      const response = await api.get('/estudiantes', { params: { limite: 100 } });
-      setStudents(response.data.datos || []);
+      setCargandoEstudiantes(true);
+      const respuesta = await api.get('/estudiantes', { params: { limite: 100 } });
+      setEstudiantes(respuesta.data.datos || []);
     } catch (error) {
       console.error('Error al obtener los estudiantes:', error);
     } finally {
-      setLoadingStudents(false);
+      setCargandoEstudiantes(false);
     }
   };
 
-  const fetchGestiones = async () => {
+  const obtenerGestiones = async () => {
     try {
-      const response = await api.get('/gestiones');
-      const data = response.data.datos || response.data || [];
-      setGestiones(data);
-      const current = data.find((g: Gestion) => g.esActual);
-      if (current) {
-        setFormData(prev => ({ ...prev, gestion: current.anio, gestionId: current.id }));
+      const respuesta = await api.get('/gestiones');
+      const datos = respuesta.data.datos || respuesta.data || [];
+      setGestiones(datos);
+      const gestionActual = datos.find((g: Gestion) => g.esActual);
+      if (gestionActual) {
+        setDatosFormulario(prev => ({ ...prev, gestion: gestionActual.anio, gestionId: gestionActual.id }));
       }
     } catch (error) {
       console.error('Error al obtener las gestiones:', error);
     }
   };
 
-  const filteredStudents = useMemo(() => {
-    if (!searchStudent.trim()) return students.slice(0, 10);
-    const q = searchStudent.toLowerCase();
-    return students.filter((s) => {
-      const person = s.persona;
-      if (!person) return false;
-      const fullName = `${person.nombres} ${person.apellidoPaterno} ${person.apellidoMaterno}`.toLowerCase();
-      return fullName.includes(q) || (person.ci || '').includes(q) || s.codigoInscripcion.toLowerCase().includes(q);
+  const estudiantesFiltrados = useMemo(() => {
+    if (!busquedaEstudiante.trim()) return estudiantes.slice(0, 10);
+    const q = busquedaEstudiante.toLowerCase();
+    return estudiantes.filter((estudiante) => {
+      const persona = estudiante.persona;
+      if (!persona) return false;
+      const nombreCompleto = `${persona.nombres} ${persona.apellidoPaterno} ${persona.apellidoMaterno}`.toLowerCase();
+      return nombreCompleto.includes(q) || (persona.ci || '').includes(q) || estudiante.codigoInscripcion.toLowerCase().includes(q);
     }).slice(0, 10);
-  }, [students, searchStudent]);
+  }, [estudiantes, busquedaEstudiante]);
 
-  const selectStudent = (student: Estudiante) => {
-    setSelectedStudent(student);
-    setFormData({ ...formData, estudianteId: student.id });
-    setSearchStudent('');
-    setErrors({ ...errors, estudianteId: '' });
+  const seleccionarEstudiante = (estudiante: Estudiante) => {
+    setEstudianteSeleccionado(estudiante);
+    setDatosFormulario({ ...datosFormulario, estudianteId: estudiante.id });
+    setBusquedaEstudiante('');
+    setErrores({ ...errores, estudianteId: '' });
   };
 
-  const clearStudent = () => {
-    setSelectedStudent(null);
-    setFormData({ ...formData, estudianteId: null });
+  const deseleccionarEstudiante = () => {
+    setEstudianteSeleccionado(null);
+    setDatosFormulario({ ...datosFormulario, estudianteId: null });
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    if (!formData.estudianteId) newErrors.estudianteId = 'Debe seleccionar un estudiante';
-    if (!formData.gestion) newErrors.gestion = 'La gestión es requerida';
-    if (!formData.semestre) newErrors.semestre = 'El semestre es requerido';
-    if (!formData.fechaEmision) newErrors.fechaEmision = 'La fecha de emisión es requerida';
-    if (!formData.validoHasta) newErrors.validoHasta = 'La fecha de validez es requerida';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const validarFormulario = () => {
+    const nuevosErrores: Record<string, string> = {};
+    if (!datosFormulario.estudianteId) nuevosErrores.estudianteId = 'Debe seleccionar un estudiante';
+    if (!datosFormulario.gestion) nuevosErrores.gestion = 'La gestión es requerida';
+    if (!datosFormulario.semestre) nuevosErrores.semestre = 'El semestre es requerido';
+    if (!datosFormulario.fechaEmision) nuevosErrores.fechaEmision = 'La fecha de emisión es requerida';
+    if (!datosFormulario.validoHasta) nuevosErrores.validoHasta = 'La fecha de validez es requerida';
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const enviarFormulario = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validarFormulario()) return;
 
-    setLoading(true);
+    setCargando(true);
     try {
-      const payload = {
-        estudianteId: formData.estudianteId,
-        gestion: formData.gestion,
-        gestionId: formData.gestionId,
-        semestre: formData.semestre,
-        fechaEmision: formData.fechaEmision,
-        validoHasta: formData.validoHasta,
-        fotoUrl: formData.fotoUrl || undefined,
+      const cuerpo = {
+        estudianteId: datosFormulario.estudianteId,
+        gestion: datosFormulario.gestion,
+        gestionId: datosFormulario.gestionId,
+        semestre: datosFormulario.semestre,
+        fechaEmision: datosFormulario.fechaEmision,
+        validoHasta: datosFormulario.validoHasta,
+        fotoUrl: datosFormulario.fotoUrl || undefined,
         estado: 'emitida',
         emitidoPor: 1,
         impreso: false,
-        notas: formData.notas || undefined,
+        notas: datosFormulario.notas || undefined,
       };
 
-      await api.post('/credenciales', payload);
+      await api.post('/credenciales', cuerpo);
       router.push('/credenciales');
     } catch (error: any) {
       console.error('Error al crear la credencial:', error);
       if (error.response?.data?.mensaje) {
-        setErrors({ submit: error.response.data.mensaje });
+        setErrores({ submit: error.response.data.mensaje });
       } else {
-        setErrors({ submit: 'Error al crear la credencial' });
+        setErrores({ submit: 'Error al crear la credencial' });
       }
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variante="fantasma" tamano="icono" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
         </Boton>
-        <Migas items={[
-          { label: 'Credenciales', href: '/credenciales' },
-          { label: 'Nueva Credencial' }
+        <Migas elementos={[
+          { etiqueta: 'Credenciales', href: '/credenciales' },
+          { etiqueta: 'Nueva Credencial' }
         ]} />
       </div>
 
@@ -182,29 +182,29 @@ export default function NewCredentialPage() {
         <h1 className="text-2xl font-bold text-gray-900">Nueva Credencial</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Tarjeta variant="bordered">
+      <form onSubmit={enviarFormulario} className="space-y-6">
+        <Tarjeta variante="conBorde">
           <EncabezadoTarjeta>
             <TituloTarjeta>Seleccionar Estudiante</TituloTarjeta>
           </EncabezadoTarjeta>
           <ContenidoTarjeta className="space-y-4">
-            {selectedStudent ? (
+            {estudianteSeleccionado ? (
               <div className="flex items-center justify-between p-4 bg-primary-50 border border-primary-200 rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold">
-                    {selectedStudent.persona?.nombres?.charAt(0) || '?'}{selectedStudent.persona?.apellidoPaterno?.charAt(0) || ''}
+                    {estudianteSeleccionado.persona?.nombres?.charAt(0) || '?'}{estudianteSeleccionado.persona?.apellidoPaterno?.charAt(0) || ''}
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">
-                      {selectedStudent.persona?.nombres} {selectedStudent.persona?.apellidoPaterno} {selectedStudent.persona?.apellidoMaterno}
+                      {estudianteSeleccionado.persona?.nombres} {estudianteSeleccionado.persona?.apellidoPaterno} {estudianteSeleccionado.persona?.apellidoMaterno}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {selectedStudent.persona?.ci} · {selectedStudent.codigoInscripcion}
+                      {estudianteSeleccionado.persona?.ci} · {estudianteSeleccionado.codigoInscripcion}
                     </p>
-                    <p className="text-sm text-gray-500">{selectedStudent.carrera?.nombre || 'Sin carrera'}</p>
+                    <p className="text-sm text-gray-500">{estudianteSeleccionado.carrera?.nombre || 'Sin carrera'}</p>
                   </div>
                 </div>
-                <Boton type="button" variant="ghost" size="icon" onClick={clearStudent}>
+                <Boton type="button" variante="fantasma" tamano="icono" onClick={deseleccionarEstudiante}>
                   <X className="w-4 h-4" />
                 </Boton>
               </div>
@@ -215,38 +215,38 @@ export default function NewCredentialPage() {
                   <Entrada
                     placeholder="Buscar estudiante por nombre, CI o código..."
                     className="pl-10"
-                    value={searchStudent}
-                    onChange={(e) => setSearchStudent(e.target.value)}
+                    value={busquedaEstudiante}
+                    onChange={(e) => setBusquedaEstudiante(e.target.value)}
                   />
                 </div>
-                {errors.estudianteId && <p className="text-sm text-red-600 mt-1">{errors.estudianteId}</p>}
+                {errores.estudianteId && <p className="text-sm text-red-600 mt-1">{errores.estudianteId}</p>}
 
-                {searchStudent && (
+                {busquedaEstudiante && (
                   <div className="mt-2 border rounded-lg overflow-hidden shadow-lg">
-                    {loadingStudents ? (
+                    {cargandoEstudiantes ? (
                       <div className="p-4 text-center text-gray-500 text-sm">
                         <Loader2 className="w-4 h-4 animate-spin inline mr-2" />
                         Buscando...
                       </div>
-                    ) : filteredStudents.length === 0 ? (
+                    ) : estudiantesFiltrados.length === 0 ? (
                       <div className="p-4 text-center text-gray-500 text-sm">
                         No se encontraron estudiantes
                       </div>
                     ) : (
-                      filteredStudents.map((student) => (
+                      estudiantesFiltrados.map((estudiante) => (
                         <div
-                          key={student.id}
-                          onClick={() => selectStudent(student)}
+                          key={estudiante.id}
+                          onClick={() => seleccionarEstudiante(estudiante)}
                           className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
                         >
                           <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xs">
-                            {student.persona?.nombres?.charAt(0) || '?'}{student.persona?.apellidoPaterno?.charAt(0) || ''}
+                            {estudiante.persona?.nombres?.charAt(0) || '?'}{estudiante.persona?.apellidoPaterno?.charAt(0) || ''}
                           </div>
                           <div className="flex-1">
                             <p className="font-medium text-sm">
-                              {student.persona?.nombres} {student.persona?.apellidoPaterno} {student.persona?.apellidoMaterno}
+                              {estudiante.persona?.nombres} {estudiante.persona?.apellidoPaterno} {estudiante.persona?.apellidoMaterno}
                             </p>
-                            <p className="text-xs text-gray-500">{student.codigoInscripcion}</p>
+                            <p className="text-xs text-gray-500">{estudiante.codigoInscripcion}</p>
                           </div>
                         </div>
                       ))
@@ -258,7 +258,7 @@ export default function NewCredentialPage() {
           </ContenidoTarjeta>
         </Tarjeta>
 
-        <Tarjeta variant="bordered">
+        <Tarjeta variante="conBorde">
           <EncabezadoTarjeta>
             <TituloTarjeta>Datos de la Credencial</TituloTarjeta>
           </EncabezadoTarjeta>
@@ -269,33 +269,33 @@ export default function NewCredentialPage() {
                   Gestión *
                 </label>
 <select
-                  className={`w-full h-10 px-3 border rounded-lg text-sm ${errors.gestion ? 'border-red-500' : ''}`}
-                  value={formData.gestion ? `${formData.gestion}-${formData.semestre}` : ''}
+                  className={`w-full h-10 px-3 border rounded-lg text-sm ${errores.gestion ? 'border-red-500' : ''}`}
+                  value={datosFormulario.gestion ? `${datosFormulario.gestion}-${datosFormulario.semestre}` : ''}
                   onChange={(e) => {
                     const [anio, sem] = e.target.value.split('-');
                     const semestre = parseInt(sem) || null;
-                    setFormData(prev => ({ ...prev, gestion: anio, semestre }));
+                    setDatosFormulario(prev => ({ ...prev, gestion: anio, semestre }));
                   }}
                 >
                   <option value="">Seleccionar...</option>
-                  {gestiones.flatMap((g) =>
-                    (g.periodos || []).map((p: any) => (
-                      <option key={`${g.id}-${p.numero}`} value={`${g.anio}-${p.numero === 'I' ? 1 : 2}`}>
-                        {p.numero}/{g.anio}
+                  {gestiones.flatMap((gestion) =>
+                    (gestion.periodos || []).map((periodo: any) => (
+                      <option key={`${gestion.id}-${periodo.numero}`} value={`${gestion.anio}-${periodo.numero === 'I' ? 1 : 2}`}>
+                        {periodo.numero}/{gestion.anio}
                       </option>
                     ))
                   )}
                 </select>
-                {errors.gestion && <p className="text-sm text-red-600 mt-1">{errors.gestion}</p>}
+                {errores.gestion && <p className="text-sm text-red-600 mt-1">{errores.gestion}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Semestre *
                 </label>
                 <select
-                  className={`w-full h-10 px-3 border rounded-lg text-sm ${errors.semestre ? 'border-red-500' : ''}`}
-                  value={formData.semestre || ''}
-                  onChange={(e) => setFormData({ ...formData, semestre: e.target.value ? parseInt(e.target.value) : null })}
+                  className={`w-full h-10 px-3 border rounded-lg text-sm ${errores.semestre ? 'border-red-500' : ''}`}
+                  value={datosFormulario.semestre || ''}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, semestre: e.target.value ? parseInt(e.target.value) : null })}
                 >
                   <option value="">Seleccionar...</option>
                   <option value="1">1° Semestre</option>
@@ -305,33 +305,33 @@ export default function NewCredentialPage() {
                   <option value="5">5° Semestre</option>
                   <option value="6">6° Semestre</option>
                 </select>
-                {errors.semestre && <p className="text-sm text-red-600 mt-1">{errors.semestre}</p>}
+                {errores.semestre && <p className="text-sm text-red-600 mt-1">{errores.semestre}</p>}
               </div>
               <div>
                 <Entrada
-                  label="Fecha de Emisión *"
+                  etiqueta="Fecha de Emisión *"
                   type="date"
-                  value={formData.fechaEmision}
-                  onChange={(e) => setFormData({ ...formData, fechaEmision: e.target.value })}
-                  error={errors.fechaEmision}
+                  value={datosFormulario.fechaEmision}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, fechaEmision: e.target.value })}
+                  error={errores.fechaEmision}
                 />
               </div>
               <div>
                 <Entrada
-                  label="Válida Hasta *"
+                  etiqueta="Válida Hasta *"
                   type="date"
-                  value={formData.validoHasta}
-                  onChange={(e) => setFormData({ ...formData, validoHasta: e.target.value })}
-                  error={errors.validoHasta}
+                  value={datosFormulario.validoHasta}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, validoHasta: e.target.value })}
+                  error={errores.validoHasta}
                 />
               </div>
             </div>
 
             <div>
               <Entrada
-                label="URL de Foto"
-                value={formData.fotoUrl}
-                onChange={(e) => setFormData({ ...formData, fotoUrl: e.target.value })}
+                etiqueta="URL de Foto"
+                value={datosFormulario.fotoUrl}
+                onChange={(e) => setDatosFormulario({ ...datosFormulario, fotoUrl: e.target.value })}
                 placeholder="https://..."
               />
             </div>
@@ -340,26 +340,26 @@ export default function NewCredentialPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Notas</label>
               <textarea
                 className="w-full h-20 px-3 py-2 border rounded-lg text-sm"
-                value={formData.notas}
-                onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+                value={datosFormulario.notas}
+                onChange={(e) => setDatosFormulario({ ...datosFormulario, notas: e.target.value })}
                 placeholder="Observaciones adicionales..."
               />
             </div>
           </ContenidoTarjeta>
         </Tarjeta>
 
-        {errors.submit && (
+        {errores.submit && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-            {errors.submit}
+            {errores.submit}
           </div>
         )}
 
         <div className="flex justify-end gap-3">
-          <Boton variant="outline" type="button" onClick={() => router.back()}>
+          <Boton variante="contorno" type="button" onClick={() => router.back()}>
             Cancelar
           </Boton>
-          <Boton type="submit" disabled={loading}>
-            {loading ? (
+          <Boton type="submit" disabled={cargando}>
+            {cargando ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Guardando...

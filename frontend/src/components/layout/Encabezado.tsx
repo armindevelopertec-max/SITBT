@@ -8,28 +8,28 @@ import { Bell, LogOut, User, Settings, ChevronDown, Menu } from 'lucide-react';
 import { cn } from '@/lib/utilidades';
 
 interface PropsEncabezado {
-  title?: string;
-  onMenuClick?: () => void;
+  titulo?: string;
+  alHacerClicMenu?: () => void;
 }
 
-export default function Encabezado({ title, onMenuClick }: PropsEncabezado) {
+export default function Encabezado({ titulo, alHacerClicMenu }: PropsEncabezado) {
   const [desplegableAbierto, setDesplegableAbierto] = useState(false);
   const refDesplegable = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { usuario, cerrarSesion } = usarAlmacenAutenticacion();
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (refDesplegable.current && !refDesplegable.current.contains(event.target as Node)) {
+    const alHacerClicFuera = (evento: MouseEvent) => {
+      if (refDesplegable.current && !refDesplegable.current.contains(evento.target as Node)) {
         setDesplegableAbierto(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', alHacerClicFuera);
+    return () => document.removeEventListener('mousedown', alHacerClicFuera);
   }, []);
 
-  const handleLogout = () => {
+  const cerrarSesionUsuario = () => {
     cerrarSesion();
     router.push('/acceder');
   };
@@ -39,13 +39,13 @@ export default function Encabezado({ title, onMenuClick }: PropsEncabezado) {
       <div className="flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-4">
           <button
-            onClick={onMenuClick}
+            onClick={alHacerClicMenu}
             className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
           >
             <Menu className="w-5 h-5 text-gray-600" />
           </button>
-          {title && (
-            <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
+          {titulo && (
+            <h1 className="text-xl font-semibold text-gray-900">{titulo}</h1>
           )}
         </div>
 
@@ -96,7 +96,7 @@ export default function Encabezado({ title, onMenuClick }: PropsEncabezado) {
                     Configuración
                   </button>
                   <button
-                    onClick={handleLogout}
+                    onClick={cerrarSesionUsuario}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                   >
                     <LogOut className="w-4 h-4" />

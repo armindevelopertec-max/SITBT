@@ -20,77 +20,77 @@ import { EstadoAdmision } from '../../entities/admission-request.entity';
 @ApiTags('Admision')
 @Controller('admision')
 export class ControladorAdmision {
-  constructor(private readonly service: ServicioAdmision) {}
+  constructor(private readonly servicio: ServicioAdmision) {}
 
   @Post()
-  create(@Body() createDto: CrearAdmisionDto) {
-    return this.service.create(createDto);
+  crear(@Body() crearAdmisionDto: CrearAdmisionDto) {
+    return this.servicio.crear(crearAdmisionDto);
   }
 
   @Get()
   @UseGuards(GuardaJwt)
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
     @Query('estado') estado?: EstadoAdmision,
     @Query('origen') origen?: string,
   ) {
-    return this.service.findAll(+page, +limit, estado, origen);
+    return this.servicio.obtenerTodos(+pagina, +limite, estado, origen);
   }
 
   @Get('estadisticas')
   @UseGuards(GuardaJwt)
-  getStatistics() {
-    return this.service.getStatistics();
+  obtenerEstadisticas() {
+    return this.servicio.obtenerEstadisticas();
   }
 
   @Get(':id')
   @UseGuards(GuardaJwt)
-  findOne(@Param('id') id: string) {
-    return this.service.findOne(id);
+  obtenerUno(@Param('id') id: string) {
+    return this.servicio.obtenerUno(id);
   }
 
   @Patch(':id')
   @UseGuards(GuardaJwt)
-  update(@Param('id') id: string, @Body() updateDto: ActualizarAdmisionDto) {
-    return this.service.update(id, updateDto);
+  actualizar(@Param('id') id: string, @Body() actualizarAdmisionDto: ActualizarAdmisionDto) {
+    return this.servicio.actualizar(id, actualizarAdmisionDto);
   }
 
   @Post(':id/verificar')
   @UseGuards(GuardaJwt)
   @HttpCode(200)
-  verify(
+  verificar(
     @Param('id') id: string,
     @Body('verificadoPor') verificadoPor: number,
     @Body('observaciones') observaciones?: string,
   ) {
-    return this.service.verify(id, verificadoPor, observaciones);
+    return this.servicio.verificar(id, verificadoPor, observaciones);
   }
 
   @Post(':id/rechazar')
   @UseGuards(GuardaJwt)
   @HttpCode(200)
-  reject(
+  rechazar(
     @Param('id') id: string,
     @Body('verificadoPor') verificadoPor: number,
     @Body('observaciones') observaciones: string,
   ) {
-    return this.service.reject(id, verificadoPor, observaciones);
+    return this.servicio.rechazar(id, verificadoPor, observaciones);
   }
 
   @Post(':id/convertir-estudiante')
   @UseGuards(GuardaJwt)
   @HttpCode(200)
-  convertToStudent(
+  convertirAEstudiante(
     @Param('id') id: string,
     @Body('gestionAdmision') gestionAdmision: string,
   ) {
-    return this.service.convertToStudent(id, gestionAdmision);
+    return this.servicio.convertirAEstudiante(id, gestionAdmision);
   }
 
   @Delete(':id')
   @UseGuards(GuardaJwt)
-  remove(@Param('id') id: string) {
-    return this.service.remove(id);
+  eliminar(@Param('id') id: string) {
+    return this.servicio.eliminar(id);
   }
 }

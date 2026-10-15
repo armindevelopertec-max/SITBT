@@ -11,60 +11,60 @@ import { Selector } from '@/components/ui/selector';
 import { ArrowLeft, FileText, Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
 
-export default function EmitDocumentPage() {
+export default function PaginaEmitirDocumento() {
   const router = useRouter();
-  const { generateBoleta, generateRecibo } = usarDocumentos();
+  const { generarBoleta, generarRecibo } = usarDocumentos();
 
-  const [documentType, setDocumentType] = useState<string>('');
-  const [studentId, setStudentId] = useState<string>('');
+  const [tipoDocumento, setTipoDocumento] = useState<string>('');
+  const [estudianteId, setEstudianteId] = useState<string>('');
   const [gestion, setGestion] = useState<string>(new Date().getFullYear().toString());
-  const [loading, setLoading] = useState(false);
+  const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [studentSearch, setStudentSearch] = useState('');
-  const [students, setStudents] = useState<any[]>([]);
-  const [searching, setSearching] = useState(false);
+  const [busquedaEstudiante, setBusquedaEstudiante] = useState('');
+  const [estudiantes, setEstudiantes] = useState<any[]>([]);
+  const [buscando, setBuscando] = useState(false);
 
-  const searchStudents = async () => {
-    if (!studentSearch || studentSearch.length < 2) return;
-    setSearching(true);
+  const buscarEstudiantes = async () => {
+    if (!busquedaEstudiante || busquedaEstudiante.length < 2) return;
+    setBuscando(true);
     try {
-      const response = await api.get('/estudiantes', {
-        params: { buscar: studentSearch, limite: 10 },
+      const respuesta = await api.get('/estudiantes', {
+        params: { buscar: busquedaEstudiante, limite: 10 },
       });
-      setStudents(response.data.datos || []);
+      setEstudiantes(respuesta.data.datos || []);
     } catch (error) {
       console.error('Error al buscar estudiantes:', error);
     } finally {
-      setSearching(false);
+      setBuscando(false);
     }
   };
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (studentSearch) searchStudents();
+      if (busquedaEstudiante) buscarEstudiantes();
     }, 500);
     return () => clearTimeout(timer);
-  }, [studentSearch]);
+  }, [busquedaEstudiante]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const enviarFormulario = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!documentType || !studentId) return;
+    if (!tipoDocumento || !estudianteId) return;
 
-    setLoading(true);
+    setCargando(true);
     setError(null);
 
     try {
-      if (documentType === 'boleta_inscripcion') {
-        await generateBoleta(parseInt(studentId), gestion);
-      } else if (documentType === 'recibo_pago') {
-        await generateRecibo(parseInt(studentId), gestion, 0);
+      if (tipoDocumento === 'boleta_inscripcion') {
+        await generarBoleta(parseInt(estudianteId), gestion);
+      } else if (tipoDocumento === 'recibo_pago') {
+        await generarRecibo(parseInt(estudianteId), gestion, 0);
       }
       router.push('/documentos');
     } catch (err: any) {
       setError(err.response?.data?.mensaje || 'Error al generar documento');
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
@@ -72,7 +72,7 @@ export default function EmitDocumentPage() {
     <div className="p-6">
       <div className="flex items-center gap-4 mb-6">
         <Link href="/documentos">
-          <Boton variant="ghost" size="sm">
+          <Boton variante="fantasma" tamano="pequeno">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver
           </Boton>
@@ -97,21 +97,21 @@ export default function EmitDocumentPage() {
           </TituloTarjeta>
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={enviarFormulario} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Tipo de documento *
               </label>
               <Selector
-                value={documentType}
-                onChange={(e) => setDocumentType(e.target.value)}
-                options={[
-                  { value: '', label: 'Seleccionar tipo' },
-                  { value: 'boleta_inscripcion', label: 'Boleta de Inscripción' },
-                  { value: 'recibo_pago', label: 'Recibo de Pago' },
-                  { value: 'carnet', label: 'Carnet de Estudiante' },
-                  { value: 'certificado', label: 'Certificado' },
-                  { value: 'constancia', label: 'Constancia' },
+                value={tipoDocumento}
+                onChange={(e) => setTipoDocumento(e.target.value)}
+                opciones={[
+                  { value: '', etiqueta: 'Seleccionar tipo' },
+                  { value: 'boleta_inscripcion', etiqueta: 'Boleta de Inscripción' },
+                  { value: 'recibo_pago', etiqueta: 'Recibo de Pago' },
+                  { value: 'carnet', etiqueta: 'Carnet de Estudiante' },
+                  { value: 'certificado', etiqueta: 'Certificado' },
+                  { value: 'constancia', etiqueta: 'Constancia' },
                 ]}
                 placeholder="Seleccionar tipo"
               />
@@ -126,41 +126,41 @@ export default function EmitDocumentPage() {
                 <Entrada
                   placeholder="Buscar por nombre o CI..."
                   className="pl-10"
-                  value={studentSearch}
+                  value={busquedaEstudiante}
                   onChange={(e) => {
-                    setStudentSearch(e.target.value);
-                    setStudentId('');
+                    setBusquedaEstudiante(e.target.value);
+                    setEstudianteId('');
                   }}
                 />
               </div>
 
-              {students.length > 0 && (
+              {estudiantes.length > 0 && (
                 <div className="mt-2 border rounded-lg max-h-48 overflow-y-auto">
-                  {students.map((student) => (
+                  {estudiantes.map((estudiante) => (
                     <button
-                      key={student.id}
+                      key={estudiante.id}
                       type="button"
                       onClick={() => {
-                        setStudentId(student.id.toString());
-                        setStudentSearch(
-                          `${student.persona?.nombres} ${student.persona?.apellidoPaterno} - ${student.persona?.ci}`
+                        setEstudianteId(estudiante.id.toString());
+                        setBusquedaEstudiante(
+                          `${estudiante.persona?.nombres} ${estudiante.persona?.apellidoPaterno} - ${estudiante.persona?.ci}`
                         );
-                        setStudents([]);
+                        setEstudiantes([]);
                       }}
                       className="w-full px-4 py-2 text-left hover:bg-gray-50 border-b last:border-b-0"
                     >
                       <p className="font-medium">
-                        {student.persona?.nombres} {student.persona?.apellidoPaterno} {student.persona?.apellidoMaterno}
+                        {estudiante.persona?.nombres} {estudiante.persona?.apellidoPaterno} {estudiante.persona?.apellidoMaterno}
                       </p>
                       <p className="text-sm text-gray-500">
-                        CI: {student.persona?.ci} - Código: {student.codigoInscripcion}
+                        CI: {estudiante.persona?.ci} - Código: {estudiante.codigoInscripcion}
                       </p>
                     </button>
                   ))}
                 </div>
               )}
 
-              {studentId && (
+              {estudianteId && (
                 <p className="mt-2 text-sm text-green-600">
                   ✓ Estudiante seleccionado
                 </p>
@@ -174,22 +174,22 @@ export default function EmitDocumentPage() {
               <Selector
                 value={gestion}
                 onChange={(e) => setGestion(e.target.value)}
-                options={[
-                  { value: (new Date().getFullYear() - 1).toString(), label: (new Date().getFullYear() - 1).toString() },
-                  { value: new Date().getFullYear().toString(), label: new Date().getFullYear().toString() },
-                  { value: (new Date().getFullYear() + 1).toString(), label: (new Date().getFullYear() + 1).toString() },
+                opciones={[
+                  { value: (new Date().getFullYear() - 1).toString(), etiqueta: (new Date().getFullYear() - 1).toString() },
+                  { value: new Date().getFullYear().toString(), etiqueta: new Date().getFullYear().toString() },
+                  { value: (new Date().getFullYear() + 1).toString(), etiqueta: (new Date().getFullYear() + 1).toString() },
                 ]}
               />
             </div>
 
             <div className="flex justify-end gap-4">
               <Link href="/documentos">
-                <Boton variant="outline" type="button">
+                <Boton variante="contorno" type="button">
                   Cancelar
                 </Boton>
               </Link>
-              <Boton type="submit" disabled={loading || !documentType || !studentId}>
-                {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              <Boton type="submit" disabled={cargando || !tipoDocumento || !estudianteId}>
+                {cargando && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Generar documento
               </Boton>
             </div>

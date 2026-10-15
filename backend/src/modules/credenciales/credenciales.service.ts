@@ -9,117 +9,117 @@ import { ActualizarCredencialDto } from './dto/actualizar-credencial.dto';
 export class ServicioCredenciales {
   constructor(
     @InjectRepository(Credencial)
-    private credencialRepository: Repository<Credencial>,
+    private repositorioCredencial: Repository<Credencial>,
   ) {}
 
-  async create(createDto: CrearCredencialDto): Promise<Credencial> {
-    const existing = await this.credencialRepository.findOne({
+  async crear(dtoCreacion: CrearCredencialDto): Promise<Credencial> {
+    const existente = await this.repositorioCredencial.findOne({
       where: {
-        estudianteId: createDto.estudianteId,
-        gestion: createDto.gestion,
-        semestre: createDto.semestre,
+        estudianteId: dtoCreacion.estudianteId,
+        gestion: dtoCreacion.gestion,
+        semestre: dtoCreacion.semestre,
       },
     });
 
-    if (existing) {
-      throw new ConflictException(`Ya existe una credencial para este estudiante en la gestión ${createDto.gestion} semestre ${createDto.semestre}`);
+    if (existente) {
+      throw new ConflictException(`Ya existe una credencial para este estudiante en la gestión ${dtoCreacion.gestion} semestre ${dtoCreacion.semestre}`);
     }
 
-    const credential = this.credencialRepository.create(createDto);
-    return this.credencialRepository.save(credential as any) as any;
+    const credencial = this.repositorioCredencial.create(dtoCreacion);
+    return this.repositorioCredencial.save(credencial as any) as any;
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
     gestion?: string,
-    semester?: number,
-    status?: EstadoCredencial,
+    semestre?: number,
+    estado?: EstadoCredencial,
   ): Promise<{ datos: Credencial[]; total: number; pagina: number; limite: number }> {
-    const query = this.credencialRepository
-      .createQueryBuilder('credential')
-      .leftJoinAndSelect('credential.estudiante', 'student')
-      .leftJoinAndSelect('student.persona', 'person')
-      .leftJoinAndSelect('student.carrera', 'career')
-      .leftJoinAndSelect('credential.gestionEntity', 'gestion')
-      .leftJoinAndSelect('credential.emisor', 'issuer');
+    const consulta = this.repositorioCredencial
+      .createQueryBuilder('credencial')
+      .leftJoinAndSelect('credencial.estudiante', 'estudiante')
+      .leftJoinAndSelect('estudiante.persona', 'persona')
+      .leftJoinAndSelect('estudiante.carrera', 'carrera')
+      .leftJoinAndSelect('credencial.gestionRelacionada', 'gestion')
+      .leftJoinAndSelect('credencial.emisor', 'emisor');
 
     if (gestion) {
-      query.andWhere('credential.gestion = :gestion', { gestion });
+      consulta.andWhere('credencial.gestion = :gestion', { gestion });
     }
 
     if (false) {
-      query.andWhere('credential.semestre = :semestre', { semestre: semester });
+      consulta.andWhere('credencial.semestre = :semestre', { semestre });
     }
 
-    if (status) {
-      query.andWhere('credential.estado = :estado', { estado: status });
+    if (estado) {
+      consulta.andWhere('credencial.estado = :estado', { estado });
     }
 
-    const [data, total] = await query
-      .orderBy('credential.fechaEmision', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('credencial.fechaEmision', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Credencial> {
-    const credential = await this.credencialRepository.findOne({
+  async obtenerUno(id: number): Promise<Credencial> {
+    const credencial = await this.repositorioCredencial.findOne({
       where: { id },
-      relations: ['estudiante', 'estudiante.persona', 'estudiante.carrera', 'gestionEntity', 'emisor'],
+      relations: ['estudiante', 'estudiante.persona', 'estudiante.carrera', 'gestionRelacionada', 'emisor'],
     });
-    if (!credential) {
+    if (!credencial) {
       throw new NotFoundException(`Credencial con ID ${id} no encontrada`);
     }
-    return credential;
+    return credencial;
   }
 
-  async update(id: number, updateDto: ActualizarCredencialDto): Promise<Credencial> {
-    const credential = await this.findOne(id);
-    Object.assign(credential, updateDto);
-    return this.credencialRepository.save(credential as any) as any;
+  async actualizar(id: number, dtoActualizacion: ActualizarCredencialDto): Promise<Credencial> {
+    const credencial = await this.obtenerUno(id);
+    Object.assign(credencial, dtoActualizacion);
+    return this.repositorioCredencial.save(credencial as any) as any;
   }
 
-  async remove(id: number): Promise<void> {
-    const credential = await this.findOne(id);
-    await this.credencialRepository.remove(credential);
+  async eliminar(id: number): Promise<void> {
+    const credencial = await this.obtenerUno(id);
+    await this.repositorioCredencial.remove(credencial);
   }
 
-  async findByStudent(studentId: number): Promise<Credencial[]> {
-    return this.credencialRepository.find({
-      where: { estudianteId: studentId },
+  async buscarPorEstudiante(estudianteId: number): Promise<Credencial[]> {
+    return this.repositorioCredencial.find({
+      where: { estudianteId },
       relations: ['emisor', 'estudiante'],
       order: { fechaEmision: 'DESC' },
     });
   }
 
-  async findActiveByStudent(studentId: number): Promise<Credencial | null> {
-    return this.credencialRepository.findOne({
-      where: { estudianteId: studentId, estado: EstadoCredencial.EMITIDA },
+  async buscarActivosPorEstudiante(estudianteId: number): Promise<Credencial | null> {
+    return this.repositorioCredencial.findOne({
+      where: { estudianteId, estado: EstadoCredencial.EMITIDA },
       relations: ['emisor'],
       order: { fechaEmision: 'DESC' },
     });
   }
 
-  async findByStudentAndGestion(studentId: number, gestion: string): Promise<Credencial[]> {
-    return this.credencialRepository.find({
-      where: { estudianteId: studentId, gestion },
+  async buscarPorEstudianteYGestion(estudianteId: number, gestion: string): Promise<Credencial[]> {
+    return this.repositorioCredencial.find({
+      where: { estudianteId, gestion },
       relations: ['emisor', 'estudiante', 'estudiante.persona'],
       order: { semestre: 'ASC' },
     });
   }
 
-  async markAsPrinted(id: number): Promise<Credencial> {
-    const credential = await this.findOne(id);
-    credential.impreso = true;
-    return this.credencialRepository.save(credential as any) as any;
+  async marcarComoImpreso(id: number): Promise<Credencial> {
+    const credencial = await this.obtenerUno(id);
+    credencial.impreso = true;
+    return this.repositorioCredencial.save(credencial as any) as any;
   }
 
-  async annul(id: number): Promise<Credencial> {
-    const credential = await this.findOne(id);
-    credential.estado = EstadoCredencial.ANULADA;
-    return this.credencialRepository.save(credential as any) as any;
+  async anular(id: number): Promise<Credencial> {
+    const credencial = await this.obtenerUno(id);
+    credencial.estado = EstadoCredencial.ANULADA;
+    return this.repositorioCredencial.save(credencial as any) as any;
   }
 }

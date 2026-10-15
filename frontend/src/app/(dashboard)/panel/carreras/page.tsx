@@ -21,120 +21,120 @@ interface Carrera {
   creadoEn: string;
 }
 
-interface CareerFormData {
+interface DatosFormularioCarrera {
   nombre: string;
   codigo: string;
   descripcion: string;
   area: string;
 }
 
-export default function CarrerasPage() {
-  const [careers, setCareers] = useState<Carrera[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCareer, setEditingCareer] = useState<Carrera | null>(null);
-  const [formLoading, setFormLoading] = useState(false);
-  const [deleteModal, setDeleteModal] = useState<Carrera | null>(null);
-  const [form, setForm] = useState<CareerFormData>({
+export default function PaginaCarreras() {
+  const [carreras, setCarreras] = useState<Carrera[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [terminoBusqueda, setTerminoBusqueda] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState<string>('');
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [carreraEditando, setCarreraEditando] = useState<Carrera | null>(null);
+  const [cargandoFormulario, setCargandoFormulario] = useState(false);
+  const [carreraEliminando, setCarreraEliminando] = useState<Carrera | null>(null);
+  const [formulario, setFormulario] = useState<DatosFormularioCarrera>({
     nombre: '',
     codigo: '',
     descripcion: '',
     area: '',
   });
 
-  const fetchCareers = async () => {
+  const obtenerCarreras = async () => {
     try {
-      setLoading(true);
-      const params: any = {};
-      if (statusFilter) params.status = statusFilter;
-      const response = await api.get('/carreras', { params });
-      setCareers(response.data.datos || response.data);
+      setCargando(true);
+      const parametros: any = {};
+      if (filtroEstado) parametros.status = filtroEstado;
+      const respuesta = await api.get('/carreras', { params: parametros });
+      setCarreras(respuesta.data.datos || respuesta.data);
     } catch (error) {
       console.error('Error al obtener las carreras:', error);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
   useEffect(() => {
-    fetchCareers();
-  }, [statusFilter]);
+    obtenerCarreras();
+  }, [filtroEstado]);
 
-  const filteredCareers = careers.filter((career) => {
-    const search = searchTerm.toLowerCase();
+  const carrerasFiltradas = carreras.filter((carrera) => {
+    const busqueda = terminoBusqueda.toLowerCase();
     return (
-      career.nombre.toLowerCase().includes(search) ||
-      career.codigo.toLowerCase().includes(search) ||
-      career.area.toLowerCase().includes(search)
+      carrera.nombre.toLowerCase().includes(busqueda) ||
+      carrera.codigo.toLowerCase().includes(busqueda) ||
+      carrera.area.toLowerCase().includes(busqueda)
     );
   });
 
-  const handleOpenModal = (career?: Carrera) => {
-    if (career) {
-      setEditingCareer(career);
-      setForm({
-        nombre: career.nombre,
-        codigo: career.codigo,
-        descripcion: career.descripcion || '',
-        area: career.area || '',
+  const abrirModal = (carrera?: Carrera) => {
+    if (carrera) {
+      setCarreraEditando(carrera);
+      setFormulario({
+        nombre: carrera.nombre,
+        codigo: carrera.codigo,
+        descripcion: carrera.descripcion || '',
+        area: carrera.area || '',
       });
     } else {
-      setEditingCareer(null);
-      setForm({ nombre: '', codigo: '', descripcion: '', area: '' });
+      setCarreraEditando(null);
+      setFormulario({ nombre: '', codigo: '', descripcion: '', area: '' });
     }
-    setIsModalOpen(true);
+    setModalAbierto(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingCareer(null);
-    setForm({ nombre: '', codigo: '', descripcion: '', area: '' });
+  const cerrarModal = () => {
+    setModalAbierto(false);
+    setCarreraEditando(null);
+    setFormulario({ nombre: '', codigo: '', descripcion: '', area: '' });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const guardar = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormLoading(true);
+    setCargandoFormulario(true);
     try {
-      if (editingCareer) {
-        await api.patch(`/carreras/${editingCareer.id}`, form);
+      if (carreraEditando) {
+        await api.patch(`/carreras/${carreraEditando.id}`, formulario);
       } else {
-        await api.post('/carreras', form);
+        await api.post('/carreras', formulario);
       }
-      handleCloseModal();
-      fetchCareers();
+      cerrarModal();
+      obtenerCarreras();
     } catch (error) {
       console.error('Error al guardar la carrera:', error);
       alert('Error al guardar la carrera');
     } finally {
-      setFormLoading(false);
+      setCargandoFormulario(false);
     }
   };
 
-  const handleDelete = async () => {
-    if (!deleteModal) return;
-    setFormLoading(true);
+  const eliminar = async () => {
+    if (!carreraEliminando) return;
+    setCargandoFormulario(true);
     try {
-      await api.delete(`/carreras/${deleteModal.id}`);
-      setDeleteModal(null);
-      fetchCareers();
+      await api.delete(`/carreras/${carreraEliminando.id}`);
+      setCarreraEliminando(null);
+      obtenerCarreras();
     } catch (error) {
       console.error('Error al eliminar la carrera:', error);
       alert('Error al eliminar la carrera');
     } finally {
-      setFormLoading(false);
+      setCargandoFormulario(false);
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const config = status === 'activo'
-      ? { label: 'Activo', color: 'bg-green-100 text-green-800' }
-      : { label: 'Inactivo', color: 'bg-red-100 text-red-800' };
-    return <Insignia className={config.color}>{config.label}</Insignia>;
+  const obtenerInsigniaEstado = (estado: string) => {
+    const config = estado === 'activo'
+      ? { etiqueta: 'Activo', color: 'bg-green-100 text-green-800' }
+      : { etiqueta: 'Inactivo', color: 'bg-red-100 text-red-800' };
+    return <Insignia className={config.color}>{config.etiqueta}</Insignia>;
   };
 
-  if (loading) {
+  if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
@@ -144,24 +144,24 @@ export default function CarrerasPage() {
 
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Panel' }, { label: 'Carreras' }]} />
+      <Migas elementos={[{ etiqueta: 'Panel' }, { etiqueta: 'Carreras' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Carreras</h1>
-        <Boton onClick={() => handleOpenModal()}>
+        <Boton onClick={() => abrirModal()}>
           <Plus className="w-4 h-4 mr-2" />
           Nueva Carrera
         </Boton>
       </div>
 
-      <Tarjeta variant="bordered">
+      <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex flex-col md:flex-row gap-4 md:items-center">
               <select
                 className="px-3 py-2 border border-gray-300 rounded-lg"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                value={filtroEstado}
+                onChange={(e) => setFiltroEstado(e.target.value)}
               >
                 <option value="">Todos los estados</option>
                 <option value="activo">Activo</option>
@@ -172,8 +172,8 @@ export default function CarrerasPage() {
                 <Entrada
                   placeholder="Buscar por nombre, código o área..."
                   className="pl-10 w-64"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={terminoBusqueda}
+                  onChange={(e) => setTerminoBusqueda(e.target.value)}
                 />
               </div>
             </div>
@@ -192,29 +192,29 @@ export default function CarrerasPage() {
               </FilaTabla>
             </EncabezadoTabla>
             <CuerpoTabla>
-              {filteredCareers.map((career) => (
-                <FilaTabla key={career.id}>
-                  <CeldaTabla className="font-medium">{career.codigo}</CeldaTabla>
-                  <CeldaTabla>{career.nombre}</CeldaTabla>
-                  <CeldaTabla>{career.area || '-'}</CeldaTabla>
-                  <CeldaTabla className="max-w-xs truncate">{career.descripcion || '-'}</CeldaTabla>
-                  <CeldaTabla>{getStatusBadge(career.estado)}</CeldaTabla>
+              {carrerasFiltradas.map((carrera) => (
+                <FilaTabla key={carrera.id}>
+                  <CeldaTabla className="font-medium">{carrera.codigo}</CeldaTabla>
+                  <CeldaTabla>{carrera.nombre}</CeldaTabla>
+                  <CeldaTabla>{carrera.area || '-'}</CeldaTabla>
+                  <CeldaTabla className="max-w-xs truncate">{carrera.descripcion || '-'}</CeldaTabla>
+                  <CeldaTabla>{obtenerInsigniaEstado(carrera.estado)}</CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Boton variant="ghost" size="icon" onClick={() => handleOpenModal(career)}>
+                      <Boton variante="fantasma" tamano="icono" onClick={() => abrirModal(carrera)}>
                         <Pencil className="w-4 h-4" />
                       </Boton>
-                      <Boton variant="ghost" size="icon" onClick={() => setDeleteModal(career)}>
+                      <Boton variante="fantasma" tamano="icono" onClick={() => setCarreraEliminando(carrera)}>
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </Boton>
                     </div>
                   </CeldaTabla>
                 </FilaTabla>
               ))}
-              {filteredCareers.length === 0 && (
+              {carrerasFiltradas.length === 0 && (
                 <FilaTabla>
                   <CeldaTabla colSpan={6} className="text-center py-8 text-gray-500">
-                    {searchTerm || statusFilter ? 'No se encontraron carreras' : 'No hay carreras registradas'}
+                    {terminoBusqueda || filtroEstado ? 'No se encontraron carreras' : 'No hay carreras registradas'}
                   </CeldaTabla>
                 </FilaTabla>
               )}
@@ -224,13 +224,13 @@ export default function CarrerasPage() {
       </Tarjeta>
 
       {/* Modal Crear/Editar */}
-      <Modal open={isModalOpen} onClose={handleCloseModal} title={editingCareer ? 'Editar Carrera' : 'Nueva Carrera'} size="md">
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <Modal abierto={modalAbierto} alCerrar={cerrarModal} titulo={carreraEditando ? 'Editar Carrera' : 'Nueva Carrera'} tamano="mediano">
+        <form onSubmit={guardar} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Código *</label>
             <Entrada
-              value={form.codigo}
-              onChange={(e) => setForm({ ...form, codigo: e.target.value })}
+              value={formulario.codigo}
+              onChange={(e) => setFormulario({ ...formulario, codigo: e.target.value })}
               placeholder="Ej: ING-SIS"
               required
             />
@@ -238,8 +238,8 @@ export default function CarrerasPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
             <Entrada
-              value={form.nombre}
-              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+              value={formulario.nombre}
+              onChange={(e) => setFormulario({ ...formulario, nombre: e.target.value })}
               placeholder="Ej: Ingeniería de Sistemas"
               required
             />
@@ -248,8 +248,8 @@ export default function CarrerasPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">Área</label>
             <select
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              value={form.area}
-              onChange={(e) => setForm({ ...form, area: e.target.value })}
+              value={formulario.area}
+              onChange={(e) => setFormulario({ ...formulario, area: e.target.value })}
             >
               <option value="">Seleccionar área</option>
               <option value="Tecnología">Tecnología</option>
@@ -264,34 +264,34 @@ export default function CarrerasPage() {
             <textarea
               className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               rows={3}
-              value={form.descripcion}
-              onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
+              value={formulario.descripcion}
+              onChange={(e) => setFormulario({ ...formulario, descripcion: e.target.value })}
               placeholder="Descripción de la carrera..."
             />
           </div>
           <div className="flex justify-end gap-2 pt-4">
-            <Boton type="button" variant="outline" onClick={handleCloseModal}>
+            <Boton type="button" variante="contorno" onClick={cerrarModal}>
               Cancelar
             </Boton>
-            <Boton type="submit" disabled={formLoading}>
-              {formLoading ? 'Guardando...' : editingCareer ? 'Actualizar' : 'Crear'}
+            <Boton type="submit" disabled={cargandoFormulario}>
+              {cargandoFormulario ? 'Guardando...' : carreraEditando ? 'Actualizar' : 'Crear'}
             </Boton>
           </div>
         </form>
       </Modal>
 
       {/* Modal Confirmar Eliminación */}
-      <Modal open={!!deleteModal} onClose={() => setDeleteModal(null)} title="Eliminar Carrera" size="sm">
+      <Modal abierto={!!carreraEliminando} alCerrar={() => setCarreraEliminando(null)} titulo="Eliminar Carrera" tamano="pequeno">
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            ¿Está seguro de eliminar la carrera <strong>{deleteModal?.nombre}</strong>?
+            ¿Está seguro de eliminar la carrera <strong>{carreraEliminando?.nombre}</strong>?
           </p>
           <div className="flex justify-end gap-2">
-            <Boton variant="outline" onClick={() => setDeleteModal(null)}>
+            <Boton variante="contorno" onClick={() => setCarreraEliminando(null)}>
               Cancelar
             </Boton>
-            <Boton variant="destructive" onClick={handleDelete} disabled={formLoading}>
-              {formLoading ? 'Eliminando...' : 'Eliminar'}
+            <Boton variante="destructivo" onClick={eliminar} disabled={cargandoFormulario}>
+              {cargandoFormulario ? 'Eliminando...' : 'Eliminar'}
             </Boton>
           </div>
         </div>

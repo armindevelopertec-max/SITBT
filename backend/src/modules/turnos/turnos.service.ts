@@ -9,68 +9,68 @@ import { ActualizarTurnoDto } from './dto/actualizar-turno.dto';
 export class ServicioTurnos {
   constructor(
     @InjectRepository(Turno)
-    private turnoRepository: Repository<Turno>,
+    private repositorioTurno: Repository<Turno>,
   ) {}
 
-  async create(crearTurnoDto: CrearTurnoDto): Promise<Turno> {
-    const existing = await this.turnoRepository.findOne({
+  async crear(crearTurnoDto: CrearTurnoDto): Promise<Turno> {
+    const existente = await this.repositorioTurno.findOne({
       where: { codigo: crearTurnoDto.codigo },
     });
-    if (existing) {
+    if (existente) {
       throw new ConflictException(`Turno con código ${crearTurnoDto.codigo} ya existe`);
     }
-    const turno = this.turnoRepository.create({
+    const turno = this.repositorioTurno.create({
       codigo: crearTurnoDto.codigo,
       nombre: crearTurnoDto.nombre,
       horaInicio: crearTurnoDto.horaInicio,
       horaFin: crearTurnoDto.horaFin,
     });
-    return this.turnoRepository.save(turno);
+    return this.repositorioTurno.save(turno);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
   ): Promise<{ datos: Turno[]; total: number; pagina: number; limite: number }> {
-    const [data, total] = await this.turnoRepository
+    const [datos, total] = await this.repositorioTurno
       .createQueryBuilder('turno')
       .orderBy('turno.horaInicio', 'ASC')
-      .skip((page - 1) * limit)
-      .take(limit)
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Turno> {
-    const turno = await this.turnoRepository.findOne({ where: { id } });
+  async obtenerUno(id: number): Promise<Turno> {
+    const turno = await this.repositorioTurno.findOne({ where: { id } });
     if (!turno) {
       throw new NotFoundException(`Turno con ID ${id} no encontrado`);
     }
     return turno;
   }
 
-  async findByCodigo(codigo: string): Promise<Turno> {
-    const turno = await this.turnoRepository.findOne({ where: { codigo } });
+  async buscarPorCodigo(codigo: string): Promise<Turno> {
+    const turno = await this.repositorioTurno.findOne({ where: { codigo } });
     if (!turno) {
       throw new NotFoundException(`Turno con código ${codigo} no encontrado`);
     }
     return turno;
   }
 
-  async update(id: number, actualizarTurnoDto: ActualizarTurnoDto): Promise<Turno> {
-    const turno = await this.findOne(id);
+  async actualizar(id: number, actualizarTurnoDto: ActualizarTurnoDto): Promise<Turno> {
+    const turno = await this.obtenerUno(id);
     Object.assign(turno, actualizarTurnoDto);
-    return this.turnoRepository.save(turno);
+    return this.repositorioTurno.save(turno);
   }
 
-  async remove(id: number): Promise<void> {
-    const turno = await this.findOne(id);
-    await this.turnoRepository.remove(turno);
+  async eliminar(id: number): Promise<void> {
+    const turno = await this.obtenerUno(id);
+    await this.repositorioTurno.remove(turno);
   }
 
-  async findAllTurnos(): Promise<Turno[]> {
-    return this.turnoRepository.find({
+  async obtenerTodosTurnos(): Promise<Turno[]> {
+    return this.repositorioTurno.find({
       order: { horaInicio: 'ASC' },
     });
   }

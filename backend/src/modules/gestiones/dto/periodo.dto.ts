@@ -9,7 +9,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EstadoGestion } from '../../../entities/enums/estado-gestion.enum';
 
-export class CreatePeriodoDto {
+export class CrearPeriodoDto {
   @ApiProperty({ example: 'I' })
   @IsString()
   @MaxLength(10)
@@ -40,7 +40,7 @@ export class CreatePeriodoDto {
   notas?: string;
 }
 
-export class UpdatePeriodoDto {
+export class ActualizarPeriodoDto {
   @ApiPropertyOptional({ example: 'I' })
   @IsString()
   @IsOptional()

@@ -9,76 +9,76 @@ import { ActualizarCarreraDto } from './dto/actualizar-carrera.dto';
 export class ServicioCarreras {
   constructor(
     @InjectRepository(Carrera)
-    private careerRepository: Repository<Carrera>,
+    private repositorioCarrera: Repository<Carrera>,
   ) {}
 
-  async create(createCareerDto: CrearCarreraDto): Promise<Carrera> {
-    const existing = await this.careerRepository.findOne({
-      where: { codigo: createCareerDto.codigo },
+  async crear(crearCarreraDto: CrearCarreraDto): Promise<Carrera> {
+    const existente = await this.repositorioCarrera.findOne({
+      where: { codigo: crearCarreraDto.codigo },
     });
-    if (existing) {
-      throw new ConflictException(`Carrera con código ${createCareerDto.codigo} ya existe`);
+    if (existente) {
+      throw new ConflictException(`Carrera con código ${crearCarreraDto.codigo} ya existe`);
     }
-    const career = this.careerRepository.create(createCareerDto);
-    return this.careerRepository.save(career);
+    const carrera = this.repositorioCarrera.create(crearCarreraDto);
+    return this.repositorioCarrera.save(carrera);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
-    status?: EstadoCarrera,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
+    estado?: EstadoCarrera,
   ): Promise<{ datos: Carrera[]; total: number; pagina: number; limite: number }> {
-    const query = this.careerRepository.createQueryBuilder('career');
+    const consulta = this.repositorioCarrera.createQueryBuilder('carrera');
 
-    if (status) {
-      query.where('career.estado = :estado', { estado: status });
+    if (estado) {
+      consulta.where('carrera.estado = :estado', { estado: estado });
     }
 
-    const [data, total] = await query
-      .orderBy('career.nombre', 'ASC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('carrera.nombre', 'ASC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Carrera> {
-    const career = await this.careerRepository.findOne({ where: { id } });
-    if (!career) {
+  async obtenerUno(id: number): Promise<Carrera> {
+    const carrera = await this.repositorioCarrera.findOne({ where: { id } });
+    if (!carrera) {
       throw new NotFoundException(`Carrera con ID ${id} no encontrada`);
     }
-    return career;
+    return carrera;
   }
 
-  async findByCode(code: string): Promise<Carrera> {
-    const career = await this.careerRepository.findOne({ where: { codigo: code } });
-    if (!career) {
-      throw new NotFoundException(`Carrera con código ${code} no encontrada`);
+  async buscarPorCodigo(codigo: string): Promise<Carrera> {
+    const carrera = await this.repositorioCarrera.findOne({ where: { codigo } });
+    if (!carrera) {
+      throw new NotFoundException(`Carrera con código ${codigo} no encontrada`);
     }
-    return career;
+    return carrera;
   }
 
-  async update(id: number, updateCareerDto: ActualizarCarreraDto): Promise<Carrera> {
-    const career = await this.findOne(id);
-    Object.assign(career, updateCareerDto);
-    return this.careerRepository.save(career);
+  async actualizar(id: number, actualizarCarreraDto: ActualizarCarreraDto): Promise<Carrera> {
+    const carrera = await this.obtenerUno(id);
+    Object.assign(carrera, actualizarCarreraDto);
+    return this.repositorioCarrera.save(carrera);
   }
 
-  async remove(id: number): Promise<void> {
-    const career = await this.findOne(id);
-    await this.careerRepository.remove(career);
+  async eliminar(id: number): Promise<void> {
+    const carrera = await this.obtenerUno(id);
+    await this.repositorioCarrera.remove(carrera);
   }
 
-  async findActive(): Promise<Carrera[]> {
-    return this.careerRepository.find({
+  async obtenerActivos(): Promise<Carrera[]> {
+    return this.repositorioCarrera.find({
       where: { estado: EstadoCarrera.ACTIVO },
       order: { nombre: 'ASC' },
     });
   }
 
-  async findByArea(area: string): Promise<Carrera[]> {
-    return this.careerRepository.find({
+  async buscarPorArea(area: string): Promise<Carrera[]> {
+    return this.repositorioCarrera.find({
       where: { area, estado: EstadoCarrera.ACTIVO },
       order: { nombre: 'ASC' },
     });

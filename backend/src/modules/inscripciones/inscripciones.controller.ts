@@ -22,75 +22,75 @@ import { EstadoInscripcion } from '../../entities/inscripcion.entity';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorInscripciones {
-  constructor(private readonly enrollmentsService: ServicioInscripciones) {}
+  constructor(private readonly servicioInscripciones: ServicioInscripciones) {}
 
   @Post()
-  create(@Body() crearInscripcionDto: CrearInscripcionDto) {
-    return this.enrollmentsService.create(crearInscripcionDto);
+  crear(@Body() crearInscripcionDto: CrearInscripcionDto) {
+    return this.servicioInscripciones.crear(crearInscripcionDto);
   }
 
   @Post('lote')
-  bulkCreate(@Body() crearInscripcionDtos: CrearInscripcionDto[]) {
-    return this.enrollmentsService.bulkCreate(crearInscripcionDtos);
+  crearEnLote(@Body() crearInscripcionDtos: CrearInscripcionDto[]) {
+    return this.servicioInscripciones.crearEnLote(crearInscripcionDtos);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
     @Query('gestion') gestion?: string,
-    @Query('estado') status?: EstadoInscripcion,
-    @Query('estudianteId') studentId?: number,
+    @Query('estado') estado?: EstadoInscripcion,
+    @Query('estudianteId') estudianteId?: number,
   ) {
-    return this.enrollmentsService.findAll(
-      +page,
-      +limit,
+    return this.servicioInscripciones.obtenerTodos(
+      +pagina,
+      +limite,
       gestion,
-      status,
-      studentId ? +studentId : undefined,
+      estado,
+      estudianteId ? +estudianteId : undefined,
     );
   }
 
   @Get('estudiante/:estudianteId')
-  findByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number, @Query('gestion') gestion?: string) {
-    return this.enrollmentsService.findByStudent(estudianteId, gestion);
+  buscarPorEstudiante(@Param('estudianteId', ParseIntPipe) estudianteId: number, @Query('gestion') gestion?: string) {
+    return this.servicioInscripciones.buscarPorEstudiante(estudianteId, gestion);
   }
 
   @Get('estudiante/:estudianteId/historial-academico')
-  getAcademicRecord(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
-    return this.enrollmentsService.getStudentAcademicRecord(estudianteId);
+  obtenerHistorialAcademico(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
+    return this.servicioInscripciones.obtenerHistorialAcademicoEstudiante(estudianteId);
   }
 
   @Get('materia/:materiaId')
-  findBySubject(@Param('materiaId', ParseIntPipe) materiaId: number, @Query('gestion') gestion: string) {
-    return this.enrollmentsService.findBySubject(materiaId, gestion);
+  buscarPorMateria(@Param('materiaId', ParseIntPipe) materiaId: number, @Query('gestion') gestion: string) {
+    return this.servicioInscripciones.buscarPorMateria(materiaId, gestion);
   }
 
   @Get('grupo/:grupoId')
-  findByGroup(@Param('grupoId', ParseIntPipe) grupoId: number, @Query('gestion') gestion: string) {
-    return this.enrollmentsService.findByGroup(grupoId, gestion);
+  buscarPorGrupo(@Param('grupoId', ParseIntPipe) grupoId: number, @Query('gestion') gestion: string) {
+    return this.servicioInscripciones.buscarPorGrupo(grupoId, gestion);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.enrollmentsService.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioInscripciones.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() actualizarInscripcionDto: ActualizarInscripcionDto) {
-    return this.enrollmentsService.update(id, actualizarInscripcionDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarInscripcionDto: ActualizarInscripcionDto) {
+    return this.servicioInscripciones.actualizar(id, actualizarInscripcionDto);
   }
 
   @Patch(':id/estado')
-  updateStatus(
+  actualizarEstado(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { estado: EstadoInscripcion; notaFinal?: number },
+    @Body() cuerpo: { estado: EstadoInscripcion; notaFinal?: number },
   ) {
-    return this.enrollmentsService.updateStatus(id, body.estado, body.notaFinal);
+    return this.servicioInscripciones.actualizarEstado(id, cuerpo.estado, cuerpo.notaFinal);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.enrollmentsService.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioInscripciones.eliminar(id);
   }
 }

@@ -17,8 +17,8 @@ import { Rol } from '../../entities/rol.entity';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET', 'sitbt_secret_key_2024'),
+      useFactory: (servicioConfiguracion: ConfigService) => ({
+        secret: servicioConfiguracion.get('JWT_SECRET', 'sitbt_secret_key_2024'),
         signOptions: { expiresIn: '24h' },
       }),
       inject: [ConfigService],

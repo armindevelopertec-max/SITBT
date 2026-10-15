@@ -9,11 +9,11 @@ import { ActualizarInscripcionDto } from './dto/actualizar-inscripcion.dto';
 export class ServicioInscripciones {
   constructor(
     @InjectRepository(Inscripcion)
-    private inscripcionRepository: Repository<Inscripcion>,
+    private repositorioInscripcion: Repository<Inscripcion>,
   ) {}
 
-  async create(crearInscripcionDto: CrearInscripcionDto): Promise<Inscripcion> {
-    const existing = await this.inscripcionRepository.findOne({
+  async crear(crearInscripcionDto: CrearInscripcionDto): Promise<Inscripcion> {
+    const existente = await this.repositorioInscripcion.findOne({
       where: {
         estudianteId: crearInscripcionDto.estudianteId,
         materiaId: crearInscripcionDto.materiaId,
@@ -21,155 +21,155 @@ export class ServicioInscripciones {
       },
     });
 
-    if (existing) {
+    if (existente) {
       throw new BadRequestException('El estudiante ya está inscrito en esta materia para esta gestión');
     }
 
-    const enrollment = this.inscripcionRepository.create(crearInscripcionDto);
-    return this.inscripcionRepository.save(enrollment);
+    const inscripcion = this.repositorioInscripcion.create(crearInscripcionDto);
+    return this.repositorioInscripcion.save(inscripcion);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
     gestion?: string,
-    status?: EstadoInscripcion,
-    studentId?: number,
+    estado?: EstadoInscripcion,
+    estudianteId?: number,
   ): Promise<{ datos: Inscripcion[]; total: number; pagina: number; limite: number }> {
-    const query = this.inscripcionRepository
+    const consulta = this.repositorioInscripcion
       .createQueryBuilder('inscripcion')
-      .leftJoinAndSelect('inscripcion.estudiante', 'student')
-      .leftJoinAndSelect('student.persona', 'person')
+      .leftJoinAndSelect('inscripcion.estudiante', 'estudiante')
+      .leftJoinAndSelect('estudiante.persona', 'person')
       .leftJoinAndSelect('inscripcion.materia', 'materia')
       .leftJoinAndSelect('inscripcion.grupo', 'grupo');
 
     if (gestion) {
-      query.andWhere('inscripcion.gestion = :gestion', { gestion });
+      consulta.andWhere('inscripcion.gestion = :gestion', { gestion });
     }
 
-    if (status) {
-      query.andWhere('inscripcion.estado = :estado', { estado: status });
+    if (estado) {
+      consulta.andWhere('inscripcion.estado = :estado', { estado });
     }
 
-    if (studentId) {
-      query.andWhere('inscripcion.estudianteId = :studentId', { studentId });
+    if (estudianteId) {
+      consulta.andWhere('inscripcion.estudianteId = :estudianteId', { estudianteId });
     }
 
-    const [data, total] = await query
+    const [datos, total] = await consulta
       .orderBy('inscripcion.creadoEn', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Inscripcion> {
-    const enrollment = await this.inscripcionRepository.findOne({
+  async obtenerUno(id: number): Promise<Inscripcion> {
+    const inscripcion = await this.repositorioInscripcion.findOne({
       where: { id },
       relations: ['estudiante', 'estudiante.persona', 'materia', 'grupo'],
     });
-    if (!enrollment) {
+    if (!inscripcion) {
       throw new NotFoundException(`Inscripción con ID ${id} no encontrada`);
     }
-    return enrollment;
+    return inscripcion;
   }
 
-  async update(id: number, actualizarInscripcionDto: ActualizarInscripcionDto): Promise<Inscripcion> {
-    const enrollment = await this.findOne(id);
-    Object.assign(enrollment, actualizarInscripcionDto);
-    return this.inscripcionRepository.save(enrollment);
+  async actualizar(id: number, actualizarInscripcionDto: ActualizarInscripcionDto): Promise<Inscripcion> {
+    const inscripcion = await this.obtenerUno(id);
+    Object.assign(inscripcion, actualizarInscripcionDto);
+    return this.repositorioInscripcion.save(inscripcion);
   }
 
-  async remove(id: number): Promise<void> {
-    const enrollment = await this.findOne(id);
-    await this.inscripcionRepository.remove(enrollment);
+  async eliminar(id: number): Promise<void> {
+    const inscripcion = await this.obtenerUno(id);
+    await this.repositorioInscripcion.remove(inscripcion);
   }
 
-  async findByStudent(studentId: number, gestion?: string): Promise<Inscripcion[]> {
-    const query = this.inscripcionRepository
+  async buscarPorEstudiante(estudianteId: number, gestion?: string): Promise<Inscripcion[]> {
+    const consulta = this.repositorioInscripcion
       .createQueryBuilder('inscripcion')
       .leftJoinAndSelect('inscripcion.materia', 'materia')
       .leftJoinAndSelect('inscripcion.grupo', 'grupo')
-      .where('inscripcion.estudianteId = :studentId', { studentId });
+      .where('inscripcion.estudianteId = :estudianteId', { estudianteId });
 
     if (gestion) {
-      query.andWhere('inscripcion.gestion = :gestion', { gestion });
+      consulta.andWhere('inscripcion.gestion = :gestion', { gestion });
     }
 
-    return query.orderBy('inscripcion.semestre', 'ASC').getMany();
+    return consulta.orderBy('inscripcion.semestre', 'ASC').getMany();
   }
 
-  async findBySubject(subjectId: number, gestion: string): Promise<Inscripcion[]> {
-    return this.inscripcionRepository.find({
-      where: { materiaId: subjectId, gestion },
+  async buscarPorMateria(materiaId: number, gestion: string): Promise<Inscripcion[]> {
+    return this.repositorioInscripcion.find({
+      where: { materiaId, gestion },
       relations: ['estudiante', 'estudiante.persona', 'grupo'],
       order: { creadoEn: 'ASC' },
     });
   }
 
-  async findByGroup(groupId: number, gestion: string): Promise<Inscripcion[]> {
-    return this.inscripcionRepository.find({
-      where: { grupoId: groupId, gestion },
+  async buscarPorGrupo(grupoId: number, gestion: string): Promise<Inscripcion[]> {
+    return this.repositorioInscripcion.find({
+      where: { grupoId, gestion },
       relations: ['estudiante', 'estudiante.persona', 'materia'],
       order: { creadoEn: 'ASC' },
     });
   }
 
-  async updateStatus(id: number, estado: EstadoInscripcion, finalGrade?: number): Promise<Inscripcion> {
-    const inscripcion = await this.findOne(id);
+  async actualizarEstado(id: number, estado: EstadoInscripcion, notaFinal?: number): Promise<Inscripcion> {
+    const inscripcion = await this.obtenerUno(id);
     inscripcion.estado = estado;
-    if (finalGrade !== undefined) {
-      inscripcion.notaFinal = finalGrade;
+    if (notaFinal !== undefined) {
+      inscripcion.notaFinal = notaFinal;
     }
-    return this.inscripcionRepository.save(inscripcion);
+    return this.repositorioInscripcion.save(inscripcion);
   }
 
-  async getStudentAcademicRecord(studentId: number): Promise<{
+  async obtenerHistorialAcademicoEstudiante(estudianteId: number): Promise<{
     enrollments: Inscripcion[];
     stats: { aprobadas: number; reprobadas: number; enCurso: number; promedio: number };
   }> {
-    const enrollments = await this.inscripcionRepository.find({
-      where: { estudianteId: studentId },
+    const inscripciones = await this.repositorioInscripcion.find({
+      where: { estudianteId },
       relations: ['materia', 'grupo'],
       order: { gestion: 'ASC', semestre: 'ASC' },
     });
 
-    const stats = {
+    const estadisticas = {
       aprobadas: 0,
       reprobadas: 0,
       enCurso: 0,
       promedio: 0,
     };
 
-    let totalGrade = 0;
-    let countWithGrade = 0;
+    let sumaCalificaciones = 0;
+    let conteoConCalificacion = 0;
 
-    enrollments.forEach((e) => {
-      if (e.estado === EstadoInscripcion.APROBADO) {
-        stats.aprobadas++;
-        if (e.notaFinal) {
-          totalGrade += e.notaFinal;
-          countWithGrade++;
+    inscripciones.forEach((inscripcion) => {
+      if (inscripcion.estado === EstadoInscripcion.APROBADO) {
+        estadisticas.aprobadas++;
+        if (inscripcion.notaFinal) {
+          sumaCalificaciones += inscripcion.notaFinal;
+          conteoConCalificacion++;
         }
-      } else if (e.estado === EstadoInscripcion.REPROBADO) {
-        stats.reprobadas++;
-      } else if (e.estado === EstadoInscripcion.CURSANDO) {
-        stats.enCurso++;
+      } else if (inscripcion.estado === EstadoInscripcion.REPROBADO) {
+        estadisticas.reprobadas++;
+      } else if (inscripcion.estado === EstadoInscripcion.CURSANDO) {
+        estadisticas.enCurso++;
       }
     });
 
-    if (countWithGrade > 0) {
-      stats.promedio = Math.round(totalGrade / countWithGrade * 100) / 100;
+    if (conteoConCalificacion > 0) {
+      estadisticas.promedio = Math.round(sumaCalificaciones / conteoConCalificacion * 100) / 100;
     }
 
-    return { enrollments, stats };
+    return { enrollments: inscripciones, stats: estadisticas };
   }
 
-  async bulkCreate(crearInscripcionDtos: CrearInscripcionDto[]): Promise<Inscripcion[]> {
-    const enrollments = crearInscripcionDtos.map((dto) =>
-      this.inscripcionRepository.create(dto),
+  async crearEnLote(crearInscripcionDtos: CrearInscripcionDto[]): Promise<Inscripcion[]> {
+    const inscripciones = crearInscripcionDtos.map((dto) =>
+      this.repositorioInscripcion.create(dto),
     );
-    return this.inscripcionRepository.save(enrollments);
+    return this.repositorioInscripcion.save(inscripciones);
   }
 }

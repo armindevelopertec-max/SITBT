@@ -15,12 +15,12 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorNotificaciones {
-  constructor(private readonly service: ServicioNotificaciones) {}
+  constructor(private readonly servicio: ServicioNotificaciones) {}
 
   @Post('correo')
   @HttpCode(200)
   enviarCorreo(@Body() dto: EnviarCorreoDto) {
-    return this.service.enviarCorreo(dto.para, dto.asunto, dto.contenido);
+    return this.servicio.enviarCorreo(dto.para, dto.asunto, dto.contenido);
   }
 
   @Post('pre-registro-aceptado')
@@ -30,7 +30,7 @@ export class ControladorNotificaciones {
     @Body('correo') correo: string,
     @Body('nombre') nombre: string,
   ) {
-    return this.service.notificarPreRegistroAceptado(estudianteId, correo, nombre);
+    return this.servicio.notificarPreRegistroAceptado(estudianteId, correo, nombre);
   }
 
   @Post('pago-confirmado')
@@ -41,7 +41,7 @@ export class ControladorNotificaciones {
     @Body('nombre') nombre: string,
     @Body('monto') monto: number,
   ) {
-    return this.service.notificarPagoConfirmado(estudianteId, correo, nombre, monto);
+    return this.servicio.notificarPagoConfirmado(estudianteId, correo, nombre, monto);
   }
 
   @Post('carnet-listo')
@@ -51,7 +51,7 @@ export class ControladorNotificaciones {
     @Body('correo') correo: string,
     @Body('nombre') nombre: string,
   ) {
-    return this.service.notificarCarnetListo(estudianteId, correo, nombre);
+    return this.servicio.notificarCarnetListo(estudianteId, correo, nombre);
   }
 
   @Post('deuda-pendiente')
@@ -62,7 +62,7 @@ export class ControladorNotificaciones {
     @Body('nombre') nombre: string,
     @Body('monto') monto: number,
   ) {
-    return this.service.notificarDeudaPendiente(estudianteId, correo, nombre, monto);
+    return this.servicio.notificarDeudaPendiente(estudianteId, correo, nombre, monto);
   }
 
   @Post('documento-generado')
@@ -73,6 +73,6 @@ export class ControladorNotificaciones {
     @Body('nombre') nombre: string,
     @Body('tipoDoc') tipoDoc: string,
   ) {
-    return this.service.notificarDocumentoGenerado(estudianteId, correo, nombre, tipoDoc);
+    return this.servicio.notificarDocumentoGenerado(estudianteId, correo, nombre, tipoDoc);
   }
 }

@@ -20,53 +20,53 @@ import { EstadoPersona } from '../../entities/persona.entity';
 @ApiTags('Personas')
 @Controller('personas')
 export class ControladorPersonas {
-  constructor(private readonly personsService: ServicioPersonas) {}
+  constructor(private readonly servicioPersonas: ServicioPersonas) {}
 
   @Post()
-  create(@Body() crearPersonaDto: CrearPersonaDto) {
-    return this.personsService.create(crearPersonaDto);
+  crear(@Body() crearPersonaDto: CrearPersonaDto) {
+    return this.servicioPersonas.crear(crearPersonaDto);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
-    @Query('estado') status?: EstadoPersona,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
+    @Query('estado') estado?: EstadoPersona,
   ) {
-    return this.personsService.findAll(+page, +limit, status);
+    return this.servicioPersonas.obtenerTodos(+pagina, +limite, estado);
   }
 
   @Get('buscar')
-  search(@Query('q') query: string, @Query('pagina') page = 1, @Query('limite') limit = 20) {
-    return this.personsService.search(query, +page, +limit);
+  buscar(@Query('q') consulta: string, @Query('pagina') pagina = 1, @Query('limite') limite = 20) {
+    return this.servicioPersonas.buscar(consulta, +pagina, +limite);
   }
 
   @Get('activos')
-  findActive() {
-    return this.personsService.findActive();
+  obtenerActivos() {
+    return this.servicioPersonas.obtenerActivos();
   }
 
   @Get('ci/:ci')
-  findByCi(@Param('ci') ci: string) {
-    return this.personsService.findByCi(ci);
+  buscarPorCi(@Param('ci') ci: string) {
+    return this.servicioPersonas.buscarPorCi(ci);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.personsService.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioPersonas.obtenerUno(id);
   }
 
   @Patch(':id')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  update(@Param('id', ParseIntPipe) id: number, @Body() actualizarPersonaDto: ActualizarPersonaDto) {
-    return this.personsService.update(id, actualizarPersonaDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarPersonaDto: ActualizarPersonaDto) {
+    return this.servicioPersonas.actualizar(id, actualizarPersonaDto);
   }
 
   @Delete(':id')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.personsService.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioPersonas.eliminar(id);
   }
 }

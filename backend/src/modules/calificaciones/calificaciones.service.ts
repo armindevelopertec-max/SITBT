@@ -16,206 +16,206 @@ import { ActualizarCalificacionDto } from './dto/actualizar-calificacion.dto';
 export class ServicioCalificaciones {
   constructor(
     @InjectRepository(Calificacion)
-    private calificacionRepository: Repository<Calificacion>,
+    private repositorioCalificacion: Repository<Calificacion>,
     @InjectRepository(AuditoriaCalificacion)
-    private gradeAuditRepository: Repository<AuditoriaCalificacion>,
+    private repositorioAuditoriaCalificacion: Repository<AuditoriaCalificacion>,
     @InjectRepository(Inscripcion)
-    private enrollmentRepository: Repository<Inscripcion>,
+    private repositorioInscripcion: Repository<Inscripcion>,
   ) {}
 
-  async create(crearCalificacionDto: CrearCalificacionDto): Promise<Calificacion> {
-    const existing = await this.calificacionRepository.findOne({
+  async crear(crearCalificacionDto: CrearCalificacionDto): Promise<Calificacion> {
+    const existente = await this.repositorioCalificacion.findOne({
       where: { inscripcionId: crearCalificacionDto.inscripcionId },
     });
 
-    if (existing) {
-      throw new BadRequestException('Grade already exists for this enrollment');
+    if (existente) {
+      throw new BadRequestException('Ya existe una calificación para esta inscripción');
     }
 
-    const grade = this.calificacionRepository.create(crearCalificacionDto);
-    return this.calificacionRepository.save(grade);
+    const calificacion = this.repositorioCalificacion.create(crearCalificacionDto);
+    return this.repositorioCalificacion.save(calificacion);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
     gestion?: string,
-    statusDefinitivo?: EstadoCalificacionDefinitivo,
+    estadoDefinitivo?: EstadoCalificacionDefinitivo,
   ): Promise<{ datos: Calificacion[]; total: number; pagina: number; limite: number }> {
-    const query = this.calificacionRepository
-      .createQueryBuilder('grade')
-      .leftJoinAndSelect('grade.inscripcion', 'enrollment')
-      .leftJoinAndSelect('enrollment.estudiante', 'student')
-      .leftJoinAndSelect('student.persona', 'person')
-      .leftJoinAndSelect('enrollment.materia', 'subject')
-      .leftJoinAndSelect('enrollment.grupo', 'group');
+    const consulta = this.repositorioCalificacion
+      .createQueryBuilder('calificacion')
+      .leftJoinAndSelect('calificacion.inscripcion', 'inscripcion')
+      .leftJoinAndSelect('inscripcion.estudiante', 'estudiante')
+      .leftJoinAndSelect('estudiante.persona', 'person')
+      .leftJoinAndSelect('inscripcion.materia', 'materia')
+      .leftJoinAndSelect('inscripcion.grupo', 'grupo');
 
     if (gestion) {
-      query.andWhere('enrollment.gestion = :gestion', { gestion });
+      consulta.andWhere('inscripcion.gestion = :gestion', { gestion });
     }
 
-    if (statusDefinitivo) {
-      query.andWhere('grade.estadoDefinitivo = :statusDefinitivo', { statusDefinitivo });
+    if (estadoDefinitivo) {
+      consulta.andWhere('calificacion.estadoDefinitivo = :estadoDefinitivo', { estadoDefinitivo });
     }
 
-    const [data, total] = await query
-      .orderBy('grade.registradoEn', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('calificacion.registradoEn', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Calificacion> {
-    const grade = await this.calificacionRepository.findOne({
+  async obtenerUno(id: number): Promise<Calificacion> {
+    const calificacion = await this.repositorioCalificacion.findOne({
       where: { id },
       relations: ['inscripcion', 'inscripcion.estudiante', 'inscripcion.estudiante.persona', 'inscripcion.materia', 'docente'],
     });
-    if (!grade) {
+    if (!calificacion) {
       throw new NotFoundException(`Calificación con ID ${id} no encontrada`);
     }
-    return grade;
+    return calificacion;
   }
 
-  async findByEnrollment(enrollmentId: number): Promise<Calificacion> {
-    const grade = await this.calificacionRepository.findOne({
-      where: { inscripcionId: enrollmentId },
+  async buscarPorInscripcion(inscripcionId: number): Promise<Calificacion> {
+    const calificacion = await this.repositorioCalificacion.findOne({
+      where: { inscripcionId },
       relations: ['inscripcion', 'inscripcion.estudiante', 'inscripcion.estudiante.persona', 'inscripcion.materia'],
     });
-    if (!grade) {
-      throw new NotFoundException(`Calificación de la inscripción ${enrollmentId} no encontrada`);
+    if (!calificacion) {
+      throw new NotFoundException(`Calificación de la inscripción ${inscripcionId} no encontrada`);
     }
-    return grade;
+    return calificacion;
   }
 
-  async update(
+  async actualizar(
     id: number,
     actualizarCalificacionDto: ActualizarCalificacionDto,
-    registeredBy: number,
+    registradoPor: number,
   ): Promise<Calificacion> {
-    const grade = await this.findOne(id);
-    const oldValue = JSON.stringify(grade);
+    const calificacion = await this.obtenerUno(id);
+    const valorAnterior = JSON.stringify(calificacion);
 
-    Object.assign(grade, actualizarCalificacionDto);
-    const savedGrade = await this.calificacionRepository.save(grade);
+    Object.assign(calificacion, actualizarCalificacionDto);
+    const calificacionGuardada = await this.repositorioCalificacion.save(calificacion);
 
-    await this.gradeAuditRepository.save({
+    await this.repositorioAuditoriaCalificacion.save({
       calificacionId: id,
       field_changed: 'multiple',
-      old_value: oldValue,
+      old_value: valorAnterior,
       new_value: JSON.stringify(actualizarCalificacionDto),
-      changed_by: registeredBy,
+      changed_by: registradoPor,
     });
 
-    return savedGrade;
+    return calificacionGuardada;
   }
 
-  async remove(id: number): Promise<void> {
-    const grade = await this.findOne(id);
-    await this.calificacionRepository.remove(grade);
+  async eliminar(id: number): Promise<void> {
+    const calificacion = await this.obtenerUno(id);
+    await this.repositorioCalificacion.remove(calificacion);
   }
 
-  async updatePartialGrades(
+  async actualizarParciales(
     id: number,
-    partial1?: number,
-    partial2?: number,
-    registeredBy?: number,
+    parcial1?: number,
+    parcial2?: number,
+    registradoPor?: number,
   ): Promise<Calificacion> {
-    const grade = await this.findOne(id);
+    const calificacion = await this.obtenerUno(id);
 
-    if (partial1 !== undefined) grade.parcial1 = partial1;
-    if (partial2 !== undefined) grade.parcial2 = partial2;
+    if (parcial1 !== undefined) calificacion.parcial1 = parcial1;
+    if (parcial2 !== undefined) calificacion.parcial2 = parcial2;
 
-    if (grade.parcial1 !== null && grade.parcial2 !== null) {
-      grade.promedioFinal = Math.round((grade.parcial1 + grade.parcial2) / 2);
-      grade.estadoRegular = grade.promedioFinal >= 51 ? EstadoCalificacionRegular.APROBADO : EstadoCalificacionRegular.REPROBADO;
+    if (calificacion.parcial1 !== null && calificacion.parcial2 !== null) {
+      calificacion.promedioFinal = Math.round((calificacion.parcial1 + calificacion.parcial2) / 2);
+      calificacion.estadoRegular = calificacion.promedioFinal >= 51 ? EstadoCalificacionRegular.APROBADO : EstadoCalificacionRegular.REPROBADO;
     }
 
-    const savedGrade = await this.calificacionRepository.save(grade);
+    const calificacionGuardada = await this.repositorioCalificacion.save(calificacion);
 
-    if (registeredBy) {
-      await this.gradeAuditRepository.save({
+    if (registradoPor) {
+      await this.repositorioAuditoriaCalificacion.save({
         calificacionId: id,
         field_changed: 'partials',
-        old_value: JSON.stringify({ partial1: grade.parcial1, partial2: grade.parcial2 }),
-        new_value: JSON.stringify({ partial1, partial2 }),
-        changed_by: registeredBy,
+        old_value: JSON.stringify({ partial1: calificacion.parcial1, partial2: calificacion.parcial2 }),
+        new_value: JSON.stringify({ partial1: parcial1, partial2: parcial2 }),
+        changed_by: registradoPor,
       });
     }
 
-    return savedGrade;
+    return calificacionGuardada;
   }
 
-  async applySecondTurn(id: number, score: number, registeredBy?: number): Promise<Calificacion> {
-    const grade = await this.findOne(id);
+  async aplicarSegundaTurno(id: number, nota: number, registradoPor?: number): Promise<Calificacion> {
+    const calificacion = await this.obtenerUno(id);
 
-    if (!grade.aptoSegundaTurno) {
-      throw new BadRequestException('Student is not eligible for second turn');
+    if (!calificacion.aptoSegundaTurno) {
+      throw new BadRequestException('El estudiante no es elegible para el segundo turno');
     }
 
-    grade.notaSegundaTurno = score;
-    grade.segundaTurnoAplicado = true;
-    grade.estado2T = score >= 51 ? EstadoCalificacion2T.APROBADO : EstadoCalificacion2T.REPROBADO;
+    calificacion.notaSegundaTurno = nota;
+    calificacion.segundaTurnoAplicado = true;
+    calificacion.estado2T = nota >= 51 ? EstadoCalificacion2T.APROBADO : EstadoCalificacion2T.REPROBADO;
 
-    if (grade.estadoRegular === EstadoCalificacionRegular.REPROBADO && grade.estado2T === EstadoCalificacion2T.APROBADO) {
-      grade.notaDefinitiva = score;
-      grade.estadoDefinitivo = EstadoCalificacionDefinitivo.APROBADO;
-    } else if (grade.estado2T === EstadoCalificacion2T.REPROBADO) {
-      grade.notaDefinitiva = grade.estadoRegular === EstadoCalificacionRegular.APROBADO ? grade.promedioFinal : score;
-      grade.estadoDefinitivo = EstadoCalificacionDefinitivo.REPROBADO;
+    if (calificacion.estadoRegular === EstadoCalificacionRegular.REPROBADO && calificacion.estado2T === EstadoCalificacion2T.APROBADO) {
+      calificacion.notaDefinitiva = nota;
+      calificacion.estadoDefinitivo = EstadoCalificacionDefinitivo.APROBADO;
+    } else if (calificacion.estado2T === EstadoCalificacion2T.REPROBADO) {
+      calificacion.notaDefinitiva = calificacion.estadoRegular === EstadoCalificacionRegular.APROBADO ? calificacion.promedioFinal : nota;
+      calificacion.estadoDefinitivo = EstadoCalificacionDefinitivo.REPROBADO;
     } else {
-      grade.notaDefinitiva = score;
-      grade.estadoDefinitivo = EstadoCalificacionDefinitivo.APROBADO;
+      calificacion.notaDefinitiva = nota;
+      calificacion.estadoDefinitivo = EstadoCalificacionDefinitivo.APROBADO;
     }
 
-    const savedGrade = await this.calificacionRepository.save(grade);
+    const calificacionGuardada = await this.repositorioCalificacion.save(calificacion);
 
-    if (registeredBy) {
-      await this.gradeAuditRepository.save({
+    if (registradoPor) {
+      await this.repositorioAuditoriaCalificacion.save({
         calificacionId: id,
         field_changed: 'second_turn',
         old_value: JSON.stringify({ second_turn_applied: false }),
-        new_value: JSON.stringify({ second_turn_score: score, second_turn_applied: true }),
-        changed_by: registeredBy,
+        new_value: JSON.stringify({ second_turn_score: nota, second_turn_applied: true }),
+        changed_by: registradoPor,
       });
     }
 
-    return savedGrade;
+    return calificacionGuardada;
   }
 
-  async getGradeHistory(enrollmentId: number): Promise<AuditoriaCalificacion[]> {
-    return this.gradeAuditRepository.find({
-      where: { calificacionId: enrollmentId },
+  async obtenerHistorialCalificaciones(inscripcionId: number): Promise<AuditoriaCalificacion[]> {
+    return this.repositorioAuditoriaCalificacion.find({
+      where: { calificacionId: inscripcionId },
       relations: ['usuario'],
       order: { cambiadoEn: 'DESC' },
     });
   }
 
-  async getGradesByStudent(studentId: number, gestion?: string): Promise<Calificacion[]> {
-    const query = this.calificacionRepository
-      .createQueryBuilder('grade')
-      .leftJoinAndSelect('grade.inscripcion', 'enrollment')
-      .leftJoinAndSelect('enrollment.materia', 'subject')
-      .leftJoinAndSelect('enrollment.grupo', 'group')
-      .where('enrollment.estudianteId = :studentId', { studentId });
+  async obtenerCalificacionesPorEstudiante(estudianteId: number, gestion?: string): Promise<Calificacion[]> {
+    const consulta = this.repositorioCalificacion
+      .createQueryBuilder('calificacion')
+      .leftJoinAndSelect('calificacion.inscripcion', 'inscripcion')
+      .leftJoinAndSelect('inscripcion.materia', 'materia')
+      .leftJoinAndSelect('inscripcion.grupo', 'grupo')
+      .where('inscripcion.estudianteId = :estudianteId', { estudianteId });
 
     if (gestion) {
-      query.andWhere('enrollment.gestion = :gestion', { gestion });
+      consulta.andWhere('inscripcion.gestion = :gestion', { gestion });
     }
 
-    return query.orderBy('enrollment.gestion', 'ASC').getMany();
+    return consulta.orderBy('inscripcion.gestion', 'ASC').getMany();
   }
 
-  async getGradesByGroup(groupId: number, gestion: string): Promise<Calificacion[]> {
-    return this.calificacionRepository
-      .createQueryBuilder('grade')
-      .leftJoinAndSelect('grade.inscripcion', 'enrollment')
-      .leftJoinAndSelect('enrollment.estudiante', 'student')
-      .leftJoinAndSelect('student.persona', 'person')
-      .leftJoinAndSelect('enrollment.materia', 'subject')
-      .where('enrollment.grupoId = :groupId', { groupId })
-      .andWhere('enrollment.gestion = :gestion', { gestion })
+  async obtenerCalificacionesPorGrupo(grupoId: number, gestion: string): Promise<Calificacion[]> {
+    return this.repositorioCalificacion
+      .createQueryBuilder('calificacion')
+      .leftJoinAndSelect('calificacion.inscripcion', 'inscripcion')
+      .leftJoinAndSelect('inscripcion.estudiante', 'estudiante')
+      .leftJoinAndSelect('estudiante.persona', 'person')
+      .leftJoinAndSelect('inscripcion.materia', 'materia')
+      .where('inscripcion.grupoId = :grupoId', { grupoId })
+      .andWhere('inscripcion.gestion = :gestion', { gestion })
       .orderBy('person.apellidoPaterno', 'ASC')
       .getMany();
   }

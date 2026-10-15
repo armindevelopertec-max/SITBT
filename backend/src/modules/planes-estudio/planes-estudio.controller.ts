@@ -22,80 +22,80 @@ import { EstadoPlanEstudio } from '../../entities/plan-estudio.entity';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorPlanesEstudio {
-  constructor(private readonly studyPlansService: ServicioPlanesEstudio) {}
+  constructor(private readonly servicioPlanesEstudio: ServicioPlanesEstudio) {}
 
   @Post()
-  create(@Body() crearPlanEstudioDto: CrearPlanEstudioDto) {
-    return this.studyPlansService.create(crearPlanEstudioDto);
+  crear(@Body() crearPlanEstudioDto: CrearPlanEstudioDto) {
+    return this.servicioPlanesEstudio.crear(crearPlanEstudioDto);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
-    @Query('estado') status?: EstadoPlanEstudio,
-    @Query('carreraId') careerId?: number,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
+    @Query('estado') estado?: EstadoPlanEstudio,
+    @Query('carreraId') carreraId?: number,
   ) {
-    return this.studyPlansService.findAll(+page, +limit, status, careerId ? +careerId : undefined);
+    return this.servicioPlanesEstudio.obtenerTodos(+pagina, +limite, estado, carreraId ? +carreraId : undefined);
   }
 
   @Get('activos')
-  findActive() {
-    return this.studyPlansService.findActive();
+  obtenerActivos() {
+    return this.servicioPlanesEstudio.obtenerActivos();
   }
 
   @Get('por-carrera/:carreraId')
-  findByCareer(@Param('carreraId', ParseIntPipe) carreraId: number) {
-    return this.studyPlansService.findByCareer(carreraId);
+  buscarPorCarrera(@Param('carreraId', ParseIntPipe) carreraId: number) {
+    return this.servicioPlanesEstudio.buscarPorCarrera(carreraId);
   }
 
   @Get('actual/:carreraId')
-  findCurrentByCareer(@Param('carreraId', ParseIntPipe) carreraId: number) {
-    return this.studyPlansService.findCurrentByCareer(carreraId);
+  buscarActualPorCarrera(@Param('carreraId', ParseIntPipe) carreraId: number) {
+    return this.servicioPlanesEstudio.buscarActualPorCarrera(carreraId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.studyPlansService.findOneWithMaterias(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioPlanesEstudio.obtenerUnoConMaterias(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() actualizarPlanEstudioDto: ActualizarPlanEstudioDto) {
-    return this.studyPlansService.update(id, actualizarPlanEstudioDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarPlanEstudioDto: ActualizarPlanEstudioDto) {
+    return this.servicioPlanesEstudio.actualizar(id, actualizarPlanEstudioDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.studyPlansService.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioPlanesEstudio.eliminar(id);
   }
 
   @Post(':id/materias')
-  addMateria(
+  agregarMateria(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { materiaId: number; semestre: number; horasSemanales: number; prerrequisitoId?: number },
+    @Body() cuerpo: { materiaId: number; semestre: number; horasSemanales: number; prerrequisitoId?: number },
   ) {
-    return this.studyPlansService.addMateria(id, body.materiaId, body.semestre, body.horasSemanales, body.prerrequisitoId);
+    return this.servicioPlanesEstudio.agregarMateria(id, cuerpo.materiaId, cuerpo.semestre, cuerpo.horasSemanales, cuerpo.prerrequisitoId);
   }
 
   @Delete(':id/materias/:materiaPlanId')
-  removeMateria(
+  eliminarMateria(
     @Param('id', ParseIntPipe) id: number,
     @Param('materiaPlanId', ParseIntPipe) materiaPlanId: number,
   ) {
-    return this.studyPlansService.removeMateria(materiaPlanId);
+    return this.servicioPlanesEstudio.eliminarMateria(materiaPlanId);
   }
 
   @Patch(':id/materias/:materiaPlanId')
-  updateMateria(
+  actualizarMateria(
     @Param('id', ParseIntPipe) id: number,
     @Param('materiaPlanId', ParseIntPipe) materiaPlanId: number,
-    @Body() body: { semestre: number; horasSemanales: number; prerrequisitoId?: number },
+    @Body() cuerpo: { semestre: number; horasSemanales: number; prerrequisitoId?: number },
   ) {
-    return this.studyPlansService.updateMateria(materiaPlanId, body.semestre, body.horasSemanales, body.prerrequisitoId);
+    return this.servicioPlanesEstudio.actualizarMateria(materiaPlanId, cuerpo.semestre, cuerpo.horasSemanales, cuerpo.prerrequisitoId);
   }
 
   @Get(':id/materias')
-  getMaterias(@Param('id', ParseIntPipe) id: number) {
-    return this.studyPlansService.getMaterias(id);
+  obtenerMaterias(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioPlanesEstudio.obtenerMaterias(id);
   }
 }

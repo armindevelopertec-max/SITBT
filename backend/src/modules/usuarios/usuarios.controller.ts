@@ -22,64 +22,64 @@ import { EstadoUsuario } from '../../entities/usuario.entity';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorUsuarios {
-  constructor(private readonly usersService: ServicioUsuarios) {}
+  constructor(private readonly servicioUsuarios: ServicioUsuarios) {}
 
   @Post()
-  create(@Body() crearUsuarioDto: CrearUsuarioDto) {
-    return this.usersService.create(crearUsuarioDto);
+  crear(@Body() crearUsuarioDto: CrearUsuarioDto) {
+    return this.servicioUsuarios.crear(crearUsuarioDto);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
-    @Query('estado') status?: EstadoUsuario,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
+    @Query('estado') estado?: EstadoUsuario,
   ) {
-    return this.usersService.findAll(+page, +limit, status);
+    return this.servicioUsuarios.obtenerTodos(+pagina, +limite, estado);
   }
 
   @Get('activos')
-  findActive() {
-    return this.usersService.findActive();
+  obtenerActivos() {
+    return this.servicioUsuarios.obtenerActivos();
   }
 
   @Get('nombre-usuario/:nombreUsuario')
-  findByNombreUsuario(@Param('nombreUsuario') nombreUsuario: string) {
-    return this.usersService.findByNombreUsuario(nombreUsuario);
+  buscarPorNombreUsuario(@Param('nombreUsuario') nombreUsuario: string) {
+    return this.servicioUsuarios.buscarPorNombreUsuario(nombreUsuario);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioUsuarios.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() actualizarUsuarioDto: ActualizarUsuarioDto) {
-    return this.usersService.update(id, actualizarUsuarioDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarUsuarioDto: ActualizarUsuarioDto) {
+    return this.servicioUsuarios.actualizar(id, actualizarUsuarioDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioUsuarios.eliminar(id);
   }
 
   @Post(':id/cambiar-contrasena')
-  cambiarContrasena(@Param('id', ParseIntPipe) id: number, @Body() body: { nuevaContrasena: string }) {
-    return this.usersService.cambiarContrasena(id, body.nuevaContrasena);
+  cambiarContrasena(@Param('id', ParseIntPipe) id: number, @Body() cuerpo: { nuevaContrasena: string }) {
+    return this.servicioUsuarios.cambiarContrasena(id, cuerpo.nuevaContrasena);
   }
 
   @Post(':id/asignar-rol/:rolId')
   asignarRol(@Param('id', ParseIntPipe) id: number, @Param('rolId', ParseIntPipe) rolId: number) {
-    return this.usersService.asignarRol(id, rolId);
+    return this.servicioUsuarios.asignarRol(id, rolId);
   }
 
   @Delete(':id/remover-rol/:rolId')
   removerRol(@Param('id', ParseIntPipe) id: number, @Param('rolId', ParseIntPipe) rolId: number) {
-    return this.usersService.removerRol(id, rolId);
+    return this.servicioUsuarios.removerRol(id, rolId);
   }
 
   @Get(':id/roles')
   obtenerRolesUsuario(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.obtenerRolesUsuario(id);
+    return this.servicioUsuarios.obtenerRolesUsuario(id);
   }
 }

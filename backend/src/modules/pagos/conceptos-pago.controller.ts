@@ -8,10 +8,10 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorConceptosPago {
-  constructor(private readonly service: ServicioPagos) {}
+  constructor(private readonly servicio: ServicioPagos) {}
 
   @Get('todos')
-  findAll() {
-    return this.service.listarConceptos();
+  obtenerTodos() {
+    return this.servicio.listarConceptos();
   }
 }

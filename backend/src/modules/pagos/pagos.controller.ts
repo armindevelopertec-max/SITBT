@@ -22,78 +22,78 @@ import { EstadoPago } from '../../entities/pago.entity';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorPagos {
-  constructor(private readonly service: ServicioPagos) {}
+  constructor(private readonly servicio: ServicioPagos) {}
 
   @Post()
-  create(@Body() createDto: CrearPagoDto) {
-    return this.service.create(createDto);
+  crear(@Body() crearPagoDto: CrearPagoDto) {
+    return this.servicio.crear(crearPagoDto);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
     @Query('gestion') gestion?: string,
-    @Query('estado') status?: EstadoPago,
-    @Query('estudianteId') studentId?: number,
-    @Query('conceptoId') conceptId?: number,
+    @Query('estado') estado?: EstadoPago,
+    @Query('estudianteId') estudianteId?: number,
+    @Query('conceptoId') conceptoId?: number,
   ) {
-    return this.service.findAll(
-      +page,
-      +limit,
+    return this.servicio.obtenerTodos(
+      +pagina,
+      +limite,
       gestion,
-      status,
-      studentId ? +studentId : undefined,
-      conceptId ? +conceptId : undefined,
+      estado,
+      estudianteId ? +estudianteId : undefined,
+      conceptoId ? +conceptoId : undefined,
     );
   }
 
   @Get('estudiante/:estudianteId')
-  findByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number, @Query('gestion') gestion?: string) {
-    return this.service.findByStudent(estudianteId, gestion);
+  buscarPorEstudiante(@Param('estudianteId', ParseIntPipe) estudianteId: number, @Query('gestion') gestion?: string) {
+    return this.servicio.buscarPorEstudiante(estudianteId, gestion);
   }
 
   @Get('estudiante/:estudianteId/deuda')
-  getStudentDebt(@Param('estudianteId', ParseIntPipe) estudianteId: number, @Query('gestion') gestion: string) {
-    return this.service.getStudentDebt(estudianteId, gestion);
+  obtenerDeudaEstudiante(@Param('estudianteId', ParseIntPipe) estudianteId: number, @Query('gestion') gestion: string) {
+    return this.servicio.obtenerDeudaEstudiante(estudianteId, gestion);
   }
 
   @Get('recaudacion-diaria')
-  getDailyCollection(@Query('fecha') fecha: string, @Query('gestion') gestion: string) {
-    return this.service.getDailyCollection(fecha, gestion);
+  obtenerRecaudacionDiaria(@Query('fecha') fecha: string, @Query('gestion') gestion: string) {
+    return this.servicio.obtenerRecaudacionDiaria(fecha, gestion);
   }
 
   @Get('resumen/:gestion')
-  getCollectionSummary(@Param('gestion') gestion: string) {
-    return this.service.getCollectionSummary(gestion);
+  obtenerResumenRecaudacion(@Param('gestion') gestion: string) {
+    return this.servicio.obtenerResumenRecaudacion(gestion);
   }
 
   @Get('rango-fechas')
-  getPaymentsByDateRange(
-    @Query('fechaInicio') startDate: string,
-    @Query('fechaFin') endDate: string,
+  obtenerPagosPorRangoFechas(
+    @Query('fechaInicio') fechaInicio: string,
+    @Query('fechaFin') fechaFin: string,
     @Query('gestion') gestion?: string,
   ) {
-    return this.service.getPaymentsByDateRange(new Date(startDate), new Date(endDate), gestion);
+    return this.servicio.obtenerPagosPorRangoFechas(new Date(fechaInicio), new Date(fechaFin), gestion);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.service.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: ActualizarPagoDto) {
-    return this.service.update(id, updateDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarPagoDto: ActualizarPagoDto) {
+    return this.servicio.actualizar(id, actualizarPagoDto);
   }
 
   @Patch(':id/anular')
-  annul(@Param('id', ParseIntPipe) id: number) {
-    return this.service.annul(id);
+  anular(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.anular(id);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.service.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.eliminar(id);
   }
 }

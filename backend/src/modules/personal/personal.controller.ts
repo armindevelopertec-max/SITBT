@@ -22,50 +22,50 @@ import { EstadoPersonal, CargoPersonal } from '../../entities/personal.entity';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorPersonal {
-  constructor(private readonly staffsService: ServicioPersonal) {}
+  constructor(private readonly servicioPersonal: ServicioPersonal) {}
 
   @Post()
-  create(@Body() createStaffDto: CrearPersonalDto) {
-    return this.staffsService.create(createStaffDto);
+  crear(@Body() crearPersonalDto: CrearPersonalDto) {
+    return this.servicioPersonal.crear(crearPersonalDto);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
-    @Query('estado') status?: EstadoPersonal,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
+    @Query('estado') estado?: EstadoPersonal,
     @Query('cargo') cargo?: CargoPersonal,
   ) {
-    return this.staffsService.findAll(+page, +limit, status, cargo);
+    return this.servicioPersonal.obtenerTodos(+pagina, +limite, estado, cargo);
   }
 
   @Get('activos')
-  findActive() {
-    return this.staffsService.findActive();
+  obtenerActivos() {
+    return this.servicioPersonal.obtenerActivos();
   }
 
   @Get('docentes')
-  findTeachers() {
-    return this.staffsService.findTeachers();
+  obtenerDocentes() {
+    return this.servicioPersonal.obtenerDocentes();
   }
 
   @Get('por-cargo/:cargo')
-  findByPosition(@Param('cargo') cargo: CargoPersonal) {
-    return this.staffsService.findByPosition(cargo);
+  buscarPorCargo(@Param('cargo') cargo: CargoPersonal) {
+    return this.servicioPersonal.buscarPorCargo(cargo);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.staffsService.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioPersonal.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateStaffDto: ActualizarPersonalDto) {
-    return this.staffsService.update(id, updateStaffDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarPersonalDto: ActualizarPersonalDto) {
+    return this.servicioPersonal.actualizar(id, actualizarPersonalDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.staffsService.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioPersonal.eliminar(id);
   }
 }

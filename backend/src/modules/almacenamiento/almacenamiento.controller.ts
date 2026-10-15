@@ -17,76 +17,76 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
-import { ServicioAlmacenamiento, UploadedFile as UploadedFileType } from './almacenamiento.service';
+import { ServicioAlmacenamiento, ArchivoSubido as ArchivoSubidoType } from './almacenamiento.service';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
 
 @ApiTags('Almacenamiento')
 @Controller('almacenamiento')
 export class ControladorAlmacenamiento {
-  private readonly logger = new Logger(ControladorAlmacenamiento.name);
-  constructor(private readonly service: ServicioAlmacenamiento) {}
+  private readonly registrador = new Logger(ControladorAlmacenamiento.name);
+  constructor(private readonly servicio: ServicioAlmacenamiento) {}
 
   @Post('subir')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('archivo'))
-  async uploadFile(
+  async subirArchivo(
     @UploadedFile() archivo: any,
     @Query('carpeta') carpeta: string = 'general',
   ) {
     if (!archivo) {
       throw new BadRequestException('No se proporcionó ningún archivo');
     }
-    return this.service.uploadFile(archivo, carpeta);
+    return this.servicio.subirArchivo(archivo, carpeta);
   }
 
   @Get('archivos/*')
-  async getFileStream(
-    @Param('0') filename: string,
+  async obtenerFlujoArchivo(
+    @Param('0') nombreArchivo: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    this.logger.log(`DEBUG: filename param = ${JSON.stringify(filename)}`);
+    this.registrador.log(`DEBUG: parámetro nombreArchivo = ${JSON.stringify(nombreArchivo)}`);
     try {
-      const { stream, size, mimetype } = await this.service.getFileStream(filename);
+      const { flujo, tamano, tipoMime } = await this.servicio.obtenerFlujoArchivo(nombreArchivo);
       res.set({
-        'Content-Type': mimetype,
-        'Content-Length': size,
-        'Content-Disposition': `inline; filename="${filename}"`,
+        'Content-Type': tipoMime,
+        'Content-Length': tamano,
+        'Content-Disposition': `inline; filename="${nombreArchivo}"`,
       });
-      return new StreamableFile(stream as any);
+      return new StreamableFile(flujo as any);
     } catch (error) {
-      this.logger.error(`Error getting file stream: ${error.message}`, error.stack);
+      this.registrador.error(`Error al obtener el flujo del archivo: ${error.message}`, error.stack);
       throw error;
     }
   }
 
   @Get(':nombreArchivo')
-  async getFile(@Param('nombreArchivo') filename: string) {
-    const file = await this.service.getFile(filename);
-    return { contenidoBase64: file.toString('base64') };
+  async obtenerArchivo(@Param('nombreArchivo') nombreArchivo: string) {
+    const archivo = await this.servicio.obtenerArchivo(nombreArchivo);
+    return { contenidoBase64: archivo.toString('base64') };
   }
 
   @Get(':nombreArchivo/url')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  async getFileUrl(@Param('nombreArchivo') filename: string) {
-    const url = await this.service.getFileUrl(filename);
+  async obtenerUrlArchivo(@Param('nombreArchivo') nombreArchivo: string) {
+    const url = await this.servicio.obtenerUrlArchivo(nombreArchivo);
     return { url };
   }
 
   @Delete(':nombreArchivo')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  async deleteFile(@Param('nombreArchivo') filename: string) {
-    await this.service.deleteFile(filename);
+  async eliminarArchivo(@Param('nombreArchivo') nombreArchivo: string) {
+    await this.servicio.eliminarArchivo(nombreArchivo);
     return { mensaje: 'Archivo eliminado correctamente' };
   }
 
   @Get()
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  async listFiles(@Query('prefijo') prefix: string = '') {
-    const files = await this.service.listFiles(prefix);
-    return { archivos: files };
+  async listarArchivos(@Query('prefijo') prefijo: string = '') {
+    const archivos = await this.servicio.listarArchivos(prefijo);
+    return { archivos };
   }
 }

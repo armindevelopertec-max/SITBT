@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { publicApi } from '@/lib/api';
+import { apiPublica } from '@/lib/api';
 import { GraduationCap, Clock, Award, FileText, ArrowRight, ChevronLeft } from 'lucide-react';
 import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
@@ -47,23 +47,23 @@ const formatearFecha = (fecha: string): string => {
 };
 
 export default function PaginaDetalleCarrera() {
-  const params = useParams();
+  const parametros = useParams();
   const { institucion } = usarInstitucion();
   const [carrera, setCarrera] = useState<Carrera | null>(null);
   const [plan, setPlan] = useState<PlanEstudio | null>(null);
   const [materias, setMaterias] = useState<MateriaPlan[]>([]);
   const [cargando, setCargando] = useState(true);
 
-  const idCarrera = parseInt(params.id as string);
+  const idCarrera = parseInt(parametros.id as string);
 
   useEffect(() => {
     const obtenerDatos = async () => {
       try {
         const [respuestaCarrera, respuestaPlan] = await Promise.all([
-          publicApi.get<{ datos: Carrera[] }>('/carreras', {
+          apiPublica.get<{ datos: Carrera[] }>('/carreras', {
             params: { estado: 'activo' },
           }),
-          publicApi.get<{ plan: PlanEstudio | null; materias: MateriaPlan[] }>(
+          apiPublica.get<{ plan: PlanEstudio | null; materias: MateriaPlan[] }>(
             `/planes-estudio/publico/carrera/${idCarrera}`,
           ),
         ]);

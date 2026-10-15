@@ -9,19 +9,19 @@ export class ControladorAutenticacion {
   constructor(private autenticacionServicio: AutenticacionServicio) {}
 
   @Post('iniciar-sesion')
-  async login(@Body() body: { nombreUsuario: string; contrasena: string }) {
-    return this.autenticacionServicio.login(body.nombreUsuario, body.contrasena);
+  async iniciarSesion(@Body() cuerpo: { nombreUsuario: string; contrasena: string }) {
+    return this.autenticacionServicio.iniciarSesion(cuerpo.nombreUsuario, cuerpo.contrasena);
   }
 
   @Post('registrar')
-  async registrar(@Body() body: { nombreUsuario: string; contrasena: string; personaId: number }) {
-    return this.autenticacionServicio.register(body);
+  async registrar(@Body() cuerpo: { nombreUsuario: string; contrasena: string; personaId: number }) {
+    return this.autenticacionServicio.registrar(cuerpo);
   }
 
   @Get('perfil')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  async getProfile(@Request() req) {
-    return this.autenticacionServicio.getProfile(req.user.id);
+  async obtenerPerfil(@Request() peticion) {
+    return this.autenticacionServicio.obtenerPerfil(peticion.user.id);
   }
 }

@@ -9,62 +9,62 @@ import { ActualizarConfiguracionInstitucionalDto } from './dto/actualizar-config
 export class ServicioConfiguracionInstitucional {
   constructor(
     @InjectRepository(ConfiguracionInstitucional)
-    private settingsRepository: Repository<ConfiguracionInstitucional>,
+    private repositorioConfiguracion: Repository<ConfiguracionInstitucional>,
   ) {}
 
-  async create(createDto: CrearConfiguracionInstitucionalDto): Promise<ConfiguracionInstitucional> {
-    const settings = this.settingsRepository.create(createDto);
-    return this.settingsRepository.save(settings);
+  async crear(crearDto: CrearConfiguracionInstitucionalDto): Promise<ConfiguracionInstitucional> {
+    const configuracion = this.repositorioConfiguracion.create(crearDto);
+    return this.repositorioConfiguracion.save(configuracion);
   }
 
-  async findAll(): Promise<ConfiguracionInstitucional[]> {
-    return this.settingsRepository.find();
+  async obtenerTodos(): Promise<ConfiguracionInstitucional[]> {
+    return this.repositorioConfiguracion.find();
   }
 
-  async findOne(): Promise<ConfiguracionInstitucional> {
-    const settings = await this.settingsRepository.findOne({ where: {} });
-    if (!settings) {
+  async obtenerUno(): Promise<ConfiguracionInstitucional> {
+    const configuracion = await this.repositorioConfiguracion.findOne({ where: {} });
+    if (!configuracion) {
       throw new NotFoundException('Configuración institucional no encontrada');
     }
-    return settings;
+    return configuracion;
   }
 
-  async update(id: number, updateDto: ActualizarConfiguracionInstitucionalDto): Promise<ConfiguracionInstitucional> {
-    const settings = await this.findOne();
-    Object.assign(settings, updateDto);
-    return this.settingsRepository.save(settings);
+  async actualizar(id: number, actualizarDto: ActualizarConfiguracionInstitucionalDto): Promise<ConfiguracionInstitucional> {
+    const configuracion = await this.obtenerUno();
+    Object.assign(configuracion, actualizarDto);
+    return this.repositorioConfiguracion.save(configuracion);
   }
 
-  async upsert(createDto: CrearConfiguracionInstitucionalDto): Promise<ConfiguracionInstitucional> {
-    const existing = await this.settingsRepository.findOne({ where: {} });
-    if (existing) {
-      Object.assign(existing, createDto);
-      return this.settingsRepository.save(existing);
+  async crearOActualizar(crearDto: CrearConfiguracionInstitucionalDto): Promise<ConfiguracionInstitucional> {
+    const existente = await this.repositorioConfiguracion.findOne({ where: {} });
+    if (existente) {
+      Object.assign(existente, crearDto);
+      return this.repositorioConfiguracion.save(existente);
     }
-    return this.create(createDto);
+    return this.crear(crearDto);
   }
 
-  async getPublicSettings(): Promise<Partial<ConfiguracionInstitucional>> {
-    const settings = await this.findOne();
-    let logoUrl = settings.logoUrl;
-    if (logoUrl && logoUrl.startsWith('http')) {
-      const match = logoUrl.match(/\/sitbt-files\/(.+)$/);
-      if (match) {
-        logoUrl = `/api/almacenamiento/files/${match[1]}`;
+  async obtenerConfiguracionPublica(): Promise<Partial<ConfiguracionInstitucional>> {
+    const configuracion = await this.obtenerUno();
+    let urlLogo = configuracion.logoUrl;
+    if (urlLogo && urlLogo.startsWith('http')) {
+      const coincidencia = urlLogo.match(/\/sitbt-files\/(.+)$/);
+      if (coincidencia) {
+        urlLogo = `/api/almacenamiento/files/${coincidencia[1]}`;
       }
     }
     return {
-      nombre: settings.nombre,
-      nombreCorto: settings.nombreCorto,
-      lema: settings.lema,
-      logoUrl: logoUrl,
-      direccion: settings.direccion,
-      telefono: settings.telefono,
-      departamento: settings.departamento,
-      correo: settings.correo,
-      sitioWeb: settings.sitioWeb,
-      ciudad: settings.ciudad,
-      pais: settings.pais,
+      nombre: configuracion.nombre,
+      nombreCorto: configuracion.nombreCorto,
+      lema: configuracion.lema,
+      logoUrl: urlLogo,
+      direccion: configuracion.direccion,
+      telefono: configuracion.telefono,
+      departamento: configuracion.departamento,
+      correo: configuracion.correo,
+      sitioWeb: configuracion.sitioWeb,
+      ciudad: configuracion.ciudad,
+      pais: configuracion.pais,
     };
   }
 }

@@ -8,122 +8,122 @@ import { Boton } from '@/components/ui/boton';
 import { Entrada } from '@/components/ui/entrada';
 import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
 import { Insignia } from '@/components/ui/insignia';
-import { Modal, ConfirmModal } from '@/components/ui/modal';
+import { Modal, ModalConfirmacion } from '@/components/ui/modal';
 import { Plus, Search, Edit2, Trash2, Loader2, User, Eye, Key, Filter } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Estudiante } from '@/types';
 import { Selector } from '@/components/ui/selector';
 
-const statusLabels: Record<string, { label: string; color: string }> = {
-  pre_registro: { label: 'Pre-registro', color: 'bg-purple-100 text-purple-800' },
-  verificado: { label: 'Verificado', color: 'bg-blue-100 text-blue-800' },
-  matriculado: { label: 'Matriculado', color: 'bg-green-100 text-green-800' },
-  egresado: { label: 'Egresado', color: 'bg-gray-100 text-gray-800' },
-  retirado: { label: 'Retirado', color: 'bg-red-100 text-red-800' },
+const etiquetasEstado: Record<string, { etiqueta: string; color: string }> = {
+  pre_registro: { etiqueta: 'Pre-registro', color: 'bg-purple-100 text-purple-800' },
+  verificado: { etiqueta: 'Verificado', color: 'bg-blue-100 text-blue-800' },
+  matriculado: { etiqueta: 'Matriculado', color: 'bg-green-100 text-green-800' },
+  egresado: { etiqueta: 'Egresado', color: 'bg-gray-100 text-gray-800' },
+  retirado: { etiqueta: 'Retirado', color: 'bg-red-100 text-red-800' },
 };
 
-const originLabels: Record<string, string> = {
+const etiquetasOrigen: Record<string, string> = {
   web: 'Web',
   secretaria: 'Secretaría',
 };
 
-export default function StudentsPage() {
+export default function PaginaEstudiantes() {
   const router = useRouter();
-  const [students, setStudents] = useState<Estudiante[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [estadoFilter, setEstadoFilter] = useState<string>('');
-  const [origenFilter, setOrigenFilter] = useState<string>('');
+  const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [terminoBusqueda, setTerminoBusqueda] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState<string>('');
+  const [filtroOrigen, setFiltroOrigen] = useState<string>('');
 
-  const [deleteModal, setDeleteModal] = useState<Estudiante | null>(null);
-  const [credentialsModal, setCredentialsModal] = useState<{ nombreUsuario: string; contrasena: string; nombre: string; estudianteId: number; personaId: number } | null>(null);
-  const [resetLoading, setResetLoading] = useState(false);
-  const [formLoading, setFormLoading] = useState(false);
+  const [estudianteEliminando, setEstudianteEliminando] = useState<Estudiante | null>(null);
+  const [modalCredenciales, setModalCredenciales] = useState<{ nombreUsuario: string; contrasena: string; nombre: string; estudianteId: number; personaId: number } | null>(null);
+  const [cargandoRestablecer, setCargandoRestablecer] = useState(false);
+  const [cargandoFormulario, setCargandoFormulario] = useState(false);
 
   useEffect(() => {
-    fetchStudents();
+    obtenerEstudiantes();
   }, []);
 
-  const fetchStudents = async () => {
+  const obtenerEstudiantes = async () => {
     try {
-      const response = await api.get('/estudiantes');
-      setStudents(response.data.datos);
+      const respuesta = await api.get('/estudiantes');
+      setEstudiantes(respuesta.data.datos);
     } catch (error) {
       console.error('Error al cargar estudiantes:', error);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const filteredStudents = students.filter((student) => {
-    const persona = student.persona;
+  const estudiantesFiltrados = estudiantes.filter((estudiante) => {
+    const persona = estudiante.persona;
     if (!persona) return false;
-    const fullName = `${persona.nombres} ${persona.apellidoPaterno} ${persona.apellidoMaterno}`.toLowerCase();
+    const nombreCompleto = `${persona.nombres} ${persona.apellidoPaterno} ${persona.apellidoMaterno}`.toLowerCase();
     const ci = persona.ci.toLowerCase();
-    const search = searchTerm.toLowerCase();
-    const matchesSearch = fullName.includes(search) || ci.includes(search);
-    const matchesEstado = !estadoFilter || student.estadoMatricula === estadoFilter;
-    const matchesOrigen = !origenFilter || student.origen === origenFilter;
-    return matchesSearch && matchesEstado && matchesOrigen;
+    const busqueda = terminoBusqueda.toLowerCase();
+    const coincideBusqueda = nombreCompleto.includes(busqueda) || ci.includes(busqueda);
+    const coincideEstado = !filtroEstado || estudiante.estadoMatricula === filtroEstado;
+    const coincideOrigen = !filtroOrigen || estudiante.origen === filtroOrigen;
+    return coincideBusqueda && coincideEstado && coincideOrigen;
   });
 
-  const getStatusBadge = (status: string) => {
-    const config = statusLabels[status] || { label: status, color: 'bg-gray-100 text-gray-800' };
-    return <Insignia className={config.color}>{config.label}</Insignia>;
+  const obtenerInsigniaEstado = (estado: string) => {
+    const configuracion = etiquetasEstado[estado] || { etiqueta: estado, color: 'bg-gray-100 text-gray-800' };
+    return <Insignia className={configuracion.color}>{configuracion.etiqueta}</Insignia>;
   };
 
-  const handleDelete = async () => {
-    if (!deleteModal) return;
-    setFormLoading(true);
+  const eliminar = async () => {
+    if (!estudianteEliminando) return;
+    setCargandoFormulario(true);
     try {
-      await api.delete(`/estudiantes/${deleteModal.id}`);
-      setDeleteModal(null);
-      fetchStudents();
+      await api.delete(`/estudiantes/${estudianteEliminando.id}`);
+      setEstudianteEliminando(null);
+      obtenerEstudiantes();
     } catch (error) {
       console.error('Error al eliminar estudiante:', error);
     } finally {
-      setFormLoading(false);
+      setCargandoFormulario(false);
     }
   };
 
-  const viewCredentials = async (student: Estudiante) => {
+  const verCredenciales = async (estudiante: Estudiante) => {
     try {
-      const response = await api.get(`/usuarios?personaId=${student.personaId}`);
-      const users = response.data.datos;
-      const persona = student.persona;
+      const respuesta = await api.get(`/usuarios?personaId=${estudiante.personaId}`);
+      const usuarios = respuesta.data.datos;
+      const persona = estudiante.persona;
       const nombre = persona ? `${persona.nombres} ${persona.apellidoPaterno}` : 'Estudiante';
 
-      if (users && users.length > 0 && persona) {
-        const user = users[0];
-        const newPassword = `${persona.ci}-${new Date().getFullYear()}`;
-        setCredentialsModal({ nombreUsuario: user.nombreUsuario, contrasena: newPassword, nombre, estudianteId: student.id, personaId: student.personaId });
+      if (usuarios && usuarios.length > 0 && persona) {
+        const usuario = usuarios[0];
+        const nuevaContrasena = `${persona.ci}-${new Date().getFullYear()}`;
+        setModalCredenciales({ nombreUsuario: usuario.nombreUsuario, contrasena: nuevaContrasena, nombre, estudianteId: estudiante.id, personaId: estudiante.personaId });
       } else {
-        setCredentialsModal({ nombreUsuario: 'No tiene usuario', contrasena: '', nombre, estudianteId: student.id, personaId: student.personaId });
+        setModalCredenciales({ nombreUsuario: 'No tiene usuario', contrasena: '', nombre, estudianteId: estudiante.id, personaId: estudiante.personaId });
       }
     } catch (error) {
       console.error('Error al obtener usuario:', error);
-      setCredentialsModal({ nombreUsuario: 'Error al cargar', contrasena: '', nombre: student.persona?.nombres || '', estudianteId: student.id, personaId: student.personaId });
+      setModalCredenciales({ nombreUsuario: 'Error al cargar', contrasena: '', nombre: estudiante.persona?.nombres || '', estudianteId: estudiante.id, personaId: estudiante.personaId });
     }
   };
 
-  const handleResetPassword = async () => {
-    if (!credentialsModal) return;
-    setResetLoading(true);
+  const restablecerContrasena = async () => {
+    if (!modalCredenciales) return;
+    setCargandoRestablecer(true);
     try {
-      const response = await api.get(`/usuarios?personaId=${credentialsModal.personaId}`);
-      const users = response.data.datos;
-      if (users && users.length > 0) {
-        await api.post(`/usuarios/${users[0].id}/cambiar-contrasena`, { nuevaContrasena: credentialsModal.contrasena });
+      const respuesta = await api.get(`/usuarios?personaId=${modalCredenciales.personaId}`);
+      const usuarios = respuesta.data.datos;
+      if (usuarios && usuarios.length > 0) {
+        await api.post(`/usuarios/${usuarios[0].id}/cambiar-contrasena`, { nuevaContrasena: modalCredenciales.contrasena });
       }
-      setCredentialsModal(null);
+      setModalCredenciales(null);
     } catch (error) {
       console.error('Error al restablecer contraseña:', error);
     } finally {
-      setResetLoading(false);
+      setCargandoRestablecer(false);
     }
   };
 
-  if (loading) {
+  if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
@@ -133,7 +133,7 @@ export default function StudentsPage() {
 
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Estudiantes' }]} />
+      <Migas elementos={[{ etiqueta: 'Estudiantes' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Estudiantes</h1>
@@ -143,32 +143,32 @@ export default function StudentsPage() {
         </Boton>
       </div>
 
-      <Tarjeta variant="bordered">
+      <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <TituloTarjeta>Lista de Estudiantes ({filteredStudents.length})</TituloTarjeta>
+            <TituloTarjeta>Lista de Estudiantes ({estudiantesFiltrados.length})</TituloTarjeta>
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex gap-2">
                 <Selector
-                  value={estadoFilter}
-                  onChange={(e) => setEstadoFilter(e.target.value)}
-                  options={[
-                    { value: '', label: 'Todos' },
-                    { value: 'pre_registro', label: 'Pre-registro' },
-                    { value: 'verificado', label: 'Verificado' },
-                    { value: 'matriculado', label: 'Matriculado' },
-                    { value: 'egresado', label: 'Egresado' },
-                    { value: 'retirado', label: 'Retirado' },
+                  value={filtroEstado}
+                  onChange={(e) => setFiltroEstado(e.target.value)}
+                  opciones={[
+                    { value: '', etiqueta: 'Todos' },
+                    { value: 'pre_registro', etiqueta: 'Pre-registro' },
+                    { value: 'verificado', etiqueta: 'Verificado' },
+                    { value: 'matriculado', etiqueta: 'Matriculado' },
+                    { value: 'egresado', etiqueta: 'Egresado' },
+                    { value: 'retirado', etiqueta: 'Retirado' },
                   ]}
                   placeholder="Estado"
                 />
                 <Selector
-                  value={origenFilter}
-                  onChange={(e) => setOrigenFilter(e.target.value)}
-                  options={[
-                    { value: '', label: 'Todos' },
-                    { value: 'web', label: 'Web' },
-                    { value: 'secretaria', label: 'Secretaría' },
+                  value={filtroOrigen}
+                  onChange={(e) => setFiltroOrigen(e.target.value)}
+                  opciones={[
+                    { value: '', etiqueta: 'Todos' },
+                    { value: 'web', etiqueta: 'Web' },
+                    { value: 'secretaria', etiqueta: 'Secretaría' },
                   ]}
                   placeholder="Origen"
                 />
@@ -178,8 +178,8 @@ export default function StudentsPage() {
                 <Entrada
                   placeholder="Buscar por nombre o CI..."
                   className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={terminoBusqueda}
+                  onChange={(e) => setTerminoBusqueda(e.target.value)}
                 />
               </div>
             </div>
@@ -199,39 +199,39 @@ export default function StudentsPage() {
               </FilaTabla>
             </EncabezadoTabla>
             <CuerpoTabla>
-              {filteredStudents.map((student) => (
-                <FilaTabla key={student.id}>
+              {estudiantesFiltrados.map((estudiante) => (
+                <FilaTabla key={estudiante.id}>
                   <CeldaTabla className="font-medium">
-                    {student.persona?.ci}
+                    {estudiante.persona?.ci}
                   </CeldaTabla>
                   <CeldaTabla>
-                    {student.persona?.nombres} {student.persona?.apellidoPaterno} {student.persona?.apellidoMaterno}
+                    {estudiante.persona?.nombres} {estudiante.persona?.apellidoPaterno} {estudiante.persona?.apellidoMaterno}
                   </CeldaTabla>
-                  <CeldaTabla>{student.codigoInscripcion}</CeldaTabla>
+                  <CeldaTabla>{estudiante.codigoInscripcion}</CeldaTabla>
                   <CeldaTabla>
-                    <Insignia variant="outline">{originLabels[student.origen || 'secretaria'] || '-'}</Insignia>
+                    <Insignia variante="contorno">{etiquetasOrigen[estudiante.origen || 'secretaria'] || '-'}</Insignia>
                   </CeldaTabla>
-                  <CeldaTabla>{getStatusBadge(student.estadoMatricula || 'matriculado')}</CeldaTabla>
-                  <CeldaTabla>{new Date(student.fechaAdmision).toLocaleDateString('es-BO')}</CeldaTabla>
+                  <CeldaTabla>{obtenerInsigniaEstado(estudiante.estadoMatricula || 'matriculado')}</CeldaTabla>
+                  <CeldaTabla>{new Date(estudiante.fechaAdmision).toLocaleDateString('es-BO')}</CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Boton variant="ghost" size="icon" title="Ver credenciales" onClick={() => viewCredentials(student)}>
+                      <Boton variante="fantasma" tamano="icono" title="Ver credenciales" onClick={() => verCredenciales(estudiante)}>
                         <Eye className="w-4 h-4" />
                       </Boton>
-                      <Boton variant="ghost" size="icon" title="Editar" onClick={() => router.push(`/estudiantes/editar/${student.id}`)}>
+                      <Boton variante="fantasma" tamano="icono" title="Editar" onClick={() => router.push(`/estudiantes/editar/${estudiante.id}`)}>
                         <Edit2 className="w-4 h-4" />
                       </Boton>
-                      <Boton variant="ghost" size="icon" title="Eliminar" onClick={() => setDeleteModal(student)}>
+                      <Boton variante="fantasma" tamano="icono" title="Eliminar" onClick={() => setEstudianteEliminando(estudiante)}>
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </Boton>
                     </div>
                   </CeldaTabla>
                 </FilaTabla>
               ))}
-              {filteredStudents.length === 0 && (
+              {estudiantesFiltrados.length === 0 && (
                 <FilaTabla>
                   <CeldaTabla colSpan={7} className="text-center py-8 text-gray-500">
-                    {searchTerm || estadoFilter || origenFilter ? 'No se encontraron estudiantes' : 'No hay estudiantes registrados'}
+                    {terminoBusqueda || filtroEstado || filtroOrigen ? 'No se encontraron estudiantes' : 'No hay estudiantes registrados'}
                   </CeldaTabla>
                 </FilaTabla>
               )}
@@ -240,36 +240,36 @@ export default function StudentsPage() {
         </ContenidoTarjeta>
       </Tarjeta>
 
-      <ConfirmModal
-        open={!!deleteModal}
-        onClose={() => setDeleteModal(null)}
-        onConfirm={handleDelete}
-        title="Eliminar Estudiante"
-        message={`¿Está seguro de eliminar al estudiante "${deleteModal?.persona?.nombres} ${deleteModal?.persona?.apellidoPaterno}"? Esta acción no se puede deshacer.`}
-        confirmText="Eliminar"
-        variant="destructive"
-        loading={formLoading}
+      <ModalConfirmacion
+        abierto={!!estudianteEliminando}
+        alCerrar={() => setEstudianteEliminando(null)}
+        alConfirmar={eliminar}
+        titulo="Eliminar Estudiante"
+        mensaje={`¿Está seguro de eliminar al estudiante "${estudianteEliminando?.persona?.nombres} ${estudianteEliminando?.persona?.apellidoPaterno}"? Esta acción no se puede deshacer.`}
+        textoConfirmar="Eliminar"
+        variante="destructivo"
+        cargando={cargandoFormulario}
       />
 
-      <Modal open={!!credentialsModal} onClose={() => setCredentialsModal(null)} title="Credenciales del Estudiante" size="md">
-        {credentialsModal && (
+      <Modal abierto={!!modalCredenciales} alCerrar={() => setModalCredenciales(null)} titulo="Credenciales del Estudiante" tamano="mediano">
+        {modalCredenciales && (
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              Credenciales de acceso para <strong>{credentialsModal.nombre}</strong>:
+              Credenciales de acceso para <strong>{modalCredenciales.nombre}</strong>:
             </p>
             <div className="bg-gray-50 p-4 rounded-lg space-y-3">
               <div className="flex items-center gap-3">
                 <User className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Nombre de usuario</p>
-                  <p className="font-mono font-medium">{credentialsModal.nombreUsuario}</p>
+                  <p className="font-mono font-medium">{modalCredenciales.nombreUsuario}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Key className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Contraseña temporal</p>
-                  <p className="font-mono font-medium text-green-600">{credentialsModal.contrasena}</p>
+                  <p className="font-mono font-medium text-green-600">{modalCredenciales.contrasena}</p>
                 </div>
               </div>
             </div>
@@ -277,8 +277,8 @@ export default function StudentsPage() {
               ⚠️ Esta contraseña es temporal. El estudiante debe cambiarla después de iniciar sesión.
             </p>
             <div className="flex justify-end gap-3">
-              <Boton variant="outline" onClick={() => setCredentialsModal(null)}>Cerrar</Boton>
-              <Boton onClick={handleResetPassword} isLoading={resetLoading} disabled={credentialsModal.nombreUsuario === 'No tiene usuario' || credentialsModal.nombreUsuario === 'Error al cargar'}>
+              <Boton variante="contorno" onClick={() => setModalCredenciales(null)}>Cerrar</Boton>
+              <Boton onClick={restablecerContrasena} cargando={cargandoRestablecer} disabled={modalCredenciales.nombreUsuario === 'No tiene usuario' || modalCredenciales.nombreUsuario === 'Error al cargar'}>
                 Restablecer Contraseña
               </Boton>
             </div>

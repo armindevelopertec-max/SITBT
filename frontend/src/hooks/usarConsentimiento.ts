@@ -3,54 +3,54 @@ import { useState } from 'react';
 import { RegistroConsentimiento } from '@/types';
 
 export function usarConsentimiento() {
-  const [loading, setLoading] = useState(false);
+  const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createConsent = async (data: {
+  const registrarConsentimiento = async (datos: {
     estudianteId: number;
     versionPolitica: string;
     nombreTutor?: string;
     ciTutor?: string;
     firmaBase64?: string;
   }): Promise<RegistroConsentimiento> => {
-    setLoading(true);
+    setCargando(true);
     setError(null);
     try {
-      const response = await api.post<RegistroConsentimiento>('/consentimiento', data);
-      return response.data;
+      const respuesta = await api.post<RegistroConsentimiento>('/consentimiento', datos);
+      return respuesta.data;
     } catch (err: any) {
       setError(err.response?.data?.mensaje || 'Error al registrar consentimiento');
       throw err;
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const getConsentByStudent = async (estudianteId: number): Promise<RegistroConsentimiento[]> => {
-    const response = await api.get<RegistroConsentimiento[]>(`/consentimiento/estudiante/${estudianteId}`);
-    return response.data;
+  const obtenerConsentimientoPorEstudiante = async (estudianteId: number): Promise<RegistroConsentimiento[]> => {
+    const respuesta = await api.get<RegistroConsentimiento[]>(`/consentimiento/estudiante/${estudianteId}`);
+    return respuesta.data;
   };
 
-  const getLatestConsent = async (estudianteId: number): Promise<RegistroConsentimiento | null> => {
+  const obtenerUltimoConsentimiento = async (estudianteId: number): Promise<RegistroConsentimiento | null> => {
     try {
-      const response = await api.get<RegistroConsentimiento | null>(`/consentimiento/estudiante/${estudianteId}/ultimo`);
-      return response.data;
+      const respuesta = await api.get<RegistroConsentimiento | null>(`/consentimiento/estudiante/${estudianteId}/ultimo`);
+      return respuesta.data;
     } catch {
       return null;
     }
   };
 
-  const hasValidConsent = async (estudianteId: number, version: string): Promise<boolean> => {
-    const response = await api.get<boolean>(`/consentimiento/verificar/${estudianteId}/${version}`);
-    return response.data;
+  const tieneConsentimientoValido = async (estudianteId: number, version: string): Promise<boolean> => {
+    const respuesta = await api.get<boolean>(`/consentimiento/verificar/${estudianteId}/${version}`);
+    return respuesta.data;
   };
 
   return {
-    createConsent,
-    getConsentByStudent,
-    getLatestConsent,
-    hasValidConsent,
-    loading,
+    registrarConsentimiento,
+    obtenerConsentimientoPorEstudiante,
+    obtenerUltimoConsentimiento,
+    tieneConsentimientoValido,
+    cargando,
     error,
   };
 }

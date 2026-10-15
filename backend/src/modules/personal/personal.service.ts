@@ -22,63 +22,63 @@ export interface PersonalCreadoConUsuario {
 export class ServicioPersonal {
   constructor(
     @InjectRepository(Personal)
-    private staffRepository: Repository<Personal>,
+    private repositorioPersonal: Repository<Personal>,
     @InjectRepository(Persona)
-    private personaRepository: Repository<Persona>,
+    private repositorioPersona: Repository<Persona>,
     @InjectRepository(Usuario)
-    private usuarioRepository: Repository<Usuario>,
+    private repositorioUsuario: Repository<Usuario>,
     @InjectRepository(UsuarioRol)
-    private usuarioRolRepository: Repository<UsuarioRol>,
+    private repositorioUsuarioRol: Repository<UsuarioRol>,
     @InjectRepository(Rol)
-    private rolRepository: Repository<Rol>,
+    private repositorioRol: Repository<Rol>,
   ) {}
 
-  async create(createStaffDto: CrearPersonalDto): Promise<PersonalCreadoConUsuario> {
-    const staff = this.staffRepository.create({
-      ...createStaffDto,
-      estado: createStaffDto.estado ?? EstadoPersonal.ACTIVO,
+  async crear(crearPersonalDto: CrearPersonalDto): Promise<PersonalCreadoConUsuario> {
+    const personal = this.repositorioPersonal.create({
+      ...crearPersonalDto,
+      estado: crearPersonalDto.estado ?? EstadoPersonal.ACTIVO,
     });
-    const savedStaff = await this.staffRepository.save(staff);
+    const personalGuardado = await this.repositorioPersonal.save(personal);
 
-    const persona = await this.personaRepository.findOne({ where: { id: createStaffDto.personaId } });
+    const persona = await this.repositorioPersona.findOne({ where: { id: crearPersonalDto.personaId } });
     if (!persona) {
       throw new NotFoundException('Persona no encontrada');
     }
-    const currentYear = new Date().getFullYear().toString();
+    const anioActual = new Date().getFullYear().toString();
 
-    const username = `doc_${persona.ci.replace(/[^a-zA-Z0-9]/g, '')}`;
-    const password = `${persona.ci}-${currentYear}`;
+    const nombreUsuario = `doc_${persona.ci.replace(/[^a-zA-Z0-9]/g, '')}`;
+    const contrasena = `${persona.ci}-${anioActual}`;
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    const usuario = this.usuarioRepository.create({
-      personaId: savedStaff.personaId,
-      nombreUsuario: username,
-      contrasenaHash: passwordHash,
+    const contrasenaHash = await bcrypt.hash(contrasena, 10);
+    const usuario = this.repositorioUsuario.create({
+      personaId: personalGuardado.personaId,
+      nombreUsuario: nombreUsuario,
+      contrasenaHash: contrasenaHash,
       estado: 'activo' as any,
     });
-    const savedUsuario = await this.usuarioRepository.save(usuario);
+    const usuarioGuardado = await this.repositorioUsuario.save(usuario);
 
-    const roleCode = this.mapPositionToRole(savedStaff.cargo);
-    const rol = await this.rolRepository.findOne({ where: { codigo: roleCode } });
+    const codigoRol = this.mapearCargoARol(personalGuardado.cargo);
+    const rol = await this.repositorioRol.findOne({ where: { codigo: codigoRol } });
     if (rol) {
-      const usuarioRol = this.usuarioRolRepository.create({
-        usuarioId: savedUsuario.id,
+      const usuarioRol = this.repositorioUsuarioRol.create({
+        usuarioId: usuarioGuardado.id,
         rolId: rol.id,
       });
-      await this.usuarioRolRepository.save(usuarioRol);
+      await this.repositorioUsuarioRol.save(usuarioRol);
     }
 
     return {
-      personal: savedStaff,
+      personal: personalGuardado,
       usuario: {
-        nombreUsuario: username,
-        contrasena: password,
+        nombreUsuario: nombreUsuario,
+        contrasena: contrasena,
       },
     };
   }
 
-  private mapPositionToRole(position: CargoPersonal): string {
-    const positionRoleMap: Record<CargoPersonal, string> = {
+  private mapearCargoARol(cargo: CargoPersonal): string {
+    const mapaCargoRol: Record<CargoPersonal, string> = {
       [CargoPersonal.DOCENTE]: 'docente',
       [CargoPersonal.SECRETARIA]: 'secretaria',
       [CargoPersonal.DIRECTOR_ACADEMICO]: 'director_academico',
@@ -86,90 +86,90 @@ export class ServicioPersonal {
       [CargoPersonal.APOYO]: 'apoyo',
       [CargoPersonal.BIBLIOTECARIO]: 'apoyo',
     };
-    return positionRoleMap[position] || 'apoyo';
+    return mapaCargoRol[cargo] || 'apoyo';
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
-    status?: EstadoPersonal,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
+    estado?: EstadoPersonal,
     cargo?: CargoPersonal,
   ): Promise<{ datos: Personal[]; total: number; pagina: number; limite: number }> {
-    const query = this.staffRepository
-      .createQueryBuilder('staff')
-      .leftJoinAndSelect('staff.persona', 'persona');
+    const consulta = this.repositorioPersonal
+      .createQueryBuilder('personal')
+      .leftJoinAndSelect('personal.persona', 'persona');
 
-    if (status) {
-      query.andWhere('staff.estado = :status', { status });
+    if (estado) {
+      consulta.andWhere('personal.estado = :estado', { estado });
     }
 
     if (cargo) {
-      query.andWhere('staff.cargo = :cargo', { cargo });
+      consulta.andWhere('personal.cargo = :cargo', { cargo });
     }
 
-    const [data, total] = await query
-      .orderBy('staff.fechaContrato', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('personal.fechaContrato', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Personal> {
-    const staff = await this.staffRepository.findOne({
+  async obtenerUno(id: number): Promise<Personal> {
+    const personal = await this.repositorioPersonal.findOne({
       where: { id },
       relations: ['persona'],
     });
-    if (!staff) {
+    if (!personal) {
       throw new NotFoundException(`Personal con ID ${id} no encontrado`);
     }
-    return staff;
+    return personal;
   }
 
-  async update(id: number, updateStaffDto: ActualizarPersonalDto): Promise<Personal> {
-    const staff = await this.findOne(id);
-    Object.assign(staff, updateStaffDto);
-    return this.staffRepository.save(staff);
+  async actualizar(id: number, actualizarPersonalDto: ActualizarPersonalDto): Promise<Personal> {
+    const personal = await this.obtenerUno(id);
+    Object.assign(personal, actualizarPersonalDto);
+    return this.repositorioPersonal.save(personal);
   }
 
-  async remove(id: number): Promise<void> {
-    const staff = await this.findOne(id);
+  async eliminar(id: number): Promise<void> {
+    const personal = await this.obtenerUno(id);
 
-    const usuario = await this.usuarioRepository.findOne({
-      where: { personaId: staff.personaId },
+    const usuario = await this.repositorioUsuario.findOne({
+      where: { personaId: personal.personaId },
     });
     if (usuario) {
-      await this.usuarioRolRepository.delete({ usuarioId: usuario.id });
-      await this.usuarioRepository.remove(usuario);
+      await this.repositorioUsuarioRol.delete({ usuarioId: usuario.id });
+      await this.repositorioUsuario.remove(usuario);
     }
 
-    const personaId = staff.personaId;
-    await this.staffRepository.remove(staff);
+    const personaId = personal.personaId;
+    await this.repositorioPersonal.remove(personal);
 
-    const persona = await this.personaRepository.findOne({ where: { id: personaId } });
+    const persona = await this.repositorioPersona.findOne({ where: { id: personaId } });
     if (persona) {
-      await this.personaRepository.remove(persona);
+      await this.repositorioPersona.remove(persona);
     }
   }
 
-  async findByPosition(position: CargoPersonal): Promise<Personal[]> {
-    return this.staffRepository.find({
-      where: { cargo: position, estado: EstadoPersonal.ACTIVO },
+  async buscarPorCargo(cargo: CargoPersonal): Promise<Personal[]> {
+    return this.repositorioPersonal.find({
+      where: { cargo: cargo, estado: EstadoPersonal.ACTIVO },
       relations: ['persona'],
       order: { fechaContrato: 'ASC' },
     });
   }
 
-  async findActive(): Promise<Personal[]> {
-    return this.staffRepository.find({
+  async obtenerActivos(): Promise<Personal[]> {
+    return this.repositorioPersonal.find({
       where: { estado: EstadoPersonal.ACTIVO },
       relations: ['persona'],
       order: { fechaContrato: 'ASC' },
     });
   }
 
-  async findTeachers(): Promise<Personal[]> {
-    return this.findByPosition(CargoPersonal.DOCENTE);
+  async obtenerDocentes(): Promise<Personal[]> {
+    return this.buscarPorCargo(CargoPersonal.DOCENTE);
   }
 }

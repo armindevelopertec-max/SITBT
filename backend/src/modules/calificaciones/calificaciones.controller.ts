@@ -22,75 +22,75 @@ import { EstadoCalificacionDefinitivo } from '../../entities/calificacion.entity
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorCalificaciones {
-  constructor(private readonly gradesService: ServicioCalificaciones) {}
+  constructor(private readonly servicioCalificaciones: ServicioCalificaciones) {}
 
   @Post()
-  create(@Body() crearCalificacionDto: CrearCalificacionDto) {
-    return this.gradesService.create(crearCalificacionDto);
+  crear(@Body() crearCalificacionDto: CrearCalificacionDto) {
+    return this.servicioCalificaciones.crear(crearCalificacionDto);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
     @Query('gestion') gestion?: string,
-    @Query('estadoDefinitivo') statusDefinitivo?: EstadoCalificacionDefinitivo,
+    @Query('estadoDefinitivo') estadoDefinitivo?: EstadoCalificacionDefinitivo,
   ) {
-    return this.gradesService.findAll(+page, +limit, gestion, statusDefinitivo);
+    return this.servicioCalificaciones.obtenerTodos(+pagina, +limite, gestion, estadoDefinitivo);
   }
 
   @Get('estudiante/:estudianteId')
-  getGradesByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number, @Query('gestion') gestion?: string) {
-    return this.gradesService.getGradesByStudent(estudianteId, gestion);
+  obtenerCalificacionesPorEstudiante(@Param('estudianteId', ParseIntPipe) estudianteId: number, @Query('gestion') gestion?: string) {
+    return this.servicioCalificaciones.obtenerCalificacionesPorEstudiante(estudianteId, gestion);
   }
 
   @Get('grupo/:grupoId')
-  getGradesByGroup(@Param('grupoId', ParseIntPipe) grupoId: number, @Query('gestion') gestion: string) {
-    return this.gradesService.getGradesByGroup(grupoId, gestion);
+  obtenerCalificacionesPorGrupo(@Param('grupoId', ParseIntPipe) grupoId: number, @Query('gestion') gestion: string) {
+    return this.servicioCalificaciones.obtenerCalificacionesPorGrupo(grupoId, gestion);
   }
 
   @Get('inscripcion/:inscripcionId')
-  findByEnrollment(@Param('inscripcionId', ParseIntPipe) inscripcionId: number) {
-    return this.gradesService.findByEnrollment(inscripcionId);
+  buscarPorInscripcion(@Param('inscripcionId', ParseIntPipe) inscripcionId: number) {
+    return this.servicioCalificaciones.buscarPorInscripcion(inscripcionId);
   }
 
   @Get('inscripcion/:inscripcionId/historial')
-  getGradeHistory(@Param('inscripcionId', ParseIntPipe) inscripcionId: number) {
-    return this.gradesService.getGradeHistory(inscripcionId);
+  obtenerHistorialCalificaciones(@Param('inscripcionId', ParseIntPipe) inscripcionId: number) {
+    return this.servicioCalificaciones.obtenerHistorialCalificaciones(inscripcionId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.gradesService.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioCalificaciones.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(
+  actualizar(
     @Param('id', ParseIntPipe) id: number,
     @Body() actualizarCalificacionDto: ActualizarCalificacionDto,
     @Body('registradoPor') registradoPor: number,
   ) {
-    return this.gradesService.update(id, actualizarCalificacionDto, registradoPor);
+    return this.servicioCalificaciones.actualizar(id, actualizarCalificacionDto, registradoPor);
   }
 
   @Patch(':id/parciales')
-  updatePartialGrades(
+  actualizarParciales(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { parcial1?: number; parcial2?: number; registradoPor?: number },
+    @Body() cuerpo: { parcial1?: number; parcial2?: number; registradoPor?: number },
   ) {
-    return this.gradesService.updatePartialGrades(id, body.parcial1, body.parcial2, body.registradoPor);
+    return this.servicioCalificaciones.actualizarParciales(id, cuerpo.parcial1, cuerpo.parcial2, cuerpo.registradoPor);
   }
 
   @Patch(':id/segundo-turno')
-  applySecondTurn(
+  aplicarSegundaTurno(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { nota: number; registradoPor?: number },
+    @Body() cuerpo: { nota: number; registradoPor?: number },
   ) {
-    return this.gradesService.applySecondTurn(id, body.nota, body.registradoPor);
+    return this.servicioCalificaciones.aplicarSegundaTurno(id, cuerpo.nota, cuerpo.registradoPor);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.gradesService.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioCalificaciones.eliminar(id);
   }
 }

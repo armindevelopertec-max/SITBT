@@ -7,94 +7,94 @@ import { RegistroAuditoria } from '../../entities/registro-auditoria.entity';
 export class ServicioAuditoria {
   constructor(
     @InjectRepository(RegistroAuditoria)
-    private auditoriaRepository: Repository<RegistroAuditoria>,
+    private repositorioAuditoria: Repository<RegistroAuditoria>,
   ) {}
 
-  async create(log: Partial<RegistroAuditoria>): Promise<RegistroAuditoria> {
-    const auditLog = this.auditoriaRepository.create(log);
-    return this.auditoriaRepository.save(auditLog);
+  async crear(registro: Partial<RegistroAuditoria>): Promise<RegistroAuditoria> {
+    const registroAuditoria = this.repositorioAuditoria.create(registro);
+    return this.repositorioAuditoria.save(registroAuditoria);
   }
 
-  async findAll(
-    page = 1,
-    limit = 50,
-    userId?: number,
-    action?: string,
-    table?: string,
-    startDate?: Date,
-    endDate?: Date,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 50,
+    usuarioId?: number,
+    accion?: string,
+    tabla?: string,
+    fechaInicio?: Date,
+    fechaFin?: Date,
   ): Promise<{ datos: RegistroAuditoria[]; total: number; pagina: number; limite: number }> {
-    const query = this.auditoriaRepository
-      .createQueryBuilder('audit')
-      .leftJoinAndSelect('audit.usuario', 'user');
+    const consulta = this.repositorioAuditoria
+      .createQueryBuilder('auditoria')
+      .leftJoinAndSelect('auditoria.usuario', 'usuario');
 
-    if (userId) {
-      query.andWhere('audit.usuarioId = :userId', { userId });
+    if (usuarioId) {
+      consulta.andWhere('auditoria.usuarioId = :usuarioId', { usuarioId });
     }
 
-    if (action) {
-      query.andWhere('audit.accion = :action', { action });
+    if (accion) {
+      consulta.andWhere('auditoria.accion = :accion', { accion });
     }
 
-    if (table) {
-      query.andWhere('audit.tabla = :table', { table });
+    if (tabla) {
+      consulta.andWhere('auditoria.tabla = :tabla', { tabla });
     }
 
-    if (startDate && endDate) {
-      query.andWhere('audit.fecha BETWEEN :startDate AND :endDate', { startDate, endDate });
+    if (fechaInicio && fechaFin) {
+      consulta.andWhere('auditoria.fecha BETWEEN :fechaInicio AND :fechaFin', { fechaInicio, fechaFin });
     }
 
-    const [data, total] = await query
-      .orderBy('audit.fecha', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('auditoria.fecha', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findByUser(userId: number, limit = 50): Promise<RegistroAuditoria[]> {
-    return this.auditoriaRepository.find({
-      where: { usuarioId: userId },
+  async buscarPorUsuario(usuarioId: number, limite = 50): Promise<RegistroAuditoria[]> {
+    return this.repositorioAuditoria.find({
+      where: { usuarioId },
       order: { fecha: 'DESC' },
-      take: limit,
+      take: limite,
     });
   }
 
-  async findByTable(tableName: string, limit = 50): Promise<RegistroAuditoria[]> {
-    return this.auditoriaRepository.find({
-      where: { tabla: tableName },
+  async buscarPorTabla(nombreTabla: string, limite = 50): Promise<RegistroAuditoria[]> {
+    return this.repositorioAuditoria.find({
+      where: { tabla: nombreTabla },
       order: { fecha: 'DESC' },
-      take: limit,
+      take: limite,
     });
   }
 
-  async findByRecord(tableName: string, recordId: number): Promise<RegistroAuditoria[]> {
-    return this.auditoriaRepository.find({
-      where: { tabla: tableName, registroId: recordId },
+  async buscarPorRegistro(nombreTabla: string, registroId: number): Promise<RegistroAuditoria[]> {
+    return this.repositorioAuditoria.find({
+      where: { tabla: nombreTabla, registroId },
       order: { fecha: 'DESC' },
     });
   }
 
-  async getRecentActions(limit = 20): Promise<RegistroAuditoria[]> {
-    return this.auditoriaRepository.find({
+  async obtenerAccionesRecientes(limite = 20): Promise<RegistroAuditoria[]> {
+    return this.repositorioAuditoria.find({
       relations: ['usuario'],
       order: { fecha: 'DESC' },
-      take: limit,
+      take: limite,
     });
   }
 
-  async getActionStats(startDate?: Date, endDate?: Date): Promise<{ action: string; count: number }[]> {
-    const query = this.auditoriaRepository
-      .createQueryBuilder('audit')
-      .select('audit.accion', 'action')
+  async obtenerEstadisticasAcciones(fechaInicio?: Date, fechaFin?: Date): Promise<{ action: string; count: number }[]> {
+    const consulta = this.repositorioAuditoria
+      .createQueryBuilder('auditoria')
+      .select('auditoria.accion', 'action')
       .addSelect('COUNT(*)', 'count')
-      .groupBy('audit.accion');
+      .groupBy('auditoria.accion');
 
-    if (startDate && endDate) {
-      query.where('audit.fecha BETWEEN :startDate AND :endDate', { startDate, endDate });
+    if (fechaInicio && fechaFin) {
+      consulta.where('auditoria.fecha BETWEEN :fechaInicio AND :fechaFin', { fechaInicio, fechaFin });
     }
 
-    return query.getRawMany();
+    return consulta.getRawMany();
   }
 }

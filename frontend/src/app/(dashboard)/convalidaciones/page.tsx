@@ -8,22 +8,22 @@ import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaT
 import { Insignia } from '@/components/ui/insignia';
 import { Plus, Search, Edit2, Trash2, Check, X } from 'lucide-react';
 
-const convalidationsData = [
+const datosConvalidaciones = [
   { id: 1, estudiante: 'Juan Perez', materiaOrigen: 'Cálculo I', materiaConvalidada: 'Matemáticas I', institucion: 'UMSA', fecha: '2024-02-15', estado: 'aprobado' },
   { id: 2, estudiante: 'Maria Lopez', materiaOrigen: 'Física Básica', materiaConvalidada: 'Física I', institucion: 'UCB', fecha: '2024-03-01', estado: 'pendiente' },
   { id: 3, estudiante: 'Carlos Mendez', materiaOrigen: 'Algebra Lineal', materiaConvalidada: 'Matemáticas II', institucion: 'UPSA', fecha: '2024-02-20', estado: 'rechazado' },
 ];
 
-const estadoColors: Record<string, 'exito' | 'advertencia' | 'error'> = {
+const coloresEstado: Record<string, 'exito' | 'advertencia' | 'error'> = {
   aprobado: 'exito',
   pendiente: 'advertencia',
   rechazado: 'error',
 };
 
-export default function ConvalidationsPage() {
+export default function PaginaConvalidaciones() {
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Convalidaciones' }]} />
+      <Migas elementos={[{ etiqueta: 'Convalidaciones' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Convalidaciones</h1>
@@ -33,7 +33,7 @@ export default function ConvalidationsPage() {
         </Boton>
       </div>
 
-      <Tarjeta variant="bordered">
+      <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
             <TituloTarjeta>Lista de Convalidaciones</TituloTarjeta>
@@ -57,27 +57,27 @@ export default function ConvalidationsPage() {
               </FilaTabla>
             </EncabezadoTabla>
             <CuerpoTabla>
-              {convalidationsData.map((conv) => (
-                <FilaTabla key={conv.id}>
-                  <CeldaTabla className="font-medium">{conv.estudiante}</CeldaTabla>
-                  <CeldaTabla>{conv.materiaOrigen}</CeldaTabla>
-                  <CeldaTabla>{conv.materiaConvalidada}</CeldaTabla>
-                  <CeldaTabla>{conv.institucion}</CeldaTabla>
-                  <CeldaTabla>{conv.fecha}</CeldaTabla>
+              {datosConvalidaciones.map((convalidacion) => (
+                <FilaTabla key={convalidacion.id}>
+                  <CeldaTabla className="font-medium">{convalidacion.estudiante}</CeldaTabla>
+                  <CeldaTabla>{convalidacion.materiaOrigen}</CeldaTabla>
+                  <CeldaTabla>{convalidacion.materiaConvalidada}</CeldaTabla>
+                  <CeldaTabla>{convalidacion.institucion}</CeldaTabla>
+                  <CeldaTabla>{convalidacion.fecha}</CeldaTabla>
                   <CeldaTabla>
-                    <Insignia variant={estadoColors[conv.estado]} className="capitalize">
-                      {conv.estado}
+                    <Insignia variante={coloresEstado[convalidacion.estado]} className="capitalize">
+                      {convalidacion.estado}
                     </Insignia>
                   </CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Boton variant="ghost" size="icon" title="Aprobar">
+                      <Boton variante="fantasma" tamano="icono" title="Aprobar">
                         <Check className="w-4 h-4 text-green-500" />
                       </Boton>
-                      <Boton variant="ghost" size="icon" title="Rechazar">
+                      <Boton variante="fantasma" tamano="icono" title="Rechazar">
                         <X className="w-4 h-4 text-red-500" />
                       </Boton>
-                      <Boton variant="ghost" size="icon">
+                      <Boton variante="fantasma" tamano="icono">
                         <Edit2 className="w-4 h-4" />
                       </Boton>
                     </div>

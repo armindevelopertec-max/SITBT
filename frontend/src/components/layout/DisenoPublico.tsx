@@ -9,17 +9,17 @@ import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 export default function DisenoPublico({ children }: { children: React.ReactNode }) {
   const { institucion } = usarInstitucion();
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
 
   const logoUrl = institucion?.logoUrl;
   const nombreInstitucion = institucion?.nombreCorto || 'ITBT';
 
-  const navItems = [
-    { href: '/', label: 'Inicio' },
-    { href: '/carreras', label: 'Carreras' },
-    { href: '/admision', label: 'Admisión' },
-    { href: '/instituto', label: 'Instituto' },
-    { href: '/contacto', label: 'Contacto' },
+  const elementosNav = [
+    { href: '/', etiqueta: 'Inicio' },
+    { href: '/carreras', etiqueta: 'Carreras' },
+    { href: '/admision', etiqueta: 'Admisión' },
+    { href: '/instituto', etiqueta: 'Instituto' },
+    { href: '/contacto', etiqueta: 'Contacto' },
   ];
 
   return (
@@ -47,17 +47,17 @@ export default function DisenoPublico({ children }: { children: React.ReactNode 
             </Link>
 
             <div className="hidden md:flex items-center gap-8">
-              {navItems.map((item) => (
+              {elementosNav.map((elemento) => (
                 <Link
-                  key={item.href}
-                  href={item.href}
+                  key={elemento.href}
+                  href={elemento.href}
                   className={`text-sm font-medium transition-colors ${
-                    pathname === item.href
+                    pathname === elemento.href
                       ? 'text-primary-400'
                       : 'text-gray-400 hover:text-primary-300'
                   }`}
                 >
-                  {item.label}
+                  {elemento.etiqueta}
                 </Link>
               ))}
             </div>
@@ -78,40 +78,40 @@ export default function DisenoPublico({ children }: { children: React.ReactNode 
             </div>
 
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={() => setMenuMovilAbierto(!menuMovilAbierto)}
               className="md:hidden p-2 -mr-2 text-gray-400 hover:text-primary-300 rounded-lg"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {menuMovilAbierto ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
 
-          {mobileMenuOpen && (
+          {menuMovilAbierto && (
             <div className="md:hidden py-4 border-t border-dark-600">
               <div className="flex flex-col gap-1">
-                {navItems.map((item) => (
+                {elementosNav.map((elemento) => (
                   <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
+                    key={elemento.href}
+                    href={elemento.href}
+                    onClick={() => setMenuMovilAbierto(false)}
                     className={`px-4 py-3 text-base font-medium rounded-lg ${
-                      pathname === item.href
+                      pathname === elemento.href
                         ? 'bg-dark-700 text-primary-400'
                         : 'text-gray-400 hover:bg-dark-700 hover:text-primary-300'
                     }`}
                   >
-                    {item.label}
+                    {elemento.etiqueta}
                   </Link>
                 ))}
                 <Link
                   href="/acceder"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => setMenuMovilAbierto(false)}
                   className="px-4 py-3 border border-gray-600 text-gray-300 text-base font-medium rounded-lg text-center hover:bg-dark-700"
                 >
                   Acceder
                 </Link>
                 <Link
                   href="/admision/pre-registro"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => setMenuMovilAbierto(false)}
                   className="mt-2 px-4 py-3 bg-primary-500 text-dark-900 text-base font-semibold rounded-lg text-center"
                 >
                   Pre-registro

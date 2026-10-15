@@ -5,109 +5,109 @@ import { Image, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utilidades';
 import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
 
-interface ImageUploadProps {
-  label?: string;
+interface PropsCargarImagen {
+  etiqueta?: string;
   value?: string;
   onChange: (url: string) => void;
   error?: string;
-  helperText?: string;
+  textoAyuda?: string;
   className?: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
-const obtenerUrlSubida = () => API_URL ? `${API_URL}/almacenamiento/subir` : `${API_BASE}/api/almacenamiento/subir`;
+const URL_API = process.env.NEXT_PUBLIC_API_URL;
+const BASE_API = process.env.NEXT_PUBLIC_API_BASE || '';
+const obtenerUrlSubida = () => URL_API ? `${URL_API}/almacenamiento/subir` : `${BASE_API}/api/almacenamiento/subir`;
 
 export function CargarImagen({
-  label,
+  etiqueta,
   value,
   onChange,
   error,
-  helperText,
+  textoAyuda,
   className,
-}: ImageUploadProps) {
-  const [uploading, setUploading] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+}: PropsCargarImagen) {
+  const [subiendo, setSubiendo] = useState(false);
+  const [arrastrando, setArrastrando] = useState(false);
+  const refEntrada = useRef<HTMLInputElement>(null);
   const { tokenAcceso } = usarAlmacenAutenticacion();
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    await uploadFile(file);
+  const alCambiarArchivo = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const archivo = e.target.files?.[0];
+    if (!archivo) return;
+    await subirArchivo(archivo);
   };
 
-  const uploadFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
+  const subirArchivo = async (archivo: File) => {
+    if (!archivo.type.startsWith('image/')) {
       alert('Por favor selecciona una imagen');
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (archivo.size > 5 * 1024 * 1024) {
       alert('La imagen debe ser menor a 5MB');
       return;
     }
 
-    setUploading(true);
+    setSubiendo(true);
     try {
-      const formData = new FormData();
-      formData.append('archivo', file);
+      const datosFormulario = new FormData();
+      datosFormulario.append('archivo', archivo);
 
-      const tokenValue = tokenAcceso || '';
-      const response = await fetch(`${obtenerUrlSubida()}?carpeta=logos`, {
+      const valorToken = tokenAcceso || '';
+      const respuesta = await fetch(`${obtenerUrlSubida()}?carpeta=logos`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${tokenValue}`,
+          'Authorization': `Bearer ${valorToken}`,
         },
-        body: formData,
+        body: datosFormulario,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.mensaje || 'Error al subir');
+      if (!respuesta.ok) {
+        const datosError = await respuesta.json();
+        throw new Error(datosError.mensaje || 'Error al subir');
       }
 
-      const data = await response.json();
-      onChange(data.url);
-    } catch (err: any) {
-      console.error('Error al subir el archivo:', err);
-      alert(err.message || 'Error al subir la imagen');
+      const datos = await respuesta.json();
+      onChange(datos.url);
+    } catch (errorSubida: any) {
+      console.error('Error al subir el archivo:', errorSubida);
+      alert(errorSubida.message || 'Error al subir la imagen');
     } finally {
-      setUploading(false);
+      setSubiendo(false);
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const alSoltar = (e: React.DragEvent) => {
     e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      uploadFile(file);
+    setArrastrando(false);
+    const archivo = e.dataTransfer.files?.[0];
+    if (archivo) {
+      subirArchivo(archivo);
     }
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const alArrastrarSobre = (e: React.DragEvent) => {
     e.preventDefault();
-    setDragOver(true);
+    setArrastrando(true);
   };
 
-  const handleDragLeave = () => {
-    setDragOver(false);
+  const alSalirArrastre = () => {
+    setArrastrando(false);
   };
 
   return (
     <div className={cn('w-full', className)}>
-      {label && (
+      {etiqueta && (
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label}
+          {etiqueta}
         </label>
       )}
 
       <input
-        ref={inputRef}
+        ref={refEntrada}
         type="file"
         accept="image/*"
-        onChange={handleFileChange}
+        onChange={alCambiarArchivo}
         className="hidden"
       />
 
@@ -132,12 +132,12 @@ export function CargarImagen({
           <div className="flex gap-2 mt-3">
             <button
               type="button"
-              onClick={() => inputRef.current?.click()}
+              onClick={() => refEntrada.current?.click()}
               className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-              disabled={uploading}
+              disabled={subiendo}
             >
               <Upload className="w-4 h-4" />
-              {uploading ? 'Subiendo...' : 'Cambiar'}
+              {subiendo ? 'Subiendo...' : 'Cambiar'}
             </button>
             <button
               type="button"
@@ -151,20 +151,20 @@ export function CargarImagen({
         </div>
       ) : (
         <div
-          onClick={() => inputRef.current?.click()}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
+          onClick={() => refEntrada.current?.click()}
+          onDrop={alSoltar}
+          onDragOver={alArrastrarSobre}
+          onDragLeave={alSalirArrastre}
           className={cn(
             'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
-            dragOver
+            arrastrando
               ? 'border-primary-500 bg-primary-50'
               : 'border-gray-300 hover:border-gray-400',
-            uploading && 'opacity-50 pointer-events-none'
+            subiendo && 'opacity-50 pointer-events-none'
           )}
         >
           <div className="flex flex-col items-center gap-3">
-            {uploading ? (
+            {subiendo ? (
               <>
                 <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
                   <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary-600 border-t-transparent"></div>
@@ -190,8 +190,8 @@ export function CargarImagen({
         </div>
       )}
 
-      {helperText && !error && (
-        <p className="mt-1 text-sm text-gray-500">{helperText}</p>
+      {textoAyuda && !error && (
+        <p className="mt-1 text-sm text-gray-500">{textoAyuda}</p>
       )}
       {error && (
         <p className="mt-1 text-sm text-red-600">{error}</p>

@@ -22,64 +22,64 @@ import { EstadoConvalidacion, TipoConvalidacion } from '../../entities/convalida
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorConvalidaciones {
-  constructor(private readonly service: ServicioConvalidaciones) {}
+  constructor(private readonly servicio: ServicioConvalidaciones) {}
 
   @Post()
-  create(@Body() createDto: CrearConvalidacionDto) {
-    return this.service.create(createDto);
+  crear(@Body() dtoCreacion: CrearConvalidacionDto) {
+    return this.servicio.crear(dtoCreacion);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
-    @Query('estado') status?: EstadoConvalidacion,
-    @Query('tipo') type?: TipoConvalidacion,
-    @Query('estudianteId') studentId?: number,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
+    @Query('estado') estado?: EstadoConvalidacion,
+    @Query('tipo') tipo?: TipoConvalidacion,
+    @Query('estudianteId') estudianteId?: number,
   ) {
-    return this.service.findAll(+page, +limit, status, type, studentId ? +studentId : undefined);
+    return this.servicio.obtenerTodos(+pagina, +limite, estado, tipo, estudianteId ? +estudianteId : undefined);
   }
 
   @Get('pendientes')
-  getPending() {
-    return this.service.getPending();
+  obtenerPendientes() {
+    return this.servicio.obtenerPendientes();
   }
 
   @Get('estudiante/:estudianteId')
-  findByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
-    return this.service.findByStudent(estudianteId);
+  buscarPorEstudiante(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
+    return this.servicio.buscarPorEstudiante(estudianteId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.service.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: ActualizarConvalidacionDto) {
-    return this.service.update(id, updateDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() dtoActualizacion: ActualizarConvalidacionDto) {
+    return this.servicio.actualizar(id, dtoActualizacion);
   }
 
   @Patch(':id/aprobar')
-  approve(
+  aprobar(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { aprobadoPor: number; numeroResolucion?: string; fechaResolucion?: string },
+    @Body() cuerpo: { aprobadoPor: number; numeroResolucion?: string; fechaResolucion?: string },
   ) {
-    return this.service.approve(
+    return this.servicio.aprobar(
       id,
-      body.aprobadoPor,
-      body.numeroResolucion,
-      body.fechaResolucion ? new Date(body.fechaResolucion) : undefined,
+      cuerpo.aprobadoPor,
+      cuerpo.numeroResolucion,
+      cuerpo.fechaResolucion ? new Date(cuerpo.fechaResolucion) : undefined,
     );
   }
 
   @Patch(':id/rechazar')
-  reject(@Param('id', ParseIntPipe) id: number) {
-    return this.service.reject(id);
+  rechazar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.rechazar(id);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.service.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.eliminar(id);
   }
 }

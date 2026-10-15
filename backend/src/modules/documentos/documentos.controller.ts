@@ -21,25 +21,25 @@ import { TipoDocumento, EstadoDocumento } from '../../entities/emitted-document.
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorDocumentos {
-  constructor(private readonly service: ServicioDocumentos) {}
+  constructor(private readonly servicio: ServicioDocumentos) {}
 
   @Post()
-  create(@Body() createDto: CrearDocumentoEmitidoDto) {
-    return this.service.create(createDto);
+  crear(@Body() crearDto: CrearDocumentoEmitidoDto) {
+    return this.servicio.crear(crearDto);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
     @Query('tipo') tipo?: TipoDocumento,
     @Query('gestion') gestion?: string,
     @Query('estudianteId') estudianteId?: number,
     @Query('estado') estado?: EstadoDocumento,
   ) {
-    return this.service.findAll(
-      +page,
-      +limit,
+    return this.servicio.obtenerTodos(
+      +pagina,
+      +limite,
       tipo,
       gestion,
       estudianteId ? +estudianteId : undefined,
@@ -48,69 +48,69 @@ export class ControladorDocumentos {
   }
 
   @Get('estadisticas')
-  getStatistics(@Query('gestion') gestion?: string) {
-    return this.service.getDocumentStatistics(gestion);
+  obtenerEstadisticas(@Query('gestion') gestion?: string) {
+    return this.servicio.obtenerEstadisticasDocumentos(gestion);
   }
 
   @Get('estudiante/:estudianteId')
-  findByStudent(
+  buscarPorEstudiante(
     @Param('estudianteId') estudianteId: string,
     @Query('tipo') tipo?: TipoDocumento,
   ) {
-    return this.service.findByStudent(+estudianteId, tipo);
+    return this.servicio.buscarPorEstudiante(+estudianteId, tipo);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.service.findOne(id);
+  obtenerUno(@Param('id') id: string) {
+    return this.servicio.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDto: ActualizarDocumentoEmitidoDto) {
-    return this.service.update(id, updateDto);
+  actualizar(@Param('id') id: string, @Body() actualizarDto: ActualizarDocumentoEmitidoDto) {
+    return this.servicio.actualizar(id, actualizarDto);
   }
 
   @Post(':id/imprimir')
   @HttpCode(200)
-  markAsPrinted(@Param('id') id: string, @Body('impresoPor') impresoPor: number) {
-    return this.service.markAsPrinted(id, impresoPor);
+  marcarComoImpreso(@Param('id') id: string, @Body('impresoPor') impresoPor: number) {
+    return this.servicio.marcarComoImpreso(id, impresoPor);
   }
 
   @Post(':id/entregar')
   @HttpCode(200)
-  markAsDelivered(@Param('id') id: string, @Body('entregadoA') entregadoA: string) {
-    return this.service.markAsDelivered(id, entregadoA);
+  marcarComoEntregado(@Param('id') id: string, @Body('entregadoA') entregadoA: string) {
+    return this.servicio.marcarComoEntregado(id, entregadoA);
   }
 
   @Post(':id/anular')
   @HttpCode(200)
-  annul(@Param('id') id: string, @Body('observaciones') observaciones?: string) {
-    return this.service.annul(id, observaciones);
+  anular(@Param('id') id: string, @Body('observaciones') observaciones?: string) {
+    return this.servicio.anular(id, observaciones);
   }
 
   @Post('generar-boleta')
   @HttpCode(200)
-  generateBoleta(
+  generarBoleta(
     @Body('estudianteId') estudianteId: number,
     @Body('gestion') gestion: string,
     @Body('gestionId') gestionId?: number,
   ) {
-    return this.service.generateBoletaInscripcion(estudianteId, gestion, gestionId);
+    return this.servicio.generarBoletaInscripcion(estudianteId, gestion, gestionId);
   }
 
   @Post('generar-recibo')
   @HttpCode(200)
-  generateRecibo(
+  generarRecibo(
     @Body('estudianteId') estudianteId: number,
     @Body('gestion') gestion: string,
-    @Body('paymentId') paymentId: number,
+    @Body('paymentId') pagoId: number,
     @Body('gestionId') gestionId?: number,
   ) {
-    return this.service.generateReciboPago(estudianteId, gestion, paymentId, gestionId);
+    return this.servicio.generarReciboPago(estudianteId, gestion, pagoId, gestionId);
   }
 
   @Post(':id')
-  remove(@Param('id') id: string) {
-    return this.service.remove(id);
+  eliminar(@Param('id') id: string) {
+    return this.servicio.eliminar(id);
   }
 }

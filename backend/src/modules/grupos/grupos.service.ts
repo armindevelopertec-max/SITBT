@@ -14,132 +14,132 @@ import { Turno } from '../../entities/turno.entity';
 export class ServicioGrupos {
   constructor(
     @InjectRepository(Grupo)
-    private grupoRepository: Repository<Grupo>,
+    private repositorioGrupo: Repository<Grupo>,
     @InjectRepository(GrupoEstudiante)
-    private grupoEstudianteRepository: Repository<GrupoEstudiante>,
+    private repositorioGrupoEstudiante: Repository<GrupoEstudiante>,
     @InjectRepository(PlanEstudio)
-    private planEstudioRepository: Repository<PlanEstudio>,
+    private repositorioPlanEstudio: Repository<PlanEstudio>,
     @InjectRepository(MateriaPlan)
-    private materiaPlanRepository: Repository<MateriaPlan>,
+    private repositorioMateriaPlan: Repository<MateriaPlan>,
     @InjectRepository(Turno)
-    private shiftRepository: Repository<Turno>,
+    private repositorioTurno: Repository<Turno>,
   ) {}
 
-  async create(crearGrupoDto: CrearGrupoDto): Promise<Grupo> {
-    const group = this.grupoRepository.create(crearGrupoDto);
-    return this.grupoRepository.save(group);
+  async crear(crearGrupoDto: CrearGrupoDto): Promise<Grupo> {
+    const grupo = this.repositorioGrupo.create(crearGrupoDto);
+    return this.repositorioGrupo.save(grupo);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
     gestion?: string,
-    careerId?: number,
+    carreraId?: number,
     semestre?: number,
   ): Promise<{ datos: Grupo[]; total: number; pagina: number; limite: number }> {
-    const query = this.grupoRepository
-      .createQueryBuilder('group')
-      .leftJoinAndSelect('group.carrera', 'career')
-      .leftJoinAndSelect('group.plan_estudio', 'study_plan')
-      .leftJoinAndSelect('group.turno', 'shift')
-      .leftJoinAndSelect('group.materia', 'materia');
+    const consulta = this.repositorioGrupo
+      .createQueryBuilder('grupo')
+      .leftJoinAndSelect('grupo.carrera', 'carrera')
+      .leftJoinAndSelect('grupo.plan_estudio', 'plan_estudio')
+      .leftJoinAndSelect('grupo.turno', 'turno')
+      .leftJoinAndSelect('grupo.materia', 'materia');
 
     if (gestion) {
-      query.andWhere('group.gestion = :gestion', { gestion });
+      consulta.andWhere('grupo.gestion = :gestion', { gestion });
     }
 
-    if (careerId) {
-      query.andWhere('group.carreraId = :careerId', { careerId });
+    if (carreraId) {
+      consulta.andWhere('grupo.carreraId = :carreraId', { carreraId });
     }
 
     if (semestre) {
-      query.andWhere('group.semestre = :semestre', { semestre: semestre });
+      consulta.andWhere('grupo.semestre = :semestre', { semestre });
     }
 
-    const [data, total] = await query
-      .orderBy('group.gestion', 'DESC')
-      .addOrderBy('group.periodo', 'ASC')
-      .addOrderBy('group.semestre', 'ASC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('grupo.gestion', 'DESC')
+      .addOrderBy('grupo.periodo', 'ASC')
+      .addOrderBy('grupo.semestre', 'ASC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Grupo> {
-    const group = await this.grupoRepository.findOne({
+  async obtenerUno(id: number): Promise<Grupo> {
+    const grupo = await this.repositorioGrupo.findOne({
       where: { id },
       relations: ['carrera', 'plan_estudio', 'turno', 'materia'],
     });
-    if (!group) {
+    if (!grupo) {
       throw new NotFoundException(`Grupo con ID ${id} no encontrado`);
     }
-    return group;
+    return grupo;
   }
 
-  async update(id: number, actualizarGrupoDto: ActualizarGrupoDto): Promise<Grupo> {
-    const group = await this.findOne(id);
-    Object.assign(group, actualizarGrupoDto);
-    return this.grupoRepository.save(group);
+  async actualizar(id: number, actualizarGrupoDto: ActualizarGrupoDto): Promise<Grupo> {
+    const grupo = await this.obtenerUno(id);
+    Object.assign(grupo, actualizarGrupoDto);
+    return this.repositorioGrupo.save(grupo);
   }
 
-  async remove(id: number): Promise<void> {
-    const group = await this.findOne(id);
-    await this.grupoRepository.remove(group);
+  async eliminar(id: number): Promise<void> {
+    const grupo = await this.obtenerUno(id);
+    await this.repositorioGrupo.remove(grupo);
   }
 
-  async addStudent(groupId: number, studentId: number): Promise<GrupoEstudiante> {
-    const groupStudent = this.grupoEstudianteRepository.create({
-      grupoId: groupId,
-      estudianteId: studentId,
+  async agregarEstudiante(grupoId: number, estudianteId: number): Promise<GrupoEstudiante> {
+    const grupoEstudiante = this.repositorioGrupoEstudiante.create({
+      grupoId,
+      estudianteId,
     });
-    return this.grupoEstudianteRepository.save(groupStudent);
+    return this.repositorioGrupoEstudiante.save(grupoEstudiante);
   }
 
-  async removeStudent(groupId: number, studentId: number): Promise<void> {
-    const groupStudent = await this.grupoEstudianteRepository.findOne({
-      where: { grupoId: groupId, estudianteId: studentId },
+  async eliminarEstudiante(grupoId: number, estudianteId: number): Promise<void> {
+    const grupoEstudiante = await this.repositorioGrupoEstudiante.findOne({
+      where: { grupoId, estudianteId },
     });
-    if (groupStudent) {
-      await this.grupoEstudianteRepository.remove(groupStudent);
+    if (grupoEstudiante) {
+      await this.repositorioGrupoEstudiante.remove(grupoEstudiante);
     }
   }
 
-  async getStudents(groupId: number): Promise<GrupoEstudiante[]> {
-    return this.grupoEstudianteRepository.find({
-      where: { grupoId: groupId },
+  async obtenerEstudiantes(grupoId: number): Promise<GrupoEstudiante[]> {
+    return this.repositorioGrupoEstudiante.find({
+      where: { grupoId },
       relations: ['estudiante', 'estudiante.persona'],
     });
   }
 
-  async findByCareerAndShift(
-    careerId: number,
+  async buscarPorCarreraYTurno(
+    carreraId: number,
     gestion: string,
     semestre: number,
-    shiftId: number,
+    turnoId: number,
     periodo?: string,
   ): Promise<Grupo[]> {
-    return this.grupoRepository.find({
-      where: { carreraId: careerId, gestion, semestre, turnoId: shiftId, periodo },
+    return this.repositorioGrupo.find({
+      where: { carreraId, gestion, semestre, turnoId, periodo },
       relations: ['turno'],
     });
   }
 
-  async getGroupStats(groupId: number): Promise<{ total: number; capacity: number }> {
-    const group = await this.findOne(groupId);
-    const count = await this.grupoEstudianteRepository.count({
-      where: { grupoId: groupId },
+  async obtenerEstadisticasGrupo(grupoId: number): Promise<{ total: number; capacity: number }> {
+    const grupo = await this.obtenerUno(grupoId);
+    const conteo = await this.repositorioGrupoEstudiante.count({
+      where: { grupoId },
     });
-    return { total: count, capacity: group.capacidad };
+    return { total: conteo, capacity: grupo.capacidad };
   }
 
-  async generateGroups(dto: GenerarGruposDto): Promise<{ creados: number; mensaje: string }> {
+  async generarGrupos(dto: GenerarGruposDto): Promise<{ creados: number; mensaje: string }> {
     try {
       const { gestion, periodo, turnoIds, paralelos, planEstudioId } = dto;
       const capacidad = parseInt(dto.capacidad || '30');
 
-      const plan = await this.planEstudioRepository.findOne({
+      const plan = await this.repositorioPlanEstudio.findOne({
         where: { id: planEstudioId },
         relations: ['carrera'],
       });
@@ -148,10 +148,10 @@ export class ServicioGrupos {
         return { creados: 0, mensaje: 'No se encontró el plan de estudio' };
       }
 
-      const materias = await this.materiaPlanRepository
+      const materias = await this.repositorioMateriaPlan
         .createQueryBuilder('mp')
         .leftJoinAndSelect('mp.materia', 'materia')
-        .where('mp.planEstudioId = :studyPlanId', { studyPlanId: planEstudioId })
+        .where('mp.planEstudioId = :planEstudioId', { planEstudioId })
         .orderBy('mp.semestre', 'ASC')
         .addOrderBy('materia.codigo', 'ASC')
         .getMany();
@@ -163,41 +163,41 @@ export class ServicioGrupos {
       const gruposCreados: Grupo[] = [];
 
       for (const materia of materias) {
-        for (const shiftId of turnoIds) {
+        for (const turnoId of turnoIds) {
           for (const paralelo of paralelos) {
-            const existe = await this.grupoRepository.findOne({
+            const existe = await this.repositorioGrupo.findOne({
               where: {
                 planEstudioId: materia.planEstudioId,
                 materiaId: materia.materiaId,
-                turnoId: shiftId,
-                paralelo: paralelo,
+                turnoId,
+                paralelo,
                 gestion,
                 periodo,
               },
             });
 
             if (!existe) {
-              const shift = await this.shiftRepository.findOne({ where: { id: shiftId } });
-              const materiaCode = materia.materia?.codigo || materia.materiaId.toString();
-              const carreraCode = plan.carrera?.codigo || 'XXX';
-              const shiftCode = shift?.codigo || 'X';
+              const turno = await this.repositorioTurno.findOne({ where: { id: turnoId } });
+              const codigoMateria = materia.materia?.codigo || materia.materiaId.toString();
+              const codigoCarrera = plan.carrera?.codigo || 'XXX';
+              const codigoTurno = turno?.codigo || 'X';
 
-              const code = `${materiaCode}-${carreraCode}-${shiftCode}-${paralelo}-${gestion}-${periodo}`;
+              const codigo = `${codigoMateria}-${codigoCarrera}-${codigoTurno}-${paralelo}-${gestion}-${periodo}`;
 
-              const grupo = this.grupoRepository.create({
-                codigo: code,
+              const grupo = this.repositorioGrupo.create({
+                codigo,
                 carreraId: plan.carreraId,
                 planEstudioId: materia.planEstudioId,
                 materiaId: materia.materiaId,
                 semestre: materia.semestre,
-                turnoId: shiftId,
-                paralelo: paralelo,
+                turnoId,
+                paralelo,
                 gestion,
                 periodo,
-                capacidad: capacidad,
+                capacidad,
               } as any);
-              const saved = await this.grupoRepository.save(grupo as any);
-              gruposCreados.push(saved);
+              const guardado = await this.repositorioGrupo.save(grupo as any);
+              gruposCreados.push(guardado);
             }
           }
         }

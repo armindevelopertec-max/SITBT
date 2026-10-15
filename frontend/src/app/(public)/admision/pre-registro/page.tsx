@@ -2,22 +2,22 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { publicApi } from '@/lib/api';
+import { apiPublica } from '@/lib/api';
 import { Carrera, CrearAdmisionDto } from '@/types';
 import { GraduationCap, AlertCircle, CheckCircle, Loader2, ArrowRight, FileText, User, BookOpen, Phone, Mail } from 'lucide-react';
 import Link from 'next/link';
 
-function PreRegistroForm() {
+function FormularioPreRegistro() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const carreraPreseleccionada = searchParams.get('carrera');
+  const parametrosBusqueda = useSearchParams();
+  const carreraPreseleccionada = parametrosBusqueda.get('carrera');
 
-  const [careers, setCareers] = useState<Carrera[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [carreras, setCarreras] = useState<Carrera[]>([]);
+  const [cargando, setCargando] = useState(false);
+  const [exito, setExito] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [form, setForm] = useState<CrearAdmisionDto>({
+  const [formulario, setFormulario] = useState<CrearAdmisionDto>({
     nombre: '',
     apellidoPaterno: '',
     apellidoMaterno: '',
@@ -39,45 +39,45 @@ function PreRegistroForm() {
   });
 
   useEffect(() => {
-    const fetchCareers = async () => {
+    const obtenerCarreras = async () => {
       try {
-        const response = await publicApi.get<{ datos: Carrera[] }>('/carreras', {
+        const respuesta = await apiPublica.get<{ datos: Carrera[] }>('/carreras', {
           params: { estado: 'activo' },
         });
-        setCareers(response.data.datos);
+        setCarreras(respuesta.data.datos);
       } catch (error) {
         console.error('Error al obtener carreras:', error);
       }
     };
-    fetchCareers();
+    obtenerCarreras();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const cambiarCampo = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    const upperFields = ['nombre', 'apellidoPaterno', 'apellidoMaterno', 'ci', 'direccion', 'lugarNacimientoOtro', 'nacionalidadOtra', 'nombreTutor', 'ciTutor'];
-    const isUpper = upperFields.includes(name);
-    setForm((prev) => ({
-      ...prev,
-      [name]: name === 'carreraId' ? (value ? parseInt(value) : undefined) : (isUpper ? value.toUpperCase() : value),
+    const camposMayusculas = ['nombre', 'apellidoPaterno', 'apellidoMaterno', 'ci', 'direccion', 'lugarNacimientoOtro', 'nacionalidadOtra', 'nombreTutor', 'ciTutor'];
+    const esMayuscula = camposMayusculas.includes(name);
+    setFormulario((anterior) => ({
+      ...anterior,
+      [name]: name === 'carreraId' ? (value ? parseInt(value) : undefined) : (esMayuscula ? value.toUpperCase() : value),
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const enviarFormulario = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setCargando(true);
     setError(null);
 
     try {
-      await publicApi.post('/admision', form);
-      setSuccess(true);
+      await apiPublica.post('/admision', formulario);
+      setExito(true);
     } catch (err: any) {
-      setError(err.response?.data?.mensaje || 'Error al enviar el pre-registro');
+      setError(err.respuesta?.data?.mensaje || 'Error al enviar el pre-registro');
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  if (success) {
+  if (exito) {
     return (
       <div className="bg-dark-900 min-h-screen flex items-center justify-center py-16">
         <div className="max-w-2xl mx-auto px-4 text-center">
@@ -141,7 +141,7 @@ function PreRegistroForm() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={enviarFormulario} className="space-y-8">
           {/* Datos Personales */}
           <div className="bg-dark-700 rounded-2xl p-6 sm:p-8">
             <div className="flex items-center gap-3 mb-4 sm:mb-6">
@@ -159,8 +159,8 @@ function PreRegistroForm() {
                 <input
                   type="text"
                   name="nombre"
-                  value={form.nombre}
-                  onChange={handleChange}
+                  value={formulario.nombre}
+                  onChange={cambiarCampo}
                   required
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   placeholder="Juan Carlos"
@@ -174,8 +174,8 @@ function PreRegistroForm() {
                 <input
                   type="text"
                   name="apellidoPaterno"
-                  value={form.apellidoPaterno || ''}
-                  onChange={handleChange}
+                  value={formulario.apellidoPaterno || ''}
+                  onChange={cambiarCampo}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   placeholder="Pérez"
                 />
@@ -188,8 +188,8 @@ function PreRegistroForm() {
                 <input
                   type="text"
                   name="apellidoMaterno"
-                  value={form.apellidoMaterno || ''}
-                  onChange={handleChange}
+                  value={formulario.apellidoMaterno || ''}
+                  onChange={cambiarCampo}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   placeholder="López"
                 />
@@ -202,8 +202,8 @@ function PreRegistroForm() {
                 <input
                   type="text"
                   name="ci"
-                  value={form.ci}
-                  onChange={handleChange}
+                  value={formulario.ci}
+                  onChange={cambiarCampo}
                   required
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   placeholder="12345678"
@@ -217,8 +217,8 @@ function PreRegistroForm() {
                 <input
                   type="date"
                   name="fechaNacimiento"
-                  value={form.fechaNacimiento}
-                  onChange={handleChange}
+                  value={formulario.fechaNacimiento}
+                  onChange={cambiarCampo}
                   required
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                 />
@@ -230,8 +230,8 @@ function PreRegistroForm() {
                 </label>
                 <select
                   name="lugarNacimiento"
-                  value={form.lugarNacimiento || ''}
-                  onChange={handleChange}
+                  value={formulario.lugarNacimiento || ''}
+                  onChange={cambiarCampo}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                 >
                   <option value="">Seleccionar</option>
@@ -247,13 +247,13 @@ function PreRegistroForm() {
                   <option value="Otra">Otra</option>
                 </select>
               </div>
-              {form.lugarNacimiento === 'Otra' && (
+              {formulario.lugarNacimiento === 'Otra' && (
                 <div>
                   <input
                     type="text"
                     name="lugarNacimientoOtro"
-                    value={form.lugarNacimientoOtro || ''}
-                    onChange={handleChange}
+                    value={formulario.lugarNacimientoOtro || ''}
+                    onChange={cambiarCampo}
                     className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                     placeholder="Especificar lugar de nacimiento"
                   />
@@ -270,8 +270,8 @@ function PreRegistroForm() {
                       type="radio"
                       name="genero"
                       value="M"
-                      checked={form.genero === 'M'}
-                      onChange={handleChange}
+                      checked={formulario.genero === 'M'}
+                      onChange={cambiarCampo}
                       className="w-4 h-4 text-primary-500 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-300">Masculino</span>
@@ -281,8 +281,8 @@ function PreRegistroForm() {
                       type="radio"
                       name="genero"
                       value="F"
-                      checked={form.genero === 'F'}
-                      onChange={handleChange}
+                      checked={formulario.genero === 'F'}
+                      onChange={cambiarCampo}
                       className="w-4 h-4 text-primary-500 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-300">Femenino</span>
@@ -300,8 +300,8 @@ function PreRegistroForm() {
                       type="radio"
                       name="estadoCivil"
                       value="Soltera(o)"
-                      checked={form.estadoCivil === 'Soltera(o)'}
-                      onChange={handleChange}
+                      checked={formulario.estadoCivil === 'Soltera(o)'}
+                      onChange={cambiarCampo}
                       className="w-4 h-4 text-primary-500 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-300">Soltero(a)</span>
@@ -311,8 +311,8 @@ function PreRegistroForm() {
                       type="radio"
                       name="estadoCivil"
                       value="Casada(o)"
-                      checked={form.estadoCivil === 'Casada(o)'}
-                      onChange={handleChange}
+                      checked={formulario.estadoCivil === 'Casada(o)'}
+                      onChange={cambiarCampo}
                       className="w-4 h-4 text-primary-500 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-300">Casado(a)</span>
@@ -326,8 +326,8 @@ function PreRegistroForm() {
                 </label>
                 <select
                   name="nacionalidad"
-                  value={form.nacionalidad || 'Boliviana'}
-                  onChange={handleChange}
+                  value={formulario.nacionalidad || 'Boliviana'}
+                  onChange={cambiarCampo}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                 >
                   <option value="Boliviana">Boliviana</option>
@@ -341,13 +341,13 @@ function PreRegistroForm() {
                   <option value="Otra">Otra</option>
                 </select>
               </div>
-              {form.nacionalidad === 'Otra' && (
+              {formulario.nacionalidad === 'Otra' && (
                 <div>
                   <input
                     type="text"
                     name="nacionalidadOtra"
-                    value={form.nacionalidadOtra || ''}
-                    onChange={handleChange}
+                    value={formulario.nacionalidadOtra || ''}
+                    onChange={cambiarCampo}
                     className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                     placeholder="Ingrese su nacionalidad"
                   />
@@ -361,8 +361,8 @@ function PreRegistroForm() {
                 <input
                   type="tel"
                   name="telefono"
-                  value={form.telefono || ''}
-                  onChange={handleChange}
+                  value={formulario.telefono || ''}
+                  onChange={cambiarCampo}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                   placeholder="71234567"
                 />
@@ -376,8 +376,8 @@ function PreRegistroForm() {
               <input
                 type="email"
                 name="correo"
-                value={form.correo}
-                onChange={handleChange}
+                value={formulario.correo}
+                onChange={cambiarCampo}
                 required
                 className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                 placeholder="juan@ejemplo.com"
@@ -391,8 +391,8 @@ function PreRegistroForm() {
               <input
                 type="text"
                 name="direccion"
-                value={form.direccion || ''}
-                onChange={handleChange}
+                value={formulario.direccion || ''}
+                onChange={cambiarCampo}
                 className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                 placeholder="Zona, calle, número"
               />
@@ -414,15 +414,15 @@ function PreRegistroForm() {
               </label>
               <select
                 name="carreraId"
-                value={form.carreraId || ''}
-                onChange={handleChange}
+                value={formulario.carreraId || ''}
+                onChange={cambiarCampo}
                 required
                 className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
               >
                 <option value="">Seleccionar carrera</option>
-                {careers.map((career) => (
-                  <option key={career.id} value={career.id}>
-                    {career.nombre}
+                {carreras.map((carrera) => (
+                  <option key={carrera.id} value={carrera.id}>
+                    {carrera.nombre}
                   </option>
                 ))}
               </select>
@@ -430,9 +430,9 @@ function PreRegistroForm() {
           </div>
 
           {/* Datos del Tutor - Solo para menores de 18 años */}
-          {form.fechaNacimiento && (() => {
+          {formulario.fechaNacimiento && (() => {
             const hoy = new Date();
-            const nacimiento = new Date(form.fechaNacimiento);
+            const nacimiento = new Date(formulario.fechaNacimiento);
             const edad = hoy.getFullYear() - nacimiento.getFullYear();
             const mesDiff = hoy.getMonth() - nacimiento.getMonth();
             const diaDiff = hoy.getDate() - nacimiento.getDate();
@@ -456,8 +456,8 @@ function PreRegistroForm() {
                 <input
                   type="text"
                   name="nombreTutor"
-                  value={form.nombreTutor || ''}
-                  onChange={handleChange}
+                  value={formulario.nombreTutor || ''}
+                  onChange={cambiarCampo}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                 />
               </div>
@@ -469,8 +469,8 @@ function PreRegistroForm() {
                 <input
                   type="text"
                   name="ciTutor"
-                  value={form.ciTutor || ''}
-                  onChange={handleChange}
+                  value={formulario.ciTutor || ''}
+                  onChange={cambiarCampo}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                 />
               </div>
@@ -482,8 +482,8 @@ function PreRegistroForm() {
                 <input
                   type="tel"
                   name="telefonoTutor"
-                  value={form.telefonoTutor || ''}
-                  onChange={handleChange}
+                  value={formulario.telefonoTutor || ''}
+                  onChange={cambiarCampo}
                   className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                 />
               </div>
@@ -512,10 +512,10 @@ function PreRegistroForm() {
             </Link>
             <button
               type="submit"
-              disabled={loading}
+              disabled={cargando}
               className="px-6 sm:px-8 py-3 sm:py-4 bg-primary-500 text-gray-100 font-semibold rounded-lg hover:bg-primary-700 disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
             >
-              {loading ? (
+              {cargando ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Enviando...
@@ -541,7 +541,7 @@ export default function PreRegistroPage() {
         <div className="w-12 h-12 border-4 border-dark-600 border-t-primary-600 rounded-full animate-spin" />
       </div>
     }>
-      <PreRegistroForm />
+      <FormularioPreRegistro />
     </Suspense>
   );
 }

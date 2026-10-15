@@ -24,66 +24,66 @@ import { EstadoCredencial } from '../../entities/credencial.entity';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorCredenciales {
-  constructor(private readonly service: ServicioCredenciales) {}
+  constructor(private readonly servicio: ServicioCredenciales) {}
 
   @Post()
-  create(@Body() createDto: CrearCredencialDto, @Req() req: Request) {
-    const user = req.user as { id: number };
-    createDto.emitidoPor = user.id;
-    return this.service.create(createDto);
+  crear(@Body() dtoCreacion: CrearCredencialDto, @Req() req: Request) {
+    const usuario = req.user as { id: number };
+    dtoCreacion.emitidoPor = usuario.id;
+    return this.servicio.crear(dtoCreacion);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
     @Query('gestion') gestion?: string,
-    @Query('semestre') semester?: string,
-    @Query('estado') status?: EstadoCredencial,
+    @Query('semestre') semestre?: string,
+    @Query('estado') estado?: EstadoCredencial,
   ) {
-    return this.service.findAll(+page, +limit, gestion, semester ? +semester : undefined, status);
+    return this.servicio.obtenerTodos(+pagina, +limite, gestion, semestre ? +semestre : undefined, estado);
   }
 
   @Get('estudiante/:estudianteId')
-  findByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
-    return this.service.findByStudent(estudianteId);
+  buscarPorEstudiante(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
+    return this.servicio.buscarPorEstudiante(estudianteId);
   }
 
   @Get('estudiante/:estudianteId/gestion/:gestion')
-  findByStudentAndGestion(
+  buscarPorEstudianteYGestion(
     @Param('estudianteId', ParseIntPipe) estudianteId: number,
     @Param('gestion') gestion: string,
   ) {
-    return this.service.findByStudentAndGestion(estudianteId, gestion);
+    return this.servicio.buscarPorEstudianteYGestion(estudianteId, gestion);
   }
 
   @Get('estudiante/:estudianteId/activos')
-  findActiveByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
-    return this.service.findActiveByStudent(estudianteId);
+  buscarActivosPorEstudiante(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
+    return this.servicio.buscarActivosPorEstudiante(estudianteId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.service.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: ActualizarCredencialDto) {
-    return this.service.update(id, updateDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() dtoActualizacion: ActualizarCredencialDto) {
+    return this.servicio.actualizar(id, dtoActualizacion);
   }
 
   @Patch(':id/marcar-impreso')
-  markAsPrinted(@Param('id', ParseIntPipe) id: number) {
-    return this.service.markAsPrinted(id);
+  marcarComoImpreso(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.marcarComoImpreso(id);
   }
 
   @Patch(':id/anular')
-  annul(@Param('id', ParseIntPipe) id: number) {
-    return this.service.annul(id);
+  anular(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.anular(id);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.service.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.eliminar(id);
   }
 }

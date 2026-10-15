@@ -9,97 +9,97 @@ import { ActualizarConvalidacionDto } from './dto/actualizar-convalidacion.dto';
 export class ServicioConvalidaciones {
   constructor(
     @InjectRepository(ConvalidacionEstudiante)
-    private convalidacionRepository: Repository<ConvalidacionEstudiante>,
+    private repositorioConvalidacion: Repository<ConvalidacionEstudiante>,
   ) {}
 
-  async create(createDto: CrearConvalidacionDto): Promise<ConvalidacionEstudiante> {
-    const convalidation = this.convalidacionRepository.create(createDto);
-    return this.convalidacionRepository.save(convalidation);
+  async crear(dtoCreacion: CrearConvalidacionDto): Promise<ConvalidacionEstudiante> {
+    const convalidacion = this.repositorioConvalidacion.create(dtoCreacion);
+    return this.repositorioConvalidacion.save(convalidacion);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
-    status?: EstadoConvalidacion,
-    type?: TipoConvalidacion,
-    studentId?: number,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
+    estado?: EstadoConvalidacion,
+    tipo?: TipoConvalidacion,
+    estudianteId?: number,
   ): Promise<{ datos: ConvalidacionEstudiante[]; total: number; pagina: number; limite: number }> {
-    const query = this.convalidacionRepository
-      .createQueryBuilder('convalidation')
-      .leftJoinAndSelect('convalidation.estudiante', 'student')
-      .leftJoinAndSelect('student.persona', 'person')
-      .leftJoinAndSelect('convalidation.materia_destino', 'subject')
-      .leftJoinAndSelect('convalidation.equivalencia', 'equivalence')
-      .leftJoinAndSelect('convalidation.aprobador', 'approver');
+    const consulta = this.repositorioConvalidacion
+      .createQueryBuilder('convalidacion')
+      .leftJoinAndSelect('convalidacion.estudiante', 'estudiante')
+      .leftJoinAndSelect('estudiante.persona', 'persona')
+      .leftJoinAndSelect('convalidacion.materia_destino', 'materia')
+      .leftJoinAndSelect('convalidacion.equivalencia', 'equivalencia')
+      .leftJoinAndSelect('convalidacion.aprobador', 'aprobador');
 
-    if (status) {
-      query.andWhere('convalidation.estado = :estado', { estado: status });
+    if (estado) {
+      consulta.andWhere('convalidacion.estado = :estado', { estado });
     }
 
-    if (type) {
-      query.andWhere('convalidation.tipo = :tipo', { tipo: type });
+    if (tipo) {
+      consulta.andWhere('convalidacion.tipo = :tipo', { tipo });
     }
 
-    if (studentId) {
-      query.andWhere('convalidation.estudianteId = :studentId', { studentId });
+    if (estudianteId) {
+      consulta.andWhere('convalidacion.estudianteId = :estudianteId', { estudianteId });
     }
 
-    const [data, total] = await query
-      .orderBy('convalidation.creadoEn', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('convalidacion.creadoEn', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<ConvalidacionEstudiante> {
-    const convalidation = await this.convalidacionRepository.findOne({
+  async obtenerUno(id: number): Promise<ConvalidacionEstudiante> {
+    const convalidacion = await this.repositorioConvalidacion.findOne({
       where: { id },
       relations: ['estudiante', 'estudiante.persona', 'materia_destino', 'equivalencia', 'aprobador'],
     });
-    if (!convalidation) {
+    if (!convalidacion) {
       throw new NotFoundException(`Convalidación con ID ${id} no encontrada`);
     }
-    return convalidation;
+    return convalidacion;
   }
 
-  async update(id: number, updateDto: ActualizarConvalidacionDto): Promise<ConvalidacionEstudiante> {
-    const convalidation = await this.findOne(id);
-    Object.assign(convalidation, updateDto);
-    return this.convalidacionRepository.save(convalidation);
+  async actualizar(id: number, dtoActualizacion: ActualizarConvalidacionDto): Promise<ConvalidacionEstudiante> {
+    const convalidacion = await this.obtenerUno(id);
+    Object.assign(convalidacion, dtoActualizacion);
+    return this.repositorioConvalidacion.save(convalidacion);
   }
 
-  async remove(id: number): Promise<void> {
-    const convalidation = await this.findOne(id);
-    await this.convalidacionRepository.remove(convalidation);
+  async eliminar(id: number): Promise<void> {
+    const convalidacion = await this.obtenerUno(id);
+    await this.repositorioConvalidacion.remove(convalidacion);
   }
 
-  async findByStudent(studentId: number): Promise<ConvalidacionEstudiante[]> {
-    return this.convalidacionRepository.find({
-      where: { estudianteId: studentId },
+  async buscarPorEstudiante(estudianteId: number): Promise<ConvalidacionEstudiante[]> {
+    return this.repositorioConvalidacion.find({
+      where: { estudianteId },
       relations: ['materia_destino', 'equivalencia', 'aprobador'],
       order: { creadoEn: 'DESC' },
     });
   }
 
-  async approve(id: number, approvedBy: number, resolutionNumber?: string, resolutionDate?: Date): Promise<ConvalidacionEstudiante> {
-    const convalidation = await this.findOne(id);
-    convalidation.estado = EstadoConvalidacion.APROBADA;
-    convalidation.aprobadoPor = approvedBy;
-    if (resolutionNumber) convalidation.numeroResolucion = resolutionNumber;
-    if (resolutionDate) convalidation.fechaResolucion = resolutionDate;
-    return this.convalidacionRepository.save(convalidation);
+  async aprobar(id: number, aprobadoPor: number, numeroResolucion?: string, fechaResolucion?: Date): Promise<ConvalidacionEstudiante> {
+    const convalidacion = await this.obtenerUno(id);
+    convalidacion.estado = EstadoConvalidacion.APROBADA;
+    convalidacion.aprobadoPor = aprobadoPor;
+    if (numeroResolucion) convalidacion.numeroResolucion = numeroResolucion;
+    if (fechaResolucion) convalidacion.fechaResolucion = fechaResolucion;
+    return this.repositorioConvalidacion.save(convalidacion);
   }
 
-  async reject(id: number): Promise<ConvalidacionEstudiante> {
-    const convalidation = await this.findOne(id);
-    convalidation.estado = EstadoConvalidacion.RECHAZADA;
-    return this.convalidacionRepository.save(convalidation);
+  async rechazar(id: number): Promise<ConvalidacionEstudiante> {
+    const convalidacion = await this.obtenerUno(id);
+    convalidacion.estado = EstadoConvalidacion.RECHAZADA;
+    return this.repositorioConvalidacion.save(convalidacion);
   }
 
-  async getPending(): Promise<ConvalidacionEstudiante[]> {
-    return this.convalidacionRepository.find({
+  async obtenerPendientes(): Promise<ConvalidacionEstudiante[]> {
+    return this.repositorioConvalidacion.find({
       where: { estado: EstadoConvalidacion.PENDIENTE },
       relations: ['estudiante', 'estudiante.persona', 'materia_destino'],
       order: { creadoEn: 'ASC' },

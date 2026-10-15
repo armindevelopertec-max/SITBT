@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { publicApi } from '@/lib/api';
+import { apiPublica } from '@/lib/api';
 
 interface ConfiguracionInstitucional {
   nombre: string;
@@ -36,8 +36,8 @@ export function ProveedorInstitucion({ children }: { children: ReactNode }) {
   useEffect(() => {
     const obtenerInstitucion = async () => {
       try {
-        const response = await publicApi.get('/configuracion-institucional/publico');
-        setInstitucion(response.data);
+        const respuesta = await apiPublica.get('/configuracion-institucional/publico');
+        setInstitucion(respuesta.data);
       } catch (error) {
         console.error('Error al obtener institución:', error);
       } finally {

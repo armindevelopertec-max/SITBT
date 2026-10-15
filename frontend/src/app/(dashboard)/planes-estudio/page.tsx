@@ -9,7 +9,7 @@ import { Entrada } from '@/components/ui/entrada';
 import { Selector } from '@/components/ui/selector';
 import { Insignia } from '@/components/ui/insignia';
 import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
-import { ConfirmModal } from '@/components/ui/modal';
+import { ModalConfirmacion } from '@/components/ui/modal';
 import { api } from '@/lib/api';
 import { Search, Plus, Edit2, Trash2, Loader2, BookOpen } from 'lucide-react';
 
@@ -31,77 +31,77 @@ interface Carrera {
   nombre: string;
 }
 
-export default function PlanesEstudioPage() {
+export default function PaginaPlanesEstudio() {
   const router = useRouter();
   const [planes, setPlanes] = useState<PlanEstudio[]>([]);
   const [carreras, setCarreras] = useState<Carrera[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterCarrera, setFilterCarrera] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [deletingPlan, setDeletingPlan] = useState<PlanEstudio | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [cargando, setCargando] = useState(true);
+  const [consultaBusqueda, setConsultaBusqueda] = useState('');
+  const [filtroCarrera, setFiltroCarrera] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('');
+  const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false);
+  const [planEliminando, setPlanEliminando] = useState<PlanEstudio | null>(null);
+  const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
-    fetchPlanes();
-    fetchCarreras();
+    obtenerPlanes();
+    obtenerCarreras();
   }, []);
 
-  const fetchPlanes = async () => {
+  const obtenerPlanes = async () => {
     try {
-      const params = new URLSearchParams();
-      if (filterCarrera) params.append('careerId', filterCarrera);
-      if (filterStatus) params.append('status', filterStatus);
+      const parametros = new URLSearchParams();
+      if (filtroCarrera) parametros.append('careerId', filtroCarrera);
+      if (filtroEstado) parametros.append('status', filtroEstado);
 
-      const response = await api.get(`/planes-estudio?${params.toString()}`);
-      setPlanes(response.data.datos?.data || response.data.datos || []);
+      const respuesta = await api.get(`/planes-estudio?${parametros.toString()}`);
+      setPlanes(respuesta.data.datos?.data || respuesta.data.datos || []);
     } catch (error) {
       console.error('Error al obtener los planes:', error);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const fetchCarreras = async () => {
+  const obtenerCarreras = async () => {
     try {
-      const response = await api.get('/carreras/activos');
-      setCarreras(response.data || []);
+      const respuesta = await api.get('/carreras/activos');
+      setCarreras(respuesta.data || []);
     } catch (error) {
       console.error('Error al obtener las carreras:', error);
     }
   };
 
   useEffect(() => {
-    fetchPlanes();
-  }, [filterCarrera, filterStatus]);
+    obtenerPlanes();
+  }, [filtroCarrera, filtroEstado]);
 
-  const handleDelete = async () => {
-    if (!deletingPlan) return;
+  const eliminar = async () => {
+    if (!planEliminando) return;
 
-    setSaving(true);
+    setGuardando(true);
     try {
-      await api.delete(`/planes-estudio/${deletingPlan.id}`);
-      setDeleteModalOpen(false);
-      setDeletingPlan(null);
-      fetchPlanes();
+      await api.delete(`/planes-estudio/${planEliminando.id}`);
+      setModalEliminarAbierto(false);
+      setPlanEliminando(null);
+      obtenerPlanes();
     } catch (error) {
       console.error('Error al eliminar el plan:', error);
     } finally {
-      setSaving(false);
+      setGuardando(false);
     }
   };
 
-  const filteredPlanes = planes.filter(p => {
-    const searchLower = searchQuery.toLowerCase();
+  const planesFiltrados = planes.filter(plan => {
+    const busquedaMinusculas = consultaBusqueda.toLowerCase();
     return (
-      p.numeroRm.toLowerCase().includes(searchLower) ||
-      (p.carrera?.nombre && p.carrera.nombre.toLowerCase().includes(searchLower)) ||
-      (p.carrera?.codigo && p.carrera.codigo.toLowerCase().includes(searchLower))
+      plan.numeroRm.toLowerCase().includes(busquedaMinusculas) ||
+      (plan.carrera?.nombre && plan.carrera.nombre.toLowerCase().includes(busquedaMinusculas)) ||
+      (plan.carrera?.codigo && plan.carrera.codigo.toLowerCase().includes(busquedaMinusculas))
     );
   });
 
-  if (loading) {
+  if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
@@ -111,7 +111,7 @@ export default function PlanesEstudioPage() {
 
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Planes de Estudio' }]} />
+      <Migas elementos={[{ etiqueta: 'Configuración', href: '/configuracion' }, { etiqueta: 'Planes de Estudio' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Planes de Estudio</h1>
@@ -121,7 +121,7 @@ export default function PlanesEstudioPage() {
         </Boton>
       </div>
 
-      <Tarjeta variant="bordered">
+      <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <TituloTarjeta>Lista de Planes</TituloTarjeta>
@@ -131,26 +131,26 @@ export default function PlanesEstudioPage() {
                 <Entrada
                   placeholder="Buscar plan..."
                   className="pl-10"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={consultaBusqueda}
+                  onChange={(e) => setConsultaBusqueda(e.target.value)}
                 />
               </div>
               <Selector
-                value={filterCarrera}
-                onChange={(e) => setFilterCarrera(e.target.value)}
-                options={[
-                  { value: '', label: 'Todas las carreras' },
-                  ...carreras.map(c => ({ value: c.id.toString(), label: c.nombre })),
+                value={filtroCarrera}
+                onChange={(e) => setFiltroCarrera(e.target.value)}
+                opciones={[
+                  { value: '', etiqueta: 'Todas las carreras' },
+                  ...carreras.map(c => ({ value: c.id.toString(), etiqueta: c.nombre })),
                 ]}
                 placeholder="Carrera"
               />
               <Selector
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                options={[
-                  { value: '', label: 'Todos los estados' },
-                  { value: 'vigente', label: 'Vigente' },
-                  { value: 'historico', label: 'Histórico' },
+                value={filtroEstado}
+                onChange={(e) => setFiltroEstado(e.target.value)}
+                opciones={[
+                  { value: '', etiqueta: 'Todos los estados' },
+                  { value: 'vigente', etiqueta: 'Vigente' },
+                  { value: 'historico', etiqueta: 'Histórico' },
                 ]}
                 placeholder="Estado"
               />
@@ -169,32 +169,32 @@ export default function PlanesEstudioPage() {
               </FilaTabla>
             </EncabezadoTabla>
             <CuerpoTabla>
-              {filteredPlanes.length === 0 ? (
+              {planesFiltrados.length === 0 ? (
                 <FilaTabla>
                   <CeldaTabla colSpan={5} className="text-center py-8 text-gray-500">
                     No se encontraron planes de estudio
                   </CeldaTabla>
                 </FilaTabla>
               ) : (
-                filteredPlanes.map((plan) => (
+                planesFiltrados.map((plan) => (
                   <FilaTabla key={plan.id}>
                     <CeldaTabla className="font-medium">{plan.numeroRm}</CeldaTabla>
                     <CeldaTabla>{new Date(plan.fechaRm).toLocaleDateString()}</CeldaTabla>
                     <CeldaTabla>{plan.carrera?.nombre || '-'}</CeldaTabla>
                     <CeldaTabla>
-                      <Insignia variant={plan.estado === 'vigente' ? 'exito' : 'secondary'}>
+                      <Insignia variante={plan.estado === 'vigente' ? 'exito' : 'secundario'}>
                         {plan.estado}
                       </Insignia>
                     </CeldaTabla>
                     <CeldaTabla>
                       <div className="flex items-center gap-2">
-                        <Boton variant="ghost" size="icon" onClick={() => router.push(`/planes-estudio/${plan.id}`)}>
+                        <Boton variante="fantasma" tamano="icono" onClick={() => router.push(`/planes-estudio/${plan.id}`)}>
                           <Edit2 className="w-4 h-4" />
                         </Boton>
-                        <Boton variant="ghost" size="icon" onClick={() => router.push(`/planes-estudio/${plan.id}/materias`)}>
+                        <Boton variante="fantasma" tamano="icono" onClick={() => router.push(`/planes-estudio/${plan.id}/materias`)}>
                           <BookOpen className="w-4 h-4" />
                         </Boton>
-                        <Boton variant="ghost" size="icon" onClick={() => { setDeletingPlan(plan); setDeleteModalOpen(true); }}>
+                        <Boton variante="fantasma" tamano="icono" onClick={() => { setPlanEliminando(plan); setModalEliminarAbierto(true); }}>
                           <Trash2 className="w-4 h-4 text-red-500" />
                         </Boton>
                       </div>
@@ -207,15 +207,15 @@ export default function PlanesEstudioPage() {
         </ContenidoTarjeta>
       </Tarjeta>
 
-      <ConfirmModal
-        open={deleteModalOpen}
-        onClose={() => { setDeleteModalOpen(false); setDeletingPlan(null); }}
-        onConfirm={handleDelete}
-        title="Eliminar Plan de Estudio"
-        message={`¿Estás seguro de eliminar el plan "${deletingPlan?.numeroRm}"? Esta acción no se puede deshacer.`}
-        confirmText="Eliminar"
-        variant="destructive"
-        loading={saving}
+      <ModalConfirmacion
+        abierto={modalEliminarAbierto}
+        alCerrar={() => { setModalEliminarAbierto(false); setPlanEliminando(null); }}
+        alConfirmar={eliminar}
+        titulo="Eliminar Plan de Estudio"
+        mensaje={`¿Estás seguro de eliminar el plan "${planEliminando?.numeroRm}"? Esta acción no se puede deshacer.`}
+        textoConfirmar="Eliminar"
+        variante="destructivo"
+        cargando={guardando}
       />
     </div>
   );

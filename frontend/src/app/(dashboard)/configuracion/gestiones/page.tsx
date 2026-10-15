@@ -8,23 +8,23 @@ import { Entrada } from '@/components/ui/entrada';
 import { Selector } from '@/components/ui/selector';
 import { Insignia } from '@/components/ui/insignia';
 import { Modal } from '@/components/ui/modal';
-import { ConfirmModal } from '@/components/ui/modal';
+import { ModalConfirmacion } from '@/components/ui/modal';
 import { api } from '@/lib/api';
 import { Gestion, Periodo } from '@/types';
 import { Plus, Edit2, Trash2, Lock, Unlock, Star, StarOff, Loader2, Calendar } from 'lucide-react';
 
-export default function GestionesPage() {
+export default function PaginaGestiones() {
   const [gestiones, setGestiones] = useState<Gestion[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<{ type: string; id: number | null; title: string; message: string } | null>(null);
-  const [editingGestion, setEditingGestion] = useState<Gestion | null>(null);
-  const [deletingGestion, setDeletingGestion] = useState<Gestion | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [cargando, setCargando] = useState(true);
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false);
+  const [modalConfirmarAbierto, setModalConfirmarAbierto] = useState(false);
+  const [accionConfirmar, setAccionConfirmar] = useState<{ type: string; id: number | null; titulo: string; mensaje: string } | null>(null);
+  const [gestionEditando, setGestionEditando] = useState<Gestion | null>(null);
+  const [gestionEliminando, setGestionEliminando] = useState<Gestion | null>(null);
+  const [guardando, setGuardando] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [datosFormulario, setDatosFormulario] = useState({
     anio: '',
     tipoPeriodo: 'semestral',
     notas: '',
@@ -32,182 +32,182 @@ export default function GestionesPage() {
   });
 
   useEffect(() => {
-    fetchGestiones();
+    obtenerGestiones();
   }, []);
 
-  const fetchGestiones = async () => {
+  const obtenerGestiones = async () => {
     try {
-      const response = await api.get('/gestiones');
-      setGestiones(response.data.datos || []);
+      const respuesta = await api.get('/gestiones');
+      setGestiones(respuesta.data.datos || []);
     } catch (error) {
       console.error('Error al obtener las gestiones:', error);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'exito' | 'error' | 'advertencia' | 'secondary'> = {
+  const obtenerInsigniaEstado = (estado: string) => {
+    const variantes: Record<string, 'exito' | 'error' | 'advertencia' | 'secundario'> = {
       abierta: 'exito',
       cerrada: 'error',
       pendiente: 'advertencia',
     };
-    return <Insignia variant={variants[status] || 'secondary'}>{status}</Insignia>;
+    return <Insignia variante={variantes[estado] || 'secundario'}>{estado}</Insignia>;
   };
 
-  const getPeriodBadge = (type: string) => {
-    const variants: Record<string, 'primary' | 'secondary' | 'outline'> = {
-      anual: 'primary',
-      semestral: 'secondary',
-      trimestral: 'outline',
+  const obtenerInsigniaPeriodo = (tipo: string) => {
+    const variantes: Record<string, 'primario' | 'secundario' | 'contorno'> = {
+      anual: 'primario',
+      semestral: 'secundario',
+      trimestral: 'contorno',
     };
-    return <Insignia variant={variants[type] || 'secondary'}>{type}</Insignia>;
+    return <Insignia variante={variantes[tipo] || 'secundario'}>{tipo}</Insignia>;
   };
 
-  const handleOpenModal = (gestion?: Gestion) => {
+  const abrirModal = (gestion?: Gestion) => {
     if (gestion) {
-      setEditingGestion(gestion);
-      setFormData({
+      setGestionEditando(gestion);
+      setDatosFormulario({
         anio: gestion.anio,
         tipoPeriodo: gestion.tipoPeriodo,
         notas: gestion.notas || '',
         esActual: gestion.esActual,
       });
     } else {
-      setEditingGestion(null);
-      setFormData({
+      setGestionEditando(null);
+      setDatosFormulario({
         anio: new Date().getFullYear().toString(),
         tipoPeriodo: 'semestral',
         notas: '',
         esActual: false,
       });
     }
-    setModalOpen(true);
+    setModalAbierto(true);
   };
 
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setEditingGestion(null);
+  const cerrarModal = () => {
+    setModalAbierto(false);
+    setGestionEditando(null);
   };
 
-  const handleSave = async () => {
-    if (!formData.anio) return;
+  const guardar = async () => {
+    if (!datosFormulario.anio) return;
 
-    setSaving(true);
+    setGuardando(true);
     try {
-      if (editingGestion) {
-        await api.patch(`/gestiones/${editingGestion.id}`, formData);
+      if (gestionEditando) {
+        await api.patch(`/gestiones/${gestionEditando.id}`, datosFormulario);
       } else {
-        await api.post('/gestiones', { ...formData, estado: 'pendiente' });
+        await api.post('/gestiones', { ...datosFormulario, estado: 'pendiente' });
       }
-      fetchGestiones();
-      handleCloseModal();
+      obtenerGestiones();
+      cerrarModal();
     } catch (error) {
       console.error('Error al guardar la gestión:', error);
     } finally {
-      setSaving(false);
+      setGuardando(false);
     }
   };
 
-  const handleOpen = (gestion: Gestion) => {
-    setConfirmAction({
+  const abrirGestion = (gestion: Gestion) => {
+    setAccionConfirmar({
       type: 'openGestion',
       id: gestion.id,
-      title: 'Abrir Gestión',
-      message: `¿Estás seguro de abrir la gestión ${gestion.anio}?`,
+      titulo: 'Abrir Gestión',
+      mensaje: `¿Estás seguro de abrir la gestión ${gestion.anio}?`,
     });
-    setConfirmModalOpen(true);
+    setModalConfirmarAbierto(true);
   };
 
-  const handleClose = (gestion: Gestion) => {
-    setConfirmAction({
+  const cerrarGestion = (gestion: Gestion) => {
+    setAccionConfirmar({
       type: 'closeGestion',
       id: gestion.id,
-      title: 'Cerrar Gestión',
-      message: `¿Estás seguro de cerrar la gestión ${gestion.anio}? Esto cerrará todos los períodos abiertos.`,
+      titulo: 'Cerrar Gestión',
+      mensaje: `¿Estás seguro de cerrar la gestión ${gestion.anio}? Esto cerrará todos los períodos abiertos.`,
     });
-    setConfirmModalOpen(true);
+    setModalConfirmarAbierto(true);
   };
 
-  const handleSetCurrent = (gestion: Gestion) => {
-    setConfirmAction({
+  const marcarActual = (gestion: Gestion) => {
+    setAccionConfirmar({
       type: 'setCurrent',
       id: gestion.id,
-      title: 'Marcar como Actual',
-      message: `¿Estás seguro de marcar la gestión ${gestion.anio} como actual?`,
+      titulo: 'Marcar como Actual',
+      mensaje: `¿Estás seguro de marcar la gestión ${gestion.anio} como actual?`,
     });
-    setConfirmModalOpen(true);
+    setModalConfirmarAbierto(true);
   };
 
-  const handleDelete = async () => {
-    if (!deletingGestion) return;
+  const eliminar = async () => {
+    if (!gestionEliminando) return;
 
-    setSaving(true);
+    setGuardando(true);
     try {
-      await api.delete(`/gestiones/${deletingGestion.id}`);
-      setDeleteModalOpen(false);
-      setDeletingGestion(null);
-      fetchGestiones();
+      await api.delete(`/gestiones/${gestionEliminando.id}`);
+      setModalEliminarAbierto(false);
+      setGestionEliminando(null);
+      obtenerGestiones();
     } catch (error) {
       console.error('Error al eliminar la gestión:', error);
     } finally {
-      setSaving(false);
+      setGuardando(false);
     }
   };
 
-  const handleOpenPeriodo = (periodoId: number, periodoNumber: string) => {
-    setConfirmAction({
+  const abrirPeriodo = (periodoId: number, numeroPeriodo: string) => {
+    setAccionConfirmar({
       type: 'openPeriodo',
       id: periodoId,
-      title: 'Abrir Período',
-      message: `¿Estás seguro de abrir el ${periodoNumber}?`,
+      titulo: 'Abrir Período',
+      mensaje: `¿Estás seguro de abrir el ${numeroPeriodo}?`,
     });
-    setConfirmModalOpen(true);
+    setModalConfirmarAbierto(true);
   };
 
-  const handleClosePeriodo = (periodoId: number, periodoNumber: string) => {
-    setConfirmAction({
+  const cerrarPeriodo = (periodoId: number, numeroPeriodo: string) => {
+    setAccionConfirmar({
       type: 'closePeriodo',
       id: periodoId,
-      title: 'Cerrar Período',
-      message: `¿Estás seguro de cerrar el ${periodoNumber}?`,
+      titulo: 'Cerrar Período',
+      mensaje: `¿Estás seguro de cerrar el ${numeroPeriodo}?`,
     });
-    setConfirmModalOpen(true);
+    setModalConfirmarAbierto(true);
   };
 
-  const handleConfirm = async () => {
-    if (!confirmAction || !confirmAction.id) return;
+  const confirmar = async () => {
+    if (!accionConfirmar || !accionConfirmar.id) return;
 
-    setSaving(true);
+    setGuardando(true);
     try {
-      switch (confirmAction.type) {
+      switch (accionConfirmar.type) {
         case 'openGestion':
-          await api.post(`/gestiones/${confirmAction.id}/abrir`);
+          await api.post(`/gestiones/${accionConfirmar.id}/abrir`);
           break;
         case 'closeGestion':
-          await api.post(`/gestiones/${confirmAction.id}/cerrar`);
+          await api.post(`/gestiones/${accionConfirmar.id}/cerrar`);
           break;
         case 'setCurrent':
-          await api.post(`/gestiones/${confirmAction.id}/establecer-actual`);
+          await api.post(`/gestiones/${accionConfirmar.id}/establecer-actual`);
           break;
         case 'openPeriodo':
-          await api.post(`/gestiones/periodos/${confirmAction.id}/abrir`);
+          await api.post(`/gestiones/periodos/${accionConfirmar.id}/abrir`);
           break;
         case 'closePeriodo':
-          await api.post(`/gestiones/periodos/${confirmAction.id}/cerrar`);
+          await api.post(`/gestiones/periodos/${accionConfirmar.id}/cerrar`);
           break;
       }
-      setConfirmModalOpen(false);
-      setConfirmAction(null);
-      fetchGestiones();
+      setModalConfirmarAbierto(false);
+      setAccionConfirmar(null);
+      obtenerGestiones();
     } catch (error) {
       console.error('Error al confirmar la acción:', error);
     } finally {
-      setSaving(false);
+      setGuardando(false);
     }
   };
 
-  if (loading) {
+  if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
@@ -217,14 +217,14 @@ export default function GestionesPage() {
 
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Configuración', href: '/configuracion' }, { label: 'Gestiones' }]} />
+      <Migas elementos={[{ etiqueta: 'Configuración', href: '/configuracion' }, { etiqueta: 'Gestiones' }]} />
 
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestiones Académicas</h1>
           <p className="text-gray-500">Administra los períodos académicos</p>
         </div>
-        <Boton onClick={() => handleOpenModal()}>
+        <Boton onClick={() => abrirModal()}>
           <Plus className="w-4 h-4 mr-2" />
           Nueva Gestión
         </Boton>
@@ -232,7 +232,7 @@ export default function GestionesPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[...gestiones].sort((a, b) => (b.esActual ? 1 : 0) - (a.esActual ? 1 : 0)).map((gestion) => (
-          <Tarjeta key={gestion.id} variant="bordered">
+          <Tarjeta key={gestion.id} variante="conBorde">
             <EncabezadoTarjeta className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -249,7 +249,7 @@ export default function GestionesPage() {
                     <p className="text-sm text-gray-500">{gestion.tipoPeriodo}</p>
                   </div>
                 </div>
-                {getStatusBadge(gestion.estado)}
+                {obtenerInsigniaEstado(gestion.estado)}
               </div>
             </EncabezadoTarjeta>
             <ContenidoTarjeta>
@@ -266,33 +266,33 @@ export default function GestionesPage() {
                         <span className="text-gray-500">({periodo.nombre || 'Sin nombre'})</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        {getStatusBadge(periodo.estado)}
+                        {obtenerInsigniaEstado(periodo.estado)}
                         {periodo.estado === 'pendiente' && (
                           <Boton
-                            size="sm"
-                            variant="ghost"
+                            tamano="pequeno"
+                            variante="fantasma"
                             className="h-6 w-6 p-0"
-                            onClick={() => handleOpenPeriodo(periodo.id, `${periodo.numero} - ${periodo.nombre}`)}
+                            onClick={() => abrirPeriodo(periodo.id, `${periodo.numero} - ${periodo.nombre}`)}
                           >
                             <Unlock className="w-3 h-3" />
                           </Boton>
                         )}
                         {periodo.estado === 'abierta' && (
                           <Boton
-                            size="sm"
-                            variant="ghost"
+                            tamano="pequeno"
+                            variante="fantasma"
                             className="h-6 w-6 p-0"
-                            onClick={() => handleClosePeriodo(periodo.id, `${periodo.numero} - ${periodo.nombre}`)}
+                            onClick={() => cerrarPeriodo(periodo.id, `${periodo.numero} - ${periodo.nombre}`)}
                           >
                             <Lock className="w-3 h-3" />
                           </Boton>
                         )}
                         {periodo.estado === 'cerrada' && (
                           <Boton
-                            size="sm"
-                            variant="ghost"
+                            tamano="pequeno"
+                            variante="fantasma"
                             className="h-6 w-6 p-0"
-                            onClick={() => handleOpenPeriodo(periodo.id, `${periodo.numero} - ${periodo.nombre}`)}
+                            onClick={() => abrirPeriodo(periodo.id, `${periodo.numero} - ${periodo.nombre}`)}
                           >
                             <Unlock className="w-3 h-3" />
                           </Boton>
@@ -309,42 +309,42 @@ export default function GestionesPage() {
 
               <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
                 {gestion.estado === 'pendiente' && (
-                  <Boton size="sm" variant="outline" className="flex-1" onClick={() => handleOpen(gestion)}>
+                  <Boton tamano="pequeno" variante="contorno" className="flex-1" onClick={() => abrirGestion(gestion)}>
                     <Unlock className="w-4 h-4 mr-1" />
                     Abrir
                   </Boton>
                 )}
                 {gestion.estado === 'abierta' && (
-                  <Boton size="sm" variant="outline" className="flex-1" onClick={() => handleClose(gestion)}>
+                  <Boton tamano="pequeno" variante="contorno" className="flex-1" onClick={() => cerrarGestion(gestion)}>
                     <Lock className="w-4 h-4 mr-1" />
                     Cerrar
                   </Boton>
                 )}
                 {gestion.estado === 'cerrada' && (
-                  <Boton size="sm" variant="outline" className="flex-1" onClick={() => handleOpen(gestion)}>
+                  <Boton tamano="pequeno" variante="contorno" className="flex-1" onClick={() => abrirGestion(gestion)}>
                     <Unlock className="w-4 h-4 mr-1" />
                     Reabrir
                   </Boton>
                 )}
                 {!gestion.esActual && (
                   <Boton
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleSetCurrent(gestion)}
+                    tamano="pequeno"
+                    variante="fantasma"
+                    onClick={() => marcarActual(gestion)}
                     title="Marcar como actual"
                   >
                     <StarOff className="w-4 h-4" />
                   </Boton>
                 )}
-                <Boton size="sm" variant="ghost" onClick={() => handleOpenModal(gestion)}>
+                <Boton tamano="pequeno" variante="fantasma" onClick={() => abrirModal(gestion)}>
                   <Edit2 className="w-4 h-4" />
                 </Boton>
                 <Boton
-                  size="sm"
-                  variant="ghost"
+                  tamano="pequeno"
+                  variante="fantasma"
                   onClick={() => {
-                    setDeletingGestion(gestion);
-                    setDeleteModalOpen(true);
+                    setGestionEliminando(gestion);
+                    setModalEliminarAbierto(true);
                   }}
                 >
                   <Trash2 className="w-4 h-4 text-red-500" />
@@ -358,7 +358,7 @@ export default function GestionesPage() {
           <div className="col-span-full text-center py-12 text-gray-500">
             <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-300" />
             <p>No hay gestiones registradas</p>
-            <Boton variant="outline" className="mt-4" onClick={() => handleOpenModal()}>
+            <Boton variante="contorno" className="mt-4" onClick={() => abrirModal()}>
               <Plus className="w-4 h-4 mr-2" />
               Crear primera gestión
             </Boton>
@@ -367,28 +367,28 @@ export default function GestionesPage() {
       </div>
 
       <Modal
-        open={modalOpen}
-        onClose={handleCloseModal}
-        title={editingGestion ? 'Editar Gestión' : 'Nueva Gestión'}
-        size="md"
+        abierto={modalAbierto}
+        alCerrar={cerrarModal}
+        titulo={gestionEditando ? 'Editar Gestión' : 'Nueva Gestión'}
+        tamano="mediano"
       >
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <Entrada
-              label="Año *"
-              value={formData.anio}
-              onChange={(e) => setFormData({ ...formData, anio: e.target.value })}
+              etiqueta="Año *"
+              value={datosFormulario.anio}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, anio: e.target.value })}
               placeholder="2025"
-              disabled={!!editingGestion}
+              disabled={!!gestionEditando}
             />
             <Selector
-              label="Régimen *"
-              value={formData.tipoPeriodo}
-              onChange={(e) => setFormData({ ...formData, tipoPeriodo: e.target.value })}
-              options={[
-                { value: 'semestral', label: 'Semestral' },
+              etiqueta="Régimen *"
+              value={datosFormulario.tipoPeriodo}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, tipoPeriodo: e.target.value })}
+              opciones={[
+                { value: 'semestral', etiqueta: 'Semestral' },
               ]}
-              disabled={!!editingGestion}
+              disabled={!!gestionEditando}
             />
           </div>
 
@@ -396,8 +396,8 @@ export default function GestionesPage() {
             <input
               type="checkbox"
               id="esActual"
-              checked={formData.esActual}
-              onChange={(e) => setFormData({ ...formData, esActual: e.target.checked })}
+              checked={datosFormulario.esActual}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, esActual: e.target.checked })}
               className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
             />
             <label htmlFor="esActual" className="text-sm text-gray-700">
@@ -410,16 +410,16 @@ export default function GestionesPage() {
             <textarea
               className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               rows={3}
-              value={formData.notas}
-              onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+              value={datosFormulario.notas}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, notas: e.target.value })}
               placeholder="Observaciones adicionales..."
             />
           </div>
 
-          {!editingGestion && (
+          {!gestionEditando && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
               <p className="font-medium">Períodos que se crearán:</p>
-              {formData.tipoPeriodo === 'semestral' && (
+              {datosFormulario.tipoPeriodo === 'semestral' && (
                 <>
                   <p>I - Primer Semestre (20 feb - 10 jul)</p>
                   <p>II - Segundo Semestre (20 jul - 11 dic)</p>
@@ -429,42 +429,42 @@ export default function GestionesPage() {
           )}
 
           <div className="flex justify-end gap-3 pt-4 border-t">
-            <Boton variant="outline" onClick={handleCloseModal}>
+            <Boton variante="contorno" onClick={cerrarModal}>
               Cancelar
             </Boton>
-            <Boton onClick={handleSave} disabled={saving || !formData.anio}>
-              {saving ? 'Guardando...' : 'Guardar'}
+            <Boton onClick={guardar} disabled={guardando || !datosFormulario.anio}>
+              {guardando ? 'Guardando...' : 'Guardar'}
             </Boton>
           </div>
         </div>
       </Modal>
 
-      <ConfirmModal
-        open={deleteModalOpen}
-        onClose={() => {
-          setDeleteModalOpen(false);
-          setDeletingGestion(null);
+      <ModalConfirmacion
+        abierto={modalEliminarAbierto}
+        alCerrar={() => {
+          setModalEliminarAbierto(false);
+          setGestionEliminando(null);
         }}
-        onConfirm={handleDelete}
-        title="Eliminar Gestión"
-        message={`¿Estás seguro de eliminar la gestión ${deletingGestion?.anio}? Se eliminarán también todos sus períodos. Esta acción no se puede deshacer.`}
-        confirmText="Eliminar"
-        variant="destructive"
-        loading={saving}
+        alConfirmar={eliminar}
+        titulo="Eliminar Gestión"
+        mensaje={`¿Estás seguro de eliminar la gestión ${gestionEliminando?.anio}? Se eliminarán también todos sus períodos. Esta acción no se puede deshacer.`}
+        textoConfirmar="Eliminar"
+        variante="destructivo"
+        cargando={guardando}
       />
 
-      <ConfirmModal
-        open={confirmModalOpen}
-        onClose={() => {
-          setConfirmModalOpen(false);
-          setConfirmAction(null);
+      <ModalConfirmacion
+        abierto={modalConfirmarAbierto}
+        alCerrar={() => {
+          setModalConfirmarAbierto(false);
+          setAccionConfirmar(null);
         }}
-        onConfirm={handleConfirm}
-        title={confirmAction?.title || ''}
-        message={confirmAction?.message || ''}
-        confirmText="Confirmar"
-        variant="default"
-        loading={saving}
+        alConfirmar={confirmar}
+        titulo={accionConfirmar?.titulo || ''}
+        mensaje={accionConfirmar?.mensaje || ''}
+        textoConfirmar="Confirmar"
+        variante="predeterminado"
+        cargando={guardando}
       />
     </div>
   );

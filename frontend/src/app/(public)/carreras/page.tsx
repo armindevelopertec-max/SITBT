@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { publicApi } from '@/lib/api';
+import { apiPublica } from '@/lib/api';
 import { GraduationCap, ArrowRight, CheckCircle, Award, Clock, FileText } from 'lucide-react';
 import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
@@ -33,36 +33,36 @@ interface CarreraConPlan extends Carrera {
   planEstudio?: PlanEstudio;
 }
 
-const careerImages: Record<number, string> = {
+const imagenesCarrera: Record<number, string> = {
   1: 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=800&q=80',
   2: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=800&q=80',
 };
 
-export default function CareersPage() {
+export default function PaginaCarreras() {
   const { institucion } = usarInstitucion();
-  const [careers, setCareers] = useState<CarreraConPlan[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [carreras, setCarreras] = useState<CarreraConPlan[]>([]);
+  const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const obtenerDatos = async () => {
       try {
-        const response = await publicApi.get<{ datos: Carrera[] }>('/carreras', { params: { estado: 'activo' } });
-        const careersWithPlans: CarreraConPlan[] = response.data.datos.map((career) => ({
-          ...career,
-          planEstudio: getPlanEstudioForCareer(career.id),
+        const respuesta = await apiPublica.get<{ datos: Carrera[] }>('/carreras', { params: { estado: 'activo' } });
+        const carrerasConPlan: CarreraConPlan[] = respuesta.data.datos.map((carrera) => ({
+          ...carrera,
+          planEstudio: obtenerPlanEstudioDeCarrera(carrera.id),
         }));
-        setCareers(careersWithPlans);
+        setCarreras(carrerasConPlan);
       } catch (error) {
         console.error('Error al obtener carreras:', error);
       } finally {
-        setLoading(false);
+        setCargando(false);
       }
     };
-    fetchData();
+    obtenerDatos();
   }, []);
 
-  const getPlanEstudioForCareer = (careerId: number): PlanEstudio | undefined => {
-    const planEstudiosData: Record<number, PlanEstudio> = {
+  const obtenerPlanEstudioDeCarrera = (idCarrera: number): PlanEstudio | undefined => {
+    const datosPlanesEstudio: Record<number, PlanEstudio> = {
       1: {
         numeroRm: 'R.M. 1049/2024',
         fechaRm: '15/12/2023',
@@ -179,10 +179,10 @@ export default function CareersPage() {
         },
       },
     };
-    return planEstudiosData[careerId];
+    return datosPlanesEstudio[idCarrera];
   };
 
-  if (loading) {
+  if (cargando) {
     return (
       <div className="bg-dark-900 min-h-screen flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-gray-700 border-t-primary-600 rounded-full animate-spin" />
@@ -211,14 +211,14 @@ export default function CareersPage() {
       <section className="bg-dark-900 text-gray-100 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-6 sm:space-y-8">
-            {careers.map((career) => (
-              <div key={career.id} className="bg-dark-700 rounded-2xl overflow-hidden">
+            {carreras.map((carrera) => (
+              <div key={carrera.id} className="bg-dark-700 rounded-2xl overflow-hidden">
                 <div className="md:flex">
                   {/* Imagen */}
                   <div className="md:w-1/3 relative">
                     <img
-                      src={careerImages[career.id] || 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&q=80'}
-                      alt={career.nombre}
+                      src={imagenesCarrera[carrera.id] || 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&q=80'}
+                      alt={carrera.nombre}
                       className="w-full h-48 sm:h-64 md:h-full object-cover"
                     />
                   </div>
@@ -228,36 +228,36 @@ export default function CareersPage() {
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
                       <div>
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                          <h2 className="text-xl sm:text-2xl font-bold">{career.nombre}</h2>
+                          <h2 className="text-xl sm:text-2xl font-bold">{carrera.nombre}</h2>
                           <span className="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full flex items-center gap-1 w-fit">
                             <CheckCircle className="w-4 h-4" />
                             Activo
                           </span>
                         </div>
-                        <p className="text-primary-400 font-medium text-sm sm:text-base">{career.titulo}</p>
+                        <p className="text-primary-400 font-medium text-sm sm:text-base">{carrera.titulo}</p>
                       </div>
                       <Link
-                        href={`/admision/pre-registro?carrera=${career.id}`}
+                        href={`/admision/pre-registro?carrera=${carrera.id}`}
                         className="hidden md:flex items-center gap-2 px-6 py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all"
                       >
                         Postular <ArrowRight className="w-4 h-4" />
                       </Link>
                     </div>
 
-                    <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">{career.descripcion}</p>
+                    <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">{carrera.descripcion}</p>
 
                     <div className="flex flex-wrap gap-4 sm:gap-6 text-sm text-gray-500 mb-4 sm:mb-6">
                       <div className="flex items-center gap-2">
                         <Award className="w-4 h-4" />
-                        <span>{career.area}</span>
+                        <span>{carrera.area}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4" />
-                        <span>{career.horasCarga} horas</span>
+                        <span>{carrera.horasCarga} horas</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4" />
-                        <span>{career.planEstudio?.numeroRm}</span>
+                        <span>{carrera.planEstudio?.numeroRm}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <GraduationCap className="w-4 h-4" />
@@ -267,7 +267,7 @@ export default function CareersPage() {
 
                     <div className="flex flex-col sm:flex-row gap-4">
                       <Link
-                        href={`/carreras/${career.id}`}
+                        href={`/carreras/${carrera.id}`}
                         className="inline-flex items-center gap-2 text-primary-400 font-semibold hover:text-primary-300 transition-colors text-sm sm:text-base"
                       >
                         Ver Malla Curricular <ArrowRight className="w-4 h-4" />
@@ -275,7 +275,7 @@ export default function CareersPage() {
 
                       <div className="mt-4 md:hidden">
                         <Link
-                          href={`/admision/pre-registro?carrera=${career.id}`}
+                          href={`/admision/pre-registro?carrera=${carrera.id}`}
                           className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all"
                         >
                           Postular <ArrowRight className="w-4 h-4" />

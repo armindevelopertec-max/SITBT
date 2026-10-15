@@ -9,31 +9,31 @@ import { Usuario } from '../../entities/usuario.entity';
 @Injectable()
 export class EstrategiaJwt extends PassportStrategy(Strategy) {
   constructor(
-    private configService: ConfigService,
+    private servicioConfiguracion: ConfigService,
     @InjectRepository(Usuario)
-    private userRepository: Repository<Usuario>,
+    private repositorioUsuario: Repository<Usuario>,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_SECRET', 'sitbt_secret_key_2024'),
+      secretOrKey: servicioConfiguracion.get('JWT_SECRET', 'sitbt_secret_key_2024'),
     });
   }
 
-  async validate(payload: { usuarioId: number; nombreUsuario: string }) {
-    const user = await this.userRepository.findOne({
-      where: { id: payload.usuarioId },
+  async validate(cargaUtil: { usuarioId: number; nombreUsuario: string }) {
+    const usuario = await this.repositorioUsuario.findOne({
+      where: { id: cargaUtil.usuarioId },
       relations: ['persona'],
     });
 
-    if (!user || user.estado !== 'activo') {
+    if (!usuario || usuario.estado !== 'activo') {
       throw new UnauthorizedException('Usuario no válido');
     }
 
     return {
-      id: user.id,
-      nombreUsuario: user.nombreUsuario,
-      personaId: user.personaId,
+      id: usuario.id,
+      nombreUsuario: usuario.nombreUsuario,
+      personaId: usuario.personaId,
     };
   }
 }

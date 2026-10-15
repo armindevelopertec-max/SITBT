@@ -30,16 +30,16 @@ interface PlanEstudio {
   numeroRm: string;
 }
 
-export default function NuevoGrupoPage() {
+export default function PaginaNuevoGrupo() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [loadingData, setLoadingData] = useState(true);
+  const [cargando, setCargando] = useState(false);
+  const [cargandoDatos, setCargandoDatos] = useState(true);
   const [carreras, setCarreras] = useState<Carrera[]>([]);
   const [turnos, setTurnos] = useState<Turno[]>([]);
   const [planesEstudio, setPlanesEstudio] = useState<PlanEstudio[]>([]);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errores, setErrores] = useState<Record<string, string>>({});
 
-  const [formData, setFormData] = useState({
+  const [datosFormulario, setDatosFormulario] = useState({
     carreraId: '',
     planEstudioId: '',
     semestre: '',
@@ -50,105 +50,105 @@ export default function NuevoGrupoPage() {
   });
 
   useEffect(() => {
-    fetchInitialData();
+    obtenerDatosIniciales();
   }, []);
 
   useEffect(() => {
-    if (formData.carreraId) {
-      fetchPlanesEstudio(Number(formData.carreraId));
+    if (datosFormulario.carreraId) {
+      obtenerPlanesEstudio(Number(datosFormulario.carreraId));
     }
-  }, [formData.carreraId]);
+  }, [datosFormulario.carreraId]);
 
-  const fetchInitialData = async () => {
-    setLoadingData(true);
+  const obtenerDatosIniciales = async () => {
+    setCargandoDatos(true);
     try {
-      const [carrerasRes, turnosRes] = await Promise.all([
+      const [respuestaCarreras, respuestaTurnos] = await Promise.all([
         api.get('/carreras/activos'),
         api.get('/turnos/todos'),
       ]);
-      setCarreras(carrerasRes.data || []);
-      setTurnos(turnosRes.data || []);
+      setCarreras(respuestaCarreras.data || []);
+      setTurnos(respuestaTurnos.data || []);
     } catch (error) {
       console.error('Error al obtener los datos:', error);
     } finally {
-      setLoadingData(false);
+      setCargandoDatos(false);
     }
   };
 
-  const fetchPlanesEstudio = async (careerId: number) => {
+  const obtenerPlanesEstudio = async (carreraId: number) => {
     try {
-      const response = await api.get(`/planes-estudio/actual/${careerId}`);
-      setPlanesEstudio(response.data || []);
-      if (!response.data || response.data.length === 0) {
-        const allResponse = await api.get(`/planes-estudio?carreraId=${careerId}`);
-        setPlanesEstudio(allResponse.data?.data || []);
+      const respuesta = await api.get(`/planes-estudio/actual/${carreraId}`);
+      setPlanesEstudio(respuesta.data || []);
+      if (!respuesta.data || respuesta.data.length === 0) {
+        const respuestaCompleta = await api.get(`/planes-estudio?carreraId=${carreraId}`);
+        setPlanesEstudio(respuestaCompleta.data?.data || []);
       }
     } catch (error) {
       console.error('Error al obtener los planes de estudio:', error);
     }
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const validarFormulario = () => {
+    const nuevosErrores: Record<string, string> = {};
 
-    if (!formData.carreraId) newErrors.carreraId = 'Carrera es requerida';
-    if (!formData.planEstudioId) newErrors.planEstudioId = 'Plan de estudio es requerido';
-    if (!formData.semestre) newErrors.semestre = 'Semestre es requerido';
-    if (!formData.turnoId) newErrors.turnoId = 'Turno es requerido';
-    if (!formData.paralelo.trim()) newErrors.paralelo = 'Paralelo es requerido';
-    if (!formData.gestion.trim()) newErrors.gestion = 'Gestión es requerida';
+    if (!datosFormulario.carreraId) nuevosErrores.carreraId = 'Carrera es requerida';
+    if (!datosFormulario.planEstudioId) nuevosErrores.planEstudioId = 'Plan de estudio es requerido';
+    if (!datosFormulario.semestre) nuevosErrores.semestre = 'Semestre es requerido';
+    if (!datosFormulario.turnoId) nuevosErrores.turnoId = 'Turno es requerido';
+    if (!datosFormulario.paralelo.trim()) nuevosErrores.paralelo = 'Paralelo es requerido';
+    if (!datosFormulario.gestion.trim()) nuevosErrores.gestion = 'Gestión es requerida';
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const enviarFormulario = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validarFormulario()) return;
 
-    setLoading(true);
+    setCargando(true);
     try {
       await api.post('/grupos', {
-        carreraId: parseInt(formData.carreraId),
-        planEstudioId: parseInt(formData.planEstudioId),
-        semestre: parseInt(formData.semestre),
-        turnoId: parseInt(formData.turnoId),
-        paralelo: formData.paralelo.toUpperCase(),
-        gestion: formData.gestion,
-        capacidad: parseInt(formData.capacidad) || 30,
+        carreraId: parseInt(datosFormulario.carreraId),
+        planEstudioId: parseInt(datosFormulario.planEstudioId),
+        semestre: parseInt(datosFormulario.semestre),
+        turnoId: parseInt(datosFormulario.turnoId),
+        paralelo: datosFormulario.paralelo.toUpperCase(),
+        gestion: datosFormulario.gestion,
+        capacidad: parseInt(datosFormulario.capacidad) || 30,
       });
 
       router.push('/grupos');
     } catch (error: any) {
       console.error('Error al crear el grupo:', error);
       if (error.response?.data?.mensaje) {
-        setErrors({ submit: error.response.data.mensaje });
+        setErrores({ submit: error.response.data.mensaje });
       } else {
-        setErrors({ submit: 'Error al crear el grupo' });
+        setErrores({ submit: 'Error al crear el grupo' });
       }
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const getSemesters = () => {
+  const obtenerSemestres = () => {
     return Array.from({ length: 10 }, (_, i) => ({
       value: (i + 1).toString(),
-      label: `Semestre ${i + 1}`,
+      etiqueta: `Semestre ${i + 1}`,
     }));
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variante="fantasma" tamano="icono" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
         </Boton>
-        <Migas items={[
-          { label: 'Configuración', href: '/configuracion' },
-          { label: 'Grupos', href: '/grupos' },
-          { label: 'Nuevo Grupo' }
+        <Migas elementos={[
+          { etiqueta: 'Configuración', href: '/configuracion' },
+          { etiqueta: 'Grupos', href: '/grupos' },
+          { etiqueta: 'Nuevo Grupo' }
         ]} />
       </div>
 
@@ -156,8 +156,8 @@ export default function NuevoGrupoPage() {
         <h1 className="text-2xl font-bold text-gray-900">Nuevo Grupo</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Tarjeta variant="bordered">
+      <form onSubmit={enviarFormulario} className="space-y-6">
+        <Tarjeta variante="conBorde">
           <EncabezadoTarjeta>
             <TituloTarjeta>Datos del Grupo</TituloTarjeta>
           </EncabezadoTarjeta>
@@ -165,33 +165,33 @@ export default function NuevoGrupoPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <Selector
-                  label="Carrera *"
-                  value={formData.carreraId}
-                  onChange={(e) => setFormData({ ...formData, carreraId: e.target.value, planEstudioId: '' })}
-                  error={errors.carreraId}
-                  options={carreras.map(c => ({ value: c.id.toString(), label: c.nombre }))}
-                  placeholder={loadingData ? 'Cargando...' : 'Seleccionar carrera...'}
-                  disabled={loadingData}
+                  etiqueta="Carrera *"
+                  value={datosFormulario.carreraId}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, carreraId: e.target.value, planEstudioId: '' })}
+                  error={errores.carreraId}
+                  opciones={carreras.map(c => ({ value: c.id.toString(), etiqueta: c.nombre }))}
+                  placeholder={cargandoDatos ? 'Cargando...' : 'Seleccionar carrera...'}
+                  disabled={cargandoDatos}
                 />
               </div>
               <div>
                 <Selector
-                  label="Plan de Estudio *"
-                  value={formData.planEstudioId}
-                  onChange={(e) => setFormData({ ...formData, planEstudioId: e.target.value })}
-                  error={errors.planEstudioId}
-                  options={planesEstudio.map(p => ({ value: p.id.toString(), label: `RM ${p.numeroRm}` }))}
-                  placeholder={!formData.carreraId ? 'Primero seleccione carrera' : planesEstudio.length ? 'Seleccionar plan...' : 'No hay planes'}
-                  disabled={!formData.carreraId || loadingData}
+                  etiqueta="Plan de Estudio *"
+                  value={datosFormulario.planEstudioId}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, planEstudioId: e.target.value })}
+                  error={errores.planEstudioId}
+                  opciones={planesEstudio.map(p => ({ value: p.id.toString(), etiqueta: `RM ${p.numeroRm}` }))}
+                  placeholder={!datosFormulario.carreraId ? 'Primero seleccione carrera' : planesEstudio.length ? 'Seleccionar plan...' : 'No hay planes'}
+                  disabled={!datosFormulario.carreraId || cargandoDatos}
                 />
               </div>
               <div>
                 <Selector
-                  label="Semestre *"
-                  value={formData.semestre}
-                  onChange={(e) => setFormData({ ...formData, semestre: e.target.value })}
-                  error={errors.semestre}
-                  options={getSemesters()}
+                  etiqueta="Semestre *"
+                  value={datosFormulario.semestre}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, semestre: e.target.value })}
+                  error={errores.semestre}
+                  opciones={obtenerSemestres()}
                   placeholder="Seleccionar semestre..."
                 />
               </div>
@@ -200,30 +200,30 @@ export default function NuevoGrupoPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <Selector
-                  label="Turno *"
-                  value={formData.turnoId}
-                  onChange={(e) => setFormData({ ...formData, turnoId: e.target.value })}
-                  error={errors.turnoId}
-                  options={turnos.map(t => ({ value: t.id.toString(), label: `${t.nombre} (${t.horaInicio}-${t.horaFin})` }))}
-                  placeholder={loadingData ? 'Cargando...' : 'Seleccionar turno...'}
-                  disabled={loadingData}
+                  etiqueta="Turno *"
+                  value={datosFormulario.turnoId}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, turnoId: e.target.value })}
+                  error={errores.turnoId}
+                  opciones={turnos.map(t => ({ value: t.id.toString(), etiqueta: `${t.nombre} (${t.horaInicio}-${t.horaFin})` }))}
+                  placeholder={cargandoDatos ? 'Cargando...' : 'Seleccionar turno...'}
+                  disabled={cargandoDatos}
                 />
               </div>
               <div>
                 <Entrada
-                  label="Paralelo *"
-                  value={formData.paralelo}
-                  onChange={(e) => setFormData({ ...formData, paralelo: e.target.value.toUpperCase() })}
-                  error={errors.paralelo}
+                  etiqueta="Paralelo *"
+                  value={datosFormulario.paralelo}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, paralelo: e.target.value.toUpperCase() })}
+                  error={errores.paralelo}
                   placeholder="A"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Gestión *"
-                  value={formData.gestion}
-                  onChange={(e) => setFormData({ ...formData, gestion: e.target.value })}
-                  error={errors.gestion}
+                  etiqueta="Gestión *"
+                  value={datosFormulario.gestion}
+                  onChange={(e) => setDatosFormulario({ ...datosFormulario, gestion: e.target.value })}
+                  error={errores.gestion}
                   placeholder="2024"
                 />
               </div>
@@ -231,28 +231,28 @@ export default function NuevoGrupoPage() {
 
             <div className="md:w-1/3">
               <Entrada
-                label="Capacidad"
+                etiqueta="Capacidad"
                 type="number"
-                value={formData.capacidad}
-                onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })}
+                value={datosFormulario.capacidad}
+                onChange={(e) => setDatosFormulario({ ...datosFormulario, capacidad: e.target.value })}
                 placeholder="30"
               />
             </div>
           </ContenidoTarjeta>
         </Tarjeta>
 
-        {errors.submit && (
+        {errores.submit && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            {errors.submit}
+            {errores.submit}
           </div>
         )}
 
         <div className="flex justify-end gap-3">
-          <Boton variant="outline" type="button" onClick={() => router.back()}>
+          <Boton variante="contorno" type="button" onClick={() => router.back()}>
             Cancelar
           </Boton>
-          <Boton type="submit" disabled={loading}>
-            {loading ? (
+          <Boton type="submit" disabled={cargando}>
+            {cargando ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Guardando...

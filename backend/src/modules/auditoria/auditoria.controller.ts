@@ -19,54 +19,54 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorAuditoria {
-  constructor(private readonly service: ServicioAuditoria) {}
+  constructor(private readonly servicio: ServicioAuditoria) {}
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 50,
-    @Query('usuarioId') userId?: number,
-    @Query('accion') action?: string,
-    @Query('tabla') table?: string,
-    @Query('fechaInicio') startDate?: string,
-    @Query('fechaFin') endDate?: string,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 50,
+    @Query('usuarioId') usuarioId?: number,
+    @Query('accion') accion?: string,
+    @Query('tabla') tabla?: string,
+    @Query('fechaInicio') fechaInicio?: string,
+    @Query('fechaFin') fechaFin?: string,
   ) {
-    return this.service.findAll(
-      +page,
-      +limit,
-      userId ? +userId : undefined,
-      action,
-      table,
-      startDate ? new Date(startDate) : undefined,
-      endDate ? new Date(endDate) : undefined,
+    return this.servicio.obtenerTodos(
+      +pagina,
+      +limite,
+      usuarioId ? +usuarioId : undefined,
+      accion,
+      tabla,
+      fechaInicio ? new Date(fechaInicio) : undefined,
+      fechaFin ? new Date(fechaFin) : undefined,
     );
   }
 
   @Get('usuario/:usuarioId')
-  findByUser(@Param('usuarioId', ParseIntPipe) usuarioId: number, @Query('limite') limit = 50) {
-    return this.service.findByUser(usuarioId, +limit);
+  buscarPorUsuario(@Param('usuarioId', ParseIntPipe) usuarioId: number, @Query('limite') limite = 50) {
+    return this.servicio.buscarPorUsuario(usuarioId, +limite);
   }
 
   @Get('tabla/:tabla')
-  findByTable(@Param('tabla') tableName: string, @Query('limite') limit = 50) {
-    return this.service.findByTable(tableName, +limit);
+  buscarPorTabla(@Param('tabla') nombreTabla: string, @Query('limite') limite = 50) {
+    return this.servicio.buscarPorTabla(nombreTabla, +limite);
   }
 
   @Get('registro/:tabla/:registroId')
-  findByRecord(@Param('tabla') tableName: string, @Param('registroId', ParseIntPipe) registroId: number) {
-    return this.service.findByRecord(tableName, registroId);
+  buscarPorRegistro(@Param('tabla') nombreTabla: string, @Param('registroId', ParseIntPipe) registroId: number) {
+    return this.servicio.buscarPorRegistro(nombreTabla, registroId);
   }
 
   @Get('recientes')
-  getRecentActions(@Query('limite') limit = 20) {
-    return this.service.getRecentActions(+limit);
+  obtenerAccionesRecientes(@Query('limite') limite = 20) {
+    return this.servicio.obtenerAccionesRecientes(+limite);
   }
 
   @Get('estadisticas')
-  getActionStats(@Query('fechaInicio') startDate?: string, @Query('fechaFin') endDate?: string) {
-    return this.service.getActionStats(
-      startDate ? new Date(startDate) : undefined,
-      endDate ? new Date(endDate) : undefined,
+  obtenerEstadisticasAcciones(@Query('fechaInicio') fechaInicio?: string, @Query('fechaFin') fechaFin?: string) {
+    return this.servicio.obtenerEstadisticasAcciones(
+      fechaInicio ? new Date(fechaInicio) : undefined,
+      fechaFin ? new Date(fechaFin) : undefined,
     );
   }
 }

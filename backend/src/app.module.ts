@@ -22,12 +22,12 @@ import { ModuloConvalidaciones } from './modules/convalidaciones/convalidaciones
 import { ModuloAuditoria } from './modules/auditoria/auditoria.module';
 import { ModuloAlmacenamiento } from './modules/almacenamiento/almacenamiento.module';
 import { ModuloConfiguracionInstitucional } from './modules/configuracion-institucional/configuracion-institucional.module';
-import { GestionesModule } from './modules/gestiones/gestiones.module';
+import { ModuloGestiones } from './modules/gestiones/gestiones.module';
 import { ModuloAdmision } from './modules/admision/admision.module';
 import { ModuloConsentimiento } from './modules/consentimiento/consentimiento.module';
 import { ModuloDocumentos } from './modules/documentos/documentos.module';
 import { ModuloNotificaciones } from './modules/notificaciones/notificaciones.module';
-import { PreinscripcionModule } from './modules/preinscripcion/preinscripcion.module';
+import { ModuloPreinscripcion } from './modules/preinscripcion/preinscripcion.module';
 
 @Module({
   imports: [
@@ -37,16 +37,16 @@ import { PreinscripcionModule } from './modules/preinscripcion/preinscripcion.mo
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: (servicioConfiguracion: ConfigService) => ({
         type: 'postgres',
-        host: configService.get('DB_HOST', 'localhost'),
-        port: configService.get('DB_PORT', 5432),
-        username: configService.get('DB_USERNAME', 'sitbt'),
-        password: configService.get('DB_PASSWORD', 'sitbt_password'),
-        database: configService.get('DB_DATABASE', 'sitbt_db'),
+        host: servicioConfiguracion.get('DB_HOST', 'localhost'),
+        port: servicioConfiguracion.get('DB_PORT', 5432),
+        username: servicioConfiguracion.get('DB_USERNAME', 'sitbt'),
+        password: servicioConfiguracion.get('DB_PASSWORD', 'sitbt_password'),
+        database: servicioConfiguracion.get('DB_DATABASE', 'sitbt_db'),
         autoLoadEntities: true,
         synchronize: true,
-        logging: configService.get('DB_LOGGING', 'false') === 'true',
+        logging: servicioConfiguracion.get('DB_LOGGING', 'false') === 'true',
         timezone: 'America/La_Paz',
       }),
       inject: [ConfigService],
@@ -72,12 +72,12 @@ import { PreinscripcionModule } from './modules/preinscripcion/preinscripcion.mo
     ModuloAuditoria,
     ModuloAlmacenamiento,
     ModuloConfiguracionInstitucional,
-    GestionesModule,
+    ModuloGestiones,
     ModuloAdmision,
     ModuloConsentimiento,
     ModuloDocumentos,
     ModuloNotificaciones,
-    PreinscripcionModule,
+    ModuloPreinscripcion,
   ],
 })
-export class AppModule {}
+export class ModuloAplicacion {}

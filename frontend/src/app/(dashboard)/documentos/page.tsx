@@ -19,45 +19,45 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const tipoLabels: Record<string, { label: string; color: string }> = {
-  boleta_inscripcion: { label: 'Boleta Inscripción', color: 'bg-blue-100 text-blue-800' },
-  recibo_pago: { label: 'Recibo Pago', color: 'bg-green-100 text-green-800' },
-  carnet: { label: 'Carnet', color: 'bg-purple-100 text-purple-800' },
-  certificado: { label: 'Certificado', color: 'bg-yellow-100 text-yellow-800' },
-  constancia: { label: 'Constancia', color: 'bg-cyan-100 text-cyan-800' },
-  record_academico: { label: 'Record Académico', color: 'bg-orange-100 text-orange-800' },
+const etiquetasTipo: Record<string, { etiqueta: string; color: string }> = {
+  boleta_inscripcion: { etiqueta: 'Boleta Inscripción', color: 'bg-blue-100 text-blue-800' },
+  recibo_pago: { etiqueta: 'Recibo Pago', color: 'bg-green-100 text-green-800' },
+  carnet: { etiqueta: 'Carnet', color: 'bg-purple-100 text-purple-800' },
+  certificado: { etiqueta: 'Certificado', color: 'bg-yellow-100 text-yellow-800' },
+  constancia: { etiqueta: 'Constancia', color: 'bg-cyan-100 text-cyan-800' },
+  record_academico: { etiqueta: 'Record Académico', color: 'bg-orange-100 text-orange-800' },
 };
 
-const estadoLabels: Record<string, { label: string; color: string }> = {
-  generado: { label: 'Generado', color: 'bg-gray-100 text-gray-800' },
-  impreso: { label: 'Impreso', color: 'bg-blue-100 text-blue-800' },
-  entregado: { label: 'Entregado', color: 'bg-green-100 text-green-800' },
-  anulado: { label: 'Anulado', color: 'bg-red-100 text-red-800' },
+const etiquetasEstado: Record<string, { etiqueta: string; color: string }> = {
+  generado: { etiqueta: 'Generado', color: 'bg-gray-100 text-gray-800' },
+  impreso: { etiqueta: 'Impreso', color: 'bg-blue-100 text-blue-800' },
+  entregado: { etiqueta: 'Entregado', color: 'bg-green-100 text-green-800' },
+  anulado: { etiqueta: 'Anulado', color: 'bg-red-100 text-red-800' },
 };
 
-export default function DocumentsPage() {
-  const { loading, fetchDocuments, getStatistics } = usarDocumentos();
-  const [documents, setDocuments] = useState<DocumentoEmitido[]>([]);
+export default function PaginaDocumentos() {
+  const { cargando, obtenerDocumentos, obtenerEstadisticas } = usarDocumentos();
+  const [documentos, setDocumentos] = useState<DocumentoEmitido[]>([]);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [tipoFilter, setTipoFilter] = useState<string>('');
-  const [estadoFilter, setEstadoFilter] = useState<string>('');
-  const [stats, setStats] = useState<any>(null);
+  const [pagina, setPagina] = useState(1);
+  const [filtroTipo, setFiltroTipo] = useState<string>('');
+  const [filtroEstado, setFiltroEstado] = useState<string>('');
+  const [estadisticas, setEstadisticas] = useState<any>(null);
 
   useEffect(() => {
-    fetchDocuments({
-      pagina: page,
+    obtenerDocumentos({
+      pagina: pagina,
       limite: 20,
-      tipo: tipoFilter || undefined,
-      estado: estadoFilter || undefined,
-    }).then((result) => {
-      setDocuments(result.datos);
-      setTotal(result.total);
+      tipo: filtroTipo || undefined,
+      estado: filtroEstado || undefined,
+    }).then((resultado) => {
+      setDocumentos(resultado.datos);
+      setTotal(resultado.total);
     }).catch(console.error);
-  }, [page, tipoFilter, estadoFilter]);
+  }, [pagina, filtroTipo, filtroEstado]);
 
   useEffect(() => {
-    getStatistics().then(setStats).catch(console.error);
+    obtenerEstadisticas().then(setEstadisticas).catch(console.error);
   }, []);
 
   return (
@@ -76,27 +76,27 @@ export default function DocumentsPage() {
       </div>
 
       {/* Stats */}
-      {stats && (
+      {estadisticas && (
         <div className="grid grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-gray-900">{stats.total || 0}</div>
+            <div className="text-2xl font-bold text-gray-900">{estadisticas.total || 0}</div>
             <div className="text-sm text-gray-500">Total documentos</div>
           </div>
           <div className="bg-blue-50 rounded-lg shadow-sm p-4">
             <div className="text-2xl font-bold text-blue-600">
-              {stats.porTipo?.find((t: any) => t.tipo === 'boleta_inscripcion')?.cantidad || 0}
+              {estadisticas.porTipo?.find((elemento: any) => elemento.tipo === 'boleta_inscripcion')?.cantidad || 0}
             </div>
             <div className="text-sm text-blue-600">Boletas</div>
           </div>
           <div className="bg-green-50 rounded-lg shadow-sm p-4">
             <div className="text-2xl font-bold text-green-600">
-              {stats.porTipo?.find((t: any) => t.tipo === 'recibo_pago')?.cantidad || 0}
+              {estadisticas.porTipo?.find((elemento: any) => elemento.tipo === 'recibo_pago')?.cantidad || 0}
             </div>
             <div className="text-sm text-green-600">Recibos</div>
           </div>
           <div className="bg-purple-50 rounded-lg shadow-sm p-4">
             <div className="text-2xl font-bold text-purple-600">
-              {stats.porTipo?.find((t: any) => t.tipo === 'carnet')?.cantidad || 0}
+              {estadisticas.porTipo?.find((elemento: any) => elemento.tipo === 'carnet')?.cantidad || 0}
             </div>
             <div className="text-sm text-purple-600">Carnets</div>
           </div>
@@ -108,26 +108,26 @@ export default function DocumentsPage() {
         <ContenidoTarjeta className="pt-6">
           <div className="flex gap-4">
             <Selector
-              value={tipoFilter}
-              onChange={(e) => setTipoFilter(e.target.value)}
-              options={[
-                { value: '', label: 'Todos los tipos' },
-                { value: 'boleta_inscripcion', label: 'Boleta Inscripción' },
-                { value: 'recibo_pago', label: 'Recibo Pago' },
-                { value: 'carnet', label: 'Carnet' },
-                { value: 'certificado', label: 'Certificado' },
+              value={filtroTipo}
+              onChange={(e) => setFiltroTipo(e.target.value)}
+              opciones={[
+                { value: '', etiqueta: 'Todos los tipos' },
+                { value: 'boleta_inscripcion', etiqueta: 'Boleta Inscripción' },
+                { value: 'recibo_pago', etiqueta: 'Recibo Pago' },
+                { value: 'carnet', etiqueta: 'Carnet' },
+                { value: 'certificado', etiqueta: 'Certificado' },
               ]}
               placeholder="Tipo de documento"
             />
             <Selector
-              value={estadoFilter}
-              onChange={(e) => setEstadoFilter(e.target.value)}
-              options={[
-                { value: '', label: 'Todos' },
-                { value: 'generado', label: 'Generado' },
-                { value: 'impreso', label: 'Impreso' },
-                { value: 'entregado', label: 'Entregado' },
-                { value: 'anulado', label: 'Anulado' },
+              value={filtroEstado}
+              onChange={(e) => setFiltroEstado(e.target.value)}
+              opciones={[
+                { value: '', etiqueta: 'Todos' },
+                { value: 'generado', etiqueta: 'Generado' },
+                { value: 'impreso', etiqueta: 'Impreso' },
+                { value: 'entregado', etiqueta: 'Entregado' },
+                { value: 'anulado', etiqueta: 'Anulado' },
               ]}
               placeholder="Estado"
             />
@@ -151,57 +151,57 @@ export default function DocumentsPage() {
               </FilaTabla>
             </EncabezadoTabla>
             <CuerpoTabla>
-              {loading ? (
+              {cargando ? (
                 <FilaTabla>
                   <CeldaTabla colSpan={7} className="text-center py-8">
                     Cargando...
                   </CeldaTabla>
                 </FilaTabla>
-              ) : documents.length === 0 ? (
+              ) : documentos.length === 0 ? (
                 <FilaTabla>
                   <CeldaTabla colSpan={7} className="text-center py-8 text-gray-500">
                     No hay documentos
                   </CeldaTabla>
                 </FilaTabla>
               ) : (
-                documents.map((doc) => (
-                  <FilaTabla key={doc.id}>
-                    <CeldaTabla className="font-medium">{doc.numeroDocumento}</CeldaTabla>
+                documentos.map((documento) => (
+                  <FilaTabla key={documento.id}>
+                    <CeldaTabla className="font-medium">{documento.numeroDocumento}</CeldaTabla>
                     <CeldaTabla>
-                      <Insignia className={tipoLabels[doc.tipo]?.color}>
-                        {tipoLabels[doc.tipo]?.label || doc.tipo}
+                      <Insignia className={etiquetasTipo[documento.tipo]?.color}>
+                        {etiquetasTipo[documento.tipo]?.etiqueta || documento.tipo}
                       </Insignia>
                     </CeldaTabla>
                     <CeldaTabla>
-                      {doc.estudiante
-                        ? `${doc.estudiante.persona?.nombres} ${doc.estudiante.persona?.apellidoPaterno}`
-                        : `ID: ${doc.estudianteId}`}
+                      {documento.estudiante
+                        ? `${documento.estudiante.persona?.nombres} ${documento.estudiante.persona?.apellidoPaterno}`
+                        : `ID: ${documento.estudianteId}`}
                     </CeldaTabla>
-                    <CeldaTabla>{doc.gestion}</CeldaTabla>
+                    <CeldaTabla>{documento.gestion}</CeldaTabla>
                     <CeldaTabla>
-                      {doc.fechaEmision
-                        ? format(new Date(doc.fechaEmision), "d 'de' MMMM 'de' yyyy", { locale: es })
+                      {documento.fechaEmision
+                        ? format(new Date(documento.fechaEmision), "d 'de' MMMM 'de' yyyy", { locale: es })
                         : '-'}
                     </CeldaTabla>
                     <CeldaTabla>
-                      <Insignia className={estadoLabels[doc.estado]?.color}>
-                        {estadoLabels[doc.estado]?.label || doc.estado}
+                      <Insignia className={etiquetasEstado[documento.estado]?.color}>
+                        {etiquetasEstado[documento.estado]?.etiqueta || documento.estado}
                       </Insignia>
                     </CeldaTabla>
                     <CeldaTabla className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Link href={`/documentos/${doc.id}`}>
-                          <Boton variant="ghost" size="sm">
+                        <Link href={`/documentos/${documento.id}`}>
+                          <Boton variante="fantasma" tamano="pequeno">
                             <Eye className="w-4 h-4" />
                           </Boton>
                         </Link>
-                        {doc.estado !== 'entregado' && doc.estado !== 'anulado' && (
-                          <Boton variant="ghost" size="sm" title="Imprimir">
+                        {documento.estado !== 'entregado' && documento.estado !== 'anulado' && (
+                          <Boton variante="fantasma" tamano="pequeno" title="Imprimir">
                             <Printer className="w-4 h-4" />
                           </Boton>
                         )}
-                        {doc.estado === 'impreso' && (
-                          <Boton variant="ghost" size="sm" title="Registrar entrega" className="text-green-600">
+                        {documento.estado === 'impreso' && (
+                          <Boton variante="fantasma" tamano="pequeno" title="Registrar entrega" className="text-green-600">
                             <CheckCircle className="w-4 h-4" />
                           </Boton>
                         )}
@@ -218,22 +218,22 @@ export default function DocumentsPage() {
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">
         <div className="text-sm text-gray-500">
-          Mostrando {documents.length} documentos
+          Mostrando {documentos.length} documentos
         </div>
         <div className="flex gap-2">
           <Boton
-            variant="outline"
-            size="sm"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
+            variante="contorno"
+            tamano="pequeno"
+            onClick={() => setPagina((p) => Math.max(1, p - 1))}
+            disabled={pagina === 1}
           >
             Anterior
           </Boton>
           <Boton
-            variant="outline"
-            size="sm"
-            onClick={() => setPage((p) => p + 1)}
-            disabled={documents.length < 20}
+            variante="contorno"
+            tamano="pequeno"
+            onClick={() => setPagina((p) => p + 1)}
+            disabled={documentos.length < 20}
           >
             Siguiente
           </Boton>

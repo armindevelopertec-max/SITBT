@@ -19,256 +19,256 @@ import { ConfiguracionInstitucional } from '../../entities/configuracion-institu
 export class ServicioAdmision {
   constructor(
     @InjectRepository(SolicitudAdmision)
-    private admissionRepository: Repository<SolicitudAdmision>,
+    private repositorioSolicitud: Repository<SolicitudAdmision>,
     @InjectRepository(Persona)
-    private personaRepository: Repository<Persona>,
+    private repositorioPersona: Repository<Persona>,
     @InjectRepository(Estudiante)
-    private estudianteRepository: Repository<Estudiante>,
+    private repositorioEstudiante: Repository<Estudiante>,
     @InjectRepository(Inscripcion)
-    private inscripcionRepository: Repository<Inscripcion>,
+    private repositorioInscripcion: Repository<Inscripcion>,
   ) {}
 
-  async create(createDto: CrearAdmisionDto): Promise<SolicitudAdmision> {
-    const existingStudent = await this.estudianteRepository
-      .createQueryBuilder('student')
-      .innerJoin('student.persona', 'person')
-      .where('person.ci = :ci', { ci: createDto.ci })
-      .andWhere('student.estado = :estado', { estado: 'activo' })
+  async crear(crearAdmisionDto: CrearAdmisionDto): Promise<SolicitudAdmision> {
+    const estudianteExistente = await this.repositorioEstudiante
+      .createQueryBuilder('estudiante')
+      .innerJoin('estudiante.persona', 'persona')
+      .where('persona.ci = :ci', { ci: crearAdmisionDto.ci })
+      .andWhere('estudiante.estado = :estado', { estado: 'activo' })
       .getOne();
 
-    if (existingStudent) {
+    if (estudianteExistente) {
       throw new BadRequestException('Esta persona ya está registrada como estudiante activo en otra carrera');
     }
 
-    if (createDto.correo) {
-      const existingEmail = await this.personaRepository
-        .createQueryBuilder('person')
-        .innerJoin('person.estudiantes', 'student')
-        .where('person.correo = :correo', { correo: createDto.correo })
-        .andWhere('student.estado = :estado', { estado: 'activo' })
+    if (crearAdmisionDto.correo) {
+      const correoExistente = await this.repositorioPersona
+        .createQueryBuilder('persona')
+        .innerJoin('persona.estudiantes', 'estudiante')
+        .where('persona.correo = :correo', { correo: crearAdmisionDto.correo })
+        .andWhere('estudiante.estado = :estado', { estado: 'activo' })
         .getOne();
-      if (existingEmail) {
+      if (correoExistente) {
         throw new BadRequestException('Ya existe un estudiante activo con este correo electrónico');
       }
     }
 
-    if (createDto.telefono) {
-      const existingPhone = await this.personaRepository
-        .createQueryBuilder('person')
-        .innerJoin('person.estudiantes', 'student')
-        .where('person.telefono = :telefono', { telefono: createDto.telefono })
-        .andWhere('student.estado = :estado', { estado: 'activo' })
+    if (crearAdmisionDto.telefono) {
+      const telefonoExistente = await this.repositorioPersona
+        .createQueryBuilder('persona')
+        .innerJoin('persona.estudiantes', 'estudiante')
+        .where('persona.telefono = :telefono', { telefono: crearAdmisionDto.telefono })
+        .andWhere('estudiante.estado = :estado', { estado: 'activo' })
         .getOne();
-      if (existingPhone) {
+      if (telefonoExistente) {
         throw new BadRequestException('Ya existe un estudiante activo con este número de celular');
       }
     }
 
-    const request = this.admissionRepository.create({
-      ...createDto,
-      fechaNacimiento: new Date(createDto.fechaNacimiento),
+    const solicitud = this.repositorioSolicitud.create({
+      ...crearAdmisionDto,
+      fechaNacimiento: new Date(crearAdmisionDto.fechaNacimiento),
     } as Partial<SolicitudAdmision>);
-    return this.admissionRepository.save(request as any) as any;
+    return this.repositorioSolicitud.save(solicitud as any) as any;
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
     estado?: EstadoAdmision,
     origen?: string,
   ): Promise<{ datos: SolicitudAdmision[]; total: number; pagina: number; limite: number }> {
-    const query = this.admissionRepository
-      .createQueryBuilder('request')
-      .leftJoinAndSelect('request.carrera', 'carrera');
+    const consulta = this.repositorioSolicitud
+      .createQueryBuilder('solicitud')
+      .leftJoinAndSelect('solicitud.carrera', 'carrera');
 
     if (estado) {
-      query.andWhere('request.estado = :estado', { estado });
+      consulta.andWhere('solicitud.estado = :estado', { estado });
     }
 
     if (origen) {
-      query.andWhere('request.origen = :origen', { origen });
+      consulta.andWhere('solicitud.origen = :origen', { origen });
     }
 
-    const [data, total] = await query
-      .orderBy('request.creadoEn', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('solicitud.creadoEn', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: string): Promise<SolicitudAdmision> {
-    const request = await this.admissionRepository.findOne({
+  async obtenerUno(id: string): Promise<SolicitudAdmision> {
+    const solicitud = await this.repositorioSolicitud.findOne({
       where: { id },
       relations: ['carrera'],
     });
-    if (!request) {
+    if (!solicitud) {
       throw new NotFoundException(`Solicitud de admisión con ID ${id} no encontrada`);
     }
-    return request;
+    return solicitud;
   }
 
-  async update(id: string, updateDto: ActualizarAdmisionDto): Promise<SolicitudAdmision> {
-    const request = await this.findOne(id);
+  async actualizar(id: string, actualizarAdmisionDto: ActualizarAdmisionDto): Promise<SolicitudAdmision> {
+    const solicitud = await this.obtenerUno(id);
 
-    if (updateDto.estado && updateDto.estado !== request.estado) {
-      if (updateDto.estado === EstadoAdmision.RECHAZADO && !updateDto.observaciones) {
+    if (actualizarAdmisionDto.estado && actualizarAdmisionDto.estado !== solicitud.estado) {
+      if (actualizarAdmisionDto.estado === EstadoAdmision.RECHAZADO && !actualizarAdmisionDto.observaciones) {
         throw new BadRequestException('Observaciones requeridas al rechazar');
       }
     }
 
-    Object.assign(request, updateDto);
-    return this.admissionRepository.save(request as any) as any;
+    Object.assign(solicitud, actualizarAdmisionDto);
+    return this.repositorioSolicitud.save(solicitud as any) as any;
   }
 
-  async verify(id: string, verificadoPor: number, observaciones?: string): Promise<SolicitudAdmision> {
-    return this.update(id, {
+  async verificar(id: string, verificadoPor: number, observaciones?: string): Promise<SolicitudAdmision> {
+    return this.actualizar(id, {
       estado: EstadoAdmision.VERIFICADO,
       verificadoPor: verificadoPor,
       observaciones,
     } as ActualizarAdmisionDto);
   }
 
-  async reject(id: string, verificadoPor: number, observaciones: string): Promise<SolicitudAdmision> {
+  async rechazar(id: string, verificadoPor: number, observaciones: string): Promise<SolicitudAdmision> {
     if (!observaciones) {
       throw new BadRequestException('Observaciones requeridas al rechazar');
     }
-    return this.update(id, {
+    return this.actualizar(id, {
       estado: EstadoAdmision.RECHAZADO,
       verificadoPor: verificadoPor,
       observaciones,
     } as ActualizarAdmisionDto);
   }
 
-  async convertToStudent(id: string, gestionAdmision: string): Promise<{ estudiante: Estudiante; persona: Persona }> {
-    const request = await this.findOne(id);
+  async convertirAEstudiante(id: string, gestionAdmision: string): Promise<{ estudiante: Estudiante; persona: Persona }> {
+    const solicitud = await this.obtenerUno(id);
 
-    if (request.estado === EstadoAdmision.CONVERTIDO) {
+    if (solicitud.estado === EstadoAdmision.CONVERTIDO) {
       throw new BadRequestException('Esta solicitud ya fue convertida a estudiante');
     }
 
-    if (request.estado !== EstadoAdmision.VERIFICADO) {
+    if (solicitud.estado !== EstadoAdmision.VERIFICADO) {
       throw new BadRequestException('La solicitud debe estar verificada para convertir a estudiante');
     }
 
-    if (!request.carreraId) {
+    if (!solicitud.carreraId) {
       throw new BadRequestException('La solicitud debe tener una carrera asignada');
     }
 
-    const existingStudent = await this.estudianteRepository.findOne({
+    const estudianteExistente = await this.repositorioEstudiante.findOne({
       where: { solicitudAdmisionId: id }
     });
-    if (existingStudent) {
+    if (estudianteExistente) {
       throw new BadRequestException('Ya existe un estudiante creado para esta solicitud');
     }
 
-    if (request.correo) {
-      const existingEmail = await this.personaRepository
-        .createQueryBuilder('person')
-        .innerJoin('person.estudiantes', 'student')
-        .where('person.correo = :correo', { correo: request.correo })
-        .andWhere('student.estado = :estado', { estado: 'activo' })
+    if (solicitud.correo) {
+      const correoExistente = await this.repositorioPersona
+        .createQueryBuilder('persona')
+        .innerJoin('persona.estudiantes', 'estudiante')
+        .where('persona.correo = :correo', { correo: solicitud.correo })
+        .andWhere('estudiante.estado = :estado', { estado: 'activo' })
         .getOne();
-      if (existingEmail) {
+      if (correoExistente) {
         throw new BadRequestException('Ya existe un estudiante activo con este correo electrónico');
       }
     }
 
-    if (request.telefono) {
-      const existingPhone = await this.personaRepository
-        .createQueryBuilder('person')
-        .innerJoin('person.estudiantes', 'student')
-        .where('person.telefono = :phone', { phone: request.telefono })
-        .andWhere('student.estado = :estado', { estado: 'activo' })
+    if (solicitud.telefono) {
+      const telefonoExistente = await this.repositorioPersona
+        .createQueryBuilder('persona')
+        .innerJoin('persona.estudiantes', 'estudiante')
+        .where('persona.telefono = :telefono', { telefono: solicitud.telefono })
+        .andWhere('estudiante.estado = :estado', { estado: 'activo' })
         .getOne();
-      if (existingPhone) {
+      if (telefonoExistente) {
         throw new BadRequestException('Ya existe un estudiante activo con este número de celular');
       }
     }
 
-    let persona = await this.personaRepository.findOne({ where: { ci: request.ci } });
+    let persona = await this.repositorioPersona.findOne({ where: { ci: solicitud.ci } });
 
-    const existingStudentInCareer = await this.estudianteRepository
-      .createQueryBuilder('student')
-      .innerJoin('student.persona', 'person')
-      .where('person.ci = :ci', { ci: request.ci })
-      .andWhere('student.carreraId = :careerId', { careerId: request.carreraId })
-      .andWhere('student.estado = :estado', { estado: 'activo' })
+    const estudianteExistenteEnCarrera = await this.repositorioEstudiante
+      .createQueryBuilder('estudiante')
+      .innerJoin('estudiante.persona', 'persona')
+      .where('persona.ci = :ci', { ci: solicitud.ci })
+      .andWhere('estudiante.carreraId = :carreraId', { carreraId: solicitud.carreraId })
+      .andWhere('estudiante.estado = :estado', { estado: 'activo' })
       .getOne();
 
-    if (existingStudentInCareer) {
+    if (estudianteExistenteEnCarrera) {
       throw new BadRequestException('Esta persona ya está registrada como estudiante activo en esta carrera');
     }
 
     if (!persona) {
-      const finalBirthplace = request.lugarNacimiento === 'Otra' && request.lugarNacimientoOtro ? request.lugarNacimientoOtro : request.lugarNacimiento;
-      const finalNationality = request.nacionalidad === 'Otra' && request.nacionalidadOtra ? request.nacionalidadOtra : request.nacionalidad;
+      const lugarNacimientoFinal = solicitud.lugarNacimiento === 'Otra' && solicitud.lugarNacimientoOtro ? solicitud.lugarNacimientoOtro : solicitud.lugarNacimiento;
+      const nacionalidadFinal = solicitud.nacionalidad === 'Otra' && solicitud.nacionalidadOtra ? solicitud.nacionalidadOtra : solicitud.nacionalidad;
 
-      persona = (this.personaRepository.create as any)({
-        ci: request.ci,
-        nombres: request.nombre,
-        apellidoPaterno: (request as any).apellidoPaterno || request.nombre.split(' ')[0] || request.nombre,
-        apellidoMaterno: request.apellidoMaterno || request.nombre.split(' ').slice(1).join(' ') || '',
-        fechaNacimiento: new Date(request.fechaNacimiento),
-        lugarNacimiento: finalBirthplace,
-        genero: request.genero as any,
-        estadoCivil: request.estadoCivil as any,
-        nacionalidad: finalNationality,
-        telefono: request.telefono,
-        correo: request.correo,
-        direccion: request.direccion,
+      persona = (this.repositorioPersona.create as any)({
+        ci: solicitud.ci,
+        nombres: solicitud.nombre,
+        apellidoPaterno: (solicitud as any).apellidoPaterno || solicitud.nombre.split(' ')[0] || solicitud.nombre,
+        apellidoMaterno: solicitud.apellidoMaterno || solicitud.nombre.split(' ').slice(1).join(' ') || '',
+        fechaNacimiento: new Date(solicitud.fechaNacimiento),
+        lugarNacimiento: lugarNacimientoFinal,
+        genero: solicitud.genero as any,
+        estadoCivil: solicitud.estadoCivil as any,
+        nacionalidad: nacionalidadFinal,
+        telefono: solicitud.telefono,
+        correo: solicitud.correo,
+        direccion: solicitud.direccion,
       } as any);
-      const saved = await (this.personaRepository.save as any)(persona as any);
-      persona = (Array.isArray(saved) ? saved[0] : saved) as Persona;
+      const guardado = await (this.repositorioPersona.save as any)(persona as any);
+      persona = (Array.isArray(guardado) ? guardado[0] : guardado) as Persona;
     }
 
-    const studyPlan = await this.estudianteRepository.manager.findOne(
+    const planEstudio = await this.repositorioEstudiante.manager.findOne(
       PlanEstudio,
-      { where: { carreraId: request.carreraId, estado: 'vigente' as any } }
+      { where: { carreraId: solicitud.carreraId, estado: 'vigente' as any } }
     );
 
-    if (!studyPlan) {
+    if (!planEstudio) {
       throw new BadRequestException('No existe un plan de estudio vigente para la carrera seleccionada');
     }
 
-    const inscriptionCode = await this.generateInscriptionCode(request);
+    const codigoInscripcion = await this.generarCodigoInscripcion(solicitud);
 
-    const estudianteData: DeepPartial<Estudiante> = {
+    const datosEstudiante: DeepPartial<Estudiante> = {
       personaId: persona.id,
       numeroTituloBachiller: undefined,
       fechaTituloBachiller: undefined,
       gestionAdmision: gestionAdmision,
       numeroFolder: undefined,
-      codigoInscripcion: inscriptionCode,
+      codigoInscripcion: codigoInscripcion,
       codigoFormulario01: undefined,
-      carreraId: request.carreraId,
-      planEstudioId: studyPlan.id,
+      carreraId: solicitud.carreraId,
+      planEstudioId: planEstudio.id,
       fechaAdmision: new Date(),
       estado: 'activo' as any,
       estadoMatricula: EstadoMatriculaEstudiante.MATRICULADO,
-      origen: request.origen === 'web' ? OrigenEstudiante.WEB : OrigenEstudiante.SECRETARIA,
-      solicitudAdmisionId: request.id,
-      verificadoPor: request.verificadoPor || undefined,
+      origen: solicitud.origen === 'web' ? OrigenEstudiante.WEB : OrigenEstudiante.SECRETARIA,
+      solicitudAdmisionId: solicitud.id,
+      verificadoPor: solicitud.verificadoPor || undefined,
       fechaVerificacion: new Date(),
-      fechaPreRegistro: request.creadoEn,
+      fechaPreRegistro: solicitud.creadoEn,
     };
 
-    const estudiante = this.estudianteRepository.create(estudianteData);
+    const estudiante = this.repositorioEstudiante.create(datosEstudiante);
 
-    const savedStudent = (await this.estudianteRepository.save(estudiante)) as Estudiante;
+    const estudianteGuardado = (await this.repositorioEstudiante.save(estudiante)) as Estudiante;
 
-    request.estado = EstadoAdmision.CONVERTIDO;
-    request.estudianteConvertidoId = savedStudent.id;
-    await this.admissionRepository.save(request);
+    solicitud.estado = EstadoAdmision.CONVERTIDO;
+    solicitud.estudianteConvertidoId = estudianteGuardado.id;
+    await this.repositorioSolicitud.save(solicitud);
 
-    return { estudiante: savedStudent, persona };
+    return { estudiante: estudianteGuardado, persona };
   }
 
-  private async generateInscriptionCode(request: SolicitudAdmision): Promise<string> {
-    const carrera = await this.estudianteRepository.manager.findOne(
+  private async generarCodigoInscripcion(solicitud: SolicitudAdmision): Promise<string> {
+    const carrera = await this.repositorioEstudiante.manager.findOne(
       Carrera,
-      { where: { id: request.carreraId } }
+      { where: { id: solicitud.carreraId } }
     ) as Carrera | null;
 
     if (!carrera) {
@@ -276,46 +276,46 @@ export class ServicioAdmision {
     }
 
     const gestion = new Date().getFullYear().toString();
-    const yearSuffix = gestion.slice(-2);
+    const sufijoAnio = gestion.slice(-2);
 
-    const initials = (
-      (request.apellidoPaterno?.[0] || '') +
-      (request.apellidoMaterno?.[0] || '') +
-      (request.nombre?.[0] || '')
+    const iniciales = (
+      (solicitud.apellidoPaterno?.[0] || '') +
+      (solicitud.apellidoMaterno?.[0] || '') +
+      (solicitud.nombre?.[0] || '')
     ).toUpperCase();
 
-    const careerCode = carrera.nombre.substring(0, 2).toUpperCase();
+    const codigoCarrera = carrera.nombre.substring(0, 2).toUpperCase();
 
-    const ciLast2 = request.ci.slice(-2);
+    const ultimos2Ci = solicitud.ci.slice(-2);
 
-    let code = `${initials}-${careerCode}${yearSuffix}${ciLast2}`;
+    let codigo = `${iniciales}-${codigoCarrera}${sufijoAnio}${ultimos2Ci}`;
 
-    let counter = 1;
-    while (await this.estudianteRepository.findOne({ where: { codigoInscripcion: code } })) {
-      code = `${initials}-${careerCode}${yearSuffix}${ciLast2}-${counter}`;
-      counter++;
+    let contador = 1;
+    while (await this.repositorioEstudiante.findOne({ where: { codigoInscripcion: codigo } })) {
+      codigo = `${iniciales}-${codigoCarrera}${sufijoAnio}${ultimos2Ci}-${contador}`;
+      contador++;
     }
 
-    return code;
+    return codigo;
   }
 
-  async remove(id: string): Promise<void> {
-    const request = await this.findOne(id);
-    await this.admissionRepository.remove(request);
+  async eliminar(id: string): Promise<void> {
+    const solicitud = await this.obtenerUno(id);
+    await this.repositorioSolicitud.remove(solicitud);
   }
 
-  async getStatistics(): Promise<{
+  async obtenerEstadisticas(): Promise<{
     total: number;
     pendientes: number;
     verificados: number;
     rechazados: number;
     convertidos: number;
   }> {
-    const total = await this.admissionRepository.count();
-    const pendientes = await this.admissionRepository.count({ where: { estado: EstadoAdmision.PENDIENTE } });
-    const verificados = await this.admissionRepository.count({ where: { estado: EstadoAdmision.VERIFICADO } });
-    const rechazados = await this.admissionRepository.count({ where: { estado: EstadoAdmision.RECHAZADO } });
-    const convertidos = await this.admissionRepository.count({ where: { estado: EstadoAdmision.CONVERTIDO } });
+    const total = await this.repositorioSolicitud.count();
+    const pendientes = await this.repositorioSolicitud.count({ where: { estado: EstadoAdmision.PENDIENTE } });
+    const verificados = await this.repositorioSolicitud.count({ where: { estado: EstadoAdmision.VERIFICADO } });
+    const rechazados = await this.repositorioSolicitud.count({ where: { estado: EstadoAdmision.RECHAZADO } });
+    const convertidos = await this.repositorioSolicitud.count({ where: { estado: EstadoAdmision.CONVERTIDO } });
 
     return { total, pendientes, verificados, rechazados, convertidos };
   }

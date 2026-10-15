@@ -7,29 +7,29 @@ import BarraLateral from '@/components/layout/BarraLateral';
 import Encabezado from '@/components/layout/Encabezado';
 import { cn } from '@/lib/utilidades';
 
-export default function DashboardLayout({
+export default function DisenoPanel({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [barraLateralAbierta, setBarraLateralAbierta] = useState(true);
+  const [barraLateralColapsada, setBarraLateralColapsada] = useState(false);
+  const [esMovil, setEsMovil] = useState(false);
   const router = useRouter();
   const { estaAutenticado, _hidratado } = usarAlmacenAutenticacion();
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
+    const verificarMovil = () => {
+      setEsMovil(window.innerWidth < 1024);
       if (window.innerWidth < 1024) {
-        setSidebarOpen(false);
+        setBarraLateralAbierta(false);
       } else {
-        setSidebarOpen(true);
+        setBarraLateralAbierta(true);
       }
     };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    verificarMovil();
+    window.addEventListener('resize', verificarMovil);
+    return () => window.removeEventListener('resize', verificarMovil);
   }, []);
 
   useEffect(() => {
@@ -46,35 +46,35 @@ export default function DashboardLayout({
     return null;
   }
 
-  const handleMenuClick = () => {
-    if (isMobile) {
-      setSidebarOpen(!sidebarOpen);
+  const manejarClicMenu = () => {
+    if (esMovil) {
+      setBarraLateralAbierta(!barraLateralAbierta);
     } else {
-      setSidebarCollapsed(!sidebarCollapsed);
+      setBarraLateralColapsada(!barraLateralColapsada);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <BarraLateral
-        colapsada={isMobile ? false : sidebarCollapsed}
-        abierta={isMobile ? sidebarOpen : true}
-        onCerrar={() => setSidebarOpen(false)}
-        onColapsar={() => setSidebarCollapsed(!sidebarCollapsed)}
+        colapsada={esMovil ? false : barraLateralColapsada}
+        abierta={esMovil ? barraLateralAbierta : true}
+        alCerrar={() => setBarraLateralAbierta(false)}
+        alColapsar={() => setBarraLateralColapsada(!barraLateralColapsada)}
       />
-      {isMobile && sidebarOpen && (
+      {esMovil && barraLateralAbierta && (
         <div
           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+          onClick={() => setBarraLateralAbierta(false)}
         />
       )}
       <div
         className={cn(
           'transition-all duration-300',
-          isMobile ? '' : (sidebarCollapsed ? 'ml-16' : 'ml-64')
+          esMovil ? '' : (barraLateralColapsada ? 'ml-16' : 'ml-64')
         )}
       >
-        <Encabezado onMenuClick={handleMenuClick} />
+        <Encabezado alHacerClicMenu={manejarClicMenu} />
         <main className="p-6">{children}</main>
       </div>
     </div>

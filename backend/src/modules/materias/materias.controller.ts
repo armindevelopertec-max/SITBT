@@ -21,45 +21,45 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorMaterias {
-  constructor(private readonly subjectsService: ServicioMaterias) {}
+  constructor(private readonly servicioMaterias: ServicioMaterias) {}
 
   @Post()
-  create(@Body() crearMateriaDto: CrearMateriaDto) {
-    return this.subjectsService.create(crearMateriaDto);
+  crear(@Body() crearMateriaDto: CrearMateriaDto) {
+    return this.servicioMaterias.crear(crearMateriaDto);
   }
 
   @Get()
-  findAll(@Query('pagina') page = 1, @Query('limite') limit = 20) {
-    return this.subjectsService.findAll(+page, +limit);
+  obtenerTodos(@Query('pagina') pagina = 1, @Query('limite') limite = 20) {
+    return this.servicioMaterias.obtenerTodos(+pagina, +limite);
   }
 
   @Get('todos')
-  findAllSubjects() {
-    return this.subjectsService.findAllSubjects();
+  obtenerTodosMaterias() {
+    return this.servicioMaterias.obtenerTodosMaterias();
   }
 
   @Get('buscar')
-  search(@Query('q') query: string) {
-    return this.subjectsService.search(query);
+  buscar(@Query('q') consulta: string) {
+    return this.servicioMaterias.buscar(consulta);
   }
 
   @Get('codigo/:codigo')
-  findByCodigo(@Param('codigo') code: string) {
-    return this.subjectsService.findByCodigo(code);
+  buscarPorCodigo(@Param('codigo') codigo: string) {
+    return this.servicioMaterias.buscarPorCodigo(codigo);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.subjectsService.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioMaterias.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() actualizarMateriaDto: ActualizarMateriaDto) {
-    return this.subjectsService.update(id, actualizarMateriaDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarMateriaDto: ActualizarMateriaDto) {
+    return this.servicioMaterias.actualizar(id, actualizarMateriaDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.subjectsService.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioMaterias.eliminar(id);
   }
 }

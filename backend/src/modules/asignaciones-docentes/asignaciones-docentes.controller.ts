@@ -22,55 +22,55 @@ import { EstadoAsignacionDocente } from '../../entities/asignacion-docente.entit
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorAsignacionesDocentes {
-  constructor(private readonly service: ServicioAsignacionesDocentes) {}
+  constructor(private readonly servicio: ServicioAsignacionesDocentes) {}
 
   @Post()
-  create(@Body() createDto: CrearAsignacionDocenteDto) {
-    return this.service.create(createDto);
+  crear(@Body() dtoCreacion: CrearAsignacionDocenteDto) {
+    return this.servicio.crear(dtoCreacion);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
     @Query('gestion') gestion?: string,
-    @Query('estado') status?: EstadoAsignacionDocente,
+    @Query('estado') estado?: EstadoAsignacionDocente,
   ) {
-    return this.service.findAll(+page, +limit, gestion, status);
+    return this.servicio.obtenerTodos(+pagina, +limite, gestion, estado);
   }
 
   @Get('activos')
-  findActive(@Query('gestion') gestion: string) {
-    return this.service.findActive(gestion);
+  buscarActivos(@Query('gestion') gestion: string) {
+    return this.servicio.buscarActivos(gestion);
   }
 
   @Get('docente/:docenteId')
-  findByTeacher(@Param('docenteId', ParseIntPipe) docenteId: number, @Query('gestion') gestion?: string) {
-    return this.service.findByTeacher(docenteId, gestion);
+  buscarPorDocente(@Param('docenteId', ParseIntPipe) docenteId: number, @Query('gestion') gestion?: string) {
+    return this.servicio.buscarPorDocente(docenteId, gestion);
   }
 
   @Get('grupo/:grupoId')
-  findByGroup(@Param('grupoId', ParseIntPipe) grupoId: number, @Query('gestion') gestion: string) {
-    return this.service.findByGroup(grupoId, gestion);
+  buscarPorGrupo(@Param('grupoId', ParseIntPipe) grupoId: number, @Query('gestion') gestion: string) {
+    return this.servicio.buscarPorGrupo(grupoId, gestion);
   }
 
   @Get('materia/:materiaId')
-  findBySubject(@Param('materiaId', ParseIntPipe) materiaId: number, @Query('gestion') gestion: string) {
-    return this.service.findBySubject(materiaId, gestion);
+  buscarPorMateria(@Param('materiaId', ParseIntPipe) materiaId: number, @Query('gestion') gestion: string) {
+    return this.servicio.buscarPorMateria(materiaId, gestion);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.service.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: ActualizarAsignacionDocenteDto) {
-    return this.service.update(id, updateDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() dtoActualizacion: ActualizarAsignacionDocenteDto) {
+    return this.servicio.actualizar(id, dtoActualizacion);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.service.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.eliminar(id);
   }
 }

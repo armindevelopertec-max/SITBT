@@ -9,117 +9,117 @@ import { ActualizarDocumentoEmitidoDto } from './dto/actualizar-documento-emitid
 export class ServicioDocumentos {
   constructor(
     @InjectRepository(DocumentoEmitido)
-    private documentoRepository: Repository<DocumentoEmitido>,
+    private repositorioDocumento: Repository<DocumentoEmitido>,
   ) {}
 
-  async create(createDto: CrearDocumentoEmitidoDto): Promise<DocumentoEmitido> {
-    const document = this.documentoRepository.create(createDto as Partial<DocumentoEmitido>);
-    return this.documentoRepository.save(document);
+  async crear(crearDto: CrearDocumentoEmitidoDto): Promise<DocumentoEmitido> {
+    const documento = this.repositorioDocumento.create(crearDto as Partial<DocumentoEmitido>);
+    return this.repositorioDocumento.save(documento);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
     tipo?: TipoDocumento,
     gestion?: string,
     estudianteId?: number,
     estado?: EstadoDocumento,
   ): Promise<{ datos: DocumentoEmitido[]; total: number; pagina: number; limite: number }> {
-    const query = this.documentoRepository
-      .createQueryBuilder('document')
-      .leftJoinAndSelect('document.estudiante', 'estudiante')
-      .leftJoinAndSelect('estudiante.persona', 'person')
-      .leftJoinAndSelect('document.gestionEntity', 'gestion');
+    const consulta = this.repositorioDocumento
+      .createQueryBuilder('documento')
+      .leftJoinAndSelect('documento.estudiante', 'estudiante')
+      .leftJoinAndSelect('estudiante.persona', 'persona')
+      .leftJoinAndSelect('documento.gestionRelacionada', 'gestion');
 
     if (tipo) {
-      query.andWhere('document.tipo = :tipo', { tipo: tipo });
+      consulta.andWhere('documento.tipo = :tipo', { tipo: tipo });
     }
 
     if (gestion) {
-      query.andWhere('document.gestion = :gestion', { gestion });
+      consulta.andWhere('documento.gestion = :gestion', { gestion });
     }
 
     if (estudianteId) {
-      query.andWhere('document.estudianteId = :estudianteId', { estudianteId });
+      consulta.andWhere('documento.estudianteId = :estudianteId', { estudianteId });
     }
 
     if (estado) {
-      query.andWhere('document.estado = :estado', { estado: estado });
+      consulta.andWhere('documento.estado = :estado', { estado: estado });
     }
 
-    const [data, total] = await query
-      .orderBy('document.fechaEmision', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('documento.fechaEmision', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: string): Promise<DocumentoEmitido> {
-    const document = await this.documentoRepository.findOne({
+  async obtenerUno(id: string): Promise<DocumentoEmitido> {
+    const documento = await this.repositorioDocumento.findOne({
       where: { id },
-      relations: ['estudiante', 'estudiante.persona', 'gestionEntity', 'impresor'],
+      relations: ['estudiante', 'estudiante.persona', 'gestionRelacionada', 'impresor'],
     });
-    if (!document) {
+    if (!documento) {
       throw new NotFoundException(`Documento con ID ${id} no encontrado`);
     }
-    return document;
+    return documento;
   }
 
-  async findByStudent(estudianteId: number, tipo?: TipoDocumento): Promise<DocumentoEmitido[]> {
-    const query = this.documentoRepository
-      .createQueryBuilder('document')
-      .where('document.estudianteId = :estudianteId', { estudianteId });
+  async buscarPorEstudiante(estudianteId: number, tipo?: TipoDocumento): Promise<DocumentoEmitido[]> {
+    const consulta = this.repositorioDocumento
+      .createQueryBuilder('documento')
+      .where('documento.estudianteId = :estudianteId', { estudianteId });
 
     if (tipo) {
-      query.andWhere('document.tipo = :tipo', { tipo: tipo });
+      consulta.andWhere('documento.tipo = :tipo', { tipo: tipo });
     }
 
-    return query.orderBy('document.fechaEmision', 'DESC').getMany();
+    return consulta.orderBy('documento.fechaEmision', 'DESC').getMany();
   }
 
-  async update(id: string, updateDto: ActualizarDocumentoEmitidoDto): Promise<DocumentoEmitido> {
-    const document = await this.findOne(id);
+  async actualizar(id: string, actualizarDto: ActualizarDocumentoEmitidoDto): Promise<DocumentoEmitido> {
+    const documento = await this.obtenerUno(id);
 
-    if (updateDto.estado === EstadoDocumento.ENTREGADO && !document.fechaEntrega) {
-      document.fechaEntrega = new Date();
+    if (actualizarDto.estado === EstadoDocumento.ENTREGADO && !documento.fechaEntrega) {
+      documento.fechaEntrega = new Date();
     }
 
-    Object.assign(document, updateDto);
-    return this.documentoRepository.save(document);
+    Object.assign(documento, actualizarDto);
+    return this.repositorioDocumento.save(documento);
   }
 
-  async markAsPrinted(id: string, impresoPor: number): Promise<DocumentoEmitido> {
-    return this.update(id, {
+  async marcarComoImpreso(id: string, impresoPor: number): Promise<DocumentoEmitido> {
+    return this.actualizar(id, {
       estado: EstadoDocumento.IMPRESO,
       impresoPor: impresoPor,
     });
   }
 
-  async markAsDelivered(id: string, entregadoA: string): Promise<DocumentoEmitido> {
-    const document = await this.findOne(id);
-    document.estado = EstadoDocumento.ENTREGADO;
-    document.entregadoA = entregadoA;
-    document.fechaEntrega = new Date();
-    return this.documentoRepository.save(document);
+  async marcarComoEntregado(id: string, entregadoA: string): Promise<DocumentoEmitido> {
+    const documento = await this.obtenerUno(id);
+    documento.estado = EstadoDocumento.ENTREGADO;
+    documento.entregadoA = entregadoA;
+    documento.fechaEntrega = new Date();
+    return this.repositorioDocumento.save(documento);
   }
 
-  async annul(id: string, observaciones?: string): Promise<DocumentoEmitido> {
-    return this.update(id, {
+  async anular(id: string, observaciones?: string): Promise<DocumentoEmitido> {
+    return this.actualizar(id, {
       estado: EstadoDocumento.ANULADO,
       observaciones,
     } as ActualizarDocumentoEmitidoDto);
   }
 
-  async generateBoletaInscripcion(
+  async generarBoletaInscripcion(
     estudianteId: number,
     gestion: string,
     gestionId?: number,
   ): Promise<DocumentoEmitido> {
     const numeroDocumento = `BOL-INS-${gestion}-${Date.now()}`;
 
-    return this.create({
+    return this.crear({
       estudianteId: estudianteId,
       tipo: TipoDocumento.BOLETA_INSCRIPCION,
       numeroDocumento,
@@ -128,54 +128,54 @@ export class ServicioDocumentos {
     });
   }
 
-  async generateReciboPago(
+  async generarReciboPago(
     estudianteId: number,
     gestion: string,
-    paymentId: number,
+    pagoId: number,
     gestionId?: number,
   ): Promise<DocumentoEmitido> {
     const numeroDocumento = `REC-PAG-${gestion}-${Date.now()}`;
 
-    return this.create({
+    return this.crear({
       estudianteId: estudianteId,
       tipo: TipoDocumento.RECIBO_PAGO,
       numeroDocumento,
       gestion,
       gestionId: gestionId,
-      pagoRelacionadoId: paymentId,
+      pagoRelacionadoId: pagoId,
     });
   }
 
-  async getDocumentStatistics(gestion?: string): Promise<{
+  async obtenerEstadisticasDocumentos(gestion?: string): Promise<{
     total: number;
     porTipo: { tipo: TipoDocumento; cantidad: number }[];
     porEstado: { estado: EstadoDocumento; cantidad: number }[];
   }> {
-    const query = this.documentoRepository.createQueryBuilder('document');
+    const consulta = this.repositorioDocumento.createQueryBuilder('documento');
 
     if (gestion) {
-      query.where('document.gestion = :gestion', { gestion });
+      consulta.where('documento.gestion = :gestion', { gestion });
     }
 
-    const documents = await query.getMany();
+    const documentos = await consulta.getMany();
 
-    const byTypeMap = new Map<TipoDocumento, number>();
-    const byStatusMap = new Map<EstadoDocumento, number>();
+    const mapaPorTipo = new Map<TipoDocumento, number>();
+    const mapaPorEstado = new Map<EstadoDocumento, number>();
 
-    documents.forEach((doc) => {
-      byTypeMap.set(doc.tipo, (byTypeMap.get(doc.tipo) || 0) + 1);
-      byStatusMap.set(doc.estado, (byStatusMap.get(doc.estado) || 0) + 1);
+    documentos.forEach((documento) => {
+      mapaPorTipo.set(documento.tipo, (mapaPorTipo.get(documento.tipo) || 0) + 1);
+      mapaPorEstado.set(documento.estado, (mapaPorEstado.get(documento.estado) || 0) + 1);
     });
 
     return {
-      total: documents.length,
-      porTipo: Array.from(byTypeMap.entries()).map(([tipo, count]) => ({ tipo, cantidad: count })),
-      porEstado: Array.from(byStatusMap.entries()).map(([estado, count]) => ({ estado, cantidad: count })),
+      total: documentos.length,
+      porTipo: Array.from(mapaPorTipo.entries()).map(([tipo, conteo]) => ({ tipo, cantidad: conteo })),
+      porEstado: Array.from(mapaPorEstado.entries()).map(([estado, conteo]) => ({ estado, cantidad: conteo })),
     };
   }
 
-  async remove(id: string): Promise<void> {
-    const document = await this.findOne(id);
-    await this.documentoRepository.remove(document);
+  async eliminar(id: string): Promise<void> {
+    const documento = await this.obtenerUno(id);
+    await this.repositorioDocumento.remove(documento);
   }
 }

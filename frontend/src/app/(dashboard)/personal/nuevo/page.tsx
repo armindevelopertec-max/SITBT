@@ -11,13 +11,13 @@ import { Modal } from '@/components/ui/modal';
 import { api } from '@/lib/api';
 import { ArrowLeft, Save, Loader2, User, Key } from 'lucide-react';
 
-export default function NewStaffPage() {
+export default function PaginaNuevoPersonal() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [credentialsModal, setCredentialsModal] = useState<{ nombreUsuario: string; contrasena: string } | null>(null);
+  const [guardando, setGuardando] = useState(false);
+  const [errores, setErrores] = useState<Record<string, string>>({});
+  const [modalCredenciales, setModalCredenciales] = useState<{ nombreUsuario: string; contrasena: string } | null>(null);
 
-  const [personData, setPersonData] = useState({
+  const [datosPersona, setDatosPersona] = useState({
     ci: '',
     nombres: '',
     apellidoPaterno: '',
@@ -34,99 +34,99 @@ export default function NewStaffPage() {
     direccion: '',
   });
 
-  const [staffData, setStaffData] = useState({
+  const [datosPersonal, setDatosPersonal] = useState({
     profesion: '',
     cargo: '',
     fechaContrato: '',
   });
 
-  const toUpper = (value: string) => value.toUpperCase();
+  const aMayusculas = (value: string) => value.toUpperCase();
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const validarFormulario = () => {
+    const nuevosErrores: Record<string, string> = {};
 
-    if (!personData.ci) newErrors.ci = 'CI es requerido';
-    if (!personData.nombres) newErrors.nombres = 'Nombres es requerido';
-    if (!personData.apellidoPaterno) newErrors.apellidoPaterno = 'Apellido paterno es requerido';
-    if (!personData.fechaNacimiento) newErrors.fechaNacimiento = 'Fecha de nacimiento es requerida';
-    if (!personData.genero) newErrors.genero = 'Género es requerido';
+    if (!datosPersona.ci) nuevosErrores.ci = 'CI es requerido';
+    if (!datosPersona.nombres) nuevosErrores.nombres = 'Nombres es requerido';
+    if (!datosPersona.apellidoPaterno) nuevosErrores.apellidoPaterno = 'Apellido paterno es requerido';
+    if (!datosPersona.fechaNacimiento) nuevosErrores.fechaNacimiento = 'Fecha de nacimiento es requerida';
+    if (!datosPersona.genero) nuevosErrores.genero = 'Género es requerido';
 
-    if (!staffData.cargo) newErrors.cargo = 'Cargo es requerido';
-    if (!staffData.fechaContrato) newErrors.fechaContrato = 'Fecha de contrato es requerida';
+    if (!datosPersonal.cargo) nuevosErrores.cargo = 'Cargo es requerido';
+    if (!datosPersonal.fechaContrato) nuevosErrores.fechaContrato = 'Fecha de contrato es requerida';
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const enviarFormulario = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validarFormulario()) return;
 
-    setLoading(true);
+    setGuardando(true);
     try {
-      const finalLugarNacimiento = personData.lugarNacimiento === 'Otra' && personData.lugarNacimientoOtro
-        ? personData.lugarNacimientoOtro
-        : personData.lugarNacimiento;
-      const finalNacionalidad = personData.nacionalidad === 'Otra' && personData.nacionalidadOtra
-        ? personData.nacionalidadOtra
-        : personData.nacionalidad;
+      const lugarNacimientoFinal = datosPersona.lugarNacimiento === 'Otra' && datosPersona.lugarNacimientoOtro
+        ? datosPersona.lugarNacimientoOtro
+        : datosPersona.lugarNacimiento;
+      const nacionalidadFinal = datosPersona.nacionalidad === 'Otra' && datosPersona.nacionalidadOtra
+        ? datosPersona.nacionalidadOtra
+        : datosPersona.nacionalidad;
 
-      const personPayload = {
-        ci: personData.ci,
-        nombres: personData.nombres,
-        apellidoPaterno: personData.apellidoPaterno,
-        apellidoMaterno: personData.apellidoMaterno,
-        fechaNacimiento: personData.fechaNacimiento,
-        lugarNacimiento: finalLugarNacimiento,
-        genero: personData.genero,
-        estadoCivil: personData.estadoCivil || undefined,
-        nacionalidad: finalNacionalidad,
-        telefono: personData.telefono || undefined,
-        correo: personData.correo || undefined,
-        direccion: personData.direccion || undefined,
+      const cuerpoPersona = {
+        ci: datosPersona.ci,
+        nombres: datosPersona.nombres,
+        apellidoPaterno: datosPersona.apellidoPaterno,
+        apellidoMaterno: datosPersona.apellidoMaterno,
+        fechaNacimiento: datosPersona.fechaNacimiento,
+        lugarNacimiento: lugarNacimientoFinal,
+        genero: datosPersona.genero,
+        estadoCivil: datosPersona.estadoCivil || undefined,
+        nacionalidad: nacionalidadFinal,
+        telefono: datosPersona.telefono || undefined,
+        correo: datosPersona.correo || undefined,
+        direccion: datosPersona.direccion || undefined,
         estado: 'activo',
       };
 
-      const personResponse = await api.post('/personas', personPayload);
-      const personId = personResponse.data.id;
+      const respuestaPersona = await api.post('/personas', cuerpoPersona);
+      const idPersona = respuestaPersona.data.id;
 
-      const staffPayload = {
-        personaId: personId,
-        profesion: staffData.profesion || undefined,
-        cargo: staffData.cargo,
-        fechaContrato: staffData.fechaContrato,
+      const cuerpoPersonal = {
+        personaId: idPersona,
+        profesion: datosPersonal.profesion || undefined,
+        cargo: datosPersonal.cargo,
+        fechaContrato: datosPersonal.fechaContrato,
         estado: 'activo',
       };
 
-      const response = await api.post('/personal', staffPayload);
+      const respuesta = await api.post('/personal', cuerpoPersonal);
 
-      if (response.data.usuario) {
-        setCredentialsModal(response.data.usuario);
+      if (respuesta.data.usuario) {
+        setModalCredenciales(respuesta.data.usuario);
       } else {
         router.push('/personal');
       }
     } catch (error: any) {
       console.error('Error al crear personal:', error);
       if (error.response?.data?.mensaje) {
-        setErrors({ submit: error.response.data.mensaje });
+        setErrores({ submit: error.response.data.mensaje });
       } else {
-        setErrors({ submit: 'Error al crear el personal' });
+        setErrores({ submit: 'Error al crear el personal' });
       }
     } finally {
-      setLoading(false);
+      setGuardando(false);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variante="fantasma" tamano="icono" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
         </Boton>
-        <Migas items={[
-          { label: 'Personal', href: '/personal' },
-          { label: 'Nuevo Personal' }
+        <Migas elementos={[
+          { etiqueta: 'Personal', href: '/personal' },
+          { etiqueta: 'Nuevo Personal' }
         ]} />
       </div>
 
@@ -134,8 +134,8 @@ export default function NewStaffPage() {
         <h1 className="text-2xl font-bold text-gray-900">Nuevo Personal</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Tarjeta variant="bordered">
+      <form onSubmit={enviarFormulario} className="space-y-6">
+        <Tarjeta variante="conBorde">
           <EncabezadoTarjeta>
             <TituloTarjeta>Datos Personales</TituloTarjeta>
           </EncabezadoTarjeta>
@@ -143,76 +143,76 @@ export default function NewStaffPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <Entrada
-                  label="Cédula de Identidad *"
-                  value={personData.ci}
-                  onChange={(e) => setPersonData({ ...personData, ci: toUpper(e.target.value) })}
-                  error={errors.ci}
+                  etiqueta="Cédula de Identidad *"
+                  value={datosPersona.ci}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, ci: aMayusculas(e.target.value) })}
+                  error={errores.ci}
                   placeholder="12345678"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Nombres *"
-                  value={personData.nombres}
-                  onChange={(e) => setPersonData({ ...personData, nombres: toUpper(e.target.value) })}
-                  error={errors.nombres}
+                  etiqueta="Nombres *"
+                  value={datosPersona.nombres}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, nombres: aMayusculas(e.target.value) })}
+                  error={errores.nombres}
                   placeholder="Juan Carlos"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Apellido Paterno *"
-                  value={personData.apellidoPaterno}
-                  onChange={(e) => setPersonData({ ...personData, apellidoPaterno: toUpper(e.target.value) })}
-                  error={errors.apellidoPaterno}
+                  etiqueta="Apellido Paterno *"
+                  value={datosPersona.apellidoPaterno}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, apellidoPaterno: aMayusculas(e.target.value) })}
+                  error={errores.apellidoPaterno}
                   placeholder="Perez"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Apellido Materno"
-                  value={personData.apellidoMaterno}
-                  onChange={(e) => setPersonData({ ...personData, apellidoMaterno: toUpper(e.target.value) })}
+                  etiqueta="Apellido Materno"
+                  value={datosPersona.apellidoMaterno}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, apellidoMaterno: aMayusculas(e.target.value) })}
                   placeholder="Gomez"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Fecha de Nacimiento *"
+                  etiqueta="Fecha de Nacimiento *"
                   type="date"
-                  value={personData.fechaNacimiento}
-                  onChange={(e) => setPersonData({ ...personData, fechaNacimiento: e.target.value })}
-                  error={errors.fechaNacimiento}
+                  value={datosPersona.fechaNacimiento}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, fechaNacimiento: e.target.value })}
+                  error={errores.fechaNacimiento}
                 />
               </div>
               <div>
                 <Selector
-                  label="Lugar de Nacimiento"
-                  value={personData.lugarNacimiento}
+                  etiqueta="Lugar de Nacimiento"
+                  value={datosPersona.lugarNacimiento}
                   onChange={(e) => {
-                    setPersonData({ ...personData, lugarNacimiento: e.target.value, lugarNacimientoOtro: '' });
+                    setDatosPersona({ ...datosPersona, lugarNacimiento: e.target.value, lugarNacimientoOtro: '' });
                   }}
-                  options={[
-                    { value: '', label: 'Seleccionar' },
-                    { value: 'La Paz', label: 'La Paz' },
-                    { value: 'Cochabamba', label: 'Cochabamba' },
-                    { value: 'Santa Cruz', label: 'Santa Cruz' },
-                    { value: 'Oruro', label: 'Oruro' },
-                    { value: 'Potosí', label: 'Potosí' },
-                    { value: 'Tarija', label: 'Tarija' },
-                    { value: 'Chuquisaca', label: 'Chuquisaca' },
-                    { value: 'Beni', label: 'Beni' },
-                    { value: 'Pando', label: 'Pando' },
-                    { value: 'Otra', label: 'Otra' },
+                  opciones={[
+                    { value: '', etiqueta: 'Seleccionar' },
+                    { value: 'La Paz', etiqueta: 'La Paz' },
+                    { value: 'Cochabamba', etiqueta: 'Cochabamba' },
+                    { value: 'Santa Cruz', etiqueta: 'Santa Cruz' },
+                    { value: 'Oruro', etiqueta: 'Oruro' },
+                    { value: 'Potosí', etiqueta: 'Potosí' },
+                    { value: 'Tarija', etiqueta: 'Tarija' },
+                    { value: 'Chuquisaca', etiqueta: 'Chuquisaca' },
+                    { value: 'Beni', etiqueta: 'Beni' },
+                    { value: 'Pando', etiqueta: 'Pando' },
+                    { value: 'Otra', etiqueta: 'Otra' },
                   ]}
                 />
               </div>
-              {personData.lugarNacimiento === 'Otra' && (
+              {datosPersona.lugarNacimiento === 'Otra' && (
                 <div>
                   <Entrada
-                    label="Especificar lugar"
-                    value={personData.lugarNacimientoOtro}
-                    onChange={(e) => setPersonData({ ...personData, lugarNacimientoOtro: toUpper(e.target.value) })}
+                    etiqueta="Especificar lugar"
+                    value={datosPersona.lugarNacimientoOtro}
+                    onChange={(e) => setDatosPersona({ ...datosPersona, lugarNacimientoOtro: aMayusculas(e.target.value) })}
                     placeholder="Ingrese el lugar"
                   />
                 </div>
@@ -225,8 +225,8 @@ export default function NewStaffPage() {
                       type="radio"
                       name="genero"
                       value="M"
-                      checked={personData.genero === 'M'}
-                      onChange={(e) => setPersonData({ ...personData, genero: e.target.value })}
+                      checked={datosPersona.genero === 'M'}
+                      onChange={(e) => setDatosPersona({ ...datosPersona, genero: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Masculino</span>
@@ -236,14 +236,14 @@ export default function NewStaffPage() {
                       type="radio"
                       name="genero"
                       value="F"
-                      checked={personData.genero === 'F'}
-                      onChange={(e) => setPersonData({ ...personData, genero: e.target.value })}
+                      checked={datosPersona.genero === 'F'}
+                      onChange={(e) => setDatosPersona({ ...datosPersona, genero: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Femenino</span>
                   </label>
                 </div>
-                {errors.genero && <p className="text-xs text-red-500 mt-1">{errors.genero}</p>}
+                {errores.genero && <p className="text-xs text-red-500 mt-1">{errores.genero}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Estado Civil</label>
@@ -253,8 +253,8 @@ export default function NewStaffPage() {
                       type="radio"
                       name="estadoCivil"
                       value="Soltera(o)"
-                      checked={personData.estadoCivil === 'Soltera(o)'}
-                      onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
+                      checked={datosPersona.estadoCivil === 'Soltera(o)'}
+                      onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Soltero(a)</span>
@@ -264,8 +264,8 @@ export default function NewStaffPage() {
                       type="radio"
                       name="estadoCivil"
                       value="Casada(o)"
-                      checked={personData.estadoCivil === 'Casada(o)'}
-                      onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
+                      checked={datosPersona.estadoCivil === 'Casada(o)'}
+                      onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Casado(a)</span>
@@ -275,8 +275,8 @@ export default function NewStaffPage() {
                       type="radio"
                       name="estadoCivil"
                       value="Viuda(o)"
-                      checked={personData.estadoCivil === 'Viuda(o)'}
-                      onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
+                      checked={datosPersona.estadoCivil === 'Viuda(o)'}
+                      onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Viudo(a)</span>
@@ -286,8 +286,8 @@ export default function NewStaffPage() {
                       type="radio"
                       name="estadoCivil"
                       value="Divorciada(o)"
-                      checked={personData.estadoCivil === 'Divorciada(o)'}
-                      onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
+                      checked={datosPersona.estadoCivil === 'Divorciada(o)'}
+                      onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Divorciado(a)</span>
@@ -296,56 +296,56 @@ export default function NewStaffPage() {
               </div>
               <div>
                 <Selector
-                  label="Nacionalidad"
-                  value={personData.nacionalidad}
+                  etiqueta="Nacionalidad"
+                  value={datosPersona.nacionalidad}
                   onChange={(e) => {
-                    setPersonData({ ...personData, nacionalidad: e.target.value, nacionalidadOtra: '' });
+                    setDatosPersona({ ...datosPersona, nacionalidad: e.target.value, nacionalidadOtra: '' });
                   }}
-                  options={[
-                    { value: 'Boliviana', label: 'Boliviana' },
-                    { value: 'Argentina', label: 'Argentina' },
-                    { value: 'Peruana', label: 'Peruana' },
-                    { value: 'Chilena', label: 'Chilena' },
-                    { value: 'Brasileña', label: 'Brasileña' },
-                    { value: 'Colombiana', label: 'Colombiana' },
-                    { value: 'Venezolana', label: 'Venezolana' },
-                    { value: 'Española', label: 'Española' },
-                    { value: 'Otra', label: 'Otra' },
+                  opciones={[
+                    { value: 'Boliviana', etiqueta: 'Boliviana' },
+                    { value: 'Argentina', etiqueta: 'Argentina' },
+                    { value: 'Peruana', etiqueta: 'Peruana' },
+                    { value: 'Chilena', etiqueta: 'Chilena' },
+                    { value: 'Brasileña', etiqueta: 'Brasileña' },
+                    { value: 'Colombiana', etiqueta: 'Colombiana' },
+                    { value: 'Venezolana', etiqueta: 'Venezolana' },
+                    { value: 'Española', etiqueta: 'Española' },
+                    { value: 'Otra', etiqueta: 'Otra' },
                   ]}
                 />
               </div>
-              {personData.nacionalidad === 'Otra' && (
+              {datosPersona.nacionalidad === 'Otra' && (
                 <div>
                   <Entrada
-                    label="Especificar nacionalidad"
-                    value={personData.nacionalidadOtra}
-                    onChange={(e) => setPersonData({ ...personData, nacionalidadOtra: toUpper(e.target.value) })}
+                    etiqueta="Especificar nacionalidad"
+                    value={datosPersona.nacionalidadOtra}
+                    onChange={(e) => setDatosPersona({ ...datosPersona, nacionalidadOtra: aMayusculas(e.target.value) })}
                     placeholder="Ingrese la nacionalidad"
                   />
                 </div>
               )}
               <div>
                 <Entrada
-                  label="Teléfono"
-                  value={personData.telefono}
-                  onChange={(e) => setPersonData({ ...personData, telefono: e.target.value })}
+                  etiqueta="Teléfono"
+                  value={datosPersona.telefono}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, telefono: e.target.value })}
                   placeholder="71234567"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Correo Electrónico"
+                  etiqueta="Correo Electrónico"
                   type="email"
-                  value={personData.correo}
-                  onChange={(e) => setPersonData({ ...personData, correo: e.target.value })}
+                  value={datosPersona.correo}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, correo: e.target.value })}
                   placeholder="correo@ejemplo.com"
                 />
               </div>
               <div className="md:col-span-2 lg:col-span-3">
                 <Entrada
-                  label="Dirección"
-                  value={personData.direccion}
-                  onChange={(e) => setPersonData({ ...personData, direccion: toUpper(e.target.value) })}
+                  etiqueta="Dirección"
+                  value={datosPersona.direccion}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, direccion: aMayusculas(e.target.value) })}
                   placeholder="Av. 16 de Julio, La Paz"
                 />
               </div>
@@ -353,7 +353,7 @@ export default function NewStaffPage() {
           </ContenidoTarjeta>
         </Tarjeta>
 
-        <Tarjeta variant="bordered">
+        <Tarjeta variante="conBorde">
           <EncabezadoTarjeta>
             <TituloTarjeta>Datos del Personal</TituloTarjeta>
           </EncabezadoTarjeta>
@@ -361,54 +361,54 @@ export default function NewStaffPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <Entrada
-                  label="Profesión"
-                  value={staffData.profesion}
-                  onChange={(e) => setStaffData({ ...staffData, profesion: e.target.value })}
+                  etiqueta="Profesión"
+                  value={datosPersonal.profesion}
+                  onChange={(e) => setDatosPersonal({ ...datosPersonal, profesion: e.target.value })}
                   placeholder="Ingeniero de Sistemas"
                 />
               </div>
               <div>
                 <Selector
-                  label="Cargo *"
-                  value={staffData.cargo}
-                  onChange={(e) => setStaffData({ ...staffData, cargo: e.target.value })}
-                  error={errors.cargo}
-                  options={[
-                    { value: 'docente', label: 'Docente' },
-                    { value: 'secretaria', label: 'Secretaria' },
-                    { value: 'director_academico', label: 'Director Académico' },
-                    { value: 'rector', label: 'Rector' },
-                    { value: 'apoyo', label: 'Personal de Apoyo' },
-                    { value: 'bibliotecario', label: 'Bibliotecario' },
+                  etiqueta="Cargo *"
+                  value={datosPersonal.cargo}
+                  onChange={(e) => setDatosPersonal({ ...datosPersonal, cargo: e.target.value })}
+                  error={errores.cargo}
+                  opciones={[
+                    { value: 'docente', etiqueta: 'Docente' },
+                    { value: 'secretaria', etiqueta: 'Secretaria' },
+                    { value: 'director_academico', etiqueta: 'Director Académico' },
+                    { value: 'rector', etiqueta: 'Rector' },
+                    { value: 'apoyo', etiqueta: 'Personal de Apoyo' },
+                    { value: 'bibliotecario', etiqueta: 'Bibliotecario' },
                   ]}
                   placeholder="Seleccionar cargo..."
                 />
               </div>
               <div>
                 <Entrada
-                  label="Fecha de Contrato *"
+                  etiqueta="Fecha de Contrato *"
                   type="date"
-                  value={staffData.fechaContrato}
-                  onChange={(e) => setStaffData({ ...staffData, fechaContrato: e.target.value })}
-                  error={errors.fechaContrato}
+                  value={datosPersonal.fechaContrato}
+                  onChange={(e) => setDatosPersonal({ ...datosPersonal, fechaContrato: e.target.value })}
+                  error={errores.fechaContrato}
                 />
               </div>
             </div>
           </ContenidoTarjeta>
         </Tarjeta>
 
-        {errors.submit && (
+        {errores.submit && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            {errors.submit}
+            {errores.submit}
           </div>
         )}
 
         <div className="flex justify-end gap-3">
-          <Boton variant="outline" type="button" onClick={() => router.back()}>
+          <Boton variante="contorno" type="button" onClick={() => router.back()}>
             Cancelar
           </Boton>
-          <Boton type="submit" disabled={loading}>
-            {loading ? (
+          <Boton type="submit" disabled={guardando}>
+            {guardando ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Guardando...
@@ -423,11 +423,11 @@ export default function NewStaffPage() {
         </div>
       </form>
 
-      {credentialsModal && (
-        <Modal open={!!credentialsModal} onClose={() => {
-          setCredentialsModal(null);
+      {modalCredenciales && (
+        <Modal abierto={!!modalCredenciales} alCerrar={() => {
+          setModalCredenciales(null);
           router.push('/personal');
-        }} title="Usuario Creado" size="md">
+        }} titulo="Usuario Creado" tamano="mediano">
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
               El personal ha sido registrado exitosamente. A continuación encontrará las credenciales de acceso al sistema:
@@ -437,14 +437,14 @@ export default function NewStaffPage() {
                 <User className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Nombre de usuario</p>
-                  <p className="font-mono font-medium">{credentialsModal.nombreUsuario}</p>
+                  <p className="font-mono font-medium">{modalCredenciales.nombreUsuario}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Key className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Contraseña temporal</p>
-                  <p className="font-mono font-medium">{credentialsModal.contrasena}</p>
+                  <p className="font-mono font-medium">{modalCredenciales.contrasena}</p>
                 </div>
               </div>
             </div>
@@ -453,7 +453,7 @@ export default function NewStaffPage() {
             </p>
             <div className="flex justify-end">
               <Boton onClick={() => {
-                setCredentialsModal(null);
+                setModalCredenciales(null);
                 router.push('/personal');
               }}>
                 Entendido

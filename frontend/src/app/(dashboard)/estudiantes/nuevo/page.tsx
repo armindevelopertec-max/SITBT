@@ -40,18 +40,18 @@ interface Periodo {
   estado: string;
 }
 
-export default function NewStudentPage() {
+export default function PaginaNuevoEstudiante() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [loadingCareers, setLoadingCareers] = useState(true);
-  const [loadingPlans, setLoadingPlans] = useState(false);
-  const [careers, setCareers] = useState<Carrera[]>([]);
-  const [studyPlans, setStudyPlans] = useState<PlanEstudio[]>([]);
+  const [cargando, setCargando] = useState(false);
+  const [cargandoCarreras, setCargandoCarreras] = useState(true);
+  const [cargandoPlanes, setCargandoPlanes] = useState(false);
+  const [carreras, setCarreras] = useState<Carrera[]>([]);
+  const [planesEstudio, setPlanesEstudio] = useState<PlanEstudio[]>([]);
   const [periodos, setPeriodos] = useState<{ gestion: Gestion; periodo: Periodo }[]>([]);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [credentialsModal, setCredentialsModal] = useState<{ nombreUsuario: string; contrasena: string } | null>(null);
+  const [errores, setErrores] = useState<Record<string, string>>({});
+  const [modalCredenciales, setModalCredenciales] = useState<{ nombreUsuario: string; contrasena: string } | null>(null);
 
-  const [personData, setPersonData] = useState({
+  const [datosPersona, setDatosPersona] = useState({
     ci: '',
     nombres: '',
     apellidoPaterno: '',
@@ -68,7 +68,7 @@ export default function NewStudentPage() {
     direccion: '',
   });
 
-  const [studentData, setStudentData] = useState({
+  const [datosEstudiante, setDatosEstudiante] = useState({
 
     gestionAdmision: new Date().getFullYear().toString(),
     fechaAdmision: '',
@@ -80,59 +80,59 @@ export default function NewStudentPage() {
     fechaTituloBachiller: '',
   });
 
-  const toUpper = (value: string) => value.toUpperCase();
+  const aMayusculas = (value: string) => value.toUpperCase();
 
   useEffect(() => {
-    fetchCareers();
-    fetchGestiones();
+    obtenerCarreras();
+    obtenerGestiones();
   }, []);
 
   useEffect(() => {
-    if (studentData.carreraId) {
-      fetchStudyPlans(Number(studentData.carreraId));
+    if (datosEstudiante.carreraId) {
+      obtenerPlanesEstudio(Number(datosEstudiante.carreraId));
     } else {
-      setStudyPlans([]);
+      setPlanesEstudio([]);
     }
-  }, [studentData.carreraId]);
+  }, [datosEstudiante.carreraId]);
 
-  const fetchCareers = async () => {
+  const obtenerCarreras = async () => {
     try {
-      const response = await api.get('/carreras/activos');
-      setCareers(response.data || []);
+      const respuesta = await api.get('/carreras/activos');
+      setCarreras(respuesta.data || []);
     } catch (error) {
       console.error('Error al cargar carreras:', error);
     } finally {
-      setLoadingCareers(false);
+      setCargandoCarreras(false);
     }
   };
 
-  const fetchStudyPlans = async (careerId: number) => {
-    setLoadingPlans(true);
+  const obtenerPlanesEstudio = async (carreraId: number) => {
+    setCargandoPlanes(true);
     try {
-      const response = await api.get(`/planes-estudio/actual/${careerId}`);
-      setStudyPlans(response.data || []);
+      const respuesta = await api.get(`/planes-estudio/actual/${carreraId}`);
+      setPlanesEstudio(respuesta.data || []);
     } catch (error) {
       console.error('Error al cargar planes de estudio:', error);
     } finally {
-      setLoadingPlans(false);
+      setCargandoPlanes(false);
     }
   };
 
-  const fetchGestiones = async () => {
+  const obtenerGestiones = async () => {
     try {
-      const response = await api.get('/gestiones/activos');
-      const allGestiones: Gestion[] = response.data || [];
-      const allPeriodos: { gestion: Gestion; periodo: Periodo }[] = [];
+      const respuesta = await api.get('/gestiones/activos');
+      const todasLasGestiones: Gestion[] = respuesta.data || [];
+      const todosLosPeriodos: { gestion: Gestion; periodo: Periodo }[] = [];
 
-      allGestiones.forEach((gestion) => {
+      todasLasGestiones.forEach((gestion) => {
         if (gestion.periodos && gestion.periodos.length > 0) {
           gestion.periodos.forEach((periodo: any) => {
-            allPeriodos.push({ gestion, periodo });
+            todosLosPeriodos.push({ gestion, periodo });
           });
         }
       });
 
-      setPeriodos(allPeriodos.sort((a, b) => {
+      setPeriodos(todosLosPeriodos.sort((a, b) => {
         if (a.gestion.anio !== b.gestion.anio) return b.gestion.anio.localeCompare(a.gestion.anio);
         return a.periodo.numero.localeCompare(b.periodo.numero);
       }));
@@ -141,81 +141,81 @@ export default function NewStudentPage() {
     }
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const validarFormulario = () => {
+    const nuevosErrores: Record<string, string> = {};
 
-    if (!personData.ci) newErrors.ci = 'CI es requerido';
-    if (!personData.nombres) newErrors.nombres = 'Nombres es requerido';
-    if (!personData.apellidoPaterno) newErrors.apellidoPaterno = 'Apellido paterno es requerido';
-    if (!personData.fechaNacimiento) newErrors.fechaNacimiento = 'Fecha de nacimiento es requerida';
-    if (!personData.genero) newErrors.genero = 'Género es requerido';
+    if (!datosPersona.ci) nuevosErrores.ci = 'CI es requerido';
+    if (!datosPersona.nombres) nuevosErrores.nombres = 'Nombres es requerido';
+    if (!datosPersona.apellidoPaterno) nuevosErrores.apellidoPaterno = 'Apellido paterno es requerido';
+    if (!datosPersona.fechaNacimiento) nuevosErrores.fechaNacimiento = 'Fecha de nacimiento es requerida';
+    if (!datosPersona.genero) nuevosErrores.genero = 'Género es requerido';
 
-    if (!studentData.gestionAdmision) newErrors.gestionAdmision = 'Gestión de ingreso es requerida';
-    if (!studentData.fechaAdmision) newErrors.fechaAdmision = 'Fecha de ingreso es requerida';
-    if (!studentData.carreraId) newErrors.carreraId = 'Carrera es requerida';
-    if (!studentData.planEstudioId) newErrors.planEstudioId = 'Plan de estudio es requerido';
+    if (!datosEstudiante.gestionAdmision) nuevosErrores.gestionAdmision = 'Gestión de ingreso es requerida';
+    if (!datosEstudiante.fechaAdmision) nuevosErrores.fechaAdmision = 'Fecha de ingreso es requerida';
+    if (!datosEstudiante.carreraId) nuevosErrores.carreraId = 'Carrera es requerida';
+    if (!datosEstudiante.planEstudioId) nuevosErrores.planEstudioId = 'Plan de estudio es requerido';
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const enviarFormulario = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validarFormulario()) return;
 
-    setLoading(true);
+    setCargando(true);
     try {
-      const personPayload = {
-        ...personData,
-        genero: personData.genero,
+      const cargaPersona = {
+        ...datosPersona,
+        genero: datosPersona.genero,
         estado: 'activo',
       };
 
-      const personResponse = await api.post('/personas', personPayload);
-      const personId = personResponse.data.id;
+      const respuestaPersona = await api.post('/personas', cargaPersona);
+      const personaId = respuestaPersona.data.id;
 
-      const studentPayload = {
-        personaId: personId,
-        gestionAdmision: studentData.gestionAdmision,
-        fechaAdmision: studentData.fechaAdmision,
-        carreraId: Number(studentData.carreraId),
-        planEstudioId: Number(studentData.planEstudioId),
-        numeroFolder: studentData.numeroFolder || undefined,
-        codigoFormulario01: studentData.codigoFormulario01 || undefined,
-        numeroTituloBachiller: studentData.numeroTituloBachiller || undefined,
-        fechaTituloBachiller: studentData.fechaTituloBachiller || undefined,
+      const cargaEstudiante = {
+        personaId: personaId,
+        gestionAdmision: datosEstudiante.gestionAdmision,
+        fechaAdmision: datosEstudiante.fechaAdmision,
+        carreraId: Number(datosEstudiante.carreraId),
+        planEstudioId: Number(datosEstudiante.planEstudioId),
+        numeroFolder: datosEstudiante.numeroFolder || undefined,
+        codigoFormulario01: datosEstudiante.codigoFormulario01 || undefined,
+        numeroTituloBachiller: datosEstudiante.numeroTituloBachiller || undefined,
+        fechaTituloBachiller: datosEstudiante.fechaTituloBachiller || undefined,
         estado: 'activo',
       };
 
-      const response = await api.post('/estudiantes', studentPayload);
+      const respuesta = await api.post('/estudiantes', cargaEstudiante);
 
-      if (response.data.usuario) {
-        setCredentialsModal(response.data.usuario);
+      if (respuesta.data.usuario) {
+        setModalCredenciales(respuesta.data.usuario);
       } else {
         router.push('/estudiantes');
       }
     } catch (error: any) {
       console.error('Error al crear estudiante:', error);
       if (error.response?.data?.mensaje) {
-        setErrors({ submit: error.response.data.mensaje });
+        setErrores({ submit: error.response.data.mensaje });
       } else {
-        setErrors({ submit: 'Error al crear el estudiante' });
+        setErrores({ submit: 'Error al crear el estudiante' });
       }
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Boton variant="ghost" size="icon" onClick={() => router.back()}>
+        <Boton variante="fantasma" tamano="icono" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
         </Boton>
-        <Migas items={[
-          { label: 'Estudiantes', href: '/estudiantes' },
-          { label: 'Nuevo Estudiante' }
+        <Migas elementos={[
+          { etiqueta: 'Estudiantes', href: '/estudiantes' },
+          { etiqueta: 'Nuevo Estudiante' }
         ]} />
       </div>
 
@@ -223,8 +223,8 @@ export default function NewStudentPage() {
         <h1 className="text-2xl font-bold text-gray-900">Nuevo Estudiante</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Tarjeta variant="bordered">
+      <form onSubmit={enviarFormulario} className="space-y-6">
+        <Tarjeta variante="conBorde">
           <EncabezadoTarjeta>
             <TituloTarjeta>Datos Personales</TituloTarjeta>
           </EncabezadoTarjeta>
@@ -232,78 +232,78 @@ export default function NewStudentPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <Entrada
-                  label="Cédula de Identidad *"
-                  value={personData.ci}
-                  onChange={(e) => setPersonData({ ...personData, ci: toUpper(e.target.value) })}
-                  error={errors.ci}
+                  etiqueta="Cédula de Identidad *"
+                  value={datosPersona.ci}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, ci: aMayusculas(e.target.value) })}
+                  error={errores.ci}
                   placeholder="12345678"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Nombres *"
-                  value={personData.nombres}
-                  onChange={(e) => setPersonData({ ...personData, nombres: toUpper(e.target.value) })}
-                  error={errors.nombres}
+                  etiqueta="Nombres *"
+                  value={datosPersona.nombres}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, nombres: aMayusculas(e.target.value) })}
+                  error={errores.nombres}
                   placeholder="Juan Carlos"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Apellido Paterno *"
-                  value={personData.apellidoPaterno}
-                  onChange={(e) => setPersonData({ ...personData, apellidoPaterno: toUpper(e.target.value) })}
-                  error={errors.apellidoPaterno}
+                  etiqueta="Apellido Paterno *"
+                  value={datosPersona.apellidoPaterno}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, apellidoPaterno: aMayusculas(e.target.value) })}
+                  error={errores.apellidoPaterno}
                   placeholder="Perez"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Apellido Materno"
-                  value={personData.apellidoMaterno}
-                  onChange={(e) => setPersonData({ ...personData, apellidoMaterno: toUpper(e.target.value) })}
-                  error={errors.apellidoMaterno}
+                  etiqueta="Apellido Materno"
+                  value={datosPersona.apellidoMaterno}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, apellidoMaterno: aMayusculas(e.target.value) })}
+                  error={errores.apellidoMaterno}
                   placeholder="Gomez"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Fecha de Nacimiento *"
+                  etiqueta="Fecha de Nacimiento *"
                   type="date"
-                  value={personData.fechaNacimiento}
-                  onChange={(e) => setPersonData({ ...personData, fechaNacimiento: e.target.value })}
-                  error={errors.fechaNacimiento}
+                  value={datosPersona.fechaNacimiento}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, fechaNacimiento: e.target.value })}
+                  error={errores.fechaNacimiento}
                 />
               </div>
               <div>
                 <Selector
-                  label="Lugar de Nacimiento"
-                  value={personData.lugarNacimiento}
+                  etiqueta="Lugar de Nacimiento"
+                  value={datosPersona.lugarNacimiento}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setPersonData({ ...personData, lugarNacimiento: value });
+                    setDatosPersona({ ...datosPersona, lugarNacimiento: value });
                   }}
-                  options={[
-                    { value: '', label: 'Seleccionar' },
-                    { value: 'La Paz', label: 'La Paz' },
-                    { value: 'Cochabamba', label: 'Cochabamba' },
-                    { value: 'Santa Cruz', label: 'Santa Cruz' },
-                    { value: 'Oruro', label: 'Oruro' },
-                    { value: 'Potosí', label: 'Potosí' },
-                    { value: 'Tarija', label: 'Tarija' },
-                    { value: 'Chuquisaca', label: 'Chuquisaca' },
-                    { value: 'Beni', label: 'Beni' },
-                    { value: 'Pando', label: 'Pando' },
-                    { value: 'Otra', label: 'Otra' },
+                  opciones={[
+                    { value: '', etiqueta: 'Seleccionar' },
+                    { value: 'La Paz', etiqueta: 'La Paz' },
+                    { value: 'Cochabamba', etiqueta: 'Cochabamba' },
+                    { value: 'Santa Cruz', etiqueta: 'Santa Cruz' },
+                    { value: 'Oruro', etiqueta: 'Oruro' },
+                    { value: 'Potosí', etiqueta: 'Potosí' },
+                    { value: 'Tarija', etiqueta: 'Tarija' },
+                    { value: 'Chuquisaca', etiqueta: 'Chuquisaca' },
+                    { value: 'Beni', etiqueta: 'Beni' },
+                    { value: 'Pando', etiqueta: 'Pando' },
+                    { value: 'Otra', etiqueta: 'Otra' },
                   ]}
                 />
               </div>
-              {personData.lugarNacimiento === 'Otra' && (
+              {datosPersona.lugarNacimiento === 'Otra' && (
                 <div>
                   <Entrada
-                    label="Especificar lugar de nacimiento"
-                    value={personData.lugarNacimientoOtro || ''}
-                    onChange={(e) => setPersonData({ ...personData, lugarNacimientoOtro: toUpper(e.target.value) })}
+                    etiqueta="Especificar lugar de nacimiento"
+                    value={datosPersona.lugarNacimientoOtro || ''}
+                    onChange={(e) => setDatosPersona({ ...datosPersona, lugarNacimientoOtro: aMayusculas(e.target.value) })}
                     placeholder="Ingrese el lugar de nacimiento"
                   />
                 </div>
@@ -316,8 +316,8 @@ export default function NewStudentPage() {
                       type="radio"
                       name="genero"
                       value="M"
-                      checked={personData.genero === 'M'}
-                      onChange={(e) => setPersonData({ ...personData, genero: e.target.value })}
+                      checked={datosPersona.genero === 'M'}
+                      onChange={(e) => setDatosPersona({ ...datosPersona, genero: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Masculino</span>
@@ -327,14 +327,14 @@ export default function NewStudentPage() {
                       type="radio"
                       name="genero"
                       value="F"
-                      checked={personData.genero === 'F'}
-                      onChange={(e) => setPersonData({ ...personData, genero: e.target.value })}
+                      checked={datosPersona.genero === 'F'}
+                      onChange={(e) => setDatosPersona({ ...datosPersona, genero: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Femenino</span>
                   </label>
                 </div>
-                {errors.genero && <p className="text-xs text-red-500 mt-1">{errors.genero}</p>}
+                {errores.genero && <p className="text-xs text-red-500 mt-1">{errores.genero}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Estado Civil</label>
@@ -344,8 +344,8 @@ export default function NewStudentPage() {
                       type="radio"
                       name="estadoCivil"
                       value="Soltera(o)"
-                      checked={personData.estadoCivil === 'Soltera(o)'}
-                      onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
+                      checked={datosPersona.estadoCivil === 'Soltera(o)'}
+                      onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Soltero(a)</span>
@@ -355,8 +355,8 @@ export default function NewStudentPage() {
                       type="radio"
                       name="estadoCivil"
                       value="Casada(o)"
-                      checked={personData.estadoCivil === 'Casada(o)'}
-                      onChange={(e) => setPersonData({ ...personData, estadoCivil: e.target.value })}
+                      checked={datosPersona.estadoCivil === 'Casada(o)'}
+                      onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
                       className="w-4 h-4 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="text-sm text-gray-700">Casado(a)</span>
@@ -365,57 +365,57 @@ export default function NewStudentPage() {
               </div>
               <div>
                 <Selector
-                  label="Nacionalidad"
-                  value={personData.nacionalidad}
+                  etiqueta="Nacionalidad"
+                  value={datosPersona.nacionalidad}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setPersonData({ ...personData, nacionalidad: value });
+                    setDatosPersona({ ...datosPersona, nacionalidad: value });
                   }}
-                  options={[
-                    { value: 'Boliviana', label: 'Boliviana' },
-                    { value: 'Argentina', label: 'Argentina' },
-                    { value: 'Peruana', label: 'Peruana' },
-                    { value: 'Chilena', label: 'Chilena' },
-                    { value: 'Brasileña', label: 'Brasileña' },
-                    { value: 'Colombiana', label: 'Colombiana' },
-                    { value: 'Venezolana', label: 'Venezolana' },
-                    { value: 'Española', label: 'Española' },
-                    { value: 'Otra', label: 'Otra' },
+                  opciones={[
+                    { value: 'Boliviana', etiqueta: 'Boliviana' },
+                    { value: 'Argentina', etiqueta: 'Argentina' },
+                    { value: 'Peruana', etiqueta: 'Peruana' },
+                    { value: 'Chilena', etiqueta: 'Chilena' },
+                    { value: 'Brasileña', etiqueta: 'Brasileña' },
+                    { value: 'Colombiana', etiqueta: 'Colombiana' },
+                    { value: 'Venezolana', etiqueta: 'Venezolana' },
+                    { value: 'Española', etiqueta: 'Española' },
+                    { value: 'Otra', etiqueta: 'Otra' },
                   ]}
                 />
               </div>
-              {personData.nacionalidad === 'Otra' && (
+              {datosPersona.nacionalidad === 'Otra' && (
                 <div>
                   <Entrada
-                    label="Especificar nacionalidad"
-                    value={personData.nacionalidadOtra || ''}
-                    onChange={(e) => setPersonData({ ...personData, nacionalidadOtra: toUpper(e.target.value) })}
+                    etiqueta="Especificar nacionalidad"
+                    value={datosPersona.nacionalidadOtra || ''}
+                    onChange={(e) => setDatosPersona({ ...datosPersona, nacionalidadOtra: aMayusculas(e.target.value) })}
                     placeholder="Ingrese su nacionalidad"
                   />
                 </div>
               )}
               <div>
                 <Entrada
-                  label="Teléfono"
-                  value={personData.telefono}
-                  onChange={(e) => setPersonData({ ...personData, telefono: e.target.value })}
+                  etiqueta="Teléfono"
+                  value={datosPersona.telefono}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, telefono: e.target.value })}
                   placeholder="71234567"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Correo Electrónico"
+                  etiqueta="Correo Electrónico"
                   type="email"
-                  value={personData.correo}
-                  onChange={(e) => setPersonData({ ...personData, correo: e.target.value })}
+                  value={datosPersona.correo}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, correo: e.target.value })}
                   placeholder="correo@ejemplo.com"
                 />
               </div>
               <div className="md:col-span-2 lg:col-span-3">
                 <Entrada
-                  label="Dirección"
-                  value={personData.direccion}
-                  onChange={(e) => setPersonData({ ...personData, direccion: toUpper(e.target.value) })}
+                  etiqueta="Dirección"
+                  value={datosPersona.direccion}
+                  onChange={(e) => setDatosPersona({ ...datosPersona, direccion: aMayusculas(e.target.value) })}
                   placeholder="Av. 16 de Julio, La Paz"
                 />
               </div>
@@ -423,7 +423,7 @@ export default function NewStudentPage() {
           </ContenidoTarjeta>
         </Tarjeta>
 
-        <Tarjeta variant="bordered">
+        <Tarjeta variante="conBorde">
           <EncabezadoTarjeta>
             <TituloTarjeta>Datos del Estudiante</TituloTarjeta>
           </EncabezadoTarjeta>
@@ -431,96 +431,96 @@ export default function NewStudentPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <Selector
-                  label="Gestión de Ingreso *"
-                  value={studentData.gestionAdmision}
-                  onChange={(e) => setStudentData({ ...studentData, gestionAdmision: e.target.value })}
-                  error={errors.gestionAdmision}
-                  options={periodos.map(p => ({
+                  etiqueta="Gestión de Ingreso *"
+                  value={datosEstudiante.gestionAdmision}
+                  onChange={(e) => setDatosEstudiante({ ...datosEstudiante, gestionAdmision: e.target.value })}
+                  error={errores.gestionAdmision}
+                  opciones={periodos.map(p => ({
                     value: `${p.gestion.anio}-${p.periodo.numero}`,
-                    label: `${p.periodo.numero}/${p.gestion.anio}${p.periodo.estado === 'abierta' ? ' ★' : ''}`,
+                    etiqueta: `${p.periodo.numero}/${p.gestion.anio}${p.periodo.estado === 'abierta' ? ' ★' : ''}`,
                   }))}
                   placeholder="Seleccionar período..."
                 />
               </div>
               <div>
                 <Entrada
-                  label="Fecha de Ingreso *"
+                  etiqueta="Fecha de Ingreso *"
                   type="date"
-                  value={studentData.fechaAdmision}
-                  onChange={(e) => setStudentData({ ...studentData, fechaAdmision: e.target.value })}
-                  error={errors.fechaAdmision}
+                  value={datosEstudiante.fechaAdmision}
+                  onChange={(e) => setDatosEstudiante({ ...datosEstudiante, fechaAdmision: e.target.value })}
+                  error={errores.fechaAdmision}
                 />
               </div>
               <div>
                 <Selector
-                  label="Carrera *"
-                  value={studentData.carreraId}
-                  onChange={(e) => setStudentData({ ...studentData, carreraId: e.target.value, planEstudioId: '' })}
-                  error={errors.carreraId}
-                  options={careers.map(c => ({ value: c.id.toString(), label: c.nombre }))}
-                  placeholder={loadingCareers ? 'Cargando...' : 'Seleccionar carrera...'}
-                  disabled={loadingCareers}
+                  etiqueta="Carrera *"
+                  value={datosEstudiante.carreraId}
+                  onChange={(e) => setDatosEstudiante({ ...datosEstudiante, carreraId: e.target.value, planEstudioId: '' })}
+                  error={errores.carreraId}
+                  opciones={carreras.map(c => ({ value: c.id.toString(), etiqueta: c.nombre }))}
+                  placeholder={cargandoCarreras ? 'Cargando...' : 'Seleccionar carrera...'}
+                  disabled={cargandoCarreras}
                 />
               </div>
               <div>
                 <Selector
-                  label="Plan de Estudio *"
-                  value={studentData.planEstudioId}
-                  onChange={(e) => setStudentData({ ...studentData, planEstudioId: e.target.value })}
-                  error={errors.planEstudioId}
-                  options={studyPlans.map(p => ({ value: p.id.toString(), label: `${p.numeroRm}` }))}
-                  placeholder={loadingPlans ? 'Cargando...' : 'Seleccionar plan...'}
-                  disabled={loadingPlans || !studentData.carreraId}
+                  etiqueta="Plan de Estudio *"
+                  value={datosEstudiante.planEstudioId}
+                  onChange={(e) => setDatosEstudiante({ ...datosEstudiante, planEstudioId: e.target.value })}
+                  error={errores.planEstudioId}
+                  opciones={planesEstudio.map(p => ({ value: p.id.toString(), etiqueta: `${p.numeroRm}` }))}
+                  placeholder={cargandoPlanes ? 'Cargando...' : 'Seleccionar plan...'}
+                  disabled={cargandoPlanes || !datosEstudiante.carreraId}
                 />
               </div>
               <div>
                 <Entrada
-                  label="Número de Folder"
-                  value={studentData.numeroFolder}
-                  onChange={(e) => setStudentData({ ...studentData, numeroFolder: e.target.value })}
+                  etiqueta="Número de Folder"
+                  value={datosEstudiante.numeroFolder}
+                  onChange={(e) => setDatosEstudiante({ ...datosEstudiante, numeroFolder: e.target.value })}
                   placeholder="F-001"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Código Formulario 01"
-                  value={studentData.codigoFormulario01}
-                  onChange={(e) => setStudentData({ ...studentData, codigoFormulario01: e.target.value })}
+                  etiqueta="Código Formulario 01"
+                  value={datosEstudiante.codigoFormulario01}
+                  onChange={(e) => setDatosEstudiante({ ...datosEstudiante, codigoFormulario01: e.target.value })}
                   placeholder="FORM01-2024-001"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Número de Título de Bachiller"
-                  value={studentData.numeroTituloBachiller}
-                  onChange={(e) => setStudentData({ ...studentData, numeroTituloBachiller: e.target.value })}
+                  etiqueta="Número de Título de Bachiller"
+                  value={datosEstudiante.numeroTituloBachiller}
+                  onChange={(e) => setDatosEstudiante({ ...datosEstudiante, numeroTituloBachiller: e.target.value })}
                   placeholder="123456"
                 />
               </div>
               <div>
                 <Entrada
-                  label="Fecha de Título de Bachiller"
+                  etiqueta="Fecha de Título de Bachiller"
                   type="date"
-                  value={studentData.fechaTituloBachiller}
-                  onChange={(e) => setStudentData({ ...studentData, fechaTituloBachiller: e.target.value })}
+                  value={datosEstudiante.fechaTituloBachiller}
+                  onChange={(e) => setDatosEstudiante({ ...datosEstudiante, fechaTituloBachiller: e.target.value })}
                 />
               </div>
             </div>
           </ContenidoTarjeta>
         </Tarjeta>
 
-        {errors.submit && (
+        {errores.submit && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            {errors.submit}
+            {errores.submit}
           </div>
         )}
 
         <div className="flex justify-end gap-3">
-          <Boton variant="outline" type="button" onClick={() => router.back()}>
+          <Boton variante="contorno" type="button" onClick={() => router.back()}>
             Cancelar
           </Boton>
-          <Boton type="submit" disabled={loading}>
-            {loading ? (
+          <Boton type="submit" disabled={cargando}>
+            {cargando ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Guardando...
@@ -535,11 +535,11 @@ export default function NewStudentPage() {
         </div>
       </form>
 
-      {credentialsModal && (
-        <Modal open={!!credentialsModal} onClose={() => {
-          setCredentialsModal(null);
+      {modalCredenciales && (
+        <Modal abierto={!!modalCredenciales} alCerrar={() => {
+          setModalCredenciales(null);
           router.push('/estudiantes');
-        }} title="Usuario Creado" size="md">
+        }} titulo="Usuario Creado" tamano="mediano">
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
               El estudiante ha sido registrado exitosamente. A continuación encontrará las credenciales de acceso al sistema:
@@ -549,14 +549,14 @@ export default function NewStudentPage() {
                 <User className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Nombre de usuario</p>
-                  <p className="font-mono font-medium">{credentialsModal.nombreUsuario}</p>
+                  <p className="font-mono font-medium">{modalCredenciales.nombreUsuario}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Key className="w-5 h-5 text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500">Contraseña temporal</p>
-                  <p className="font-mono font-medium">{credentialsModal.contrasena}</p>
+                  <p className="font-mono font-medium">{modalCredenciales.contrasena}</p>
                 </div>
               </div>
             </div>
@@ -565,7 +565,7 @@ export default function NewStudentPage() {
             </p>
             <div className="flex justify-end">
               <Boton onClick={() => {
-                setCredentialsModal(null);
+                setModalCredenciales(null);
                 router.push('/estudiantes');
               }}>
                 Entendido

@@ -53,7 +53,7 @@ export class DocumentoEmitido {
 
   @ManyToOne(() => Gestion)
   @JoinColumn({ name: 'gestionId' })
-  gestionEntity: Gestion;
+  gestionRelacionada: Gestion;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', name: 'fechaEmision' })
   fechaEmision: Date;

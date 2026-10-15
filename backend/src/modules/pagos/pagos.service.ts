@@ -10,179 +10,179 @@ import { ActualizarPagoDto } from './dto/actualizar-pago.dto';
 export class ServicioPagos {
   constructor(
     @InjectRepository(Pago)
-    private pagoRepository: Repository<Pago>,
+    private repositorioPago: Repository<Pago>,
     @InjectRepository(ConceptoPago)
-    private conceptoRepository: Repository<ConceptoPago>,
+    private repositorioConcepto: Repository<ConceptoPago>,
   ) {}
 
   async listarConceptos(): Promise<ConceptoPago[]> {
-    return this.conceptoRepository.find({
+    return this.repositorioConcepto.find({
       where: { estado: EstadoConceptoPago.ACTIVO },
       order: { nombre: 'ASC' },
     });
   }
 
-  async create(createDto: CrearPagoDto): Promise<Pago> {
-    const payment = this.pagoRepository.create({
-      ...createDto,
-      fechaPago: new Date(createDto.fechaPago),
+  async crear(crearPagoDto: CrearPagoDto): Promise<Pago> {
+    const pago = this.repositorioPago.create({
+      ...crearPagoDto,
+      fechaPago: new Date(crearPagoDto.fechaPago),
     } as any);
-    return this.pagoRepository.save(payment as any);
+    return this.repositorioPago.save(pago as any);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
     gestion?: string,
-    status?: EstadoPago,
-    studentId?: number,
-    conceptId?: number,
+    estado?: EstadoPago,
+    estudianteId?: number,
+    conceptoId?: number,
   ): Promise<{ datos: Pago[]; total: number; pagina: number; limite: number }> {
-    const query = this.pagoRepository
-      .createQueryBuilder('payment')
-      .leftJoinAndSelect('payment.estudiante', 'student')
-      .leftJoinAndSelect('student.persona', 'person')
-      .leftJoinAndSelect('payment.concepto', 'concept')
-      .leftJoinAndSelect('payment.receptor', 'receiver');
+    const consulta = this.repositorioPago
+      .createQueryBuilder('pago')
+      .leftJoinAndSelect('pago.estudiante', 'estudiante')
+      .leftJoinAndSelect('estudiante.persona', 'persona')
+      .leftJoinAndSelect('pago.concepto', 'concepto')
+      .leftJoinAndSelect('pago.receptor', 'receptor');
 
     if (gestion) {
-      query.andWhere('payment.gestion = :gestion', { gestion });
+      consulta.andWhere('pago.gestion = :gestion', { gestion });
     }
 
-    if (status) {
-      query.andWhere('payment.estado = :estado', { estado: status });
+    if (estado) {
+      consulta.andWhere('pago.estado = :estado', { estado });
     }
 
-    if (studentId) {
-      query.andWhere('payment.estudianteId = :studentId', { studentId });
+    if (estudianteId) {
+      consulta.andWhere('pago.estudianteId = :estudianteId', { estudianteId });
     }
 
-    if (conceptId) {
-      query.andWhere('payment.conceptoId = :conceptId', { conceptId });
+    if (conceptoId) {
+      consulta.andWhere('pago.conceptoId = :conceptoId', { conceptoId });
     }
 
-    const [data, total] = await query
-      .orderBy('payment.fechaPago', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('pago.fechaPago', 'DESC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Pago> {
-    const payment = await this.pagoRepository.findOne({
+  async obtenerUno(id: number): Promise<Pago> {
+    const pago = await this.repositorioPago.findOne({
       where: { id },
       relations: ['estudiante', 'estudiante.persona', 'concepto', 'receptor'],
     });
-    if (!payment) {
+    if (!pago) {
       throw new NotFoundException(`Pago con ID ${id} no encontrado`);
     }
-    return payment;
+    return pago;
   }
 
-  async update(id: number, updateDto: ActualizarPagoDto): Promise<Pago> {
-    const payment = await this.findOne(id);
-    Object.assign(payment, updateDto);
-    return this.pagoRepository.save(payment as any);
+  async actualizar(id: number, actualizarPagoDto: ActualizarPagoDto): Promise<Pago> {
+    const pago = await this.obtenerUno(id);
+    Object.assign(pago, actualizarPagoDto);
+    return this.repositorioPago.save(pago as any);
   }
 
-  async remove(id: number): Promise<void> {
-    const payment = await this.findOne(id);
-    await this.pagoRepository.remove(payment);
+  async eliminar(id: number): Promise<void> {
+    const pago = await this.obtenerUno(id);
+    await this.repositorioPago.remove(pago);
   }
 
-  async findByStudent(studentId: number, gestion?: string): Promise<Pago[]> {
-    const query = this.pagoRepository
-      .createQueryBuilder('payment')
-      .leftJoinAndSelect('payment.concepto', 'concept')
-      .leftJoinAndSelect('payment.receptor', 'receiver')
-      .where('payment.estudianteId = :studentId', { studentId });
+  async buscarPorEstudiante(estudianteId: number, gestion?: string): Promise<Pago[]> {
+    const consulta = this.repositorioPago
+      .createQueryBuilder('pago')
+      .leftJoinAndSelect('pago.concepto', 'concepto')
+      .leftJoinAndSelect('pago.receptor', 'receptor')
+      .where('pago.estudianteId = :estudianteId', { estudianteId });
 
     if (gestion) {
-      query.andWhere('payment.gestion = :gestion', { gestion });
+      consulta.andWhere('pago.gestion = :gestion', { gestion });
     }
 
-    return query.orderBy('payment.fechaPago', 'DESC').getMany();
+    return consulta.orderBy('pago.fechaPago', 'DESC').getMany();
   }
 
-  async getStudentDebt(studentId: number, gestion: string): Promise<{ totalPaid: number; pending: number }> {
-    const payments = await this.pagoRepository.find({
-      where: { estudianteId: studentId, gestion, estado: EstadoPago.PAGADO },
+  async obtenerDeudaEstudiante(estudianteId: number, gestion: string): Promise<{ totalPaid: number; pending: number }> {
+    const pagos = await this.repositorioPago.find({
+      where: { estudianteId, gestion, estado: EstadoPago.PAGADO },
     });
 
-    const totalPaid = payments.reduce((sum, p) => sum + Number(p.monto), 0);
+    const totalPagado = pagos.reduce((suma, pago) => suma + Number(pago.monto), 0);
 
-    return { totalPaid, pending: 0 };
+    return { totalPaid: totalPagado, pending: 0 };
   }
 
-  async getPaymentsByDateRange(
-    startDate: Date,
-    endDate: Date,
+  async obtenerPagosPorRangoFechas(
+    fechaInicio: Date,
+    fechaFin: Date,
     gestion?: string,
   ): Promise<Pago[]> {
-    const query = this.pagoRepository
-      .createQueryBuilder('payment')
-      .leftJoinAndSelect('payment.estudiante', 'student')
-      .leftJoinAndSelect('student.persona', 'person')
-      .leftJoinAndSelect('payment.concepto', 'concept')
-      .where('payment.fechaPago BETWEEN :startDate AND :endDate', { startDate, endDate })
-      .andWhere('payment.estado = :estado', { estado: EstadoPago.PAGADO });
+    const consulta = this.repositorioPago
+      .createQueryBuilder('pago')
+      .leftJoinAndSelect('pago.estudiante', 'estudiante')
+      .leftJoinAndSelect('estudiante.persona', 'persona')
+      .leftJoinAndSelect('pago.concepto', 'concepto')
+      .where('pago.fechaPago BETWEEN :fechaInicio AND :fechaFin', { fechaInicio, fechaFin })
+      .andWhere('pago.estado = :estado', { estado: EstadoPago.PAGADO });
 
     if (gestion) {
-      query.andWhere('payment.gestion = :gestion', { gestion });
+      consulta.andWhere('pago.gestion = :gestion', { gestion });
     }
 
-    return query.orderBy('payment.fechaPago', 'DESC').getMany();
+    return consulta.orderBy('pago.fechaPago', 'DESC').getMany();
   }
 
-  async getDailyCollection(fecha: string, gestion: string): Promise<{ total: number; count: number }> {
-    const startDate = new Date(fecha);
-    const endDate = new Date(fecha);
-    endDate.setHours(23, 59, 59);
+  async obtenerRecaudacionDiaria(fecha: string, gestion: string): Promise<{ total: number; count: number }> {
+    const fechaInicio = new Date(fecha);
+    const fechaFin = new Date(fecha);
+    fechaFin.setHours(23, 59, 59);
 
-    const payments = await this.pagoRepository
-      .createQueryBuilder('payment')
-      .where('payment.fechaPago BETWEEN :startDate AND :endDate', { startDate, endDate })
-      .andWhere('payment.gestion = :gestion', { gestion })
-      .andWhere('payment.estado = :estado', { estado: EstadoPago.PAGADO })
+    const pagos = await this.repositorioPago
+      .createQueryBuilder('pago')
+      .where('pago.fechaPago BETWEEN :fechaInicio AND :fechaFin', { fechaInicio, fechaFin })
+      .andWhere('pago.gestion = :gestion', { gestion })
+      .andWhere('pago.estado = :estado', { estado: EstadoPago.PAGADO })
       .getMany();
 
-    const total = payments.reduce((sum, p) => sum + Number(p.monto), 0);
+    const total = pagos.reduce((suma, pago) => suma + Number(pago.monto), 0);
 
-    return { total, count: payments.length };
+    return { total, count: pagos.length };
   }
 
-  async annul(id: number): Promise<Pago> {
-    const payment = await this.findOne(id);
-    payment.estado = EstadoPago.ANULADO;
-    return this.pagoRepository.save(payment as any);
+  async anular(id: number): Promise<Pago> {
+    const pago = await this.obtenerUno(id);
+    pago.estado = EstadoPago.ANULADO;
+    return this.repositorioPago.save(pago as any);
   }
 
-  async getCollectionSummary(gestion: string): Promise<{
+  async obtenerResumenRecaudacion(gestion: string): Promise<{
     total: number;
     byMethod: { method: MetodoPago; total: number }[];
     byConcept: { concept: string; total: number }[];
   }> {
-    const payments = await this.pagoRepository.find({
+    const pagos = await this.repositorioPago.find({
       where: { gestion, estado: EstadoPago.PAGADO },
       relations: ['concepto'],
     });
 
-    const total = payments.reduce((sum, p) => sum + Number(p.monto), 0);
+    const total = pagos.reduce((suma, pago) => suma + Number(pago.monto), 0);
 
-    const byMethodMap = new Map<MetodoPago, number>();
-    const byConceptMap = new Map<string, number>();
+    const mapaPorMetodo = new Map<MetodoPago, number>();
+    const mapaPorConcepto = new Map<string, number>();
 
-    payments.forEach((p) => {
-      byMethodMap.set(p.metodoPago, (byMethodMap.get(p.metodoPago) || 0) + Number(p.monto));
-      byConceptMap.set(p.concepto?.nombre || 'Unknown', (byConceptMap.get(p.concepto?.nombre || 'Unknown') || 0) + Number(p.monto));
+    pagos.forEach((pago) => {
+      mapaPorMetodo.set(pago.metodoPago, (mapaPorMetodo.get(pago.metodoPago) || 0) + Number(pago.monto));
+      mapaPorConcepto.set(pago.concepto?.nombre || 'Unknown', (mapaPorConcepto.get(pago.concepto?.nombre || 'Unknown') || 0) + Number(pago.monto));
     });
 
     return {
       total,
-      byMethod: Array.from(byMethodMap.entries()).map(([method, total]) => ({ method, total })),
-      byConcept: Array.from(byConceptMap.entries()).map(([concept, total]) => ({ concept, total })),
+      byMethod: Array.from(mapaPorMetodo.entries()).map(([metodo, total]) => ({ method: metodo, total })),
+      byConcept: Array.from(mapaPorConcepto.entries()).map(([concepto, total]) => ({ concept: concepto, total })),
     };
   }
 }

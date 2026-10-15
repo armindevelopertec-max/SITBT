@@ -26,7 +26,7 @@ export default function PaginaPanel() {
 
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Panel' }]} />
+      <Migas elementos={[{ etiqueta: 'Panel' }]} />
 
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Bienvenido, {usuario?.nombreUsuario}</h1>
@@ -37,7 +37,7 @@ export default function PaginaPanel() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {estadisticas.map((estadistica) => (
-          <Tarjeta key={estadistica.titulo} variant="bordered">
+          <Tarjeta key={estadistica.titulo} variante="conBorde">
             <ContenidoTarjeta className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -59,7 +59,7 @@ export default function PaginaPanel() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Tarjeta variant="bordered">
+        <Tarjeta variante="conBorde">
           <EncabezadoTarjeta>
             <TituloTarjeta>Actividad Reciente</TituloTarjeta>
           </EncabezadoTarjeta>
@@ -80,7 +80,7 @@ export default function PaginaPanel() {
           </ContenidoTarjeta>
         </Tarjeta>
 
-        <Tarjeta variant="bordered">
+        <Tarjeta variante="conBorde">
           <EncabezadoTarjeta>
             <TituloTarjeta>Calendario Académico</TituloTarjeta>
           </EncabezadoTarjeta>
@@ -92,15 +92,15 @@ export default function PaginaPanel() {
                 { fecha: '01 Nov', evento: 'Feriado - Día de la Revolución', tipo: 'Feriado' },
                 { fecha: '15 Nov', evento: 'Publicación de resultados', tipo: 'Resultados' },
                 { fecha: '01 Dic', evento: 'Inicio de exámenes finales', tipo: 'Examen' },
-              ].map((item, index) => (
-                <div key={index} className="flex items-center gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+              ].map((elemento, indice) => (
+                <div key={indice} className="flex items-center gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
                   <div className="w-14 h-14 rounded-lg bg-primary-50 flex flex-col items-center justify-center">
-                    <span className="text-xs text-primary-600 font-medium">{item.fecha.split(' ')[0]}</span>
-                    <span className="text-lg font-bold text-primary-700">{item.fecha.split(' ')[1]}</span>
+                    <span className="text-xs text-primary-600 font-medium">{elemento.fecha.split(' ')[0]}</span>
+                    <span className="text-lg font-bold text-primary-700">{elemento.fecha.split(' ')[1]}</span>
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{item.evento}</p>
-                    <p className="text-xs text-gray-500">{item.tipo}</p>
+                    <p className="text-sm font-medium text-gray-900">{elemento.evento}</p>
+                    <p className="text-xs text-gray-500">{elemento.tipo}</p>
                   </div>
                 </div>
               ))}

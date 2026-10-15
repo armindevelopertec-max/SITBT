@@ -9,74 +9,74 @@ import { ActualizarRolDto } from './dto/update-role.dto';
 export class ServicioRoles {
   constructor(
     @InjectRepository(Rol)
-    private rolRepository: Repository<Rol>,
+    private repositorioRol: Repository<Rol>,
   ) {}
 
-  async create(crearRolDto: CrearRolDto): Promise<Rol> {
-    const existing = await this.rolRepository.findOne({
+  async crear(crearRolDto: CrearRolDto): Promise<Rol> {
+    const existente = await this.repositorioRol.findOne({
       where: { codigo: crearRolDto.codigo },
     });
-    if (existing) {
+    if (existente) {
       throw new ConflictException(`Rol con código ${crearRolDto.codigo} ya existe`);
     }
-    const rol = this.rolRepository.create({
+    const rol = this.repositorioRol.create({
       codigo: crearRolDto.codigo,
       nombre: crearRolDto.nombre,
       descripcion: crearRolDto.descripcion,
       estado: crearRolDto.estado,
     });
-    return this.rolRepository.save(rol);
+    return this.repositorioRol.save(rol);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
     estado?: EstadoRol,
   ): Promise<{ datos: Rol[]; total: number; pagina: number; limite: number }> {
-    const query = this.rolRepository.createQueryBuilder('rol');
+    const consulta = this.repositorioRol.createQueryBuilder('rol');
 
     if (estado) {
-      query.where('rol.estado = :estado', { estado: estado });
+      consulta.where('rol.estado = :estado', { estado: estado });
     }
 
-    const [data, total] = await query
+    const [datos, total] = await consulta
       .orderBy('rol.nombre', 'ASC')
-      .skip((page - 1) * limit)
-      .take(limit)
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Rol> {
-    const rol = await this.rolRepository.findOne({ where: { id } });
+  async obtenerUno(id: number): Promise<Rol> {
+    const rol = await this.repositorioRol.findOne({ where: { id } });
     if (!rol) {
       throw new NotFoundException(`Rol con ID ${id} no encontrado`);
     }
     return rol;
   }
 
-  async findByCodigo(codigo: string): Promise<Rol> {
-    const rol = await this.rolRepository.findOne({ where: { codigo } });
+  async buscarPorCodigo(codigo: string): Promise<Rol> {
+    const rol = await this.repositorioRol.findOne({ where: { codigo } });
     if (!rol) {
       throw new NotFoundException(`Rol con código ${codigo} no encontrado`);
     }
     return rol;
   }
 
-  async update(id: number, actualizarRolDto: ActualizarRolDto): Promise<Rol> {
-    const rol = await this.findOne(id);
+  async actualizar(id: number, actualizarRolDto: ActualizarRolDto): Promise<Rol> {
+    const rol = await this.obtenerUno(id);
     Object.assign(rol, actualizarRolDto);
-    return this.rolRepository.save(rol);
+    return this.repositorioRol.save(rol);
   }
 
-  async remove(id: number): Promise<void> {
-    const rol = await this.findOne(id);
-    await this.rolRepository.remove(rol);
+  async eliminar(id: number): Promise<void> {
+    const rol = await this.obtenerUno(id);
+    await this.repositorioRol.remove(rol);
   }
 
-  async findActive(): Promise<Rol[]> {
-    return this.rolRepository.find({
+  async obtenerActivos(): Promise<Rol[]> {
+    return this.repositorioRol.find({
       where: { estado: EstadoRol.ACTIVO },
       order: { nombre: 'ASC' },
     });

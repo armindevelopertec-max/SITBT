@@ -19,57 +19,57 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 @ApiTags('Certificados')
 @Controller('certificados')
 export class ControladorCertificados {
-  constructor(private readonly service: ServicioCertificados) {}
+  constructor(private readonly servicio: ServicioCertificados) {}
 
   @Post()
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  create(@Body() createDto: CrearCertificadoDto) {
-    return this.service.create(createDto);
+  crear(@Body() dtoCreacion: CrearCertificadoDto) {
+    return this.servicio.crear(dtoCreacion);
   }
 
   @Get()
-  findAll(
-    @Query('pagina') page = 1,
-    @Query('limite') limit = 20,
+  obtenerTodos(
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
     @Query('gestion') gestion?: string,
-    @Query('tipo') type?: string,
-    @Query('estudianteId') studentId?: number,
+    @Query('tipo') tipo?: string,
+    @Query('estudianteId') estudianteId?: number,
   ) {
-    return this.service.findAll(+page, +limit, gestion, type, studentId ? +studentId : undefined);
+    return this.servicio.obtenerTodos(+pagina, +limite, gestion, tipo, estudianteId ? +estudianteId : undefined);
   }
 
   @Get('estudiante/:estudianteId')
-  findByStudent(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
-    return this.service.findByStudent(estudianteId);
+  buscarPorEstudiante(@Param('estudianteId', ParseIntPipe) estudianteId: number) {
+    return this.servicio.buscarPorEstudiante(estudianteId);
   }
 
   @Get('verificar/:codigo')
-  verifyCertificate(@Param('codigo') code: string) {
-    return this.service.verifyCertificate(code);
+  verificarCertificado(@Param('codigo') codigo: string) {
+    return this.servicio.verificarCertificado(codigo);
   }
 
   @Get('codigo/:codigo')
-  findByCode(@Param('codigo') code: string) {
-    return this.service.findByCode(code);
+  buscarPorCodigo(@Param('codigo') codigo: string) {
+    return this.servicio.buscarPorCodigo(codigo);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.service.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.obtenerUno(id);
   }
 
   @Patch(':id')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: ActualizarCertificadoDto) {
-    return this.service.update(id, updateDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() dtoActualizacion: ActualizarCertificadoDto) {
+    return this.servicio.actualizar(id, dtoActualizacion);
   }
 
   @Delete(':id')
   @UseGuards(GuardaJwt)
   @ApiBearerAuth()
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.service.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicio.eliminar(id);
   }
 }

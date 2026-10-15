@@ -9,175 +9,175 @@ import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, C
 import { Rol } from '@/types';
 
 interface ElementoMenu {
-  title: string;
+  titulo: string;
   href: string;
-  icon: React.ReactNode;
+  icono: React.ReactNode;
   roles: Rol[];
 }
 
 interface SeccionMenu {
-  title?: string;
-  items: ElementoMenu[];
+  titulo?: string;
+  elementos: ElementoMenu[];
 }
 
 interface PropsBarraLateral {
   colapsada: boolean;
   abierta?: boolean;
-  onCerrar?: () => void;
-  onColapsar?: () => void;
+  alCerrar?: () => void;
+  alColapsar?: () => void;
 }
 
 const seccionesMenu: SeccionMenu[] = [
   {
-    items: [
+    elementos: [
       {
-        title: 'Panel Principal',
+        titulo: 'Panel Principal',
         href: '/panel',
-        icon: <Home className="w-5 h-5" />,
+        icono: <Home className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente', 'estudiante', 'apoyo'],
       },
       {
-        title: 'Admisión',
+        titulo: 'Admisión',
         href: '/panel/admision',
-        icon: <ClipboardCheck className="w-5 h-5" />,
+        icono: <ClipboardCheck className="w-5 h-5" />,
         roles: ['administrador', 'secretaria'],
       },
       {
-        title: 'Estudiantes',
+        titulo: 'Estudiantes',
         href: '/estudiantes',
-        icon: <GraduationCap className="w-5 h-5" />,
+        icono: <GraduationCap className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente'],
       },
       {
-        title: 'Personal',
+        titulo: 'Personal',
         href: '/personal',
-        icon: <UserCog className="w-5 h-5" />,
+        icono: <UserCog className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'rector'],
       },
       {
-        title: 'Carreras',
+        titulo: 'Carreras',
         href: '/panel/carreras',
-        icon: <BookOpen className="w-5 h-5" />,
+        icono: <BookOpen className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'rector'],
       },
       {
-        title: 'Materias',
+        titulo: 'Materias',
         href: '/materias',
-        icon: <BookMarked className="w-5 h-5" />,
+        icono: <BookMarked className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente'],
       },
       {
-        title: 'Grupos',
+        titulo: 'Grupos',
         href: '/grupos',
-        icon: <FolderKanban className="w-5 h-5" />,
+        icono: <FolderKanban className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente'],
       },
       {
-        title: 'Preinscripcion',
+        titulo: 'Preinscripcion',
         href: '/preinscripcion',
-        icon: <CalendarCheck className="w-5 h-5" />,
+        icono: <CalendarCheck className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico'],
       },
       {
-        title: 'Calificaciones',
+        titulo: 'Calificaciones',
         href: '/calificaciones',
-        icon: <ClipboardList className="w-5 h-5" />,
+        icono: <ClipboardList className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'docente'],
       },
       {
-        title: 'Pagos *',
+        titulo: 'Pagos *',
         href: '/pagos',
-        icon: <CreditCard className="w-5 h-5" />,
+        icono: <CreditCard className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'rector'],
       },
       {
-        title: 'Certificados',
+        titulo: 'Certificados',
         href: '/certificados',
-        icon: <Award className="w-5 h-5" />,
+        icono: <Award className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico'],
       },
       {
-        title: 'Convalidaciones',
+        titulo: 'Convalidaciones',
         href: '/convalidaciones',
-        icon: <RefreshCw className="w-5 h-5" />,
+        icono: <RefreshCw className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico'],
       },
       {
-        title: 'Reportes',
+        titulo: 'Reportes',
         href: '/reportes',
-        icon: <BarChart3 className="w-5 h-5" />,
+        icono: <BarChart3 className="w-5 h-5" />,
         roles: ['administrador', 'director_academico', 'rector'],
       },
     ],
   },
   {
-    title: 'Administración',
-    items: [
+    titulo: 'Administración',
+    elementos: [
       {
-        title: 'Usuarios',
+        titulo: 'Usuarios',
         href: '/usuarios',
-        icon: <Shield className="w-5 h-5" />,
+        icono: <Shield className="w-5 h-5" />,
         roles: ['administrador'],
       },
       {
-        title: 'Credenciales',
+        titulo: 'Credenciales',
         href: '/credenciales',
-        icon: <FileText className="w-5 h-5" />,
+        icono: <FileText className="w-5 h-5" />,
         roles: ['administrador', 'secretaria'],
       },
       {
-        title: 'Documentos',
+        titulo: 'Documentos',
         href: '/documentos',
-        icon: <FileBadge className="w-5 h-5" />,
+        icono: <FileBadge className="w-5 h-5" />,
         roles: ['administrador', 'secretaria'],
       },
     ],
   },
   {
-    title: 'Configuración',
-    items: [
+    titulo: 'Configuración',
+    elementos: [
       {
-        title: 'Institución',
+        titulo: 'Institución',
         href: '/configuracion/institucion',
-        icon: <Building2 className="w-5 h-5" />,
+        icono: <Building2 className="w-5 h-5" />,
         roles: ['administrador'],
       },
       {
-        title: 'Gestiones',
+        titulo: 'Gestiones',
         href: '/configuracion/gestiones',
-        icon: <Calendar className="w-5 h-5" />,
+        icono: <Calendar className="w-5 h-5" />,
         roles: ['administrador'],
       },
       {
-        title: 'Planes de Estudio',
+        titulo: 'Planes de Estudio',
         href: '/planes-estudio',
-        icon: <BookOpen className="w-5 h-5" />,
+        icono: <BookOpen className="w-5 h-5" />,
         roles: ['administrador'],
       },
     ],
   },
 ];
 
-export default function BarraLateral({ colapsada, abierta = true, onCerrar, onColapsar }: PropsBarraLateral) {
+export default function BarraLateral({ colapsada, abierta = true, alCerrar, alColapsar }: PropsBarraLateral) {
   const pathname = usePathname();
   const { usuario } = usarAlmacenAutenticacion();
-  const userRoles: string[] =
+  const rolesUsuario: string[] =
     usuario?.roles && usuario.roles.length > 0
       ? usuario.roles.map((r: any) => r.codigo || r.code || r)
       : usuario?.rol
         ? [usuario.rol]
         : [];
-  const { settings } = usarConfiguracionInstitucional();
+  const { configuracion } = usarConfiguracionInstitucional();
 
-  const filteredSections = seccionesMenu
-    .map((section) => ({
-      ...section,
-      items: section.items.filter((item) => {
+  const seccionesFiltradas = seccionesMenu
+    .map((seccion) => ({
+      ...seccion,
+      elementos: seccion.elementos.filter((elemento) => {
         if (!usuario) return false;
-        return item.roles.some((r) => userRoles.includes(r));
+        return elemento.roles.some((r) => rolesUsuario.includes(r));
       }),
     }))
-    .filter((section) => section.items.length > 0);
+    .filter((seccion) => seccion.elementos.length > 0);
 
   return (
     <aside
@@ -192,44 +192,44 @@ export default function BarraLateral({ colapsada, abierta = true, onCerrar, onCo
           {!colapsada ? (
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-2">
-                {settings?.logoUrl ? (
+                {configuracion?.logoUrl ? (
                   <img
-                    src={settings.logoUrl}
+                    src={configuracion.logoUrl}
                     alt="Logo"
                     className="w-8 h-8 object-contain"
                   />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
                     <span className="text-sm font-bold text-primary-600">
-                      {settings?.nombreCorto?.charAt(0) || 'S'}
+                      {configuracion?.nombreCorto?.charAt(0) || 'S'}
                     </span>
                   </div>
                 )}
                 <span className="text-lg font-bold text-primary-600 truncate">
-                  {settings?.nombreCorto || 'SITBT'}
+                  {configuracion?.nombreCorto || 'SITBT'}
                 </span>
               </div>
-              <span className="text-xs text-gray-500 truncate mt-0.5" title={settings?.lema || ''}>
-                {settings?.lema || 'Instituto Tecnológico'}
+              <span className="text-xs text-gray-500 truncate mt-0.5" title={configuracion?.lema || ''}>
+                {configuracion?.lema || 'Instituto Tecnológico'}
               </span>
             </div>
           ) : (
-            settings?.logoUrl ? (
+            configuracion?.logoUrl ? (
               <img
-                src={settings.logoUrl}
+                src={configuracion.logoUrl}
                 alt="Logo"
                 className="w-8 h-8 object-contain"
               />
             ) : (
               <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
                 <span className="text-sm font-bold text-primary-600">
-                  {settings?.nombreCorto?.charAt(0) || 'S'}
+                  {configuracion?.nombreCorto?.charAt(0) || 'S'}
                 </span>
               </div>
             )
           )}
           <button
-            onClick={onColapsar}
+            onClick={alColapsar}
             className="hidden lg:block p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
             {colapsada ? (
@@ -239,7 +239,7 @@ export default function BarraLateral({ colapsada, abierta = true, onCerrar, onCo
             )}
           </button>
           <button
-            onClick={onCerrar}
+            onClick={alCerrar}
             className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <X className="w-5 h-5 text-gray-600" />
@@ -247,30 +247,30 @@ export default function BarraLateral({ colapsada, abierta = true, onCerrar, onCo
         </div>
 
         <nav className="flex-1 overflow-y-auto py-4 px-2">
-          {filteredSections.map((section, sectionIndex) => (
-            <div key={section.title || sectionIndex} className="mb-4">
-              {section.title && !colapsada && (
+          {seccionesFiltradas.map((seccion, indiceSeccion) => (
+            <div key={seccion.titulo || indiceSeccion} className="mb-4">
+              {seccion.titulo && !colapsada && (
                 <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  {section.title}
+                  {seccion.titulo}
                 </div>
               )}
               <ul className="space-y-1">
-                {section.items.map((item) => (
-                  <li key={item.title}>
+                {seccion.elementos.map((elemento) => (
+                  <li key={elemento.titulo}>
                     <Link
-                      href={item.href}
+                      href={elemento.href}
                       className={cn(
                         'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors',
-                        pathname === item.href
+                        pathname === elemento.href
                           ? 'bg-primary-50 text-primary-600'
                           : 'text-gray-700 hover:bg-gray-100'
                       )}
                     >
-                      <span className={cn(pathname === item.href && 'text-primary-600')}>
-                        {item.icon}
+                      <span className={cn(pathname === elemento.href && 'text-primary-600')}>
+                        {elemento.icono}
                       </span>
                       {!colapsada && (
-                        <span className="font-medium">{item.title}</span>
+                        <span className="font-medium">{elemento.titulo}</span>
                       )}
                     </Link>
                   </li>
@@ -291,7 +291,7 @@ export default function BarraLateral({ colapsada, abierta = true, onCerrar, onCo
                   {usuario?.nombreUsuario}
                 </p>
                 <p className="text-xs text-gray-500 truncate capitalize">
-                  {userRoles[0]?.replace('_', ' ') || 'Usuario'}
+                  {rolesUsuario[0]?.replace('_', ' ') || 'Usuario'}
                 </p>
               </div>
             </div>

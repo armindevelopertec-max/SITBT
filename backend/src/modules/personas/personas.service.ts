@@ -11,96 +11,96 @@ import { ActualizarPersonaDto } from './dto/actualizar-persona.dto';
 export class ServicioPersonas {
   constructor(
     @InjectRepository(Persona)
-    private personaRepository: Repository<Persona>,
+    private repositorioPersona: Repository<Persona>,
   ) {}
 
-  async create(crearPersonaDto: CrearPersonaDto): Promise<Persona> {
-    const existingCi = await this.personaRepository.findOne({
+  async crear(crearPersonaDto: CrearPersonaDto): Promise<Persona> {
+    const ciExistente = await this.repositorioPersona.findOne({
       where: { ci: crearPersonaDto.ci },
     });
-    if (existingCi) {
+    if (ciExistente) {
       throw new ConflictException('Ya existe una persona con este CI');
     }
 
-    const person = this.personaRepository.create(crearPersonaDto);
-    return this.personaRepository.save(person);
+    const persona = this.repositorioPersona.create(crearPersonaDto);
+    return this.repositorioPersona.save(persona);
   }
 
-  async findAll(
-    page = 1,
-    limit = 20,
-    status?: EstadoPersona,
+  async obtenerTodos(
+    pagina = 1,
+    limite = 20,
+    estado?: EstadoPersona,
   ): Promise<{ datos: Persona[]; total: number; pagina: number; limite: number }> {
-    const query = this.personaRepository.createQueryBuilder('person');
+    const consulta = this.repositorioPersona.createQueryBuilder('persona');
 
-    if (status) {
-      query.where('person.estado = :estado', { estado: status });
+    if (estado) {
+      consulta.where('persona.estado = :estado', { estado });
     }
 
-    const [data, total] = await query
-      .orderBy('person.apellidoPaterno', 'ASC')
-      .skip((page - 1) * limit)
-      .take(limit)
+    const [datos, total] = await consulta
+      .orderBy('persona.apellidoPaterno', 'ASC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total, pagina: page, limite: limit };
+    return { datos, total, pagina, limite };
   }
 
-  async findOne(id: number): Promise<Persona> {
-    const person = await this.personaRepository.findOne({ where: { id } });
-    if (!person) {
+  async obtenerUno(id: number): Promise<Persona> {
+    const persona = await this.repositorioPersona.findOne({ where: { id } });
+    if (!persona) {
       throw new NotFoundException(`Persona con ID ${id} no encontrada`);
     }
-    return person;
+    return persona;
   }
 
-  async findByCi(ci: string): Promise<Persona> {
-    const person = await this.personaRepository.findOne({ where: { ci } });
-    if (!person) {
+  async buscarPorCi(ci: string): Promise<Persona> {
+    const persona = await this.repositorioPersona.findOne({ where: { ci } });
+    if (!persona) {
       throw new NotFoundException(`Persona con CI ${ci} no encontrada`);
     }
-    return person;
+    return persona;
   }
 
-  async update(id: number, actualizarPersonaDto: ActualizarPersonaDto): Promise<Persona> {
-    const person = await this.findOne(id);
-    Object.assign(person, actualizarPersonaDto);
-    return this.personaRepository.save(person);
+  async actualizar(id: number, actualizarPersonaDto: ActualizarPersonaDto): Promise<Persona> {
+    const persona = await this.obtenerUno(id);
+    Object.assign(persona, actualizarPersonaDto);
+    return this.repositorioPersona.save(persona);
   }
 
-  async remove(id: number): Promise<void> {
-    const person = await this.findOne(id);
+  async eliminar(id: number): Promise<void> {
+    const persona = await this.obtenerUno(id);
 
     // Eliminar el usuario asociado (y sus asignaciones de rol) para evitar
     // violaciones de clave foránea al borrar la persona.
-    const usuario = await this.personaRepository.manager.findOne(Usuario, {
+    const usuario = await this.repositorioPersona.manager.findOne(Usuario, {
       where: { personaId: id },
     });
     if (usuario) {
-      await this.personaRepository.manager.delete(UsuarioRol, { usuarioId: usuario.id });
-      await this.personaRepository.manager.remove(usuario);
+      await this.repositorioPersona.manager.delete(UsuarioRol, { usuarioId: usuario.id });
+      await this.repositorioPersona.manager.remove(usuario);
     }
 
-    await this.personaRepository.remove(person);
+    await this.repositorioPersona.remove(persona);
   }
 
-  async search(query: string, page = 1, limit = 20): Promise<{ datos: Persona[]; total: number }> {
-    const [data, total] = await this.personaRepository
-      .createQueryBuilder('person')
-      .where('person.nombres ILIKE :query', { query: `%${query}%` })
-      .orWhere('person.apellidoPaterno ILIKE :query', { query: `%${query}%` })
-      .orWhere('person.apellidoMaterno ILIKE :query', { query: `%${query}%` })
-      .orWhere('person.ci ILIKE :query', { query: `%${query}%` })
-      .orderBy('person.apellidoPaterno', 'ASC')
-      .skip((page - 1) * limit)
-      .take(limit)
+  async buscar(consulta: string, pagina = 1, limite = 20): Promise<{ datos: Persona[]; total: number }> {
+    const [datos, total] = await this.repositorioPersona
+      .createQueryBuilder('persona')
+      .where('persona.nombres ILIKE :consulta', { consulta: `%${consulta}%` })
+      .orWhere('persona.apellidoPaterno ILIKE :consulta', { consulta: `%${consulta}%` })
+      .orWhere('persona.apellidoMaterno ILIKE :consulta', { consulta: `%${consulta}%` })
+      .orWhere('persona.ci ILIKE :consulta', { consulta: `%${consulta}%` })
+      .orderBy('persona.apellidoPaterno', 'ASC')
+      .skip((pagina - 1) * limite)
+      .take(limite)
       .getManyAndCount();
 
-    return { datos: data, total };
+    return { datos, total };
   }
 
-  async findActive(): Promise<Persona[]> {
-    return this.personaRepository.find({
+  async obtenerActivos(): Promise<Persona[]> {
+    return this.repositorioPersona.find({
       where: { estado: EstadoPersona.ACTIVO },
       order: { apellidoPaterno: 'ASC' },
     });

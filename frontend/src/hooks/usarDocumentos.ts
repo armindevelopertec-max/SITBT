@@ -19,10 +19,10 @@ export interface DocumentoEmitido {
 }
 
 export function usarDocumentos() {
-  const [loading, setLoading] = useState(false);
+  const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchDocuments = async (params?: {
+  const obtenerDocumentos = async (parametros?: {
     pagina?: number;
     limite?: number;
     tipo?: string;
@@ -30,73 +30,73 @@ export function usarDocumentos() {
     estudianteId?: number;
     estado?: string;
   }): Promise<{ datos: DocumentoEmitido[]; total: number }> => {
-    setLoading(true);
+    setCargando(true);
     setError(null);
     try {
-      const response = await api.get('/documentos', { params });
-      return response.data;
+      const respuesta = await api.get('/documentos', { params: parametros });
+      return respuesta.data;
     } catch (err: any) {
       setError(err.response?.data?.mensaje || 'Error al obtener documentos');
       throw err;
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const getDocument = async (id: string): Promise<DocumentoEmitido> => {
-    const response = await api.get<DocumentoEmitido>(`/documentos/${id}`);
-    return response.data;
+  const obtenerDocumento = async (id: string): Promise<DocumentoEmitido> => {
+    const respuesta = await api.get<DocumentoEmitido>(`/documentos/${id}`);
+    return respuesta.data;
   };
 
-  const generateBoleta = async (estudianteId: number, gestion: string, gestionId?: number) => {
-    const response = await api.post('/documentos/generar-boleta', {
+  const generarBoleta = async (estudianteId: number, gestion: string, gestionId?: number) => {
+    const respuesta = await api.post('/documentos/generar-boleta', {
       estudianteId,
       gestion,
       gestionId,
     });
-    return response.data;
+    return respuesta.data;
   };
 
-  const generateRecibo = async (estudianteId: number, gestion: string, paymentId: number, gestionId?: number) => {
-    const response = await api.post('/documentos/generar-recibo', {
+  const generarRecibo = async (estudianteId: number, gestion: string, pagoId: number, gestionId?: number) => {
+    const respuesta = await api.post('/documentos/generar-recibo', {
       estudianteId,
       gestion,
-      paymentId,
+      paymentId: pagoId,
       gestionId,
     });
-    return response.data;
+    return respuesta.data;
   };
 
-  const markAsPrinted = async (id: string, impresoPor: number) => {
-    const response = await api.post(`/documentos/${id}/imprimir`, { impresoPor });
-    return response.data;
+  const marcarComoImpreso = async (id: string, impresoPor: number) => {
+    const respuesta = await api.post(`/documentos/${id}/imprimir`, { impresoPor });
+    return respuesta.data;
   };
 
-  const markAsDelivered = async (id: string, entregadoA: string) => {
-    const response = await api.post(`/documentos/${id}/entregar`, { entregadoA });
-    return response.data;
+  const marcarComoEntregado = async (id: string, entregadoA: string) => {
+    const respuesta = await api.post(`/documentos/${id}/entregar`, { entregadoA });
+    return respuesta.data;
   };
 
-  const annulDocument = async (id: string, observaciones?: string) => {
-    const response = await api.post(`/documentos/${id}/anular`, { observaciones });
-    return response.data;
+  const anularDocumento = async (id: string, observaciones?: string) => {
+    const respuesta = await api.post(`/documentos/${id}/anular`, { observaciones });
+    return respuesta.data;
   };
 
-  const getStatistics = async (gestion?: string) => {
-    const response = await api.get('/documentos/estadisticas', { params: { gestion } });
-    return response.data;
+  const obtenerEstadisticas = async (gestion?: string) => {
+    const respuesta = await api.get('/documentos/estadisticas', { params: { gestion } });
+    return respuesta.data;
   };
 
   return {
-    loading,
+    cargando,
     error,
-    fetchDocuments,
-    getDocument,
-    generateBoleta,
-    generateRecibo,
-    markAsPrinted,
-    markAsDelivered,
-    annulDocument,
-    getStatistics,
+    obtenerDocumentos,
+    obtenerDocumento,
+    generarBoleta,
+    generarRecibo,
+    marcarComoImpreso,
+    marcarComoEntregado,
+    anularDocumento,
+    obtenerEstadisticas,
   };
 }

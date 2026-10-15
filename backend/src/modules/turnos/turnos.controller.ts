@@ -21,40 +21,40 @@ import { GuardaJwt } from '../autenticacion/guarda-jwt';
 @UseGuards(GuardaJwt)
 @ApiBearerAuth()
 export class ControladorTurnos {
-  constructor(private readonly shiftsService: ServicioTurnos) {}
+  constructor(private readonly servicioTurnos: ServicioTurnos) {}
 
   @Post()
-  create(@Body() crearTurnoDto: CrearTurnoDto) {
-    return this.shiftsService.create(crearTurnoDto);
+  crear(@Body() crearTurnoDto: CrearTurnoDto) {
+    return this.servicioTurnos.crear(crearTurnoDto);
   }
 
   @Get()
-  findAll(@Query('pagina') page = 1, @Query('limite') limit = 20) {
-    return this.shiftsService.findAll(+page, +limit);
+  obtenerTodos(@Query('pagina') pagina = 1, @Query('limite') limite = 20) {
+    return this.servicioTurnos.obtenerTodos(+pagina, +limite);
   }
 
   @Get('todos')
-  findAllTurnos() {
-    return this.shiftsService.findAllTurnos();
+  obtenerTodosTurnos() {
+    return this.servicioTurnos.obtenerTodosTurnos();
   }
 
   @Get('codigo/:codigo')
-  findByCodigo(@Param('codigo') codigo: string) {
-    return this.shiftsService.findByCodigo(codigo);
+  buscarPorCodigo(@Param('codigo') codigo: string) {
+    return this.servicioTurnos.buscarPorCodigo(codigo);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.shiftsService.findOne(id);
+  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioTurnos.obtenerUno(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() actualizarTurnoDto: ActualizarTurnoDto) {
-    return this.shiftsService.update(id, actualizarTurnoDto);
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarTurnoDto: ActualizarTurnoDto) {
+    return this.servicioTurnos.actualizar(id, actualizarTurnoDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.shiftsService.remove(id);
+  eliminar(@Param('id', ParseIntPipe) id: number) {
+    return this.servicioTurnos.eliminar(id);
   }
 }

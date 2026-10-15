@@ -6,26 +6,26 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utilidades';
 import { Building2, Shield, Settings as SettingsIcon, Calendar } from 'lucide-react';
 
-interface ConfiguracionLayoutProps {
+interface PropsDisposicionConfiguracion {
   children: ReactNode;
 }
 
-const configuracionLinks = [
+const enlacesConfiguracion = [
   {
-    title: 'Institución',
+    titulo: 'Institución',
     href: '/configuracion/institucion',
-    icon: Building2,
-    description: 'Datos generales, contacto y logo',
+    icono: Building2,
+    descripcion: 'Datos generales, contacto y logo',
   },
   {
-    title: 'Gestiones',
+    titulo: 'Gestiones',
     href: '/configuracion/gestiones',
-    icon: Calendar,
-    description: 'Períodos académicos y estados',
+    icono: Calendar,
+    descripcion: 'Períodos académicos y estados',
   },
 ];
 
-export default function ConfiguracionLayout({ children }: ConfiguracionLayoutProps) {
+export default function DisposicionConfiguracion({ children }: PropsDisposicionConfiguracion) {
   const pathname = usePathname();
 
   return (
@@ -43,23 +43,23 @@ export default function ConfiguracionLayout({ children }: ConfiguracionLayoutPro
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-1">
           <nav className="space-y-1">
-            {configuracionLinks.map((link) => {
-              const isActive = pathname === link.href;
+            {enlacesConfiguracion.map((enlace) => {
+              const esActivo = pathname === enlace.href;
               return (
                 <Link
-                  key={link.href}
-                  href={link.href}
+                  key={enlace.href}
+                  href={enlace.href}
                   className={cn(
                     'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-                    isActive
+                    esActivo
                       ? 'bg-primary-50 text-primary-600 border-l-4 border-primary-600'
                       : 'text-gray-600 hover:bg-gray-50'
                   )}
                 >
-                  <link.icon className="w-5 h-5" />
+                  <enlace.icono className="w-5 h-5" />
                   <div>
-                    <p className="font-medium">{link.title}</p>
-                    <p className="text-xs text-gray-400">{link.description}</p>
+                    <p className="font-medium">{enlace.titulo}</p>
+                    <p className="text-xs text-gray-400">{enlace.descripcion}</p>
                   </div>
                 </Link>
               );

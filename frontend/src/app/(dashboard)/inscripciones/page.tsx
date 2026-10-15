@@ -8,22 +8,22 @@ import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaT
 import { Insignia } from '@/components/ui/insignia';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 
-const enrollmentsData = [
+const datosInscripciones = [
   { id: 1, estudiante: 'Juan Perez', grupo: 'A-2024-1', materia: 'Programación I', fecha: '2024-01-15', estado: 'confirmado' },
   { id: 2, estudiante: 'Maria Lopez', grupo: 'A-2024-1', materia: 'Programación I', fecha: '2024-01-16', estado: 'confirmado' },
   { id: 3, estudiante: 'Carlos Mendez', grupo: 'B-2024-1', materia: 'Matemáticas I', fecha: '2024-01-17', estado: 'pendiente' },
 ];
 
-const estadoColors: Record<string, 'exito' | 'advertencia' | 'error'> = {
+const coloresEstado: Record<string, 'exito' | 'advertencia' | 'error'> = {
   confirmado: 'exito',
   pendiente: 'advertencia',
   cancelado: 'error',
 };
 
-export default function EnrollmentsPage() {
+export default function PaginaInscripciones() {
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Inscripciones' }]} />
+      <Migas elementos={[{ etiqueta: 'Inscripciones' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Inscripciones</h1>
@@ -33,7 +33,7 @@ export default function EnrollmentsPage() {
         </Boton>
       </div>
 
-      <Tarjeta variant="bordered">
+      <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
             <TituloTarjeta>Lista de Inscripciones</TituloTarjeta>
@@ -56,23 +56,23 @@ export default function EnrollmentsPage() {
               </FilaTabla>
             </EncabezadoTabla>
             <CuerpoTabla>
-              {enrollmentsData.map((enrollment) => (
-                <FilaTabla key={enrollment.id}>
-                  <CeldaTabla className="font-medium">{enrollment.estudiante}</CeldaTabla>
-                  <CeldaTabla>{enrollment.grupo}</CeldaTabla>
-                  <CeldaTabla>{enrollment.materia}</CeldaTabla>
-                  <CeldaTabla>{enrollment.fecha}</CeldaTabla>
+              {datosInscripciones.map((inscripcion) => (
+                <FilaTabla key={inscripcion.id}>
+                  <CeldaTabla className="font-medium">{inscripcion.estudiante}</CeldaTabla>
+                  <CeldaTabla>{inscripcion.grupo}</CeldaTabla>
+                  <CeldaTabla>{inscripcion.materia}</CeldaTabla>
+                  <CeldaTabla>{inscripcion.fecha}</CeldaTabla>
                   <CeldaTabla>
-                    <Insignia variant={estadoColors[enrollment.estado]} className="capitalize">
-                      {enrollment.estado}
+                    <Insignia variante={coloresEstado[inscripcion.estado]} className="capitalize">
+                      {inscripcion.estado}
                     </Insignia>
                   </CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Boton variant="ghost" size="icon">
+                      <Boton variante="fantasma" tamano="icono">
                         <Edit2 className="w-4 h-4" />
                       </Boton>
-                      <Boton variant="ghost" size="icon">
+                      <Boton variante="fantasma" tamano="icono">
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </Boton>
                     </div>

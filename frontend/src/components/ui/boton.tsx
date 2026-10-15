@@ -2,40 +2,40 @@ import { cn } from '@/lib/utilidades';
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 
 interface PropsBoton extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';
-  size?: 'sm' | 'md' | 'lg' | 'icon';
-  isLoading?: boolean;
+  variante?: 'primario' | 'secundario' | 'contorno' | 'fantasma' | 'destructivo';
+  tamano?: 'pequeno' | 'mediano' | 'grande' | 'icono';
+  cargando?: boolean;
 }
 
 const Boton = forwardRef<HTMLButtonElement, PropsBoton>(
-  ({ className, variant = 'primary', size = 'md', isLoading, children, disabled, onClick, type = 'button', ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+  ({ className, variante = 'primario', tamano = 'mediano', cargando, children, disabled, onClick, type = 'button', ...props }, ref) => {
+    const estilosBase = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
 
-    const variants = {
-      primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500',
-      secondary: 'bg-secondary-100 text-secondary-900 hover:bg-secondary-200 focus:ring-secondary-500',
-      outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-primary-500',
-      ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500',
-      destructive: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+    const variantes = {
+      primario: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500',
+      secundario: 'bg-secondary-100 text-secondary-900 hover:bg-secondary-200 focus:ring-secondary-500',
+      contorno: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-primary-500',
+      fantasma: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500',
+      destructivo: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
     };
 
-    const sizes = {
-      sm: 'h-8 px-3 text-sm',
-      md: 'h-10 px-4 text-sm',
-      lg: 'h-12 px-6 text-base',
-      icon: 'h-10 w-10',
+    const tamanos = {
+      pequeno: 'h-8 px-3 text-sm',
+      mediano: 'h-10 px-4 text-sm',
+      grande: 'h-12 px-6 text-base',
+      icono: 'h-10 w-10',
     };
 
     return (
       <button
         ref={ref}
         type={type}
-        className={cn(baseStyles, variants[variant], sizes[size], className)}
-        disabled={disabled || isLoading}
+        className={cn(estilosBase, variantes[variante], tamanos[tamano], className)}
+        disabled={disabled || cargando}
         onClick={onClick}
         {...props}
       >
-        {isLoading ? (
+        {cargando ? (
           <>
             <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

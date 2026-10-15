@@ -8,7 +8,7 @@ import { Entrada } from '@/components/ui/entrada';
 import { Selector } from '@/components/ui/selector';
 import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
 import { Insignia } from '@/components/ui/insignia';
-import { Modal, ConfirmModal } from '@/components/ui/modal';
+import { Modal, ModalConfirmacion } from '@/components/ui/modal';
 import { api } from '@/lib/api';
 import { Search, Plus, Edit2, Trash2, Loader2 } from 'lucide-react';
 
@@ -64,38 +64,38 @@ interface Gestion {
   anio: string;
 }
 
-const statusColors: Record<string, 'exito' | 'advertencia' | 'error'> = {
+const coloresEstado: Record<string, 'exito' | 'advertencia' | 'error'> = {
   pagado: 'exito',
   pendiente: 'advertencia',
   anulado: 'error',
 };
 
-const statusLabels: Record<string, string> = {
+const etiquetasEstado: Record<string, string> = {
   pagado: 'Pagado',
   pendiente: 'Pendiente',
   anulado: 'Anulado',
 };
 
-const methodLabels: Record<string, string> = {
+const etiquetasMetodo: Record<string, string> = {
   efectivo: 'Efectivo',
   transferencia: 'Transferencia',
   qr: 'QR',
 };
 
-export default function PaymentsPage() {
+export default function PaginaPagos() {
   const [pagos, setPagos] = useState<Pago[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterGestion, setFilterGestion] = useState<string>('');
-  const [filterStatus, setFilterStatus] = useState<string>('');
+  const [cargando, setCargando] = useState(true);
+  const [terminoBusqueda, setTerminoBusqueda] = useState('');
+  const [filtroGestion, setFiltroGestion] = useState<string>('');
+  const [filtroEstado, setFiltroEstado] = useState<string>('');
   const [gestiones, setGestiones] = useState<Gestion[]>([]);
   const [conceptos, setConceptos] = useState<ConceptoPago[]>([]);
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [deleteModal, setDeleteModal] = useState<Pago | null>(null);
-  const [loadingSave, setLoadingSave] = useState(false);
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [pagoEliminando, setPagoEliminando] = useState<Pago | null>(null);
+  const [cargandoGuardado, setCargandoGuardado] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [datosFormulario, setDatosFormulario] = useState({
     estudianteId: null as number | null,
     conceptoId: '' as string,
     gestion: '',
@@ -106,163 +106,163 @@ export default function PaymentsPage() {
     notas: '',
   });
 
-  const [searchStudent, setSearchStudent] = useState('');
-  const [students, setStudents] = useState<Estudiante[]>([]);
-  const [selectedStudent, setSelectedStudent] = useState<Estudiante | null>(null);
+  const [busquedaEstudiante, setBusquedaEstudiante] = useState('');
+  const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
+  const [estudianteSeleccionado, setEstudianteSeleccionado] = useState<Estudiante | null>(null);
 
   useEffect(() => {
-    fetchPagos();
-    fetchGestiones();
-    fetchConceptos();
-  }, [filterGestion, filterStatus]);
+    obtenerPagos();
+    obtenerGestiones();
+    obtenerConceptos();
+  }, [filtroGestion, filtroEstado]);
 
-  const fetchPagos = async () => {
+  const obtenerPagos = async () => {
     try {
-      setLoading(true);
-      const params: any = { limite: 100 };
-      if (filterGestion) params.gestion = filterGestion;
-      if (filterStatus) params.status = filterStatus;
+      setCargando(true);
+      const parametros: any = { limite: 100 };
+      if (filtroGestion) parametros.gestion = filtroGestion;
+      if (filtroEstado) parametros.status = filtroEstado;
 
-      const response = await api.get('/pagos', { params });
-      setPagos(response.data.datos || []);
+      const respuesta = await api.get('/pagos', { params: parametros });
+      setPagos(respuesta.data.datos || []);
     } catch (error) {
       console.error('Error al obtener los pagos:', error);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
-  const fetchGestiones = async () => {
+  const obtenerGestiones = async () => {
     try {
-      const response = await api.get('/gestiones');
-      setGestiones(response.data.datos || response.data || []);
+      const respuesta = await api.get('/gestiones');
+      setGestiones(respuesta.data.datos || respuesta.data || []);
     } catch (error) {
       console.error('Error al obtener las gestiones:', error);
     }
   };
 
-  const fetchConceptos = async () => {
+  const obtenerConceptos = async () => {
     try {
-      const response = await api.get('/conceptos-pago/todos');
-      setConceptos(response.data || []);
+      const respuesta = await api.get('/conceptos-pago/todos');
+      setConceptos(respuesta.data || []);
     } catch (error) {
       console.error('Error al obtener los conceptos:', error);
     }
   };
 
-  const searchStudents = async () => {
-    if (!searchStudent.trim()) return;
+  const buscarEstudiantes = async () => {
+    if (!busquedaEstudiante.trim()) return;
     try {
-      const response = await api.get('/estudiantes', {
-        params: { buscar: searchStudent, limite: 10 }
+      const respuesta = await api.get('/estudiantes', {
+        params: { buscar: busquedaEstudiante, limite: 10 }
       });
-      setStudents(response.data.datos || []);
+      setEstudiantes(respuesta.data.datos || []);
     } catch (error) {
       console.error('Error al buscar estudiantes:', error);
     }
   };
 
-  const selectStudent = (student: Estudiante) => {
-    setSelectedStudent(student);
-    setFormData({ ...formData, estudianteId: student.id });
-    setSearchStudent('');
-    setStudents([]);
+  const seleccionarEstudiante = (estudiante: Estudiante) => {
+    setEstudianteSeleccionado(estudiante);
+    setDatosFormulario({ ...datosFormulario, estudianteId: estudiante.id });
+    setBusquedaEstudiante('');
+    setEstudiantes([]);
   };
 
-  const clearStudent = () => {
-    setSelectedStudent(null);
-    setFormData({ ...formData, estudianteId: null });
+  const limpiarEstudiante = () => {
+    setEstudianteSeleccionado(null);
+    setDatosFormulario({ ...datosFormulario, estudianteId: null });
   };
 
-  const openNewModal = () => {
-    const currentYear = new Date().getFullYear().toString();
-    setFormData({
+  const abrirModalNuevo = () => {
+    const anioActual = new Date().getFullYear().toString();
+    setDatosFormulario({
       estudianteId: null,
       conceptoId: '',
-      gestion: filterGestion || currentYear,
+      gestion: filtroGestion || anioActual,
       monto: '',
       fechaPago: new Date().toISOString().split('T')[0],
       metodoPago: 'efectivo',
       numeroRecibo: '',
       notas: '',
     });
-    setSelectedStudent(null);
-    setModalOpen(true);
+    setEstudianteSeleccionado(null);
+    setModalAbierto(true);
   };
 
-  const handleSubmit = async () => {
-    if (!formData.estudianteId || !formData.conceptoId || !formData.monto) return;
+  const crear = async () => {
+    if (!datosFormulario.estudianteId || !datosFormulario.conceptoId || !datosFormulario.monto) return;
 
-    setLoadingSave(true);
+    setCargandoGuardado(true);
     try {
-      const concepto = conceptos.find(c => c.id.toString() === formData.conceptoId);
+      const concepto = conceptos.find(c => c.id.toString() === datosFormulario.conceptoId);
       await api.post('/pagos', {
-        estudianteId: formData.estudianteId,
-        conceptoId: parseInt(formData.conceptoId),
-        gestion: formData.gestion,
-        monto: parseFloat(formData.monto),
-        fechaPago: formData.fechaPago,
-        metodoPago: formData.metodoPago,
-        numeroRecibo: formData.numeroRecibo || undefined,
-        notas: formData.notas || undefined,
+        estudianteId: datosFormulario.estudianteId,
+        conceptoId: parseInt(datosFormulario.conceptoId),
+        gestion: datosFormulario.gestion,
+        monto: parseFloat(datosFormulario.monto),
+        fechaPago: datosFormulario.fechaPago,
+        metodoPago: datosFormulario.metodoPago,
+        numeroRecibo: datosFormulario.numeroRecibo || undefined,
+        notas: datosFormulario.notas || undefined,
         recibidoPor: 1,
         estado: 'pagado',
       });
-      setModalOpen(false);
-      fetchPagos();
+      setModalAbierto(false);
+      obtenerPagos();
     } catch (error) {
       console.error('Error al crear el pago:', error);
     } finally {
-      setLoadingSave(false);
+      setCargandoGuardado(false);
     }
   };
 
-  const handleDelete = async () => {
-    if (!deleteModal) return;
-    setLoadingSave(true);
+  const eliminar = async () => {
+    if (!pagoEliminando) return;
+    setCargandoGuardado(true);
     try {
-      await api.delete(`/pagos/${deleteModal.id}`);
-      setDeleteModal(null);
-      fetchPagos();
+      await api.delete(`/pagos/${pagoEliminando.id}`);
+      setPagoEliminando(null);
+      obtenerPagos();
     } catch (error) {
       console.error('Error al eliminar el pago:', error);
     } finally {
-      setLoadingSave(false);
+      setCargandoGuardado(false);
     }
   };
 
-  const handleAnnul = async (pago: Pago) => {
+  const anular = async (pago: Pago) => {
     try {
       await api.patch(`/pagos/${pago.id}/anular`);
-      fetchPagos();
+      obtenerPagos();
     } catch (error) {
       console.error('Error al anular el pago:', error);
     }
   };
 
-  const filteredPagos = pagos.filter(pago => {
-    if (!searchTerm) return true;
-    const person = pago.estudiante?.persona;
-    const fullName = `${person?.nombres || ''} ${person?.apellidoPaterno || ''} ${person?.apellidoMaterno || ''}`.toLowerCase();
-    const ci = person?.ci?.toLowerCase() || '';
-    const code = pago.estudiante?.codigoInscripcion?.toLowerCase() || '';
-    const search = searchTerm.toLowerCase();
-    return fullName.includes(search) || ci.includes(search) || code.includes(search);
+  const pagosFiltrados = pagos.filter(pago => {
+    if (!terminoBusqueda) return true;
+    const persona = pago.estudiante?.persona;
+    const nombreCompleto = `${persona?.nombres || ''} ${persona?.apellidoPaterno || ''} ${persona?.apellidoMaterno || ''}`.toLowerCase();
+    const ci = persona?.ci?.toLowerCase() || '';
+    const codigo = pago.estudiante?.codigoInscripcion?.toLowerCase() || '';
+    const busqueda = terminoBusqueda.toLowerCase();
+    return nombreCompleto.includes(busqueda) || ci.includes(busqueda) || codigo.includes(busqueda);
   });
 
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Pagos' }]} />
+      <Migas elementos={[{ etiqueta: 'Pagos' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Pagos</h1>
-        <Boton onClick={openNewModal}>
+        <Boton onClick={abrirModalNuevo}>
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Pago
         </Boton>
       </div>
 
-      <Tarjeta variant="bordered">
+      <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <TituloTarjeta>Lista de Pagos</TituloTarjeta>
@@ -272,33 +272,33 @@ export default function PaymentsPage() {
                 <Entrada
                   placeholder="Buscar..."
                   className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={terminoBusqueda}
+                  onChange={(e) => setTerminoBusqueda(e.target.value)}
                 />
               </div>
               <Selector
-                value={filterGestion}
-                onChange={(e) => setFilterGestion(e.target.value)}
-                options={[
-                  { value: '', label: 'Todas las gestiones' },
-                  ...gestiones.map(g => ({ value: g.anio, label: g.anio }))
+                value={filtroGestion}
+                onChange={(e) => setFiltroGestion(e.target.value)}
+                opciones={[
+                  { value: '', etiqueta: 'Todas las gestiones' },
+                  ...gestiones.map(g => ({ value: g.anio, etiqueta: g.anio }))
                 ]}
               />
               <Selector
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                options={[
-                  { value: '', label: 'Todos los estados' },
-                  { value: 'pagado', label: 'Pagado' },
-                  { value: 'pendiente', label: 'Pendiente' },
-                  { value: 'anulado', label: 'Anulado' },
+                value={filtroEstado}
+                onChange={(e) => setFiltroEstado(e.target.value)}
+                opciones={[
+                  { value: '', etiqueta: 'Todos los estados' },
+                  { value: 'pagado', etiqueta: 'Pagado' },
+                  { value: 'pendiente', etiqueta: 'Pendiente' },
+                  { value: 'anulado', etiqueta: 'Anulado' },
                 ]}
               />
             </div>
           </div>
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
-          {loading ? (
+          {cargando ? (
             <div className="flex justify-center py-8">
               <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
             </div>
@@ -316,14 +316,14 @@ export default function PaymentsPage() {
                 </FilaTabla>
               </EncabezadoTabla>
               <CuerpoTabla>
-                {filteredPagos.length === 0 ? (
+                {pagosFiltrados.length === 0 ? (
                   <FilaTabla>
                     <CeldaTabla colSpan={7} className="text-center py-8 text-gray-500">
                       No hay pagos registrados
                     </CeldaTabla>
                   </FilaTabla>
                 ) : (
-                  filteredPagos.map((pago) => (
+                  pagosFiltrados.map((pago) => (
                     <FilaTabla key={pago.id}>
                       <CeldaTabla className="font-medium">
                         <div>
@@ -334,20 +334,20 @@ export default function PaymentsPage() {
                       <CeldaTabla>{pago.concepto?.nombre || '-'}</CeldaTabla>
                       <CeldaTabla>Bs. {pago.monto}</CeldaTabla>
                       <CeldaTabla>{new Date(pago.fechaPago).toLocaleDateString('es-BO')}</CeldaTabla>
-                      <CeldaTabla>{methodLabels[pago.metodoPago] || pago.metodoPago}</CeldaTabla>
+                      <CeldaTabla>{etiquetasMetodo[pago.metodoPago] || pago.metodoPago}</CeldaTabla>
                       <CeldaTabla>
-                        <Insignia variant={statusColors[pago.estado] || 'secondary'}>
-                          {statusLabels[pago.estado] || pago.estado}
+                        <Insignia variante={coloresEstado[pago.estado] || 'secundario'}>
+                          {etiquetasEstado[pago.estado] || pago.estado}
                         </Insignia>
                       </CeldaTabla>
                       <CeldaTabla>
                         <div className="flex items-center gap-2">
                           {pago.estado === 'pagado' && (
                             <Boton
-                              variant="ghost"
-                              size="icon"
+                              variante="fantasma"
+                              tamano="icono"
                               title="Anular"
-                              onClick={() => handleAnnul(pago)}
+                              onClick={() => anular(pago)}
                             >
                               <Trash2 className="w-4 h-4 text-red-500" />
                             </Boton>
@@ -363,21 +363,21 @@ export default function PaymentsPage() {
         </ContenidoTarjeta>
       </Tarjeta>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Nuevo Pago" size="lg">
+      <Modal abierto={modalAbierto} alCerrar={() => setModalAbierto(false)} titulo="Nuevo Pago" tamano="grande">
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Estudiante *</label>
-            {selectedStudent ? (
+            {estudianteSeleccionado ? (
               <div className="flex items-center justify-between p-3 bg-primary-50 border border-primary-200 rounded-lg">
                 <div>
                   <p className="font-medium">
-                    {selectedStudent.persona?.nombres} {selectedStudent.persona?.apellidoPaterno}
+                    {estudianteSeleccionado.persona?.nombres} {estudianteSeleccionado.persona?.apellidoPaterno}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {selectedStudent.persona?.ci} · {selectedStudent.codigoInscripcion}
+                    {estudianteSeleccionado.persona?.ci} · {estudianteSeleccionado.codigoInscripcion}
                   </p>
                 </div>
-                <Boton variant="ghost" size="icon" onClick={clearStudent}>
+                <Boton variante="fantasma" tamano="icono" onClick={limpiarEstudiante}>
                   <Trash2 className="w-4 h-4" />
                 </Boton>
               </div>
@@ -386,25 +386,25 @@ export default function PaymentsPage() {
                 <div className="flex gap-2">
                   <Entrada
                     placeholder="Buscar por nombre o CI..."
-                    value={searchStudent}
-                    onChange={(e) => setSearchStudent(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && searchStudents()}
+                    value={busquedaEstudiante}
+                    onChange={(e) => setBusquedaEstudiante(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && buscarEstudiantes()}
                   />
-                  <Boton onClick={searchStudents}>Buscar</Boton>
+                  <Boton onClick={buscarEstudiantes}>Buscar</Boton>
                 </div>
-                {students.length > 0 && (
+                {estudiantes.length > 0 && (
                   <div className="mt-2 border rounded-lg overflow-hidden max-h-40 overflow-y-auto">
-                    {students.map((student) => (
+                    {estudiantes.map((estudiante) => (
                       <div
-                        key={student.id}
-                        onClick={() => selectStudent(student)}
+                        key={estudiante.id}
+                        onClick={() => seleccionarEstudiante(estudiante)}
                         className="p-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
                       >
                         <p className="font-medium text-sm">
-                          {student.persona?.nombres} {student.persona?.apellidoPaterno}
+                          {estudiante.persona?.nombres} {estudiante.persona?.apellidoPaterno}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {student.persona?.ci} · {student.codigoInscripcion}
+                          {estudiante.persona?.ci} · {estudiante.codigoInscripcion}
                         </p>
                       </div>
                     ))}
@@ -419,8 +419,8 @@ export default function PaymentsPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Concepto *</label>
               <select
                 className="w-full h-10 px-3 border rounded-lg text-sm"
-                value={formData.conceptoId}
-                onChange={(e) => setFormData({ ...formData, conceptoId: e.target.value })}
+                value={datosFormulario.conceptoId}
+                onChange={(e) => setDatosFormulario({ ...datosFormulario, conceptoId: e.target.value })}
               >
                 <option value="">Seleccionar...</option>
                 {conceptos.map(c => (
@@ -432,8 +432,8 @@ export default function PaymentsPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Monto *</label>
               <Entrada
                 type="number"
-                value={formData.monto}
-                onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
+                value={datosFormulario.monto}
+                onChange={(e) => setDatosFormulario({ ...datosFormulario, monto: e.target.value })}
                 placeholder="0.00"
               />
             </div>
@@ -444,15 +444,15 @@ export default function PaymentsPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Pago *</label>
               <Entrada
                 type="date"
-                value={formData.fechaPago}
-                onChange={(e) => setFormData({ ...formData, fechaPago: e.target.value })}
+                value={datosFormulario.fechaPago}
+                onChange={(e) => setDatosFormulario({ ...datosFormulario, fechaPago: e.target.value })}
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Gestión *</label>
               <Entrada
-                value={formData.gestion}
-                onChange={(e) => setFormData({ ...formData, gestion: e.target.value })}
+                value={datosFormulario.gestion}
+                onChange={(e) => setDatosFormulario({ ...datosFormulario, gestion: e.target.value })}
               />
             </div>
           </div>
@@ -462,8 +462,8 @@ export default function PaymentsPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label>
               <select
                 className="w-full h-10 px-3 border rounded-lg text-sm"
-                value={formData.metodoPago}
-                onChange={(e) => setFormData({ ...formData, metodoPago: e.target.value })}
+                value={datosFormulario.metodoPago}
+                onChange={(e) => setDatosFormulario({ ...datosFormulario, metodoPago: e.target.value })}
               >
                 <option value="efectivo">Efectivo</option>
                 <option value="transferencia">Transferencia</option>
@@ -473,8 +473,8 @@ export default function PaymentsPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Número de Recibo</label>
               <Entrada
-                value={formData.numeroRecibo}
-                onChange={(e) => setFormData({ ...formData, numeroRecibo: e.target.value })}
+                value={datosFormulario.numeroRecibo}
+                onChange={(e) => setDatosFormulario({ ...datosFormulario, numeroRecibo: e.target.value })}
                 placeholder="R-001"
               />
             </div>
@@ -484,18 +484,18 @@ export default function PaymentsPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">Notas</label>
             <textarea
               className="w-full h-20 px-3 py-2 border rounded-lg text-sm"
-              value={formData.notas}
-              onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+              value={datosFormulario.notas}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, notas: e.target.value })}
               placeholder="Observaciones..."
             />
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Boton variant="outline" onClick={() => setModalOpen(false)}>
+            <Boton variante="contorno" onClick={() => setModalAbierto(false)}>
               Cancelar
             </Boton>
-            <Boton onClick={handleSubmit} disabled={loadingSave || !formData.estudianteId || !formData.conceptoId || !formData.monto}>
-              {loadingSave ? (
+            <Boton onClick={crear} disabled={cargandoGuardado || !datosFormulario.estudianteId || !datosFormulario.conceptoId || !datosFormulario.monto}>
+              {cargandoGuardado ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
                 'Guardar'
@@ -505,15 +505,15 @@ export default function PaymentsPage() {
         </div>
       </Modal>
 
-      <ConfirmModal
-        open={!!deleteModal}
-        onClose={() => setDeleteModal(null)}
-        onConfirm={handleDelete}
-        title="Eliminar Pago"
-        message={`¿Está seguro de eliminar este pago de "${deleteModal?.estudiante?.persona?.nombres}"?`}
-        confirmText="Eliminar"
-        variant="destructive"
-        loading={loadingSave}
+      <ModalConfirmacion
+        abierto={!!pagoEliminando}
+        alCerrar={() => setPagoEliminando(null)}
+        alConfirmar={eliminar}
+        titulo="Eliminar Pago"
+        mensaje={`¿Está seguro de eliminar este pago de "${pagoEliminando?.estudiante?.persona?.nombres}"?`}
+        textoConfirmar="Eliminar"
+        variante="destructivo"
+        cargando={cargandoGuardado}
       />
     </div>
   );

@@ -7,24 +7,24 @@ import { usarInstitucion } from '@/contexts/ContextoInstitucional';
 
 export default function ContactoPage() {
   const { institucion } = usarInstitucion();
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
+  const [enviado, setEnviado] = useState(false);
+  const [cargando, setCargando] = useState(false);
+  const [formulario, setFormulario] = useState({
     nombre: '',
     correo: '',
     telefono: '',
     mensaje: '',
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const enviarFormulario = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setCargando(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
-    setLoading(false);
-    setSubmitted(true);
+    setCargando(false);
+    setEnviado(true);
   };
 
-  if (submitted) {
+  if (enviado) {
     return (
       <div className="bg-dark-900 min-h-screen flex items-center justify-center">
         <div className="max-w-2xl mx-auto px-4 text-center">
@@ -37,7 +37,7 @@ export default function ContactoPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => { setSubmitted(false); setForm({ nombre: '', correo: '', telefono: '', mensaje: '' }); }}
+              onClick={() => { setEnviado(false); setFormulario({ nombre: '', correo: '', telefono: '', mensaje: '' }); }}
               className="px-6 py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all"
             >
               Enviar otro mensaje
@@ -146,7 +146,7 @@ export default function ContactoPage() {
             <div>
               <div className="bg-dark-700 border border-dark-600 rounded-2xl p-6 sm:p-8">
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-100 mb-4 sm:mb-6">Envíanos un mensaje</h3>
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={enviarFormulario} className="space-y-6">
                   <div>
                     <label htmlFor="nombre" className="block text-sm font-medium text-gray-300 mb-2">
                       Nombre completo
@@ -155,8 +155,8 @@ export default function ContactoPage() {
                       type="text"
                       id="nombre"
                       required
-                      value={form.nombre}
-                      onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                      value={formulario.nombre}
+                      onChange={(e) => setFormulario({ ...formulario, nombre: e.target.value })}
                       className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                       placeholder="Tu nombre"
                     />
@@ -170,8 +170,8 @@ export default function ContactoPage() {
                       type="email"
                       id="correo"
                       required
-                      value={form.correo}
-                      onChange={(e) => setForm({ ...form, correo: e.target.value })}
+                      value={formulario.correo}
+                      onChange={(e) => setFormulario({ ...formulario, correo: e.target.value })}
                       className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                       placeholder="tu@correo.com"
                     />
@@ -184,8 +184,8 @@ export default function ContactoPage() {
                     <input
                       type="tel"
                       id="telefono"
-                      value={form.telefono}
-                      onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+                      value={formulario.telefono}
+                      onChange={(e) => setFormulario({ ...formulario, telefono: e.target.value })}
                       className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                       placeholder="+591 XXXXXXXX"
                     />
@@ -199,8 +199,8 @@ export default function ContactoPage() {
                       id="mensaje"
                       required
                       rows={5}
-                      value={form.mensaje}
-                      onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
+                      value={formulario.mensaje}
+                      onChange={(e) => setFormulario({ ...formulario, mensaje: e.target.value })}
                       className="w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 resize-none"
                       placeholder="¿En qué podemos ayudarte?"
                     />
@@ -208,10 +208,10 @@ export default function ContactoPage() {
 
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={cargando}
                     className="w-full px-6 py-4 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    {loading ? (
+                    {cargando ? (
                       <>
                         <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />

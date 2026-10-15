@@ -49,7 +49,7 @@ export class Credencial {
 
   @ManyToOne(() => Gestion)
   @JoinColumn({ name: 'gestionId' })
-  gestionEntity: Gestion;
+  gestionRelacionada: Gestion;
 
   @Column({ type: 'integer', name: 'semestre' })
   semestre: number;

@@ -8,16 +8,16 @@ import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaT
 import { Insignia } from '@/components/ui/insignia';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 
-const personsData = [
+const datosPersonas = [
   { id: 1, ci: '12345678', nombre: 'Juan', primerApellido: 'Perez', segundoApellido: 'Gomez', telefono: '76543210', correo: 'juan.perez@email.com', genero: 'M' },
   { id: 2, ci: '87654321', nombre: 'Maria', primerApellido: 'Lopez', segundoApellido: 'Rodriguez', telefono: '71234567', correo: 'maria.lopez@email.com', genero: 'F' },
   { id: 3, ci: '11223344', nombre: 'Carlos', primerApellido: 'Mendez', segundoApellido: 'Fernandez', telefono: '77889900', correo: 'carlos.mendez@email.com', genero: 'M' },
 ];
 
-export default function PersonsPage() {
+export default function PaginaPersonas() {
   return (
     <div className="space-y-6">
-      <Migas items={[{ label: 'Personas' }]} />
+      <Migas elementos={[{ etiqueta: 'Personas' }]} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestión de Personas</h1>
@@ -27,7 +27,7 @@ export default function PersonsPage() {
         </Boton>
       </div>
 
-      <Tarjeta variant="bordered">
+      <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
             <TituloTarjeta>Lista de Personas</TituloTarjeta>
@@ -51,24 +51,24 @@ export default function PersonsPage() {
               </FilaTabla>
             </EncabezadoTabla>
             <CuerpoTabla>
-              {personsData.map((person) => (
-                <FilaTabla key={person.id}>
-                  <CeldaTabla className="font-medium">{person.ci}</CeldaTabla>
-                  <CeldaTabla>{person.nombre}</CeldaTabla>
-                  <CeldaTabla>{person.primerApellido} {person.segundoApellido}</CeldaTabla>
-                  <CeldaTabla>{person.telefono}</CeldaTabla>
-                  <CeldaTabla>{person.correo}</CeldaTabla>
+              {datosPersonas.map((persona) => (
+                <FilaTabla key={persona.id}>
+                  <CeldaTabla className="font-medium">{persona.ci}</CeldaTabla>
+                  <CeldaTabla>{persona.nombre}</CeldaTabla>
+                  <CeldaTabla>{persona.primerApellido} {persona.segundoApellido}</CeldaTabla>
+                  <CeldaTabla>{persona.telefono}</CeldaTabla>
+                  <CeldaTabla>{persona.correo}</CeldaTabla>
                   <CeldaTabla>
-                    <Insignia variant={person.genero === 'M' ? 'primary' : 'secondary'}>
-                      {person.genero === 'M' ? 'Masculino' : 'Femenino'}
+                    <Insignia variante={persona.genero === 'M' ? 'primario' : 'secundario'}>
+                      {persona.genero === 'M' ? 'Masculino' : 'Femenino'}
                     </Insignia>
                   </CeldaTabla>
                   <CeldaTabla>
                     <div className="flex items-center gap-2">
-                      <Boton variant="ghost" size="icon">
+                      <Boton variante="fantasma" tamano="icono">
                         <Edit2 className="w-4 h-4" />
                       </Boton>
-                      <Boton variant="ghost" size="icon">
+                      <Boton variante="fantasma" tamano="icono">
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </Boton>
                     </div>

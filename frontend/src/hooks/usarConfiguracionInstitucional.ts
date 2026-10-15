@@ -17,20 +17,20 @@ export interface ConfiguracionInstitucional {
 }
 
 export function usarConfiguracionInstitucional() {
-  const [settings, setSettings] = useState<ConfiguracionInstitucional | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [configuracion, setConfiguracion] = useState<ConfiguracionInstitucional | null>(null);
+  const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSettings = async () => {
+  const obtenerConfiguracion = async () => {
     try {
-      setLoading(true);
+      setCargando(true);
       setError(null);
-      const response = await api.get('/configuracion-institucional/publico');
-      setSettings(response.data);
+      const respuesta = await api.get('/configuracion-institucional/publico');
+      setConfiguracion(respuesta.data);
     } catch (err: any) {
       console.error('Error al cargar la configuración institucional:', err);
       setError(err.response?.data?.mensaje || 'Error al cargar configuración');
-      setSettings({
+      setConfiguracion({
         nombre: 'Instituto Tecnológico Boliviana de Tecnología',
         nombreCorto: 'SITBT',
         lema: null,
@@ -45,18 +45,18 @@ export function usarConfiguracionInstitucional() {
         descripcion: null,
       });
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
   useEffect(() => {
-    fetchSettings();
+    obtenerConfiguracion();
   }, []);
 
   return {
-    settings,
-    loading,
+    configuracion,
+    cargando,
     error,
-    refetch: fetchSettings,
+    recargar: obtenerConfiguracion,
   };
 }
