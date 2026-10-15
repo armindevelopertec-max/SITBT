@@ -93,7 +93,7 @@ export class ServicioEstudiantes {
       }
     }
 
-    const datosEstudiante = { ...crearEstudianteDto, inscription_code: codigoInscripcion };
+    const datosEstudiante = { ...crearEstudianteDto, codigoInscripcion };
     const estudiante = this.repositorioEstudiante.create(datosEstudiante);
     const estudianteGuardado = await this.repositorioEstudiante.save(estudiante);
 
