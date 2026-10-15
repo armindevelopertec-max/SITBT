@@ -226,6 +226,11 @@ export default function PaginaPagos() {
       obtenerPagos();
     } catch (error) {
       console.error('Error al eliminar el pago:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al eliminar el pago'));
+      }).catch(() => {
+        alert('Error al eliminar el pago');
+      });
     } finally {
       setCargandoGuardado(false);
     }

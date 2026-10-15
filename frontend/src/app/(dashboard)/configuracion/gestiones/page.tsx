@@ -150,6 +150,11 @@ export default function PaginaGestiones() {
       obtenerGestiones();
     } catch (error) {
       console.error('Error al eliminar la gestión:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al eliminar la gestión'));
+      }).catch(() => {
+        alert('Error al eliminar la gestión');
+      });
     } finally {
       setGuardando(false);
     }

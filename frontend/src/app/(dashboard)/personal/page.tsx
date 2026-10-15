@@ -88,6 +88,11 @@ export default function PaginaPersonal() {
       obtenerPersonal();
     } catch (error) {
       console.error('Error al eliminar personal:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al eliminar personal'));
+      }).catch(() => {
+        alert('Error al eliminar personal');
+      });
     } finally {
       setCargandoFormulario(false);
     }

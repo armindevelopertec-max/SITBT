@@ -199,6 +199,11 @@ export default function PaginaMateriasPlan() {
       obtenerMateriasPlan();
     } catch (error) {
       console.error('Error al eliminar la materia:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al eliminar la materia'));
+      }).catch(() => {
+        alert('Error al eliminar la materia');
+      });
     }
   };
 

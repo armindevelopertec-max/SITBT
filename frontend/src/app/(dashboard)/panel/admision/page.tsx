@@ -288,7 +288,12 @@ export default function PaginaAdmision() {
       setSolicitudEliminando(null);
       obtenerSolicitudes();
     } catch (error) {
-      console.error('Error al eliminar:', error);
+      console.error('Error al eliminar la solicitud de admisión:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al eliminar la solicitud de admisión'));
+      }).catch(() => {
+        alert('Error al eliminar la solicitud de admisión');
+      });
     } finally {
       setCargandoFormulario(false);
     }

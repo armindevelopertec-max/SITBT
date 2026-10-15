@@ -87,6 +87,11 @@ export default function PaginaPlanesEstudio() {
       obtenerPlanes();
     } catch (error) {
       console.error('Error al eliminar el plan:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al eliminar el plan'));
+      }).catch(() => {
+        alert('Error al eliminar el plan');
+      });
     } finally {
       setGuardando(false);
     }

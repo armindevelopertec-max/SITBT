@@ -348,6 +348,11 @@ export default function PaginaCredenciales() {
       }
     } catch (error) {
       console.error('Error al eliminar la credencial:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al eliminar la credencial'));
+      }).catch(() => {
+        alert('Error al eliminar la credencial');
+      });
     } finally {
       setGuardando(false);
     }

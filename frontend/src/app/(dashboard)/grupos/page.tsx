@@ -274,6 +274,11 @@ export default function PaginaGrupos() {
       obtenerGrupos();
     } catch (error) {
       console.error('Error al eliminar grupo:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al eliminar grupo'));
+      }).catch(() => {
+        alert('Error al eliminar grupo');
+      });
     } finally {
       setGuardando(false);
     }
