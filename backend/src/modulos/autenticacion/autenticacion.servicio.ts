@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -61,6 +61,10 @@ export class AutenticacionServicio {
   }
 
   async iniciarSesion(nombreUsuario: string, contrasena: string) {
+    if (!nombreUsuario || !contrasena) {
+      throw new BadRequestException('El nombre de usuario y la contraseña son obligatorios');
+    }
+
     const usuario = await (this.repositorioUsuario.findOne as any)({
       where: { nombreUsuario: nombreUsuario },
       relations: ['persona'],

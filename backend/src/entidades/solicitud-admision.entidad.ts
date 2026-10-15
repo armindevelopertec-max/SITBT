@@ -85,7 +85,7 @@ export class SolicitudAdmision {
   @Column({ name: 'telefono_tutor', type: 'varchar', length: 20, nullable: true })
   telefonoTutor: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'carrera_id' })
   carreraId: number;
 
   @ManyToOne(() => Carrera)

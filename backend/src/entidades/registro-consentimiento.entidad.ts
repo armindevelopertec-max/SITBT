@@ -21,7 +21,7 @@ export class RegistroConsentimiento {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ name: 'estudiante_id' })
   estudianteId: number;
 
   @ManyToOne(() => Estudiante)

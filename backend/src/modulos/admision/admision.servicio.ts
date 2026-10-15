@@ -118,8 +118,15 @@ export class ServicioAdmision {
       }
     }
 
-    Object.assign(solicitud, actualizarAdmisionDto);
-    return this.repositorioSolicitud.save(solicitud as any) as any;
+    // Se actualiza por columnas con update(): la relación 'carrera' que carga
+    // obtenerUno() haría que save() reescriba carrera_id con el valor anterior.
+    const cambios = Object.fromEntries(
+      Object.entries(actualizarAdmisionDto).filter(([, valor]) => valor !== undefined),
+    );
+    if (Object.keys(cambios).length > 0) {
+      await this.repositorioSolicitud.update(id, cambios as any);
+    }
+    return this.obtenerUno(id);
   }
 
   async verificar(id: string, verificadoPor: number, observaciones?: string): Promise<SolicitudAdmision> {
