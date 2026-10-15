@@ -79,8 +79,13 @@ export default function PaginaEstudiantes() {
       await api.delete(`/estudiantes/${estudianteEliminando.id}`);
       setEstudianteEliminando(null);
       obtenerEstudiantes();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al eliminar estudiante:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al eliminar estudiante'));
+      }).catch(() => {
+        alert('Error al eliminar estudiante');
+      });
     } finally {
       setCargandoFormulario(false);
     }

@@ -119,9 +119,13 @@ export default function PaginaCarreras() {
       await api.delete(`/carreras/${carreraEliminando.id}`);
       setCarreraEliminando(null);
       obtenerCarreras();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al eliminar la carrera:', error);
-      alert('Error al eliminar la carrera');
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al eliminar la carrera'));
+      }).catch(() => {
+        alert('Error al eliminar la carrera');
+      });
     } finally {
       setCargandoFormulario(false);
     }

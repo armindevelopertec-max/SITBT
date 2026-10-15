@@ -35,10 +35,27 @@ export const capitalizar = (texto: string): string => {
 };
 
 export const obtenerIniciales = (nombre: string): string => {
+  if (!nombre) return '';
   return nombre
     .split(' ')
     .map((n) => n[0])
     .join('')
     .toUpperCase()
     .slice(0, 2);
+};
+
+export const mensajeDeError = (error: any, porDefecto = 'Ocurrió un error'): string => {
+  if (!error) return porDefecto;
+  const dato = error?.response?.data;
+  if (dato && typeof dato === 'object') {
+    const candidato =
+      dato.mensaje ?? dato.message ?? dato.error ?? dato.msg;
+    if (typeof candidato === 'string' && candidato.trim()) {
+      return candidato;
+    }
+  }
+  if (typeof error?.message === 'string' && error.message.trim()) {
+    return error.message;
+  }
+  return porDefecto;
 };

@@ -96,8 +96,13 @@ export default function PaginaUsuarios() {
       setCargandoFormulario(true);
       await eliminarUsuario(modalEliminar.usuario.id);
       setModalEliminar({ abierto: false, usuario: null });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al eliminar usuario:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al eliminar usuario'));
+      }).catch(() => {
+        alert('Error al eliminar usuario');
+      });
     } finally {
       setCargandoFormulario(false);
     }

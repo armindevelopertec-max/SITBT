@@ -48,9 +48,13 @@ export default function PaginaMaterias() {
       setModalEliminarAbierto(false);
       setMateriaEliminando(null);
       obtenerMaterias();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al eliminar la materia:', error);
-      alert('Error al eliminar la materia');
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al eliminar la materia'));
+      }).catch(() => {
+        alert('Error al eliminar la materia');
+      });
     } finally {
       setGuardando(false);
     }
