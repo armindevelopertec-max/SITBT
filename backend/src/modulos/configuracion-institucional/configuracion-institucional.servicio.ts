@@ -50,7 +50,7 @@ export class ServicioConfiguracionInstitucional {
     if (urlLogo && urlLogo.startsWith('http')) {
       const coincidencia = urlLogo.match(/\/sitbt-files\/(.+)$/);
       if (coincidencia) {
-        urlLogo = `/api/almacenamiento/files/${coincidencia[1]}`;
+        urlLogo = `/api/almacenamiento/archivos/${coincidencia[1]}`;
       }
     }
     return {

@@ -52,13 +52,13 @@ interface Credencial {
 interface Institucion {
   id: number;
   nombre: string;
-  nombre_corto: string;
+  nombreCorto: string;
   lema: string;
-  logo_url: string;
+  logoUrl: string;
   direccion: string;
   telefono: string;
   correo: string;
-  website: string;
+  sitioWeb: string;
   ciudad: string;
   pais: string;
   departamento: string;
@@ -190,9 +190,9 @@ function VistaPreviaCredencial({ credencial, institucion }: { credencial: Creden
   const CREMA = '#faf7f1';
 
   const nombreInstitucion = institucion?.nombre || 'INSTITUCIÓN EDUCATIVA';
-  const nombreCortoInstitucion = institucion?.nombre_corto || 'IE';
+  const nombreCortoInstitucion = institucion?.nombreCorto || 'IE';
   const lema = institucion?.lema || '"Conectando Mentes, Impulsando el Progreso"';
-  const logoUrl = institucion?.logo_url;
+  const logoUrl = institucion?.logoUrl;
 
   const franja = { height: 62, background: '#14213d26', display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px', position: 'relative' as const, zIndex: 1 };
 
@@ -270,8 +270,8 @@ export default function PaginaCredenciales() {
   const [cargando, setCargando] = useState(true);
   const [seleccionada, setSeleccionada] = useState<Credencial | null>(null);
   const [busqueda, setBusqueda] = useState('');
-  const [filtroEstado, setFiltroEstado] = useState<'ALL' | EstadoCredencial>('ALL');
-  const [filtroGestion, setFiltroGestion] = useState<string>('ALL');
+  const [filtroEstado, setFiltroEstado] = useState<'TODOS' | EstadoCredencial>('TODOS');
+  const [filtroGestion, setFiltroGestion] = useState<string>('TODOS');
   const [modalAnular, setModalAnular] = useState<Credencial | null>(null);
   const [modalEliminar, setModalEliminar] = useState<Credencial | null>(null);
   const [guardando, setGuardando] = useState(false);
@@ -308,8 +308,8 @@ export default function PaginaCredenciales() {
       const persona = credencial.estudiante?.persona;
       const nombreCompleto = persona ? `${persona.nombres} ${persona.apellidoPaterno} ${persona.apellidoMaterno}`.toLowerCase() : '';
       const coincideBusqueda = !q || nombreCompleto.includes(q) || (persona?.ci || '').includes(q) || (credencial.estudiante?.codigoInscripcion || '').toLowerCase().includes(q);
-      const coincideEstado = filtroEstado === 'ALL' || credencial.estado === filtroEstado;
-      const coincideGestion = filtroGestion === 'ALL' || credencial.gestion === filtroGestion;
+      const coincideEstado = filtroEstado === 'TODOS' || credencial.estado === filtroEstado;
+      const coincideGestion = filtroGestion === 'TODOS' || credencial.gestion === filtroGestion;
       return coincideBusqueda && coincideEstado && coincideGestion;
     });
   }, [credenciales, busqueda, filtroEstado, filtroGestion]);
@@ -398,11 +398,11 @@ export default function PaginaCredenciales() {
           <Entrada placeholder="Buscar por nombre o código..." className="pl-7 h-8 text-sm" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
         </div>
         <select className="h-8 text-sm border rounded px-2" value={filtroGestion} onChange={(e) => setFiltroGestion(e.target.value)}>
-          <option value="ALL">Todas las gestiones</option>
+          <option value="TODOS">Todas las gestiones</option>
           {gestiones.map((g) => <option key={g} value={g}>{g}</option>)}
         </select>
         <select className="h-8 text-sm border rounded px-2" value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value as any)}>
-          <option value="ALL">Todos los estados</option>
+          <option value="TODOS">Todos los estados</option>
           <option value="emitida">Emitidas</option>
           <option value="anulada">Anuladas</option>
           <option value="reemplazada">Reemplazadas</option>
