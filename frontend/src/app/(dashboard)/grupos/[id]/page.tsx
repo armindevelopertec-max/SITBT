@@ -119,7 +119,7 @@ export default function PaginaEditarGrupo() {
       setPlanesEstudio(respuesta.data || []);
       if (!respuesta.data || respuesta.data.length === 0) {
         const respuestaCompleta = await api.get(`/planes-estudio?carreraId=${carreraId}`);
-        setPlanesEstudio(respuestaCompleta.data?.data || []);
+        setPlanesEstudio(respuestaCompleta.data?.datos || []);
       }
     } catch (error) {
       console.error('Error al obtener los planes de estudio:', error);

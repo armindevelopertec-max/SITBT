@@ -52,8 +52,8 @@ export function usarUsuarios() {
       setCargando(true);
       setError(null);
       const respuesta = await api.get(`/usuarios?pagina=${pagina}&limite=${limite}`);
-      const { data: datos, total, pagina: paginaActual, limite: limiteActual } = respuesta.data;
-      setUsuarios(datos);
+      const { datos, total, pagina: paginaActual, limite: limiteActual } = respuesta.data;
+      setUsuarios(Array.isArray(datos) ? datos : []);
       setPaginacion({ pagina: paginaActual, limite: limiteActual, total });
     } catch (err: any) {
       console.error('Error al obtener usuarios:', err);

@@ -71,7 +71,7 @@ function FormularioPreRegistro() {
       await apiPublica.post('/admision', formulario);
       setExito(true);
     } catch (err: any) {
-      setError(err.respuesta?.data?.mensaje || 'Error al enviar el pre-registro');
+      setError(err.response?.data?.mensaje || 'Error al enviar el pre-registro');
     } finally {
       setCargando(false);
     }

@@ -164,8 +164,8 @@ export default function PaginaAdmision() {
       const datos = respuesta.data;
       if (Array.isArray(datos)) {
         setGestiones(datos.map((g: any) => g.anio || g.gestion || g));
-      } else if (datos.data) {
-        setGestiones(datos.data.map((g: any) => g.anio || g.gestion || g));
+      } else if (datos.datos) {
+        setGestiones(datos.datos.map((g: any) => g.anio || g.gestion || g));
       }
     } catch (error) {
       console.error('Error al obtener las gestiones:', error);
