@@ -2,6 +2,8 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Persona, EstadoPersona } from '../../entities/persona.entity';
+import { Usuario } from '../../entities/usuario.entity';
+import { UsuarioRol } from '../../entities/usuario-rol.entity';
 import { CrearPersonaDto } from './dto/crear-persona.dto';
 import { ActualizarPersonaDto } from './dto/actualizar-persona.dto';
 
@@ -68,6 +70,17 @@ export class ServicioPersonas {
 
   async remove(id: number): Promise<void> {
     const person = await this.findOne(id);
+
+    // Eliminar el usuario asociado (y sus asignaciones de rol) para evitar
+    // violaciones de clave foránea al borrar la persona.
+    const usuario = await this.personaRepository.manager.findOne(Usuario, {
+      where: { personaId: id },
+    });
+    if (usuario) {
+      await this.personaRepository.manager.delete(UsuarioRol, { usuarioId: usuario.id });
+      await this.personaRepository.manager.remove(usuario);
+    }
+
     await this.personaRepository.remove(person);
   }
 

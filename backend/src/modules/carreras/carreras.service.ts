@@ -52,7 +52,7 @@ export class ServicioCarreras {
   }
 
   async findByCode(code: string): Promise<Carrera> {
-    const career = await this.careerRepository.findOne({ where: { codigo: undefined } });
+    const career = await this.careerRepository.findOne({ where: { codigo: code } });
     if (!career) {
       throw new NotFoundException(`Carrera con código ${code} no encontrada`);
     }

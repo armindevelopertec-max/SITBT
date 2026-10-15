@@ -572,7 +572,7 @@ export class PreinscripcionService {
       .andWhere('grupo.semestre = :semestre', { semestre: semestre });
 
     if (turnoId) {
-      query.andWhere('grupo.turnoId = :turnoId', { turnoId: undefined });
+      query.andWhere('grupo.turnoId = :turnoId', { turnoId });
     }
 
     return query.getMany();

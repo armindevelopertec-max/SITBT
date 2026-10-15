@@ -64,7 +64,7 @@ export class ServicioCertificados {
 
   async findByCode(code: string): Promise<Certificado> {
     const certificate = await this.certificadoRepository.findOne({
-      where: { codigo: undefined },
+      where: { codigo: code },
       relations: ['estudiante', 'estudiante.persona', 'emisor'],
     });
     if (!certificate) {

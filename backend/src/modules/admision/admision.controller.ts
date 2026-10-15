@@ -28,6 +28,7 @@ export class ControladorAdmision {
   }
 
   @Get()
+  @UseGuards(GuardaJwt)
   findAll(
     @Query('pagina') page = 1,
     @Query('limite') limit = 20,
@@ -38,21 +39,25 @@ export class ControladorAdmision {
   }
 
   @Get('estadisticas')
+  @UseGuards(GuardaJwt)
   getStatistics() {
     return this.service.getStatistics();
   }
 
   @Get(':id')
+  @UseGuards(GuardaJwt)
   findOne(@Param('id') id: string) {
     return this.service.findOne(id);
   }
 
   @Patch(':id')
+  @UseGuards(GuardaJwt)
   update(@Param('id') id: string, @Body() updateDto: ActualizarAdmisionDto) {
     return this.service.update(id, updateDto);
   }
 
   @Post(':id/verificar')
+  @UseGuards(GuardaJwt)
   @HttpCode(200)
   verify(
     @Param('id') id: string,
@@ -63,6 +68,7 @@ export class ControladorAdmision {
   }
 
   @Post(':id/rechazar')
+  @UseGuards(GuardaJwt)
   @HttpCode(200)
   reject(
     @Param('id') id: string,
@@ -73,6 +79,7 @@ export class ControladorAdmision {
   }
 
   @Post(':id/convertir-estudiante')
+  @UseGuards(GuardaJwt)
   @HttpCode(200)
   convertToStudent(
     @Param('id') id: string,
@@ -82,6 +89,7 @@ export class ControladorAdmision {
   }
 
   @Delete(':id')
+  @UseGuards(GuardaJwt)
   remove(@Param('id') id: string) {
     return this.service.remove(id);
   }

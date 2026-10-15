@@ -34,7 +34,10 @@ export class ServicioPersonal {
   ) {}
 
   async create(createStaffDto: CrearPersonalDto): Promise<PersonalCreadoConUsuario> {
-    const staff = this.staffRepository.create(createStaffDto);
+    const staff = this.staffRepository.create({
+      ...createStaffDto,
+      estado: createStaffDto.estado ?? EstadoPersonal.ACTIVO,
+    });
     const savedStaff = await this.staffRepository.save(staff);
 
     const persona = await this.personaRepository.findOne({ where: { id: createStaffDto.personaId } });
@@ -137,6 +140,7 @@ export class ServicioPersonal {
       where: { personaId: staff.personaId },
     });
     if (usuario) {
+      await this.usuarioRolRepository.delete({ usuarioId: usuario.id });
       await this.usuarioRepository.remove(usuario);
     }
 

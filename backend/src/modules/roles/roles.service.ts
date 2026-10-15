@@ -57,7 +57,7 @@ export class ServicioRoles {
   }
 
   async findByCodigo(codigo: string): Promise<Rol> {
-    const rol = await this.rolRepository.findOne({ where: { codigo: undefined } });
+    const rol = await this.rolRepository.findOne({ where: { codigo } });
     if (!rol) {
       throw new NotFoundException(`Rol con código ${codigo} no encontrado`);
     }
