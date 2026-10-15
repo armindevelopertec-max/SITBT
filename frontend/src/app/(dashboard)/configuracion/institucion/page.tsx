@@ -4,14 +4,14 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Migas } from '@/components/ui/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta, DescripcionTarjeta } from '@/components/ui/tarjeta';
-import { Boton } from '@/components/ui/boton';
-import { Entrada } from '@/components/ui/entrada';
-import { CargarImagen } from '@/components/ui/cargar-imagen';
-import { usarConfiguracionInstitucional } from '@/hooks/usarConfiguracionInstitucional';
+import { Migas } from '@/componentes/iu/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta, DescripcionTarjeta } from '@/componentes/iu/tarjeta';
+import { Boton } from '@/componentes/iu/boton';
+import { Entrada } from '@/componentes/iu/entrada';
+import { CargarImagen } from '@/componentes/iu/cargar-imagen';
+import { usarConfiguracionInstitucional } from '@/ganchos/usarConfiguracionInstitucional';
 import { Save, Building2, Phone, MapPin, Pencil, X } from 'lucide-react';
-import api from '@/lib/api';
+import api from '@/libreria/api';
 
 const esquemaConfiguracion = z.object({
   nombre: z.string().min(1, 'El nombre es requerido'),

@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Migas } from '@/components/ui/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
-import { Boton } from '@/components/ui/boton';
-import { Entrada } from '@/components/ui/entrada';
-import { Selector } from '@/components/ui/selector';
-import { Insignia } from '@/components/ui/insignia';
-import { api } from '@/lib/api';
+import { Migas } from '@/componentes/iu/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Boton } from '@/componentes/iu/boton';
+import { Entrada } from '@/componentes/iu/entrada';
+import { Selector } from '@/componentes/iu/selector';
+import { Insignia } from '@/componentes/iu/insignia';
+import { api } from '@/libreria/api';
 import { Search, Loader2, CheckCircle, AlertCircle, User, BookOpen, Calendar, CreditCard, FileText, Users } from 'lucide-react';
 
 interface Estudiante {

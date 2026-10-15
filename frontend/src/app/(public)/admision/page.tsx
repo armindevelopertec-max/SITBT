@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { GraduationCap, CheckCircle, Users, BookOpen, CreditCard, FileText, ArrowRight, MapPin, Phone, Mail, Clock, ArrowRight as ArrowRightIcon } from 'lucide-react';
-import { usarInstitucion } from '@/contexts/ContextoInstitucional';
+import { usarInstitucion } from '@/contextos/ContextoInstitucional';
 
 const pasosProceso = [
   {

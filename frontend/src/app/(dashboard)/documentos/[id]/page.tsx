@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { usarDocumentos, DocumentoEmitido } from '@/hooks/usarDocumentos';
-import { Boton } from '@/components/ui/boton';
-import { Insignia } from '@/components/ui/insignia';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
+import { usarDocumentos, DocumentoEmitido } from '@/ganchos/usarDocumentos';
+import { Boton } from '@/componentes/iu/boton';
+import { Insignia } from '@/componentes/iu/insignia';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { ArrowLeft, Printer, CheckCircle, XCircle, FileText, Calendar, User } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';

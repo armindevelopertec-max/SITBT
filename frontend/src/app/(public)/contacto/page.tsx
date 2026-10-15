@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle, ArrowRight, MessageCircle } from 'lucide-react';
-import { usarInstitucion } from '@/contexts/ContextoInstitucional';
+import { usarInstitucion } from '@/contextos/ContextoInstitucional';
 
 export default function ContactoPage() {
   const { institucion } = usarInstitucion();

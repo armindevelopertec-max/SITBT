@@ -1,15 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Migas } from '@/components/ui/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
-import { Boton } from '@/components/ui/boton';
-import { Entrada } from '@/components/ui/entrada';
-import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
-import { Insignia } from '@/components/ui/insignia';
-import { Modal } from '@/components/ui/modal';
+import { Migas } from '@/componentes/iu/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Boton } from '@/componentes/iu/boton';
+import { Entrada } from '@/componentes/iu/entrada';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/componentes/iu/tabla';
+import { Insignia } from '@/componentes/iu/insignia';
+import { Modal } from '@/componentes/iu/modal';
 import { Loader2, Plus, Pencil, Trash2, Search, BookOpen } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api } from '@/libreria/api';
 
 interface Carrera {
   id: number;
@@ -128,10 +128,10 @@ export default function PaginaCarreras() {
   };
 
   const obtenerInsigniaEstado = (estado: string) => {
-    const config = estado === 'activo'
+    const configuracionInsignia = estado === 'activo'
       ? { etiqueta: 'Activo', color: 'bg-green-100 text-green-800' }
       : { etiqueta: 'Inactivo', color: 'bg-red-100 text-red-800' };
-    return <Insignia className={config.color}>{config.etiqueta}</Insignia>;
+    return <Insignia className={configuracionInsignia.color}>{configuracionInsignia.etiqueta}</Insignia>;
   };
 
   if (cargando) {

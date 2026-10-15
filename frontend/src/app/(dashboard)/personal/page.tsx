@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Migas } from '@/components/ui/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
-import { Boton } from '@/components/ui/boton';
-import { Entrada } from '@/components/ui/entrada';
-import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
-import { Insignia } from '@/components/ui/insignia';
-import { Modal, ModalConfirmacion } from '@/components/ui/modal';
+import { Migas } from '@/componentes/iu/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Boton } from '@/componentes/iu/boton';
+import { Entrada } from '@/componentes/iu/entrada';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/componentes/iu/tabla';
+import { Insignia } from '@/componentes/iu/insignia';
+import { Modal, ModalConfirmacion } from '@/componentes/iu/modal';
 import { Plus, Search, Edit2, Trash2, Loader2, User, Eye, Key } from 'lucide-react';
-import { api } from '@/lib/api';
-import { Personal } from '@/types';
+import { api } from '@/libreria/api';
+import { Personal } from '@/tipos';
 
 const OPCIONES_CARGO = [
   { value: 'docente', etiqueta: 'Docente' },

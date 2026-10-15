@@ -1,10 +1,10 @@
 'use client';
 
-import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
-import { Migas } from '@/components/ui/migas';
+import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Migas } from '@/componentes/iu/migas';
 import { Users, GraduationCap, UserCog, BookOpen, TrendingUp, Calendar, DollarSign, Award } from 'lucide-react';
-import { etiquetaRol } from '@/lib/autenticacion';
+import { etiquetaRol } from '@/libreria/autenticacion';
 
 export default function PaginaPanel() {
   const { usuario } = usarAlmacenAutenticacion();

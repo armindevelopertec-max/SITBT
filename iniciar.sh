@@ -293,7 +293,7 @@ start_dev() {
     # En dev corremos los scripts npm localmente apuntando al postgres del host
     # (DB_PORT 5434). Esto evita depender de psql local o de un contenedor backend
     # que en prod no expone package.json.
-    (cd backend && DB_HOST=localhost DB_PORT=5434 npm run seed)
+    (cd backend && DB_HOST=localhost DB_PORT=5434 npm run semilla)
   else
     info "Saltando seed por --no-seed"
   fi

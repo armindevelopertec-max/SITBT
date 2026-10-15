@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
+import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { AlertCircle, Lock, User } from 'lucide-react';
 
 export default function AccederPage() {

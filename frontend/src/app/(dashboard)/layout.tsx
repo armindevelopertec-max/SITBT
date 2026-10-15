@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { usarAlmacenAutenticacion } from '@/store/almacen-autenticacion';
-import BarraLateral from '@/components/layout/BarraLateral';
-import Encabezado from '@/components/layout/Encabezado';
-import { cn } from '@/lib/utilidades';
+import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
+import BarraLateral from '@/componentes/diseno/BarraLateral';
+import Encabezado from '@/componentes/diseno/Encabezado';
+import { cn } from '@/libreria/utilidades';
 
 export default function DisenoPanel({
   children,

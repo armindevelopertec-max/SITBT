@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Migas } from '@/components/ui/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
-import { Boton } from '@/components/ui/boton';
-import { Entrada } from '@/components/ui/entrada';
-import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
-import { Insignia } from '@/components/ui/insignia';
-import { api } from '@/lib/api';
+import { Migas } from '@/componentes/iu/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Boton } from '@/componentes/iu/boton';
+import { Entrada } from '@/componentes/iu/entrada';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/componentes/iu/tabla';
+import { Insignia } from '@/componentes/iu/insignia';
+import { api } from '@/libreria/api';
 import { ArrowLeft, Plus, Trash2, Loader2, BookOpen, Edit2, Save, X, Check, Search } from 'lucide-react';
 
 interface Materia {

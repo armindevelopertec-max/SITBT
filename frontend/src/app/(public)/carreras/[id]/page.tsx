@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { apiPublica } from '@/lib/api';
+import { apiPublica } from '@/libreria/api';
 import { GraduationCap, Clock, Award, FileText, ArrowRight, ChevronLeft } from 'lucide-react';
-import { usarInstitucion } from '@/contexts/ContextoInstitucional';
+import { usarInstitucion } from '@/contextos/ContextoInstitucional';
 
 interface Carrera {
   id: number;

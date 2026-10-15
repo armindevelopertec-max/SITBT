@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { apiPublica } from '@/lib/api';
+import { apiPublica } from '@/libreria/api';
 import { GraduationCap, ArrowRight, CheckCircle, Award, Clock, FileText } from 'lucide-react';
-import { usarInstitucion } from '@/contexts/ContextoInstitucional';
+import { usarInstitucion } from '@/contextos/ContextoInstitucional';
 
 interface Materia {
   codigo: string;

@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { usarDocumentos } from '@/hooks/usarDocumentos';
-import { api } from '@/lib/api';
-import { Boton } from '@/components/ui/boton';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
-import { Entrada } from '@/components/ui/entrada';
-import { Selector } from '@/components/ui/selector';
+import { usarDocumentos } from '@/ganchos/usarDocumentos';
+import { api } from '@/libreria/api';
+import { Boton } from '@/componentes/iu/boton';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Entrada } from '@/componentes/iu/entrada';
+import { Selector } from '@/componentes/iu/selector';
 import { ArrowLeft, FileText, Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
 

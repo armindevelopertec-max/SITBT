@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { GraduationCap, Users, BookOpen, Award, ArrowRight, CheckCircle, MapPin, Phone, Mail, Clock, Target, Eye, Shield, Star } from 'lucide-react';
-import { usarInstitucion } from '@/contexts/ContextoInstitucional';
+import { usarInstitucion } from '@/contextos/ContextoInstitucional';
 
 const hitos = [
   { anio: '2014', evento: 'Fundación del Instituto' },

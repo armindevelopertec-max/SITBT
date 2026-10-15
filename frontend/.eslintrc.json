@@ -3,10 +3,10 @@
   "overrides": [
     {
       "files": [
-        "src/hooks/**/*.ts",
-        "src/hooks/**/*.tsx",
-        "src/contexts/**/*.tsx",
-        "src/store/**/*.ts"
+        "src/ganchos/**/*.ts",
+        "src/ganchos/**/*.tsx",
+        "src/contextos/**/*.tsx",
+        "src/almacen/**/*.ts"
       ],
       "rules": {
         "react-hooks/rules-of-hooks": "off"

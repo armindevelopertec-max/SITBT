@@ -1,7 +1,7 @@
 'use client';
 
-import { ProveedorInstitucion } from '@/contexts/ContextoInstitucional';
-import DisenoPublico from '@/components/layout/DisenoPublico';
+import { ProveedorInstitucion } from '@/contextos/ContextoInstitucional';
+import DisenoPublico from '@/componentes/diseno/DisenoPublico';
 
 export default function EnvoltorioDiseno({ children }: { children: React.ReactNode }) {
   return (

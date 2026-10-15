@@ -1,16 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Migas } from '@/components/ui/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
-import { Boton } from '@/components/ui/boton';
-import { Entrada } from '@/components/ui/entrada';
-import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
-import { Insignia } from '@/components/ui/insignia';
-import { Modal, ModalConfirmacion } from '@/components/ui/modal';
+import { Migas } from '@/componentes/iu/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Boton } from '@/componentes/iu/boton';
+import { Entrada } from '@/componentes/iu/entrada';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/componentes/iu/tabla';
+import { Insignia } from '@/componentes/iu/insignia';
+import { Modal, ModalConfirmacion } from '@/componentes/iu/modal';
 import { Search, Loader2, Eye, CheckCircle, XCircle, UserPlus, FileText } from 'lucide-react';
-import { api } from '@/lib/api';
-import { Selector } from '@/components/ui/selector';
+import { api } from '@/libreria/api';
+import { Selector } from '@/componentes/iu/selector';
 
 const etiquetasEstado: Record<string, { etiqueta: string; color: string }> = {
   pendiente: { etiqueta: 'Pendiente', color: 'bg-yellow-100 text-yellow-800' },
@@ -229,8 +229,8 @@ export default function PaginaAdmision() {
   });
 
   const obtenerInsigniaEstado = (estado: string) => {
-    const config = etiquetasEstado[estado] || { etiqueta: estado, color: 'bg-gray-100 text-gray-800' };
-    return <Insignia className={config.color}>{config.etiqueta}</Insignia>;
+    const configuracionInsignia = etiquetasEstado[estado] || { etiqueta: estado, color: 'bg-gray-100 text-gray-800' };
+    return <Insignia className={configuracionInsignia.color}>{configuracionInsignia.etiqueta}</Insignia>;
   };
 
   const esMenor = (fechaNacimiento: string): boolean => {

@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Migas } from '@/components/ui/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
-import { Boton } from '@/components/ui/boton';
-import { Entrada } from '@/components/ui/entrada';
-import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
-import { Insignia } from '@/components/ui/insignia';
-import { Modal, ModalConfirmacion } from '@/components/ui/modal';
-import { usarUsuarios, UsuarioRespuesta } from '@/hooks/usarUsuarios';
-import { Rol } from '@/types';
+import { Migas } from '@/componentes/iu/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Boton } from '@/componentes/iu/boton';
+import { Entrada } from '@/componentes/iu/entrada';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/componentes/iu/tabla';
+import { Insignia } from '@/componentes/iu/insignia';
+import { Modal, ModalConfirmacion } from '@/componentes/iu/modal';
+import { usarUsuarios, UsuarioRespuesta } from '@/ganchos/usarUsuarios';
+import { Rol } from '@/tipos';
 import { Plus, Search, Edit2, Trash2, Shield, Key, X, Loader2 } from 'lucide-react';
 
 const coloresRol: Record<string, 'predeterminado' | 'primario' | 'secundario' | 'exito' | 'advertencia' | 'error'> = {

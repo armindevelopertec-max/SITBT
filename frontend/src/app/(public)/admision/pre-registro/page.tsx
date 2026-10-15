@@ -2,8 +2,8 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { apiPublica } from '@/lib/api';
-import { Carrera, CrearAdmisionDto } from '@/types';
+import { apiPublica } from '@/libreria/api';
+import { Carrera, CrearAdmisionDto } from '@/tipos';
 import { GraduationCap, AlertCircle, CheckCircle, Loader2, ArrowRight, FileText, User, BookOpen, Phone, Mail } from 'lucide-react';
 import Link from 'next/link';
 

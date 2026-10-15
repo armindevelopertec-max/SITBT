@@ -1,16 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Migas } from '@/components/ui/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
-import { Boton } from '@/components/ui/boton';
-import { Entrada } from '@/components/ui/entrada';
-import { Selector } from '@/components/ui/selector';
-import { Insignia } from '@/components/ui/insignia';
-import { Modal } from '@/components/ui/modal';
-import { ModalConfirmacion } from '@/components/ui/modal';
-import { api } from '@/lib/api';
-import { Gestion, Periodo } from '@/types';
+import { Migas } from '@/componentes/iu/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Boton } from '@/componentes/iu/boton';
+import { Entrada } from '@/componentes/iu/entrada';
+import { Selector } from '@/componentes/iu/selector';
+import { Insignia } from '@/componentes/iu/insignia';
+import { Modal } from '@/componentes/iu/modal';
+import { ModalConfirmacion } from '@/componentes/iu/modal';
+import { api } from '@/libreria/api';
+import { Gestion, Periodo } from '@/tipos';
 import { Plus, Edit2, Trash2, Lock, Unlock, Star, StarOff, Loader2, Calendar } from 'lucide-react';
 
 export default function PaginaGestiones() {

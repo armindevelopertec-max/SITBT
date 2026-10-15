@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Migas } from '@/components/ui/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
-import { Boton } from '@/components/ui/boton';
-import { Entrada } from '@/components/ui/entrada';
-import { Selector } from '@/components/ui/selector';
-import { Insignia } from '@/components/ui/insignia';
-import { Modal, ModalConfirmacion } from '@/components/ui/modal';
-import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/components/ui/tabla';
-import { api } from '@/lib/api';
+import { Migas } from '@/componentes/iu/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Boton } from '@/componentes/iu/boton';
+import { Entrada } from '@/componentes/iu/entrada';
+import { Selector } from '@/componentes/iu/selector';
+import { Insignia } from '@/componentes/iu/insignia';
+import { Modal, ModalConfirmacion } from '@/componentes/iu/modal';
+import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/componentes/iu/tabla';
+import { api } from '@/libreria/api';
 import { Search, Plus, Edit2, Trash2, Loader2, Users, UserCheck, BookOpen, ArrowLeft } from 'lucide-react';
 
 interface Grupo {

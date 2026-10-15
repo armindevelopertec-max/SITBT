@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { GraduationCap, Users, BookOpen, ArrowRight, Wrench, Zap, MapPin, Phone, Mail, Clock, ChevronLeft, ChevronRight, Target, Eye, Heart, Globe, Shield, Briefcase, Laptop, Home, Info, HeartHandshake, GraduationCap as GraduationCapIcon, Lightbulb, MapPin as MapPinIcon, User } from 'lucide-react';
-import { usarInstitucion } from '@/contexts/ContextoInstitucional';
+import { usarInstitucion } from '@/contextos/ContextoInstitucional';
 
 const imagenesHeroe = [
   {

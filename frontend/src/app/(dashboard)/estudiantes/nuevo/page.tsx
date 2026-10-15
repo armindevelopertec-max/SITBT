@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Migas } from '@/components/ui/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/components/ui/tarjeta';
-import { Boton } from '@/components/ui/boton';
-import { Entrada } from '@/components/ui/entrada';
-import { Selector } from '@/components/ui/selector';
-import { Modal } from '@/components/ui/modal';
-import { api } from '@/lib/api';
+import { Migas } from '@/componentes/iu/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Boton } from '@/componentes/iu/boton';
+import { Entrada } from '@/componentes/iu/entrada';
+import { Selector } from '@/componentes/iu/selector';
+import { Modal } from '@/componentes/iu/modal';
+import { api } from '@/libreria/api';
 import { ArrowLeft, Save, Loader2, Star, User, Key } from 'lucide-react';
 
 interface Carrera {
@@ -280,8 +280,8 @@ export default function PaginaNuevoEstudiante() {
                   etiqueta="Lugar de Nacimiento"
                   value={datosPersona.lugarNacimiento}
                   onChange={(e) => {
-                    const value = e.target.value;
-                    setDatosPersona({ ...datosPersona, lugarNacimiento: value });
+                    const valor = e.target.value;
+                    setDatosPersona({ ...datosPersona, lugarNacimiento: valor });
                   }}
                   opciones={[
                     { value: '', etiqueta: 'Seleccionar' },
@@ -368,8 +368,8 @@ export default function PaginaNuevoEstudiante() {
                   etiqueta="Nacionalidad"
                   value={datosPersona.nacionalidad}
                   onChange={(e) => {
-                    const value = e.target.value;
-                    setDatosPersona({ ...datosPersona, nacionalidad: value });
+                    const valor = e.target.value;
+                    setDatosPersona({ ...datosPersona, nacionalidad: valor });
                   }}
                   opciones={[
                     { value: 'Boliviana', etiqueta: 'Boliviana' },

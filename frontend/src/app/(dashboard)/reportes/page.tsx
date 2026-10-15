@@ -1,10 +1,10 @@
 'use client';
 
-import { Migas } from '@/components/ui/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta, DescripcionTarjeta } from '@/components/ui/tarjeta';
-import { Boton } from '@/components/ui/boton';
-import { Selector } from '@/components/ui/selector';
-import { Entrada } from '@/components/ui/entrada';
+import { Migas } from '@/componentes/iu/migas';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta, DescripcionTarjeta } from '@/componentes/iu/tarjeta';
+import { Boton } from '@/componentes/iu/boton';
+import { Selector } from '@/componentes/iu/selector';
+import { Entrada } from '@/componentes/iu/entrada';
 import { BarChart3, FileText, Download, Users, GraduationCap, DollarSign, BookOpen } from 'lucide-react';
 
 const tiposReporte = [

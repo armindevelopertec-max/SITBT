@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Migas } from '@/components/ui/migas';
-import { Tarjeta, ContenidoTarjeta } from '@/components/ui/tarjeta';
-import { Boton } from '@/components/ui/boton';
-import { Entrada } from '@/components/ui/entrada';
-import { ModalConfirmacion } from '@/components/ui/modal';
-import { api } from '@/lib/api';
+import { Migas } from '@/componentes/iu/migas';
+import { Tarjeta, ContenidoTarjeta } from '@/componentes/iu/tarjeta';
+import { Boton } from '@/componentes/iu/boton';
+import { Entrada } from '@/componentes/iu/entrada';
+import { ModalConfirmacion } from '@/componentes/iu/modal';
+import { api } from '@/libreria/api';
 import { Search, Plus, Printer, X, Loader2, Trash2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
