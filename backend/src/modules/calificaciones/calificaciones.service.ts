@@ -216,7 +216,7 @@ export class ServicioCalificaciones {
       .leftJoinAndSelect('enrollment.materia', 'subject')
       .where('enrollment.grupoId = :groupId', { groupId })
       .andWhere('enrollment.gestion = :gestion', { gestion })
-      .orderBy('student.persona.apellidoPaterno', 'ASC')
+      .orderBy('person.apellidoPaterno', 'ASC')
       .getMany();
   }
 }
