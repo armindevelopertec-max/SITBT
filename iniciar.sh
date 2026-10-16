@@ -48,7 +48,7 @@ ok()     { log "${C_GREEN}✔${C_RESET} $*"; }
 warn()   { log "${C_YELLOW}⚠${C_RESET} $*"; }
 err()    { log "${C_RED}✖${C_RESET} $*" >&2; }
 title()  { log "${C_BOLD}${C_CYAN}$*${C_RESET}"; }
-paso()   { log "${C_BOLD}${C_BLUE}[$1]${C_RESET} $*"; }
+paso()   { local n="$1"; shift; log "${C_BOLD}${C_BLUE}[$n]${C_RESET} $*"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
@@ -193,17 +193,36 @@ limpiar_huerfanos() {
 # Si una sesión anterior terminó de forma abrupta, pueden quedar procesos
 # `node` huérfanos atascados en los puertos 3000 (Next) y 4000 (Nest), lo
 # que provoca 'EADDRINUSE' y un bucle de reinicios con 'nest start --watch'.
+#
+# pids_de_puerto: devuelve los PID que ESCUCHAN en un puerto TCP (uno por línea).
+# Usamos varias fuentes porque 'lsof -ti :puerto' es poco fiable: puede
+# devolver el PID de un cliente conectado en vez del proceso que escucha,
+# o incluso no ver el listener. 'ss' (netlink) y 'fuser' sí lo detectan.
+pids_de_puerto() {
+  local puerto="$1"
+  # 'set +e' dentro del subshell: cuando no hay nada, grep/lsof devuelven
+  # estado != 0 y con 'set -euo pipefail' eso abortaría el script entero.
+  (
+    set +e
+    ss -ltnpH "sport = :$puerto" 2>/dev/null | grep -oE 'pid=[0-9]+' | cut -d= -f2
+    fuser -n tcp "$puerto" 2>/dev/null | tr -s ' ' '\n' | grep -E '^[0-9]+$'
+    lsof -tiTCP:"$puerto" -sTCP:LISTEN 2>/dev/null
+  ) | sort -u || true
+}
+
 liberar_puerto() {
   local puerto="$1"
   local pids
-  pids=$(lsof -ti :"$puerto" 2>/dev/null || true)
+  pids=$(pids_de_puerto "$puerto")
   if [[ -n "$pids" ]]; then
-    warn "Puerto $puerto ocupado por PID(s) $pids. Liberando..."
+    warn "Puerto $puerto ocupado por PID(s) $(echo "$pids" | tr '\n' ' '). Liberando..."
     # shellcheck disable=SC2086
     kill -9 $pids 2>/dev/null || true
     sleep 1
-    if lsof -ti :"$puerto" >/dev/null 2>&1; then
-      warn "El puerto $puerto sigue ocupado tras kill -9. Revísalo manualmente."
+    local restantes
+    restantes=$(pids_de_puerto "$puerto")
+    if [[ -n "$restantes" ]]; then
+      warn "El puerto $puerto sigue ocupado tras kill -9 (PID(s) $(echo "$restantes" | tr '\n' ' ')). Revísalo manualmente."
     else
       ok "Puerto $puerto liberado."
     fi
@@ -215,9 +234,11 @@ liberar_puerto() {
 # enganchados en 3001, 3002, ... aunque el 3000 ya esté libre.
 matar_huerfanos_next() {
   local pids
-  pids=$(pgrep -f "next-server\\|next dev" 2>/dev/null | grep -v "$$" || true)
+  # OJO: pgrep usa expresiones regulares EXTENDIDAS, así que el separador de
+  # alternancia es '|' y NO '\|'. Con '\|' el patrón no coincide con nada.
+  pids=$(pgrep -f "next-server|next dev" 2>/dev/null | grep -v "^$$\$" || true)
   if [[ -n "$pids" ]]; then
-    warn "Procesos 'next' huérfanos: $pids. Terminando..."
+    warn "Procesos 'next' huérfanos: $(echo "$pids" | tr '\n' ' '). Terminando..."
     # shellcheck disable=SC2086
     kill -9 $pids 2>/dev/null || true
     sleep 1
@@ -225,7 +246,7 @@ matar_huerfanos_next() {
 }
 
 liberar_puertos_dev() {
-  require_cmd lsof
+  require_cmd ss
   # Primero, barrido de procesos Next huérfanos (pueden estar en 3001, 3002, ...)
   matar_huerfanos_next
   liberar_puerto 4000  # NestJS backend
@@ -271,7 +292,7 @@ start_dev() {
   # enganchados a 3000/4000 desde una sesión anterior. Sin esto, 'nest start
   # --watch' entra en bucle con 'EADDRINUSE' al levantar el backend.
   liberar_puertos_dev
-  dc up -d postgres redis minio
+  dc up -d postgres redis minio pgadmin
 
   paso "$paso/$total" "Esperando servicios base..."
   ((paso++))
@@ -336,8 +357,9 @@ trap_dev() {
   log "${C_BOLD}${C_GREEN}=== Sistema iniciado en DESARROLLO ===${C_RESET}"
   log "  Frontend:    ${C_CYAN}http://localhost:3000${C_RESET}"
   log "  Backend API: ${C_CYAN}http://localhost:4000${C_RESET}"
-  log "  Swagger:     ${C_CYAN}http://localhost:4000/api/docs${C_RESET}"
+  log "  Swagger:     ${C_CYAN}http://localhost:4000/api/documentacion${C_RESET}"
   log "  MinIO:       ${C_CYAN}http://localhost:9011${C_RESET}"
+  log "  pgAdmin:     ${C_CYAN}http://localhost:5050${C_RESET}"
   if [[ $WITH_CADDY -eq 1 ]]; then
     log "  Caddy (80):  ${C_CYAN}http://localhost${C_RESET}"
   fi
@@ -352,10 +374,20 @@ trap_dev() {
 }
 
 on_exit_dev() {
+  # El trap de SIGINT/SIGTERM y el de EXIT apuntan al mismo handler; esta
+  # guarda evita que la limpieza se ejecute dos veces.
+  [[ -n "${_SALIENDO:-}" ]] && return 0
+  _SALIENDO=1
   echo
   info "Deteniendo backend/frontend nativos..."
-  kill ${BACKEND_PID:-0} ${FRONTEND_PID:-0} 2>/dev/null || true
+  for pid in "${BACKEND_PID:-}" "${FRONTEND_PID:-}"; do
+    [[ -n "$pid" ]] && kill "$pid" 2>/dev/null || true
+  done
   wait 2>/dev/null || true
+  # npm/nest/next pueden dejar hijos huérfanos enganchados a los puertos;
+  # los liberamos por puerto para evitar 'EADDRINUSE' en el próximo arranque.
+  liberar_puerto 4000
+  liberar_puerto 3000
   info "Apagando contenedores docker (sin -v para no perder datos)..."
   dc down >/dev/null 2>&1 || true
   ok "SITBT detenido. Para volver a producción: ./iniciar.sh prod"
@@ -389,7 +421,7 @@ start_prod() {
   log ""
   log "${C_BOLD}${C_GREEN}=== Sistema iniciado en PRODUCCIÓN ===${C_RESET}"
   log "  Sitio web:  ${C_CYAN}http://localhost${C_RESET}"
-  log "  Swagger:    ${C_CYAN}http://localhost/api/docs${C_RESET}"
+  log "  Swagger:    ${C_CYAN}http://localhost/api/documentacion${C_RESET}"
   log "  (HTTPS automático al configurar dominio en Caddyfile)"
   log ""
   log "  Detener:    ${C_BOLD}./iniciar.sh --stop${C_RESET}"
