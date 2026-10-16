@@ -6,12 +6,19 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  Unique,
 } from 'typeorm';
 import { Carrera } from './carrera.entidad';
 import { PlanEstudio } from './plan-estudio.entidad';
 import { Turno } from './turno.entidad';
 import { Materia } from './materia.entidad';
 
+export enum EstadoGrupo {
+  ACTIVO = 'activo',
+  CERRADO = 'cerrado',
+}
+
+@Unique('UQ_grupo_combinacion', ['gestion', 'carreraId', 'semestre', 'turnoId', 'paralelo'])
 @Entity('grupos')
 export class Grupo {
   @PrimaryGeneratedColumn()
@@ -62,6 +69,9 @@ export class Grupo {
 
   @Column({ type: 'int', default: 30, name: 'capacidad' })
   capacidad: number;
+
+  @Column({ type: 'varchar', length: 20, name: 'estado', default: EstadoGrupo.ACTIVO })
+  estado: EstadoGrupo;
 
   @CreateDateColumn({ name: 'creado_en' })
   creadoEn: Date;

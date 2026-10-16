@@ -6,13 +6,15 @@ export class CrearGrupoDto {
   @IsInt()
   carreraId: number;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsInt()
-  planEstudioId: number;
+  @IsOptional()
+  planEstudioId?: number;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsInt()
-  materiaId: number;
+  @IsOptional()
+  materiaId?: number;
 
   @ApiProperty()
   @IsInt()
@@ -32,10 +34,11 @@ export class CrearGrupoDto {
   @MaxLength(10)
   gestion: string;
 
-  @ApiProperty({ example: 'I' })
+  @ApiPropertyOptional({ example: 'I' })
   @IsString()
-  @MaxLength(10)
-  periodo: string;
+  @MaxLength(2)
+  @IsOptional()
+  periodo?: string;
 
   @ApiPropertyOptional({ example: 30 })
   @IsInt()

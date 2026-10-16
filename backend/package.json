@@ -11,6 +11,7 @@
     "semilla": "ts-node src/semilla.ts",
     "semilla:docentes": "ts-node src/semilla-docentes.ts",
     "semilla:estudiantes": "ts-node src/semilla-estudiantes.ts",
+    "semilla:grupos": "ts-node src/semilla-grupos.ts",
     "generar-usuarios": "ts-node src/generar-usuarios.ts"
   },
   "dependencies": {

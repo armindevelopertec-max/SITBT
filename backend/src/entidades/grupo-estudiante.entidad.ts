@@ -5,10 +5,12 @@ import {
   ManyToOne,
   JoinColumn,
   CreateDateColumn,
+  Unique,
 } from 'typeorm';
 import { Grupo } from './grupo.entidad';
 import { Estudiante } from './estudiante.entidad';
 
+@Unique('UQ_grupo_estudiante', ['grupoId', 'estudianteId'])
 @Entity('grupos_estudiantes')
 export class GrupoEstudiante {
   @PrimaryGeneratedColumn()
