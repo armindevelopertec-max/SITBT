@@ -207,6 +207,11 @@ export default function PaginaGestiones() {
       obtenerGestiones();
     } catch (error) {
       console.error('Error al confirmar la acción:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al confirmar la acción'));
+      }).catch(() => {
+        alert('Error al confirmar la acción');
+      });
     } finally {
       setGuardando(false);
     }

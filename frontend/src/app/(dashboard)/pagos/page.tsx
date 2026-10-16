@@ -242,6 +242,11 @@ export default function PaginaPagos() {
       obtenerPagos();
     } catch (error) {
       console.error('Error al anular el pago:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al anular el pago'));
+      }).catch(() => {
+        alert('Error al anular el pago');
+      });
     }
   };
 

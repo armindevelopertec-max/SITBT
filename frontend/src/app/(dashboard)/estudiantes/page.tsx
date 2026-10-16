@@ -123,6 +123,11 @@ export default function PaginaEstudiantes() {
       setModalCredenciales(null);
     } catch (error) {
       console.error('Error al restablecer contraseña:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al restablecer la contraseña'));
+      }).catch(() => {
+        alert('Error al restablecer la contraseña');
+      });
     } finally {
       setCargandoRestablecer(false);
     }

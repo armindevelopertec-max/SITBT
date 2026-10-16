@@ -331,6 +331,11 @@ export default function PaginaCredenciales() {
       }
     } catch (error) {
       console.error('Error al anular la credencial:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al anular la credencial'));
+      }).catch(() => {
+        alert('Error al anular la credencial');
+      });
     } finally {
       setGuardando(false);
     }
@@ -366,6 +371,11 @@ export default function PaginaCredenciales() {
       window.print();
     } catch (error) {
       console.error('Error al marcar como impresa:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al marcar como impresa la credencial'));
+      }).catch(() => {
+        alert('Error al marcar como impresa la credencial');
+      });
     }
   };
 

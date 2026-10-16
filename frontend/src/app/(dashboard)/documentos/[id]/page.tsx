@@ -58,6 +58,11 @@ export default function PaginaDetalleDocumento() {
       setDocumento(actualizado);
     } catch (error) {
       console.error('Error al marcar como impreso:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al marcar como impreso'));
+      }).catch(() => {
+        alert('Error al marcar como impreso');
+      });
     } finally {
       setCargandoAccion(false);
     }
@@ -73,6 +78,11 @@ export default function PaginaDetalleDocumento() {
       setDocumento(actualizado);
     } catch (error) {
       console.error('Error al registrar la entrega:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al registrar la entrega'));
+      }).catch(() => {
+        alert('Error al registrar la entrega');
+      });
     } finally {
       setCargandoAccion(false);
     }
@@ -88,6 +98,11 @@ export default function PaginaDetalleDocumento() {
       setDocumento(actualizado);
     } catch (error) {
       console.error('Error al anular el documento:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al anular el documento'));
+      }).catch(() => {
+        alert('Error al anular el documento');
+      });
     } finally {
       setCargandoAccion(false);
     }
