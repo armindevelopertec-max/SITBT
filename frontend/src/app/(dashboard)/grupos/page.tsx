@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Migas } from '@/componentes/iu/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta, DescripcionTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
 import { Selector } from '@/componentes/iu/selector';
@@ -11,41 +11,27 @@ import { Insignia } from '@/componentes/iu/insignia';
 import { Modal, ModalConfirmacion } from '@/componentes/iu/modal';
 import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/componentes/iu/tabla';
 import { api } from '@/libreria/api';
-import { Search, Plus, Edit2, Trash2, Loader2, Users, UserCheck, BookOpen, ArrowLeft } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, Loader2, Eye, Wand2 } from 'lucide-react';
 
 interface Grupo {
   id: number;
   codigo: string;
   carreraId: number;
   planEstudioId: number;
-  materiaId: number;
+  materiaId: number | null;
   semestre: number;
   turnoId: number;
   paralelo: string;
   gestion: string;
   periodo: string;
   capacidad: number;
+  estado: 'activo' | 'cerrado';
   carrera?: { id: number; codigo: string; nombre: string };
+  plan_estudio?: { id: number; numeroRm: string };
   turno?: { id: number; codigo: string; nombre: string; horaInicio: string; horaFin: string };
-  plan_estudio?: { numeroRm: string };
-  materia?: { id: number; codigo: string; nombre: string };
-}
-
-interface EstudianteEnGrupo {
-  id: number;
-  grupoId: number;
-  estudianteId: number;
-  inscritoEn: string;
-  estudiante?: {
-    id: number;
-    codigoInscripcion: string;
-    persona?: {
-      ci: string;
-      nombres: string;
-      apellidoPaterno: string;
-      apellidoMaterno: string;
-    };
-  };
+  materia?: { id: number; codigo: string; nombre: string } | null;
+  inscritos?: number;
+  cuposDisponibles?: number;
 }
 
 interface Carrera {
@@ -60,87 +46,87 @@ interface Gestion {
   esActual: boolean;
 }
 
-interface Personal {
+interface Turno {
   id: number;
-  personaId: number;
-  cargo: string;
-  persona?: {
-    ci: string;
-    nombres: string;
-    apellidoPaterno: string;
-    apellidoMaterno: string;
-  };
+  codigo: string;
+  nombre: string;
+  horaInicio: string;
+  horaFin: string;
 }
 
-interface AsignacionDocente {
+interface PlanEstudio {
   id: number;
-  docenteId: number;
-  materiaId: number;
-  grupoId: number;
-  gestion: string;
-  estado: string;
-  docente?: Personal;
-  materia?: {
-    id: number;
-    codigo: string;
-    nombre: string;
-  };
+  carreraId: number;
+  numeroRm: string;
 }
+
+interface ResultadoGenerar {
+  creados: number;
+  existentes: number;
+  mensaje: string;
+}
+
+const obtenerSemestres = () =>
+  Array.from({ length: 10 }, (_, i) => ({
+    value: (i + 1).toString(),
+    etiqueta: `${i + 1}.º semestre`,
+  }));
 
 export default function PaginaGrupos() {
   const router = useRouter();
+
   const [grupos, setGrupos] = useState<Grupo[]>([]);
+  const [total, setTotal] = useState(0);
   const [carreras, setCarreras] = useState<Carrera[]>([]);
   const [gestiones, setGestiones] = useState<Gestion[]>([]);
+  const [turnos, setTurnos] = useState<Turno[]>([]);
   const [cargando, setCargando] = useState(true);
-  const [consultaBusqueda, setConsultaBusqueda] = useState('');
+
+  // Filtros
   const [filtroGestion, setFiltroGestion] = useState('');
   const [filtroCarrera, setFiltroCarrera] = useState('');
   const [filtroSemestre, setFiltroSemestre] = useState('');
+  const [filtroTurno, setFiltroTurno] = useState('');
+  const [filtroParalelo, setFiltroParalelo] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('');
+  const [busqueda, setBusqueda] = useState('');
+  const [busquedaAplicada, setBusquedaAplicada] = useState('');
 
-  const [grupoSeleccionado, setGrupoSeleccionado] = useState<Grupo | null>(null);
-  const [estudiantesGrupo, setEstudiantesGrupo] = useState<EstudianteEnGrupo[]>([]);
-  const [asignacionesGrupo, setAsignacionesGrupo] = useState<AsignacionDocente[]>([]);
-  const [cargandoDetalles, setCargandoDetalles] = useState(false);
-
-  const [modalAbierto, setModalAbierto] = useState(false);
-  const [modalEliminarAbierto, setModalEliminarAbierto] = useState(false);
-  const [grupoEliminando, setGrupoEliminando] = useState<Grupo | null>(null);
+  // Modales / acciones
   const [guardando, setGuardando] = useState(false);
-
   const [modalGenerarAbierto, setModalGenerarAbierto] = useState(false);
-  const [turnos, setTurnos] = useState<any[]>([]);
-  const [planesCarrera, setPlanesCarrera] = useState<any[]>([]);
+  const [grupoEliminando, setGrupoEliminando] = useState<Grupo | null>(null);
+  const [grupoCambiandoEstado, setGrupoCambiandoEstado] = useState<Grupo | null>(null);
+
+  const [resultadoGenerar, setResultadoGenerar] = useState<ResultadoGenerar | null>(null);
+  const [planesGenerar, setPlanesGenerar] = useState<PlanEstudio[]>([]);
   const [formularioGenerar, setFormularioGenerar] = useState({
     gestion: new Date().getFullYear().toString(),
     periodo: 'I',
-    turnoIds: [] as number[],
-    paralelos: ['A'],
-    carreraId: '' as string,
-    planEstudioId: '' as string,
-    capacidad: '30',
-  });
-  const [resultadoGenerar, setResultadoGenerar] = useState<{ creados: number; mensaje: string } | null>(null);
-
-  const [formularioNuevo, setFormularioNuevo] = useState({
     carreraId: '',
     planEstudioId: '',
-    materiaId: '',
-    semestre: '',
-    turnoId: '',
-    paralelo: '',
-    gestion: new Date().getFullYear().toString(),
-    periodo: 'I',
+    semestres: [] as number[],
+    turnoIds: [] as number[],
+    paralelos: ['A'] as string[],
     capacidad: '30',
   });
 
+  // Carga inicial de catálogos
   useEffect(() => {
     obtenerDatosIniciales();
   }, []);
 
+  // Recarga de la lista al cambiar filtros
   useEffect(() => {
     obtenerGrupos();
-  }, [filtroGestion, filtroCarrera, filtroSemestre]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtroGestion, filtroCarrera, filtroSemestre, filtroTurno, filtroParalelo, filtroEstado, busquedaAplicada]);
+
+  // Debounce del buscador
+  useEffect(() => {
+    const temporizador = setTimeout(() => setBusquedaAplicada(busqueda), 400);
+    return () => clearTimeout(temporizador);
+  }, [busqueda]);
 
   const obtenerDatosIniciales = async () => {
     try {
@@ -154,207 +140,231 @@ export default function PaginaGrupos() {
       setGestiones(todasLasGestiones);
       setTurnos(respuestaTurnos.data.datos || respuestaTurnos.data || []);
 
-      const gestionActual = todasLasGestiones.find((g: any) => g.esActual);
+      const gestionActual = todasLasGestiones.find((g: Gestion) => g.esActual);
       if (gestionActual) {
         setFiltroGestion(gestionActual.anio);
       }
     } catch (error) {
       console.error('Error al obtener datos:', error);
-    } finally {
-      setCargando(false);
     }
   };
 
   const obtenerGrupos = async () => {
     try {
       setCargando(true);
-      const parametros: any = { limite: 100 };
+      const parametros: Record<string, string | number> = { pagina: 1, limite: 100 };
       if (filtroGestion) parametros.gestion = filtroGestion;
-      if (filtroCarrera) parametros.careerId = filtroCarrera;
-      if (filtroSemestre) parametros.semester = parseInt(filtroSemestre);
+      if (filtroCarrera) parametros.carreraId = Number(filtroCarrera);
+      if (filtroSemestre) parametros.semestre = Number(filtroSemestre);
+      if (filtroTurno) parametros.turnoId = Number(filtroTurno);
+      if (filtroParalelo) parametros.paralelo = filtroParalelo.toUpperCase();
+      if (filtroEstado) parametros.estado = filtroEstado;
+      if (busquedaAplicada.trim()) parametros.busqueda = busquedaAplicada.trim();
 
-      const respuesta = await api.get(`/grupos`, { params: parametros });
+      const respuesta = await api.get('/grupos', { params: parametros });
       setGrupos(respuesta.data.datos || []);
+      setTotal(respuesta.data.total || 0);
     } catch (error) {
       console.error('Error al obtener grupos:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) =>
+        alert(mensajeDeError(error, 'Error al obtener grupos')),
+      );
     } finally {
       setCargando(false);
     }
   };
 
-  const obtenerDetallesGrupo = async (grupo: Grupo) => {
-    setGrupoSeleccionado(grupo);
-    setCargandoDetalles(true);
-    try {
-      const [respuestaEstudiantes, respuestaAsignaciones] = await Promise.all([
-        api.get(`/grupos/${grupo.id}/estudiantes`),
-        api.get(`/asignaciones-docentes/grupo/${grupo.id}?gestion=${grupo.gestion}`),
-      ]);
-      setEstudiantesGrupo(respuestaEstudiantes.data || []);
-      setAsignacionesGrupo(respuestaAsignaciones.data || []);
-    } catch (error) {
-      console.error('Error al obtener detalles:', error);
-    } finally {
-      setCargandoDetalles(false);
-    }
+  const abrirGenerar = () => {
+    setResultadoGenerar(null);
+    setPlanesGenerar([]);
+    setFormularioGenerar({
+      gestion: filtroGestion || new Date().getFullYear().toString(),
+      periodo: 'I',
+      carreraId: '',
+      planEstudioId: '',
+      semestres: [],
+      turnoIds: [],
+      paralelos: ['A'],
+      capacidad: '30',
+    });
+    setModalGenerarAbierto(true);
   };
 
-  const crear = async () => {
-    setGuardando(true);
-    try {
-      await api.post('/grupos', {
-        carreraId: parseInt(formularioNuevo.carreraId),
-        planEstudioId: parseInt(formularioNuevo.planEstudioId) || undefined,
-        materiaId: parseInt(formularioNuevo.materiaId) || undefined,
-        semestre: parseInt(formularioNuevo.semestre),
-        turnoId: parseInt(formularioNuevo.turnoId) || undefined,
-        paralelo: formularioNuevo.paralelo.toUpperCase(),
-        gestion: formularioNuevo.gestion,
-        periodo: formularioNuevo.periodo,
-        capacidad: parseInt(formularioNuevo.capacidad) || 30,
-      });
-      setModalAbierto(false);
-      obtenerGrupos();
-    } catch (error) {
-      console.error('Error al crear grupo:', error);
-    } finally {
-      setGuardando(false);
-    }
-  };
-
-  const generar = async () => {
-    if (!formularioGenerar.planEstudioId) {
-      setResultadoGenerar({ creados: 0, mensaje: 'Selecciona un plan de estudios' });
-      return;
-    }
-    setGuardando(true);
-    try {
-      const resultado = await api.post('/grupos/generar', {
-        gestion: formularioGenerar.gestion,
-        periodo: formularioGenerar.periodo,
-        turnoIds: formularioGenerar.turnoIds,
-        paralelos: formularioGenerar.paralelos,
-        planEstudioId: parseInt(formularioGenerar.planEstudioId),
-        capacidad: formularioGenerar.capacidad,
-      });
-      setResultadoGenerar(resultado.data);
-      if (resultado.data.creados > 0) {
-        obtenerGrupos();
-      }
-    } catch (error) {
-      console.error('Error al generar grupos:', error);
-      setResultadoGenerar({ creados: 0, mensaje: 'Error al generar grupos' });
-    } finally {
-      setGuardando(false);
-    }
-  };
-
-  const obtenerPlanesPorCarrera = async (carreraId: string) => {
+  const obtenerPlanesGenerar = async (carreraId: string) => {
+    setFormularioGenerar((actual) => ({ ...actual, carreraId, planEstudioId: '' }));
     if (!carreraId) {
-      setPlanesCarrera([]);
+      setPlanesGenerar([]);
       return;
     }
     try {
       const respuesta = await api.get(`/planes-estudio/actual/${carreraId}`);
-      setPlanesCarrera(respuesta.data || []);
+      const planes: PlanEstudio[] = respuesta.data || [];
+      setPlanesGenerar(planes);
+      if (planes.length === 1) {
+        setFormularioGenerar((actual) => ({ ...actual, planEstudioId: planes[0].id.toString() }));
+      }
     } catch (error) {
-      console.error('Error al obtener planes:', error);
-      setPlanesCarrera([]);
+      console.error('Error al obtener planes de estudio:', error);
+      setPlanesGenerar([]);
     }
   };
 
-  const eliminar = async () => {
+  const alternarEnArray = <T,>(lista: T[], valor: T): T[] =>
+    lista.includes(valor) ? lista.filter((elemento) => elemento !== valor) : [...lista, valor];
+
+  const generar = async () => {
+    if (!formularioGenerar.planEstudioId) {
+      setResultadoGenerar({ creados: 0, existentes: 0, mensaje: 'Selecciona un plan de estudios.' });
+      return;
+    }
+    setGuardando(true);
+    try {
+      const respuesta = await api.post('/grupos/generar', {
+        gestion: formularioGenerar.gestion,
+        periodo: formularioGenerar.periodo,
+        planEstudioId: Number(formularioGenerar.planEstudioId),
+        semestres: formularioGenerar.semestres,
+        turnoIds: formularioGenerar.turnoIds,
+        paralelos: formularioGenerar.paralelos,
+        capacidad: formularioGenerar.capacidad,
+      });
+      setResultadoGenerar(respuesta.data);
+      if (respuesta.data.creados > 0) {
+        obtenerGrupos();
+      }
+    } catch (error) {
+      console.error('Error al generar grupos:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) =>
+        setResultadoGenerar({ creados: 0, existentes: 0, mensaje: mensajeDeError(error, 'Error al generar grupos') }),
+      );
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  const confirmarEliminar = async () => {
     if (!grupoEliminando) return;
     setGuardando(true);
     try {
       await api.delete(`/grupos/${grupoEliminando.id}`);
-      setModalEliminarAbierto(false);
       setGrupoEliminando(null);
-      setGrupoSeleccionado(null);
       obtenerGrupos();
     } catch (error) {
       console.error('Error al eliminar grupo:', error);
       import('@/libreria/utilidades').then(({ mensajeDeError }) => {
         alert(mensajeDeError(error, 'Error al eliminar grupo'));
-      }).catch(() => {
-        alert('Error al eliminar grupo');
       });
     } finally {
       setGuardando(false);
     }
   };
 
-  const gruposFiltrados = grupos.filter(grupo => {
-    if (!consultaBusqueda) return true;
-    const busqueda = consultaBusqueda.toLowerCase();
-    return (
-      grupo.paralelo.toLowerCase().includes(busqueda) ||
-      grupo.turno?.nombre?.toLowerCase().includes(busqueda) ||
-      grupo.carrera?.nombre?.toLowerCase().includes(busqueda)
-    );
-  });
-
-  const obtenerSemestres = () => Array.from({ length: 10 }, (_, i) => ({
-    value: (i + 1).toString(),
-    etiqueta: `${i + 1}° Semestre`,
-  }));
+  const confirmarCambiarEstado = async () => {
+    if (!grupoCambiandoEstado) return;
+    setGuardando(true);
+    try {
+      const nuevoEstado = grupoCambiandoEstado.estado === 'activo' ? 'cerrado' : 'activo';
+      await api.patch(`/grupos/${grupoCambiandoEstado.id}/estado`, { estado: nuevoEstado });
+      setGrupoCambiandoEstado(null);
+      obtenerGrupos();
+    } catch (error) {
+      console.error('Error al cambiar estado del grupo:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
+        alert(mensajeDeError(error, 'Error al cambiar el estado del grupo'));
+      });
+    } finally {
+      setGuardando(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <Migas elementos={[{ etiqueta: 'Grupos' }]} />
 
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gestión de Grupos</h1>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">Grupos y Paralelos</h1>
         <div className="flex gap-2">
-          <Boton variante="contorno" onClick={() => setModalGenerarAbierto(true)}>
-            <BookOpen className="w-4 h-4 mr-2" />
-            Generar Grupos
+          <Boton variante="contorno" onClick={abrirGenerar}>
+            <Wand2 className="w-4 h-4 mr-2" />
+            Generar grupos
           </Boton>
-          <Boton onClick={() => setModalAbierto(true)}>
+          <Boton onClick={() => router.push('/grupos/nuevo')}>
             <Plus className="w-4 h-4 mr-2" />
-            Nuevo Grupo
+            Nuevo grupo
           </Boton>
         </div>
       </div>
 
       <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <TituloTarjeta>Lista de Grupos</TituloTarjeta>
-            <div className="flex-1 flex flex-col md:flex-row gap-4 md:justify-end">
-              <div className="relative w-full md:w-48">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Entrada
-                  placeholder="Buscar grupo..."
-                  className="pl-10"
-                  value={consultaBusqueda}
-                  onChange={(e) => setConsultaBusqueda(e.target.value)}
-                />
-              </div>
+          <div className="flex flex-col gap-4">
+            <div>
+              <TituloTarjeta>Filtros</TituloTarjeta>
+              <DescripcionTarjeta>Busca y filtra los grupos y paralelos registrados.</DescripcionTarjeta>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Selector
+                etiqueta="Gestión"
                 value={filtroGestion}
                 onChange={(e) => setFiltroGestion(e.target.value)}
                 opciones={[
                   { value: '', etiqueta: 'Todas las gestiones' },
-                  ...gestiones.map(gestion => ({ value: gestion.anio, etiqueta: gestion.anio }))
+                  ...gestiones.map((gestion) => ({ value: gestion.anio, etiqueta: gestion.anio })),
                 ]}
               />
               <Selector
+                etiqueta="Carrera"
                 value={filtroCarrera}
                 onChange={(e) => setFiltroCarrera(e.target.value)}
                 opciones={[
                   { value: '', etiqueta: 'Todas las carreras' },
-                  ...carreras.map(carrera => ({ value: carrera.id.toString(), etiqueta: carrera.nombre }))
+                  ...carreras.map((carrera) => ({ value: carrera.id.toString(), etiqueta: carrera.nombre })),
                 ]}
               />
               <Selector
+                etiqueta="Semestre"
                 value={filtroSemestre}
                 onChange={(e) => setFiltroSemestre(e.target.value)}
+                opciones={[{ value: '', etiqueta: 'Todos los semestres' }, ...obtenerSemestres()]}
+              />
+              <Selector
+                etiqueta="Turno"
+                value={filtroTurno}
+                onChange={(e) => setFiltroTurno(e.target.value)}
                 opciones={[
-                  { value: '', etiqueta: 'Todos los semestres' },
-                  ...obtenerSemestres()
+                  { value: '', etiqueta: 'Todos los turnos' },
+                  ...turnos.map((turno) => ({ value: turno.id.toString(), etiqueta: `${turno.codigo} - ${turno.nombre}` })),
                 ]}
               />
+              <Entrada
+                etiqueta="Paralelo"
+                value={filtroParalelo}
+                onChange={(e) => setFiltroParalelo(e.target.value.toUpperCase())}
+                placeholder="Ej.: A"
+                maxLength={5}
+              />
+              <Selector
+                etiqueta="Estado"
+                value={filtroEstado}
+                onChange={(e) => setFiltroEstado(e.target.value)}
+                opciones={[
+                  { value: '', etiqueta: 'Todos' },
+                  { value: 'activo', etiqueta: 'Activos' },
+                  { value: 'cerrado', etiqueta: 'Cerrados' },
+                ]}
+              />
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Búsqueda</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Entrada
+                    placeholder="Buscar por código o carrera..."
+                    className="pl-10"
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </EncabezadoTarjeta>
@@ -364,340 +374,252 @@ export default function PaginaGrupos() {
               <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
             </div>
           ) : (
-            <Tabla>
-              <EncabezadoTabla>
-                <FilaTabla>
-                  <CeldaEncabezado>Código</CeldaEncabezado>
-                  <CeldaEncabezado>Materia</CeldaEncabezado>
-                  <CeldaEncabezado>Sem</CeldaEncabezado>
-                  <CeldaEncabezado>Cap</CeldaEncabezado>
-                  <CeldaEncabezado>Acciones</CeldaEncabezado>
-                </FilaTabla>
-              </EncabezadoTabla>
-              <CuerpoTabla>
-                {gruposFiltrados.length === 0 ? (
+            <>
+              <Tabla>
+                <EncabezadoTabla>
                   <FilaTabla>
-                    <CeldaTabla colSpan={5} className="text-center py-8 text-gray-500">
-                      No se encontraron grupos
-                    </CeldaTabla>
+                    <CeldaEncabezado>Código</CeldaEncabezado>
+                    <CeldaEncabezado>Carrera</CeldaEncabezado>
+                    <CeldaEncabezado>Nivel / Semestre</CeldaEncabezado>
+                    <CeldaEncabezado>Turno</CeldaEncabezado>
+                    <CeldaEncabezado>Paralelo</CeldaEncabezado>
+                    <CeldaEncabezado>Capacidad</CeldaEncabezado>
+                    <CeldaEncabezado>Inscritos</CeldaEncabezado>
+                    <CeldaEncabezado>Cupos</CeldaEncabezado>
+                    <CeldaEncabezado>Estado</CeldaEncabezado>
+                    <CeldaEncabezado className="text-right">Acciones</CeldaEncabezado>
                   </FilaTabla>
-                ) : (
-                  gruposFiltrados.map((grupo) => (
-                    <FilaTabla
-                      key={grupo.id}
-                      className={grupoSeleccionado?.id === grupo.id ? 'bg-primary-50' : ''}
-                    >
-                      <CeldaTabla className="font-medium">
-                        <button
-                          onClick={() => obtenerDetallesGrupo(grupo)}
-                          className="text-primary-600 hover:underline text-left"
-                        >
-                          <div className="font-bold">{grupo.codigo}</div>
-                        </button>
-                      </CeldaTabla>
-                      <CeldaTabla>
-                        <div className="text-sm font-medium">{grupo.materia?.codigo || '-'}</div>
-                        <div className="text-xs text-gray-500">{grupo.materia?.nombre || '-'}</div>
-                      </CeldaTabla>
-                      <CeldaTabla>{grupo.semestre}°</CeldaTabla>
-                      <CeldaTabla>{grupo.capacidad}</CeldaTabla>
-                      <CeldaTabla>
-                        <div className="flex items-center gap-2">
-                          <Boton variante="fantasma" tamano="icono" onClick={() => router.push(`/grupos/${grupo.id}`)}>
-                            <Edit2 className="w-4 h-4" />
-                          </Boton>
-                          <Boton variante="fantasma" tamano="icono" onClick={() => {
-                            setGrupoEliminando(grupo);
-                            setModalEliminarAbierto(true);
-                          }}>
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </Boton>
-                        </div>
+                </EncabezadoTabla>
+                <CuerpoTabla>
+                  {grupos.length === 0 ? (
+                    <FilaTabla>
+                      <CeldaTabla colSpan={10} className="text-center py-8 text-gray-500">
+                        No se encontraron grupos
                       </CeldaTabla>
                     </FilaTabla>
-                  ))
-                )}
-              </CuerpoTabla>
-            </Tabla>
+                  ) : (
+                    grupos.map((grupo) => (
+                      <FilaTabla key={grupo.id}>
+                        <CeldaTabla className="font-medium">
+                          <button
+                            onClick={() => router.push(`/grupos/${grupo.id}`)}
+                            className="text-primary-600 hover:underline text-left font-bold"
+                          >
+                            {grupo.codigo}
+                          </button>
+                        </CeldaTabla>
+                        <CeldaTabla>
+                          <div className="text-sm font-medium">{grupo.carrera?.nombre || '-'}</div>
+                          <div className="text-xs text-gray-500">{grupo.carrera?.codigo || ''}</div>
+                        </CeldaTabla>
+                        <CeldaTabla>{grupo.semestre}.º semestre</CeldaTabla>
+                        <CeldaTabla>
+                          <div className="text-sm">{grupo.turno?.nombre || '-'}</div>
+                          <div className="text-xs text-gray-500">
+                            {grupo.turno ? `${grupo.turno.horaInicio} - ${grupo.turno.horaFin}` : ''}
+                          </div>
+                        </CeldaTabla>
+                        <CeldaTabla>{grupo.paralelo}</CeldaTabla>
+                        <CeldaTabla>{grupo.capacidad}</CeldaTabla>
+                        <CeldaTabla>{grupo.inscritos ?? 0}</CeldaTabla>
+                        <CeldaTabla>{grupo.cuposDisponibles ?? grupo.capacidad}</CeldaTabla>
+                        <CeldaTabla>
+                          <Insignia variante={grupo.estado === 'activo' ? 'exito' : 'secundario'}>
+                            {grupo.estado === 'activo' ? 'Activo' : 'Cerrado'}
+                          </Insignia>
+                        </CeldaTabla>
+                        <CeldaTabla>
+                          <div className="flex items-center justify-end gap-1">
+                            <Boton
+                              variante="fantasma"
+                              tamano="icono"
+                              title="Ver detalle"
+                              onClick={() => router.push(`/grupos/${grupo.id}`)}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Boton>
+                            <Boton
+                              variante="fantasma"
+                              tamano="icono"
+                              title={grupo.estado === 'activo' ? 'Cerrar grupo' : 'Reactivar grupo'}
+                              onClick={() => setGrupoCambiandoEstado(grupo)}
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Boton>
+                            <Boton
+                              variante="fantasma"
+                              tamano="icono"
+                              title="Eliminar"
+                              onClick={() => setGrupoEliminando(grupo)}
+                            >
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </Boton>
+                          </div>
+                        </CeldaTabla>
+                      </FilaTabla>
+                    ))
+                  )}
+                </CuerpoTabla>
+              </Tabla>
+              <p className="mt-4 text-sm text-gray-500">
+                Mostrando {grupos.length} de {total} grupo(s).
+              </p>
+            </>
           )}
         </ContenidoTarjeta>
       </Tarjeta>
 
-      {grupoSeleccionado && (
-        <Tarjeta variante="conBorde">
-          <EncabezadoTarjeta>
-            <div className="flex items-center justify-between">
-              <TituloTarjeta className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Detalles del Grupo: {grupoSeleccionado.paralelo} - {grupoSeleccionado.turno?.nombre}
-              </TituloTarjeta>
-              <Boton variante="fantasma" tamano="icono" onClick={() => setGrupoSeleccionado(null)}>
-                <ArrowLeft className="w-4 h-4" />
-              </Boton>
-            </div>
-          </EncabezadoTarjeta>
-          <ContenidoTarjeta>
-            {cargandoDetalles ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium mb-3 flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    Estudiantes ({estudiantesGrupo.length}/{grupoSeleccionado.capacidad})
-                  </h4>
-                  {estudiantesGrupo.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No hay estudiantes en este grupo</p>
-                  ) : (
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {estudiantesGrupo.map((estudianteGrupo) => (
-                        <div key={estudianteGrupo.id} className="p-3 bg-gray-50 rounded-lg">
-                          <p className="font-medium text-sm">
-                            {estudianteGrupo.estudiante?.persona?.nombres} {estudianteGrupo.estudiante?.persona?.apellidoPaterno}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {estudianteGrupo.estudiante?.persona?.ci} · {estudianteGrupo.estudiante?.codigoInscripcion}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <h4 className="font-medium mb-3 flex items-center gap-2">
-                    <UserCheck className="w-4 h-4" />
-                    Docentes Asignados
-                  </h4>
-                  {asignacionesGrupo.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No hay docentes asignados</p>
-                  ) : (
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {asignacionesGrupo.map((asignacion) => (
-                        <div key={asignacion.id} className="p-3 bg-gray-50 rounded-lg">
-                          <p className="font-medium text-sm">
-                            {asignacion.docente?.persona?.nombres} {asignacion.docente?.persona?.apellidoPaterno}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {asignacion.materia?.codigo} - {asignacion.materia?.nombre}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </ContenidoTarjeta>
-        </Tarjeta>
-      )}
-
-      <Modal abierto={modalAbierto} alCerrar={() => setModalAbierto(false)} titulo="Nuevo Grupo" tamano="grande">
-        <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Gestión *</label>
-              <Entrada
-                value={formularioNuevo.gestion}
-                onChange={(e) => setFormularioNuevo({ ...formularioNuevo, gestion: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Periodo *</label>
-              <select
-                className="w-full h-10 px-3 border rounded-lg text-sm"
-                value={formularioNuevo.periodo}
-                onChange={(e) => setFormularioNuevo({ ...formularioNuevo, periodo: e.target.value })}
-              >
-                <option value="I">I (Primer Semestre)</option>
-                <option value="II">II (Segundo Semestre)</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Paralelo *</label>
-              <Entrada
-                value={formularioNuevo.paralelo}
-                onChange={(e) => setFormularioNuevo({ ...formularioNuevo, paralelo: e.target.value.toUpperCase() })}
-                placeholder="A"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Semestre *</label>
-              <select
-                className="w-full h-10 px-3 border rounded-lg text-sm"
-                value={formularioNuevo.semestre}
-                onChange={(e) => setFormularioNuevo({ ...formularioNuevo, semestre: e.target.value })}
-              >
-                <option value="">Seleccionar...</option>
-                {obtenerSemestres().map(semestre => (
-                  <option key={semestre.value} value={semestre.value}>{semestre.etiqueta}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad</label>
-              <Entrada
-                type="number"
-                value={formularioNuevo.capacidad}
-                onChange={(e) => setFormularioNuevo({ ...formularioNuevo, capacidad: e.target.value })}
-                placeholder="30"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Carrera *</label>
-            <select
-              className="w-full h-10 px-3 border rounded-lg text-sm"
-              value={formularioNuevo.carreraId}
-              onChange={(e) => setFormularioNuevo({ ...formularioNuevo, carreraId: e.target.value })}
-            >
-              <option value="">Seleccionar...</option>
-              {carreras.map(carrera => (
-                <option key={carrera.id} value={carrera.id}>{carrera.nombre}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Boton variante="contorno" onClick={() => setModalAbierto(false)}>
-              Cancelar
-            </Boton>
-            <Boton onClick={crear} disabled={guardando || !formularioNuevo.carreraId || !formularioNuevo.semestre || !formularioNuevo.paralelo}>
-              {guardando ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Crear Grupo'}
-            </Boton>
-          </div>
-        </div>
-      </Modal>
-
-      <ModalConfirmacion
-        abierto={modalEliminarAbierto}
-        alCerrar={() => { setModalEliminarAbierto(false); setGrupoEliminando(null); }}
-        alConfirmar={eliminar}
-        titulo="Eliminar Grupo"
-        mensaje={`¿Estás seguro de eliminar el grupo "${grupoEliminando?.paralelo}"?`}
-        textoConfirmar="Eliminar"
-        variante="destructivo"
-        cargando={guardando}
-      />
-
+      {/* Modal Generar grupos */}
       <Modal
         abierto={modalGenerarAbierto}
-        alCerrar={() => { setModalGenerarAbierto(false); setResultadoGenerar(null); setPlanesCarrera([]); }}
-        titulo="Generar Grupos"
+        alCerrar={() => {
+          setModalGenerarAbierto(false);
+          setResultadoGenerar(null);
+        }}
+        titulo="Generar grupos"
+        tamano="grande"
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            Genera grupos automáticamente para las materias de un plan de estudios.
+            Genera automáticamente los grupos para los semestres, turnos y paralelos seleccionados de un plan de estudios.
           </p>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Gestión *</label>
-              <Entrada
-                value={formularioGenerar.gestion}
-                onChange={(e) => setFormularioGenerar({ ...formularioGenerar, gestion: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Periodo *</label>
-              <select
-                className="w-full h-10 px-3 border rounded-lg text-sm"
-                value={formularioGenerar.periodo}
-                onChange={(e) => setFormularioGenerar({ ...formularioGenerar, periodo: e.target.value })}
-              >
-                <option value="I">I</option>
-                <option value="II">II</option>
-              </select>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Entrada
+              etiqueta="Gestión *"
+              value={formularioGenerar.gestion}
+              onChange={(e) => setFormularioGenerar({ ...formularioGenerar, gestion: e.target.value })}
+              placeholder="2024"
+            />
+            <Selector
+              etiqueta="Periodo *"
+              value={formularioGenerar.periodo}
+              onChange={(e) => setFormularioGenerar({ ...formularioGenerar, periodo: e.target.value })}
+              opciones={[
+                { value: 'I', etiqueta: 'I (Primer semestre)' },
+                { value: 'II', etiqueta: 'II (Segundo semestre)' },
+              ]}
+            />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Carrera *</label>
-            <select
-              className="w-full h-10 px-3 border rounded-lg text-sm"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Selector
+              etiqueta="Carrera *"
               value={formularioGenerar.carreraId}
-              onChange={(e) => {
-                setFormularioGenerar({ ...formularioGenerar, carreraId: e.target.value, planEstudioId: '' });
-                obtenerPlanesPorCarrera(e.target.value);
-              }}
-            >
-              <option value="">Seleccionar...</option>
-              {carreras.map(carrera => (
-                <option key={carrera.id} value={carrera.id}>{carrera.codigo} - {carrera.nombre}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Plan de Estudios *</label>
-            <select
-              className="w-full h-10 px-3 border rounded-lg text-sm"
+              onChange={(e) => obtenerPlanesGenerar(e.target.value)}
+              opciones={[
+                { value: '', etiqueta: 'Seleccionar carrera...' },
+                ...carreras.map((carrera) => ({
+                  value: carrera.id.toString(),
+                  etiqueta: `${carrera.codigo} - ${carrera.nombre}`,
+                })),
+              ]}
+            />
+            <Selector
+              etiqueta="Plan de estudios *"
               value={formularioGenerar.planEstudioId}
               onChange={(e) => setFormularioGenerar({ ...formularioGenerar, planEstudioId: e.target.value })}
               disabled={!formularioGenerar.carreraId}
-            >
-              <option value="">Seleccionar...</option>
-              {planesCarrera.map(plan => (
-                <option key={plan.id} value={plan.id}>{plan.numeroRm}</option>
-              ))}
-            </select>
+              opciones={[
+                { value: '', etiqueta: formularioGenerar.carreraId ? 'Seleccionar plan...' : 'Primero seleccione una carrera' },
+                ...planesGenerar.map((plan) => ({ value: plan.id.toString(), etiqueta: `RM ${plan.numeroRm}` })),
+              ]}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Semestres *</label>
+            <div className="flex flex-wrap gap-2">
+              {obtenerSemestres().map((semestre) => {
+                const valor = Number(semestre.value);
+                const activo = formularioGenerar.semestres.includes(valor);
+                return (
+                  <button
+                    key={semestre.value}
+                    type="button"
+                    onClick={() =>
+                      setFormularioGenerar({
+                        ...formularioGenerar,
+                        semestres: alternarEnArray(formularioGenerar.semestres, valor),
+                      })
+                    }
+                    className={
+                      'px-3 py-1.5 rounded-full border text-sm transition-colors ' +
+                      (activo
+                        ? 'bg-primary-600 border-primary-600 text-white'
+                        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50')
+                    }
+                  >
+                    {semestre.etiqueta}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Turnos *</label>
             <div className="flex flex-wrap gap-2">
-              {turnos.map(turno => (
-                <label key={turno.id} className="flex items-center gap-1 px-3 py-1 border rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input
-                    type="checkbox"
-                    checked={formularioGenerar.turnoIds.includes(turno.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setFormularioGenerar({ ...formularioGenerar, turnoIds: [...formularioGenerar.turnoIds, turno.id] });
-                      } else {
-                        setFormularioGenerar({ ...formularioGenerar, turnoIds: formularioGenerar.turnoIds.filter(id => id !== turno.id) });
-                      }
-                    }}
-                  />
-                  <span className="text-sm font-medium">{turno.codigo}</span>
-                  <span className="text-xs text-gray-500">({turno.nombre})</span>
-                </label>
-              ))}
+              {turnos.map((turno) => {
+                const activo = formularioGenerar.turnoIds.includes(turno.id);
+                return (
+                  <button
+                    key={turno.id}
+                    type="button"
+                    onClick={() =>
+                      setFormularioGenerar({
+                        ...formularioGenerar,
+                        turnoIds: alternarEnArray(formularioGenerar.turnoIds, turno.id),
+                      })
+                    }
+                    className={
+                      'px-3 py-1.5 rounded-full border text-sm transition-colors ' +
+                      (activo
+                        ? 'bg-primary-600 border-primary-600 text-white'
+                        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50')
+                    }
+                  >
+                    {turno.codigo} ({turno.nombre})
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Paralelos *</label>
             <div className="flex flex-wrap gap-2">
-              {['A', 'B', 'C'].map(paralelo => (
-                <label key={paralelo} className="flex items-center gap-1 px-3 py-1 border rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input
-                    type="checkbox"
-                    checked={formularioGenerar.paralelos.includes(paralelo)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setFormularioGenerar({ ...formularioGenerar, paralelos: [...formularioGenerar.paralelos, paralelo] });
-                      } else {
-                        setFormularioGenerar({ ...formularioGenerar, paralelos: formularioGenerar.paralelos.filter(p => p !== paralelo) });
-                      }
-                    }}
-                  />
-                  <span className="text-sm font-medium">{paralelo}</span>
-                </label>
-              ))}
+              {['A', 'B', 'C'].map((paralelo) => {
+                const activo = formularioGenerar.paralelos.includes(paralelo);
+                return (
+                  <button
+                    key={paralelo}
+                    type="button"
+                    onClick={() =>
+                      setFormularioGenerar({
+                        ...formularioGenerar,
+                        paralelos: alternarEnArray(formularioGenerar.paralelos, paralelo),
+                      })
+                    }
+                    className={
+                      'px-3 py-1.5 rounded-full border text-sm transition-colors ' +
+                      (activo
+                        ? 'bg-primary-600 border-primary-600 text-white'
+                        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50')
+                    }
+                  >
+                    {paralelo}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad por grupo</label>
+          <div className="md:w-1/3">
             <Entrada
+              etiqueta="Capacidad por grupo"
               type="number"
+              min={1}
               value={formularioGenerar.capacidad}
               onChange={(e) => setFormularioGenerar({ ...formularioGenerar, capacidad: e.target.value })}
               placeholder="30"
@@ -705,24 +627,71 @@ export default function PaginaGrupos() {
           </div>
 
           {resultadoGenerar && (
-            <div className={`p-3 rounded-lg ${resultadoGenerar.creados > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-              {resultadoGenerar.mensaje}
+            <div
+              className={
+                'p-3 rounded-lg text-sm ' +
+                (resultadoGenerar.creados > 0 ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700')
+              }
+            >
+              <p>{resultadoGenerar.mensaje}</p>
+              <p className="mt-1 font-medium">
+                Creados: {resultadoGenerar.creados} · Existentes: {resultadoGenerar.existentes}
+              </p>
             </div>
           )}
 
           <div className="flex justify-end gap-3 pt-4">
-            <Boton variante="contorno" onClick={() => { setModalGenerarAbierto(false); setResultadoGenerar(null); setPlanesCarrera([]); }}>
+            <Boton
+              variante="contorno"
+              onClick={() => {
+                setModalGenerarAbierto(false);
+                setResultadoGenerar(null);
+              }}
+            >
               Cerrar
             </Boton>
             <Boton
               onClick={generar}
-              disabled={guardando || !formularioGenerar.planEstudioId || formularioGenerar.turnoIds.length === 0 || formularioGenerar.paralelos.length === 0}
+              cargando={guardando}
+              disabled={
+                !formularioGenerar.planEstudioId ||
+                formularioGenerar.semestres.length === 0 ||
+                formularioGenerar.turnoIds.length === 0 ||
+                formularioGenerar.paralelos.length === 0
+              }
             >
-              {guardando ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Generar Grupos'}
+              Generar grupos
             </Boton>
           </div>
         </div>
       </Modal>
+
+      {/* Confirmación de eliminación */}
+      <ModalConfirmacion
+        abierto={!!grupoEliminando}
+        alCerrar={() => setGrupoEliminando(null)}
+        alConfirmar={confirmarEliminar}
+        titulo="Eliminar grupo"
+        mensaje={`¿Estás seguro de eliminar el grupo "${grupoEliminando?.codigo}"? Esta acción no se puede deshacer.`}
+        textoConfirmar="Eliminar"
+        variante="destructivo"
+        cargando={guardando}
+      />
+
+      {/* Confirmación de cambio de estado */}
+      <ModalConfirmacion
+        abierto={!!grupoCambiandoEstado}
+        alCerrar={() => setGrupoCambiandoEstado(null)}
+        alConfirmar={confirmarCambiarEstado}
+        titulo={grupoCambiandoEstado?.estado === 'activo' ? 'Cerrar grupo' : 'Reactivar grupo'}
+        mensaje={
+          grupoCambiandoEstado?.estado === 'activo'
+            ? `El grupo "${grupoCambiandoEstado?.codigo}" pasará a estado cerrado.`
+            : `El grupo "${grupoCambiandoEstado?.codigo}" volverá a estar activo.`
+        }
+        textoConfirmar={grupoCambiandoEstado?.estado === 'activo' ? 'Cerrar grupo' : 'Reactivar'}
+        cargando={guardando}
+      />
     </div>
   );
 }
