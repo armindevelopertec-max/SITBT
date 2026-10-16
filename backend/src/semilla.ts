@@ -68,7 +68,7 @@ async function sembrar() {
     let idPersona: number;
     if (resultadoPersona.length === 0) {
       const resultadoInsercion: any[] = await ejecutorConsultas.query(
-        `INSERT INTO personas (ci, nombres, apellido_paterno, apellido_materno, fecha_nacimiento, genero, estado_civil, nacionalidad, correo, estado)
+        `INSERT INTO personas (ci, nombres, apellido_paterno, apellido_materno, fecha_nacimiento, genero, "estadoCivil", nacionalidad, correo, estado)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'activo')
          RETURNING id`,
         ['0000001', 'Administrador', 'Sistema', 'SITBT', '1990-01-01', 'M', 'Soltera(o)', 'Boliviana', 'admin@sitbt.edu.bo']
@@ -90,7 +90,7 @@ async function sembrar() {
     if (resultadoUsuario.length === 0) {
       const hashContrasena = await bcrypt.hash('admin123', 10);
       const resultadoInsercion: any[] = await ejecutorConsultas.query(
-        `INSERT INTO usuarios (persona_id, nombre_usuario, contrasena_hash, estado)
+        `INSERT INTO usuarios ("personaId", nombre_usuario, contrasena_hash, estado)
          VALUES ($1, $2, $3, 'activo')
          RETURNING id`,
         [idPersona, 'admin', hashContrasena]
