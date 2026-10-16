@@ -9,6 +9,7 @@
     "start:dev": "nest start --watch",
     "start:prod": "node dist/principal",
     "semilla": "ts-node src/semilla.ts",
+    "semilla:docentes": "ts-node src/semilla-docentes.ts",
     "generar-usuarios": "ts-node src/generar-usuarios.ts"
   },
   "dependencies": {
