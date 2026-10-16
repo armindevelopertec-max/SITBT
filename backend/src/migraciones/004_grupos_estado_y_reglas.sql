@@ -12,7 +12,7 @@ BEGIN
     SELECT 1 FROM pg_constraint WHERE lower(conname) = 'uq_grupo_combinacion'
   ) THEN
     ALTER TABLE grupos
-      ADD CONSTRAINT UQ_grupo_combinacion
+      ADD CONSTRAINT "UQ_grupo_combinacion"
       UNIQUE (gestion, carrera_id, semestre, turno_id, paralelo);
   END IF;
 END $$;

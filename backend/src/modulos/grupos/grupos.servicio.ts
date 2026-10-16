@@ -51,18 +51,20 @@ export class ServicioGrupos {
     private readonly fuenteDatos: DataSource,
   ) {}
 
-  /** Genera el código de grupo con formato CARRERA-GESTION-SS-T-P. */
+  /** Genera el código de grupo con formato CARRERA-GESTION-PERIODO-SS-T-P. */
   private async generarCodigo(
     carrera: Carrera,
     semestre: number,
     turno: Turno,
     paralelo: string,
     gestion: string,
+    periodo: string,
   ): Promise<string> {
     const codigoCarrera = (carrera?.codigo || 'XXX').toUpperCase();
+    const periodoNormalizado = (periodo || 'I').trim().toUpperCase();
     const semestreDosDigitos = String(semestre).padStart(2, '0');
     const inicialTurno = (turno?.codigo || 'X').trim().charAt(0).toUpperCase();
-    const codigo = `${codigoCarrera}-${gestion}-${semestreDosDigitos}-${inicialTurno}-${paralelo}`;
+    const codigo = `${codigoCarrera}-${gestion}-${periodoNormalizado}-${semestreDosDigitos}-${inicialTurno}-${paralelo}`;
 
     const existente = await this.repositorioGrupo.findOne({ where: { codigo } });
     if (existente) {
@@ -126,10 +128,13 @@ export class ServicioGrupos {
 
     const plan = await this.resolverPlanDeCarrera(crearGrupoDto.carreraId, crearGrupoDto.planEstudioId);
 
+    const periodo = (crearGrupoDto.periodo || 'I').trim().toUpperCase();
+
     const existente = await this.repositorioGrupo.findOne({
       where: {
         gestion: crearGrupoDto.gestion,
         carreraId: crearGrupoDto.carreraId,
+        periodo,
         semestre: crearGrupoDto.semestre,
         turnoId: crearGrupoDto.turnoId,
         paralelo: crearGrupoDto.paralelo,
@@ -137,7 +142,7 @@ export class ServicioGrupos {
     });
     if (existente) {
       throw new ConflictException(
-        `Ya existe un grupo para la combinación gestión ${crearGrupoDto.gestion}, carrera ${carrera.codigo}, semestre ${crearGrupoDto.semestre}, turno ${turno.codigo}, paralelo ${crearGrupoDto.paralelo}`,
+        `Ya existe un grupo para la combinación gestión ${crearGrupoDto.gestion}, periodo ${periodo}, carrera ${carrera.codigo}, semestre ${crearGrupoDto.semestre}, turno ${turno.codigo}, paralelo ${crearGrupoDto.paralelo}`,
       );
     }
 
@@ -147,6 +152,7 @@ export class ServicioGrupos {
       turno,
       crearGrupoDto.paralelo,
       crearGrupoDto.gestion,
+      periodo,
     );
 
     const grupo = this.repositorioGrupo.create({
@@ -157,7 +163,7 @@ export class ServicioGrupos {
       turnoId: crearGrupoDto.turnoId,
       paralelo: crearGrupoDto.paralelo,
       gestion: crearGrupoDto.gestion,
-      periodo: crearGrupoDto.periodo || 'I',
+      periodo,
       capacidad: crearGrupoDto.capacidad ?? 30,
       estado: EstadoGrupo.ACTIVO,
       ...(crearGrupoDto.materiaId ? { materiaId: crearGrupoDto.materiaId } : {}),
@@ -185,6 +191,7 @@ export class ServicioGrupos {
     }
 
     const capacidad = parseInt(dto.capacidad || '30', 10) || 30;
+    const periodo = (dto.periodo || 'I').trim().toUpperCase();
     let creados = 0;
     let existentes = 0;
 
@@ -195,6 +202,7 @@ export class ServicioGrupos {
             where: {
               gestion: dto.gestion,
               carreraId: plan.carreraId,
+              periodo,
               semestre,
               turnoId,
               paralelo,
@@ -210,7 +218,7 @@ export class ServicioGrupos {
             continue;
           }
 
-          const codigo = await this.generarCodigo(carrera, semestre, turno, paralelo, dto.gestion);
+          const codigo = await this.generarCodigo(carrera, semestre, turno, paralelo, dto.gestion, periodo);
 
           await this.repositorioGrupo.save(
             this.repositorioGrupo.create({
@@ -221,7 +229,7 @@ export class ServicioGrupos {
               turnoId,
               paralelo,
               gestion: dto.gestion,
-              periodo: dto.periodo || 'I',
+              periodo,
               capacidad,
               estado: EstadoGrupo.ACTIVO,
             }),
@@ -341,6 +349,7 @@ export class ServicioGrupos {
     const nuevaCombinacion = {
       gestion: actualizarGrupoDto.gestion ?? grupo.gestion,
       carreraId: actualizarGrupoDto.carreraId ?? grupo.carreraId,
+      periodo: (actualizarGrupoDto.periodo ?? grupo.periodo ?? 'I').trim().toUpperCase(),
       semestre: actualizarGrupoDto.semestre ?? grupo.semestre,
       turnoId: actualizarGrupoDto.turnoId ?? grupo.turnoId,
       paralelo: actualizarGrupoDto.paralelo ?? grupo.paralelo,
@@ -349,6 +358,7 @@ export class ServicioGrupos {
     const combinacionCambia =
       nuevaCombinacion.gestion !== grupo.gestion ||
       nuevaCombinacion.carreraId !== grupo.carreraId ||
+      nuevaCombinacion.periodo !== grupo.periodo ||
       nuevaCombinacion.semestre !== grupo.semestre ||
       nuevaCombinacion.turnoId !== grupo.turnoId ||
       nuevaCombinacion.paralelo !== grupo.paralelo;
@@ -357,7 +367,7 @@ export class ServicioGrupos {
       const colision = await this.repositorioGrupo.findOne({ where: nuevaCombinacion });
       if (colision && colision.id !== id) {
         throw new ConflictException(
-          'Ya existe otro grupo con la misma gestión, carrera, semestre, turno y paralelo',
+          'Ya existe otro grupo con la misma gestión, periodo, carrera, semestre, turno y paralelo',
         );
       }
 
@@ -378,10 +388,12 @@ export class ServicioGrupos {
         turno,
         nuevaCombinacion.paralelo,
         nuevaCombinacion.gestion,
+        nuevaCombinacion.periodo,
       );
     }
 
     Object.assign(grupo, actualizarGrupoDto);
+    grupo.periodo = nuevaCombinacion.periodo;
     await this.repositorioGrupo.save(grupo);
     return this.obtenerUno(id);
   }

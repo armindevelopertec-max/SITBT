@@ -879,8 +879,8 @@ export default function PaginaDetalleGrupo() {
               value={datosEditar.periodo}
               onChange={(e) => setDatosEditar({ ...datosEditar, periodo: e.target.value })}
               opciones={[
-                { value: 'I', etiqueta: 'I (Primer semestre)' },
-                { value: 'II', etiqueta: 'II (Segundo semestre)' },
+                { value: 'I', etiqueta: 'Periodo I' },
+                { value: 'II', etiqueta: 'Periodo II' },
               ]}
             />
             <Entrada

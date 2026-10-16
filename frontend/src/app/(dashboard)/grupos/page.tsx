@@ -512,8 +512,8 @@ export default function PaginaGrupos() {
               value={formularioGenerar.periodo}
               onChange={(e) => setFormularioGenerar({ ...formularioGenerar, periodo: e.target.value })}
               opciones={[
-                { value: 'I', etiqueta: 'I (Primer semestre)' },
-                { value: 'II', etiqueta: 'II (Segundo semestre)' },
+                { value: 'I', etiqueta: 'Periodo I' },
+                { value: 'II', etiqueta: 'Periodo II' },
               ]}
             />
           </div>

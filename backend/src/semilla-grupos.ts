@@ -147,7 +147,7 @@ async function sembrarGrupos() {
         continue;
       }
 
-      const clave = `${GESTION}|${carreraInfo.id}|${semestre}|${turnoId}|${paralelo}`;
+      const clave = `${GESTION}|${PERIODO}|${carreraInfo.id}|${semestre}|${turnoId}|${paralelo}`;
       if (!combinaciones.has(clave)) {
         combinaciones.set(clave, {
           carreraId: carreraInfo.id,
@@ -170,12 +170,12 @@ async function sembrarGrupos() {
       }
 
       const semestreDosDigitos = String(combo.semestre).padStart(2, '0');
-      const codigo = `${combo.codigoCarrera}-${GESTION}-${semestreDosDigitos}-${combo.inicialTurno}-${combo.paralelo}`;
+      const codigo = `${combo.codigoCarrera}-${GESTION}-${PERIODO}-${semestreDosDigitos}-${combo.inicialTurno}-${combo.paralelo}`;
 
       const existente: any[] = await ejecutor.query(
         `SELECT id FROM grupos
-         WHERE gestion = $1 AND carrera_id = $2 AND semestre = $3 AND turno_id = $4 AND paralelo = $5`,
-        [GESTION, combo.carreraId, combo.semestre, combo.turnoId, combo.paralelo],
+         WHERE gestion = $1 AND carrera_id = $2 AND semestre = $3 AND turno_id = $4 AND paralelo = $5 AND periodo = $6`,
+        [GESTION, combo.carreraId, combo.semestre, combo.turnoId, combo.paralelo, PERIODO],
       );
 
       if (existente.length > 0) {
@@ -236,7 +236,7 @@ async function sembrarGrupos() {
       }
       const estudianteId = estudiante[0].id;
 
-      const clave = `${GESTION}|${carreraInfo.id}|${semestre}|${turnoId}|${paralelo}`;
+      const clave = `${GESTION}|${PERIODO}|${carreraInfo.id}|${semestre}|${turnoId}|${paralelo}`;
       const grupoId = mapaGrupos.get(clave);
       if (!grupoId) {
         continue;

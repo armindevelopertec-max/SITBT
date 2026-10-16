@@ -18,7 +18,7 @@ export enum EstadoGrupo {
   CERRADO = 'cerrado',
 }
 
-@Unique('UQ_grupo_combinacion', ['gestion', 'carreraId', 'semestre', 'turnoId', 'paralelo'])
+@Unique('UQ_grupo_combinacion', ['gestion', 'carreraId', 'periodo', 'semestre', 'turnoId', 'paralelo'])
 @Entity('grupos')
 export class Grupo {
   @PrimaryGeneratedColumn()
