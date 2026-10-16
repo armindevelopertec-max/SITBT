@@ -565,6 +565,7 @@ export default function PaginaDetalleGrupo() {
             <DatoResumen etiqueta="Carrera" valor={grupo.carrera?.nombre || '-'} />
             <DatoResumen etiqueta="Nivel" valor="Técnico Superior" />
             <DatoResumen etiqueta="Semestre" valor={`${grupo.semestre}.º semestre`} />
+            <DatoResumen etiqueta="Periodo" valor={`Periodo ${grupo.periodo || 'I'}`} />
             <DatoResumen etiqueta="Turno" valor={grupo.turno?.nombre || '-'} />
             <DatoResumen etiqueta="Paralelo" valor={grupo.paralelo} />
             <DatoResumen etiqueta="Código" valor={grupo.codigo} />

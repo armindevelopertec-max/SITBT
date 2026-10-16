@@ -86,6 +86,7 @@ export default function PaginaGrupos() {
   const [filtroGestion, setFiltroGestion] = useState('');
   const [filtroCarrera, setFiltroCarrera] = useState('');
   const [filtroSemestre, setFiltroSemestre] = useState('');
+  const [filtroPeriodo, setFiltroPeriodo] = useState('');
   const [filtroTurno, setFiltroTurno] = useState('');
   const [filtroParalelo, setFiltroParalelo] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
@@ -120,7 +121,7 @@ export default function PaginaGrupos() {
   useEffect(() => {
     obtenerGrupos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filtroGestion, filtroCarrera, filtroSemestre, filtroTurno, filtroParalelo, filtroEstado, busquedaAplicada]);
+  }, [filtroGestion, filtroCarrera, filtroSemestre, filtroPeriodo, filtroTurno, filtroParalelo, filtroEstado, busquedaAplicada]);
 
   // Debounce del buscador
   useEffect(() => {
@@ -156,6 +157,7 @@ export default function PaginaGrupos() {
       if (filtroGestion) parametros.gestion = filtroGestion;
       if (filtroCarrera) parametros.carreraId = Number(filtroCarrera);
       if (filtroSemestre) parametros.semestre = Number(filtroSemestre);
+      if (filtroPeriodo) parametros.periodo = filtroPeriodo;
       if (filtroTurno) parametros.turnoId = Number(filtroTurno);
       if (filtroParalelo) parametros.paralelo = filtroParalelo.toUpperCase();
       if (filtroEstado) parametros.estado = filtroEstado;
@@ -328,6 +330,16 @@ export default function PaginaGrupos() {
                 opciones={[{ value: '', etiqueta: 'Todos los semestres' }, ...obtenerSemestres()]}
               />
               <Selector
+                etiqueta="Periodo"
+                value={filtroPeriodo}
+                onChange={(e) => setFiltroPeriodo(e.target.value)}
+                opciones={[
+                  { value: '', etiqueta: 'Todos los periodos' },
+                  { value: 'I', etiqueta: 'Periodo I' },
+                  { value: 'II', etiqueta: 'Periodo II' },
+                ]}
+              />
+              <Selector
                 etiqueta="Turno"
                 value={filtroTurno}
                 onChange={(e) => setFiltroTurno(e.target.value)}
@@ -381,6 +393,7 @@ export default function PaginaGrupos() {
                     <CeldaEncabezado>Código</CeldaEncabezado>
                     <CeldaEncabezado>Carrera</CeldaEncabezado>
                     <CeldaEncabezado>Nivel / Semestre</CeldaEncabezado>
+                    <CeldaEncabezado>Periodo</CeldaEncabezado>
                     <CeldaEncabezado>Turno</CeldaEncabezado>
                     <CeldaEncabezado>Paralelo</CeldaEncabezado>
                     <CeldaEncabezado>Capacidad</CeldaEncabezado>
@@ -393,7 +406,7 @@ export default function PaginaGrupos() {
                 <CuerpoTabla>
                   {grupos.length === 0 ? (
                     <FilaTabla>
-                      <CeldaTabla colSpan={10} className="text-center py-8 text-gray-500">
+                      <CeldaTabla colSpan={11} className="text-center py-8 text-gray-500">
                         No se encontraron grupos
                       </CeldaTabla>
                     </FilaTabla>
@@ -413,6 +426,9 @@ export default function PaginaGrupos() {
                           <div className="text-xs text-gray-500">{grupo.carrera?.codigo || ''}</div>
                         </CeldaTabla>
                         <CeldaTabla>{grupo.semestre}.º semestre</CeldaTabla>
+                        <CeldaTabla>
+                          <Insignia variante="primario">Periodo {grupo.periodo || 'I'}</Insignia>
+                        </CeldaTabla>
                         <CeldaTabla>
                           <div className="text-sm">{grupo.turno?.nombre || '-'}</div>
                           <div className="text-xs text-gray-500">
