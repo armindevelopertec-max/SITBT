@@ -45,6 +45,9 @@ export class Pago {
   @Column({ type: 'varchar', length: 10 })
   gestion: string;
 
+  @Column({ type: 'varchar', length: 10, nullable: true, name: 'periodo' })
+  periodo: string;
+
   @Column({ type: 'decimal', precision: 10, scale: 2, name: 'monto' })
   monto: number;
 

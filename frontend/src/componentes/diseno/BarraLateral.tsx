@@ -91,7 +91,7 @@ const seccionesMenu: SeccionMenu[] = [
         roles: ['administrador', 'secretaria', 'director_academico', 'docente'],
       },
       {
-        titulo: 'Pagos *',
+        titulo: 'Pagos',
         href: '/pagos',
         icono: <CreditCard className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'rector'],

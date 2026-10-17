@@ -48,10 +48,15 @@ export class ControladorPreinscripcion {
   obtenerGruposPorCarreraYSemestre(
     @Query('carreraId') carreraId: number,
     @Query('gestion') gestion: string,
-    @Query('semestre') semestre: number,
+    @Query('semestre') semestre?: number,
     @Query('turnoId') turnoId?: number,
   ) {
-    return this.servicio.obtenerGruposPorCarreraYSemestre(carreraId, gestion, semestre, turnoId ? +turnoId : undefined);
+    return this.servicio.obtenerGruposPorCarreraYSemestre(
+      carreraId,
+      gestion,
+      semestre ? +semestre : undefined,
+      turnoId ? +turnoId : undefined,
+    );
   }
 
   @Get('abrir-periodo')

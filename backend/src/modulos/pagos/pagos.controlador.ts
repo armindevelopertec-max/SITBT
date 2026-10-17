@@ -37,6 +37,7 @@ export class ControladorPagos {
     @Query('estado') estado?: EstadoPago,
     @Query('estudianteId') estudianteId?: number,
     @Query('conceptoId') conceptoId?: number,
+    @Query('periodo') periodo?: string,
   ) {
     return this.servicio.obtenerTodos(
       +pagina,
@@ -45,6 +46,7 @@ export class ControladorPagos {
       estado,
       estudianteId ? +estudianteId : undefined,
       conceptoId ? +conceptoId : undefined,
+      periodo,
     );
   }
 

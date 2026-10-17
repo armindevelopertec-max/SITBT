@@ -35,8 +35,15 @@ export class ControladorEstudiantes {
     @Query('limite') limite = 20,
     @Query('estado') estado?: EstadoEstudiante,
     @Query('carreraId') carreraId?: number,
+    @Query('buscar') buscar?: string,
   ) {
-    return this.servicioEstudiantes.obtenerTodos(+pagina, +limite, estado, carreraId ? +carreraId : undefined);
+    return this.servicioEstudiantes.obtenerTodos(
+      +pagina,
+      +limite,
+      estado,
+      carreraId ? +carreraId : undefined,
+      buscar,
+    );
   }
 
   @Get('estadisticas')

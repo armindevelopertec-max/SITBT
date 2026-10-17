@@ -37,6 +37,7 @@ export class ServicioPagos {
     estado?: EstadoPago,
     estudianteId?: number,
     conceptoId?: number,
+    periodo?: string,
   ): Promise<{ datos: Pago[]; total: number; pagina: number; limite: number }> {
     const consulta = this.repositorioPago
       .createQueryBuilder('pago')
@@ -47,6 +48,10 @@ export class ServicioPagos {
 
     if (gestion) {
       consulta.andWhere('pago.gestion = :gestion', { gestion });
+    }
+
+    if (periodo) {
+      consulta.andWhere('pago.periodo = :periodo', { periodo });
     }
 
     if (estado) {

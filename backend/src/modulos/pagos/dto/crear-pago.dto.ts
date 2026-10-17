@@ -24,6 +24,12 @@ export class CrearPagoDto {
   @MaxLength(10)
   gestion: string;
 
+  @ApiPropertyOptional({ example: 'I', description: 'Período dentro de la gestión (I o II)' })
+  @IsString()
+  @IsOptional()
+  @MaxLength(10)
+  periodo?: string;
+
   @ApiProperty({ example: 100.50 })
   @IsNumber()
   monto: number;

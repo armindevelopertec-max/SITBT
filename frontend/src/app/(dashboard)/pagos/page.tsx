@@ -1,22 +1,37 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { Migas } from '@/componentes/iu/migas';
-import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
+import { Tarjeta, ContenidoTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
-import { Entrada } from '@/componentes/iu/entrada';
+import { Entrada, AreaTexto } from '@/componentes/iu/entrada';
 import { Selector } from '@/componentes/iu/selector';
 import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/componentes/iu/tabla';
 import { Insignia } from '@/componentes/iu/insignia';
 import { Modal, ModalConfirmacion } from '@/componentes/iu/modal';
 import { api } from '@/libreria/api';
-import { Search, Plus, Edit2, Trash2, Loader2 } from 'lucide-react';
+import { cn, formatearFecha, formatearMoneda, mensajeDeError, obtenerIniciales } from '@/libreria/utilidades';
+import {
+  Search,
+  Plus,
+  Trash2,
+  Loader2,
+  Wallet,
+  Receipt,
+  Clock,
+  Ban,
+  Users,
+  Filter,
+  X,
+} from 'lucide-react';
 
 interface Pago {
   id: number;
   estudianteId: number;
   conceptoId: number;
   gestion: string;
+  periodo?: string;
   monto: number;
   fechaPago: string;
   metodoPago: string;
@@ -64,7 +79,7 @@ interface Gestion {
   anio: string;
 }
 
-const coloresEstado: Record<string, 'exito' | 'advertencia' | 'error'> = {
+const variantesEstado: Record<string, 'exito' | 'advertencia' | 'error'> = {
   pagado: 'exito',
   pendiente: 'advertencia',
   anulado: 'error',
@@ -82,23 +97,37 @@ const etiquetasMetodo: Record<string, string> = {
   qr: 'QR',
 };
 
+const etiquetasTipoConcepto: Record<string, string> = {
+  unico: 'Único',
+  semestral: 'Semestral',
+};
+
+const OPCIONES_PERIODO = [
+  { value: 'I', etiqueta: 'Periodo I' },
+  { value: 'II', etiqueta: 'Periodo II' },
+];
+
 export default function PaginaPagos() {
   const [pagos, setPagos] = useState<Pago[]>([]);
   const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
   const [filtroGestion, setFiltroGestion] = useState<string>('');
+  const [filtroPeriodo, setFiltroPeriodo] = useState<string>('');
   const [filtroEstado, setFiltroEstado] = useState<string>('');
   const [gestiones, setGestiones] = useState<Gestion[]>([]);
   const [conceptos, setConceptos] = useState<ConceptoPago[]>([]);
 
   const [modalAbierto, setModalAbierto] = useState(false);
-  const [pagoEliminando, setPagoEliminando] = useState<Pago | null>(null);
+  const [pagoAnulando, setPagoAnulando] = useState<Pago | null>(null);
   const [cargandoGuardado, setCargandoGuardado] = useState(false);
+  const [errorModal, setErrorModal] = useState<string | null>(null);
 
   const [datosFormulario, setDatosFormulario] = useState({
     estudianteId: null as number | null,
     conceptoId: '' as string,
     gestion: '',
+    periodo: 'I',
     monto: '',
     fechaPago: new Date().toISOString().split('T')[0],
     metodoPago: 'efectivo',
@@ -108,24 +137,31 @@ export default function PaginaPagos() {
 
   const [busquedaEstudiante, setBusquedaEstudiante] = useState('');
   const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
+  const [buscandoEstudiante, setBuscandoEstudiante] = useState(false);
   const [estudianteSeleccionado, setEstudianteSeleccionado] = useState<Estudiante | null>(null);
 
   useEffect(() => {
-    obtenerPagos();
     obtenerGestiones();
     obtenerConceptos();
-  }, [filtroGestion, filtroEstado]);
+  }, []);
+
+  useEffect(() => {
+    obtenerPagos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtroGestion, filtroPeriodo]);
 
   const obtenerPagos = async () => {
     try {
       setCargando(true);
-      const parametros: any = { limite: 100 };
+      setError(null);
+      const parametros: any = { limite: 500 };
       if (filtroGestion) parametros.gestion = filtroGestion;
-      if (filtroEstado) parametros.status = filtroEstado;
+      if (filtroPeriodo) parametros.periodo = filtroPeriodo;
 
       const respuesta = await api.get('/pagos', { params: parametros });
       setPagos(respuesta.data.datos || []);
     } catch (error) {
+      setError(mensajeDeError(error, 'No se pudieron obtener los pagos'));
       console.error('Error al obtener los pagos:', error);
     } finally {
       setCargando(false);
@@ -152,26 +188,38 @@ export default function PaginaPagos() {
 
   const buscarEstudiantes = async () => {
     if (!busquedaEstudiante.trim()) return;
+    setBuscandoEstudiante(true);
     try {
       const respuesta = await api.get('/estudiantes', {
-        params: { buscar: busquedaEstudiante, limite: 10 }
+        params: { buscar: busquedaEstudiante, limite: 10 },
       });
       setEstudiantes(respuesta.data.datos || []);
     } catch (error) {
       console.error('Error al buscar estudiantes:', error);
+    } finally {
+      setBuscandoEstudiante(false);
     }
   };
 
   const seleccionarEstudiante = (estudiante: Estudiante) => {
     setEstudianteSeleccionado(estudiante);
-    setDatosFormulario({ ...datosFormulario, estudianteId: estudiante.id });
+    setDatosFormulario((actual) => ({ ...actual, estudianteId: estudiante.id }));
     setBusquedaEstudiante('');
     setEstudiantes([]);
   };
 
   const limpiarEstudiante = () => {
     setEstudianteSeleccionado(null);
-    setDatosFormulario({ ...datosFormulario, estudianteId: null });
+    setDatosFormulario((actual) => ({ ...actual, estudianteId: null }));
+  };
+
+  const seleccionarConcepto = (valor: string) => {
+    const concepto = conceptos.find((c) => c.id.toString() === valor);
+    setDatosFormulario((actual) => ({
+      ...actual,
+      conceptoId: valor,
+      monto: concepto ? String(concepto.montoPredeterminado ?? '') : actual.monto,
+    }));
   };
 
   const abrirModalNuevo = () => {
@@ -180,6 +228,7 @@ export default function PaginaPagos() {
       estudianteId: null,
       conceptoId: '',
       gestion: filtroGestion || anioActual,
+      periodo: filtroPeriodo || 'I',
       monto: '',
       fechaPago: new Date().toISOString().split('T')[0],
       metodoPago: 'efectivo',
@@ -187,19 +236,26 @@ export default function PaginaPagos() {
       notas: '',
     });
     setEstudianteSeleccionado(null);
+    setBusquedaEstudiante('');
+    setEstudiantes([]);
+    setErrorModal(null);
     setModalAbierto(true);
   };
 
   const crear = async () => {
-    if (!datosFormulario.estudianteId || !datosFormulario.conceptoId || !datosFormulario.monto) return;
+    if (!datosFormulario.estudianteId || !datosFormulario.conceptoId || !datosFormulario.monto) {
+      setErrorModal('Completa el estudiante, el concepto y el monto.');
+      return;
+    }
 
     setCargandoGuardado(true);
+    setErrorModal(null);
     try {
-      const concepto = conceptos.find(c => c.id.toString() === datosFormulario.conceptoId);
       await api.post('/pagos', {
         estudianteId: datosFormulario.estudianteId,
         conceptoId: parseInt(datosFormulario.conceptoId),
         gestion: datosFormulario.gestion,
+        periodo: datosFormulario.periodo || undefined,
         monto: parseFloat(datosFormulario.monto),
         fechaPago: datosFormulario.fechaPago,
         metodoPago: datosFormulario.metodoPago,
@@ -211,106 +267,195 @@ export default function PaginaPagos() {
       setModalAbierto(false);
       obtenerPagos();
     } catch (error) {
+      setErrorModal(mensajeDeError(error, 'No se pudo registrar el pago'));
       console.error('Error al crear el pago:', error);
     } finally {
       setCargandoGuardado(false);
     }
   };
 
-  const eliminar = async () => {
-    if (!pagoEliminando) return;
+  const anular = async () => {
+    if (!pagoAnulando) return;
     setCargandoGuardado(true);
     try {
-      await api.delete(`/pagos/${pagoEliminando.id}`);
-      setPagoEliminando(null);
+      await api.patch(`/pagos/${pagoAnulando.id}/anular`);
+      setPagoAnulando(null);
       obtenerPagos();
     } catch (error) {
-      console.error('Error al eliminar el pago:', error);
-      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
-        alert(mensajeDeError(error, 'Error al eliminar el pago'));
-      }).catch(() => {
-        alert('Error al eliminar el pago');
-      });
+      alert(mensajeDeError(error, 'Error al anular el pago'));
+      console.error('Error al anular el pago:', error);
     } finally {
       setCargandoGuardado(false);
     }
   };
 
-  const anular = async (pago: Pago) => {
-    try {
-      await api.patch(`/pagos/${pago.id}/anular`);
-      obtenerPagos();
-    } catch (error) {
-      console.error('Error al anular el pago:', error);
-      import('@/libreria/utilidades').then(({ mensajeDeError }) => {
-        alert(mensajeDeError(error, 'Error al anular el pago'));
-      }).catch(() => {
-        alert('Error al anular el pago');
-      });
-    }
-  };
-
-  const pagosFiltrados = pagos.filter(pago => {
+  const pagosFiltrados = pagos.filter((pago) => {
+    if (filtroEstado && pago.estado !== filtroEstado) return false;
     if (!terminoBusqueda) return true;
     const persona = pago.estudiante?.persona;
-    const nombreCompleto = `${persona?.nombres || ''} ${persona?.apellidoPaterno || ''} ${persona?.apellidoMaterno || ''}`.toLowerCase();
+    const nombreCompleto =
+      `${persona?.nombres || ''} ${persona?.apellidoPaterno || ''} ${persona?.apellidoMaterno || ''}`.toLowerCase();
     const ci = persona?.ci?.toLowerCase() || '';
     const codigo = pago.estudiante?.codigoInscripcion?.toLowerCase() || '';
     const busqueda = terminoBusqueda.toLowerCase();
     return nombreCompleto.includes(busqueda) || ci.includes(busqueda) || codigo.includes(busqueda);
   });
 
+  const totalRecaudado = pagos
+    .filter((pago) => pago.estado === 'pagado')
+    .reduce((suma, pago) => suma + Number(pago.monto || 0), 0);
+  const cantidadPagados = pagos.filter((pago) => pago.estado === 'pagado').length;
+  const cantidadPendientes = pagos.filter((pago) => pago.estado === 'pendiente').length;
+  const cantidadAnulados = pagos.filter((pago) => pago.estado === 'anulado').length;
+
+  const resumen: { etiqueta: string; valor: string; icono: LucideIcon; tono: string }[] = [
+    {
+      etiqueta: 'Total recaudado',
+      valor: formatearMoneda(totalRecaudado),
+      icono: Wallet,
+      tono: 'bg-emerald-50 text-emerald-600',
+    },
+    {
+      etiqueta: 'Pagos registrados',
+      valor: String(cantidadPagados),
+      icono: Receipt,
+      tono: 'bg-primary-50 text-primary-600',
+    },
+    {
+      etiqueta: 'Pendientes',
+      valor: String(cantidadPendientes),
+      icono: Clock,
+      tono: 'bg-amber-50 text-amber-600',
+    },
+    {
+      etiqueta: 'Anulados',
+      valor: String(cantidadAnulados),
+      icono: Ban,
+      tono: 'bg-red-50 text-red-600',
+    },
+  ];
+
+  const hayFiltros = !!(terminoBusqueda || filtroGestion || filtroPeriodo || filtroEstado);
+
   return (
     <div className="space-y-6">
       <Migas elementos={[{ etiqueta: 'Pagos' }]} />
 
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gestión de Pagos</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Gestión de pagos</h1>
+          <p className="text-sm text-gray-500">Registra y controla los pagos de matrícula y semestrales.</p>
+        </div>
         <Boton onClick={abrirModalNuevo}>
-          <Plus className="w-4 h-4 mr-2" />
-          Nuevo Pago
+          <Plus className="mr-2 h-4 w-4" />
+          Nuevo pago
         </Boton>
       </div>
 
-      <Tarjeta variante="conBorde">
-        <EncabezadoTarjeta>
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <TituloTarjeta>Lista de Pagos</TituloTarjeta>
-            <div className="flex-1 flex flex-col md:flex-row gap-4 md:justify-end">
-              <div className="relative w-full md:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Entrada
-                  placeholder="Buscar..."
-                  className="pl-10"
-                  value={terminoBusqueda}
-                  onChange={(e) => setTerminoBusqueda(e.target.value)}
-                />
-              </div>
-              <Selector
-                value={filtroGestion}
-                onChange={(e) => setFiltroGestion(e.target.value)}
-                opciones={[
-                  { value: '', etiqueta: 'Todas las gestiones' },
-                  ...gestiones.map(g => ({ value: g.anio, etiqueta: g.anio }))
-                ]}
-              />
-              <Selector
-                value={filtroEstado}
-                onChange={(e) => setFiltroEstado(e.target.value)}
-                opciones={[
-                  { value: '', etiqueta: 'Todos los estados' },
-                  { value: 'pagado', etiqueta: 'Pagado' },
-                  { value: 'pendiente', etiqueta: 'Pendiente' },
-                  { value: 'anulado', etiqueta: 'Anulado' },
-                ]}
-              />
-            </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {resumen.map((item) => {
+          const Icono = item.icono;
+          return (
+            <Tarjeta key={item.etiqueta} variante="conBorde" className="rounded-2xl">
+              <ContenidoTarjeta className="flex items-center gap-4">
+                <span className={cn('grid h-11 w-11 shrink-0 place-items-center rounded-xl', item.tono)}>
+                  <Icono className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-medium uppercase tracking-wide text-gray-500">
+                    {item.etiqueta}
+                  </p>
+                  <p className="truncate text-xl font-bold text-gray-900">{item.valor}</p>
+                </div>
+              </ContenidoTarjeta>
+            </Tarjeta>
+          );
+        })}
+      </div>
+
+      {error && (
+        <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+          {error}
+        </div>
+      )}
+
+      <Tarjeta variante="conBorde" className="rounded-2xl">
+        <div className="flex flex-col gap-4 border-b border-gray-100 p-5 lg:flex-row lg:items-center">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Entrada
+              className="pl-9"
+              placeholder="Buscar por estudiante, CI o código..."
+              value={terminoBusqueda}
+              onChange={(e) => setTerminoBusqueda(e.target.value)}
+            />
           </div>
-        </EncabezadoTarjeta>
-        <ContenidoTarjeta>
+          <div className="flex items-center gap-3">
+            <div className="hidden items-center gap-2 text-sm text-gray-500 sm:flex">
+              <Filter className="h-4 w-4" />
+            </div>
+            <Selector
+              className="w-full sm:w-40"
+              value={filtroGestion}
+              onChange={(e) => setFiltroGestion(e.target.value)}
+              opciones={[
+                { value: '', etiqueta: 'Todas las gestiones' },
+                ...gestiones.map((g) => ({ value: g.anio, etiqueta: g.anio })),
+              ]}
+            />
+            <Selector
+              className="w-full sm:w-36"
+              value={filtroPeriodo}
+              onChange={(e) => setFiltroPeriodo(e.target.value)}
+              opciones={[{ value: '', etiqueta: 'Todos los períodos' }, ...OPCIONES_PERIODO]}
+            />
+            <Selector
+              className="w-full sm:w-40"
+              value={filtroEstado}
+              onChange={(e) => setFiltroEstado(e.target.value)}
+              opciones={[
+                { value: '', etiqueta: 'Todos los estados' },
+                { value: 'pagado', etiqueta: 'Pagado' },
+                { value: 'pendiente', etiqueta: 'Pendiente' },
+                { value: 'anulado', etiqueta: 'Anulado' },
+              ]}
+            />
+            {hayFiltros && (
+              <Boton
+                variante="fantasma"
+                tamano="icono"
+                title="Limpiar filtros"
+                onClick={() => {
+                  setTerminoBusqueda('');
+                  setFiltroGestion('');
+                  setFiltroPeriodo('');
+                  setFiltroEstado('');
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Boton>
+            )}
+          </div>
+        </div>
+
+        <ContenidoTarjeta className="p-0">
           {cargando ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+            <div className="flex justify-center py-16">
+              <Loader2 className="h-6 w-6 animate-spin text-primary-600" />
+            </div>
+          ) : pagosFiltrados.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 py-16 text-center">
+              <div className="grid h-12 w-12 place-items-center rounded-full bg-gray-100 text-gray-400">
+                <Receipt className="h-5 w-5" />
+              </div>
+              <p className="font-medium text-gray-700">
+                {hayFiltros ? 'Sin resultados' : 'Aún no hay pagos registrados'}
+              </p>
+              <p className="max-w-sm text-sm text-gray-500">
+                {hayFiltros
+                  ? 'Prueba con otro término de búsqueda o ajusta los filtros.'
+                  : 'Registra el primer pago con el botón «Nuevo pago».'}
+              </p>
             </div>
           ) : (
             <Tabla>
@@ -318,105 +463,158 @@ export default function PaginaPagos() {
                 <FilaTabla>
                   <CeldaEncabezado>Estudiante</CeldaEncabezado>
                   <CeldaEncabezado>Concepto</CeldaEncabezado>
-                  <CeldaEncabezado>Monto</CeldaEncabezado>
+                  <CeldaEncabezado>Período</CeldaEncabezado>
+                  <CeldaEncabezado className="text-right">Monto</CeldaEncabezado>
                   <CeldaEncabezado>Fecha</CeldaEncabezado>
                   <CeldaEncabezado>Método</CeldaEncabezado>
                   <CeldaEncabezado>Estado</CeldaEncabezado>
-                  <CeldaEncabezado>Acciones</CeldaEncabezado>
+                  <CeldaEncabezado className="text-right">Acciones</CeldaEncabezado>
                 </FilaTabla>
               </EncabezadoTabla>
               <CuerpoTabla>
-                {pagosFiltrados.length === 0 ? (
-                  <FilaTabla>
-                    <CeldaTabla colSpan={7} className="text-center py-8 text-gray-500">
-                      No hay pagos registrados
-                    </CeldaTabla>
-                  </FilaTabla>
-                ) : (
-                  pagosFiltrados.map((pago) => (
+                {pagosFiltrados.map((pago) => {
+                  const persona = pago.estudiante?.persona;
+                  return (
                     <FilaTabla key={pago.id}>
-                      <CeldaTabla className="font-medium">
-                        <div>
-                          <p>{pago.estudiante?.persona?.nombres} {pago.estudiante?.persona?.apellidoPaterno}</p>
-                          <p className="text-xs text-gray-500">{pago.estudiante?.codigoInscripcion}</p>
+                      <CeldaTabla>
+                        <div className="flex items-center gap-3">
+                          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary-100 text-xs font-semibold text-primary-700">
+                            {obtenerIniciales(
+                              `${persona?.nombres || ''} ${persona?.apellidoPaterno || ''}`,
+                            ) || '?'}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="truncate font-medium text-gray-900">
+                              {persona?.nombres} {persona?.apellidoPaterno}
+                            </p>
+                            <p className="truncate text-xs text-gray-500">
+                              {pago.estudiante?.codigoInscripcion}
+                            </p>
+                          </div>
                         </div>
                       </CeldaTabla>
-                      <CeldaTabla>{pago.concepto?.nombre || '-'}</CeldaTabla>
-                      <CeldaTabla>Bs. {pago.monto}</CeldaTabla>
-                      <CeldaTabla>{new Date(pago.fechaPago).toLocaleDateString('es-BO')}</CeldaTabla>
-                      <CeldaTabla>{etiquetasMetodo[pago.metodoPago] || pago.metodoPago}</CeldaTabla>
                       <CeldaTabla>
-                        <Insignia variante={coloresEstado[pago.estado] || 'secundario'}>
-                          {etiquetasEstado[pago.estado] || pago.estado}
+                        <p className="text-gray-800">{pago.concepto?.nombre || '-'}</p>
+                        {pago.concepto?.tipo && (
+                          <p className="text-xs text-gray-400">
+                            {etiquetasTipoConcepto[pago.concepto.tipo] || pago.concepto.tipo}
+                          </p>
+                        )}
+                      </CeldaTabla>
+                      <CeldaTabla>
+                        <Insignia variante="contorno">
+                          {pago.periodo ? `${pago.periodo}/${pago.gestion}` : pago.gestion}
+                        </Insignia>
+                      </CeldaTabla>
+                      <CeldaTabla className="text-right font-semibold text-gray-900">
+                        {formatearMoneda(Number(pago.monto))}
+                      </CeldaTabla>
+                      <CeldaTabla className="text-gray-600">{formatearFecha(pago.fechaPago)}</CeldaTabla>
+                      <CeldaTabla>
+                        <Insignia variante="contorno">
+                          {etiquetasMetodo[pago.metodoPago] || pago.metodoPago}
                         </Insignia>
                       </CeldaTabla>
                       <CeldaTabla>
-                        <div className="flex items-center gap-2">
-                          {pago.estado === 'pagado' && (
-                            <Boton
-                              variante="fantasma"
-                              tamano="icono"
-                              title="Anular"
-                              onClick={() => anular(pago)}
-                            >
-                              <Trash2 className="w-4 h-4 text-red-500" />
-                            </Boton>
-                          )}
-                        </div>
+                        <Insignia variante={variantesEstado[pago.estado] || 'secundario'}>
+                          {etiquetasEstado[pago.estado] || pago.estado}
+                        </Insignia>
+                      </CeldaTabla>
+                      <CeldaTabla className="text-right">
+                        {pago.estado === 'pagado' ? (
+                          <Boton
+                            variante="fantasma"
+                            tamano="icono"
+                            title="Anular pago"
+                            onClick={() => setPagoAnulando(pago)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Boton>
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
+                        )}
                       </CeldaTabla>
                     </FilaTabla>
-                  ))
-                )}
+                  );
+                })}
               </CuerpoTabla>
             </Tabla>
           )}
         </ContenidoTarjeta>
       </Tarjeta>
 
-      <Modal abierto={modalAbierto} alCerrar={() => setModalAbierto(false)} titulo="Nuevo Pago" tamano="grande">
-        <div className="space-y-4">
+      <Modal
+        abierto={modalAbierto}
+        alCerrar={() => setModalAbierto(false)}
+        titulo="Registrar pago"
+        descripcion="Los campos marcados con * son obligatorios."
+        tamano="grande"
+      >
+        <div className="space-y-5">
+          {/* Estudiante */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Estudiante *</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Estudiante *</label>
             {estudianteSeleccionado ? (
-              <div className="flex items-center justify-between p-3 bg-primary-50 border border-primary-200 rounded-lg">
-                <div>
-                  <p className="font-medium">
-                    {estudianteSeleccionado.persona?.nombres} {estudianteSeleccionado.persona?.apellidoPaterno}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {estudianteSeleccionado.persona?.ci} · {estudianteSeleccionado.codigoInscripcion}
-                  </p>
+              <div className="flex items-center justify-between rounded-xl border border-primary-200 bg-primary-50 p-3">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-primary-600 text-xs font-semibold text-white">
+                    {obtenerIniciales(
+                      `${estudianteSeleccionado.persona?.nombres || ''} ${estudianteSeleccionado.persona?.apellidoPaterno || ''}`,
+                    ) || '?'}
+                  </span>
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {estudianteSeleccionado.persona?.nombres} {estudianteSeleccionado.persona?.apellidoPaterno}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      CI {estudianteSeleccionado.persona?.ci} · {estudianteSeleccionado.codigoInscripcion}
+                    </p>
+                  </div>
                 </div>
-                <Boton variante="fantasma" tamano="icono" onClick={limpiarEstudiante}>
-                  <Trash2 className="w-4 h-4" />
+                <Boton variante="fantasma" tamano="icono" onClick={limpiarEstudiante} title="Cambiar estudiante">
+                  <X className="h-4 w-4" />
                 </Boton>
               </div>
             ) : (
               <div>
                 <div className="flex gap-2">
-                  <Entrada
-                    placeholder="Buscar por nombre o CI..."
-                    value={busquedaEstudiante}
-                    onChange={(e) => setBusquedaEstudiante(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && buscarEstudiantes()}
-                  />
-                  <Boton onClick={buscarEstudiantes}>Buscar</Boton>
+                  <div className="relative flex-1">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <Entrada
+                      className="pl-9"
+                      placeholder="Buscar por nombre o CI..."
+                      value={busquedaEstudiante}
+                      onChange={(e) => setBusquedaEstudiante(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), buscarEstudiantes())}
+                    />
+                  </div>
+                  <Boton variante="contorno" onClick={buscarEstudiantes} cargando={buscandoEstudiante}>
+                    Buscar
+                  </Boton>
                 </div>
                 {estudiantes.length > 0 && (
-                  <div className="mt-2 border rounded-lg overflow-hidden max-h-40 overflow-y-auto">
+                  <div className="mt-2 max-h-44 divide-y divide-gray-100 overflow-y-auto rounded-xl border border-gray-200">
                     {estudiantes.map((estudiante) => (
-                      <div
+                      <button
                         key={estudiante.id}
+                        type="button"
                         onClick={() => seleccionarEstudiante(estudiante)}
-                        className="p-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
+                        className="flex w-full items-center gap-3 p-3 text-left hover:bg-gray-50"
                       >
-                        <p className="font-medium text-sm">
-                          {estudiante.persona?.nombres} {estudiante.persona?.apellidoPaterno}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {estudiante.persona?.ci} · {estudiante.codigoInscripcion}
-                        </p>
-                      </div>
+                        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gray-100 text-xs font-semibold text-gray-600">
+                          {obtenerIniciales(
+                            `${estudiante.persona?.nombres || ''} ${estudiante.persona?.apellidoPaterno || ''}`,
+                          ) || '?'}
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-medium text-gray-800">
+                            {estudiante.persona?.nombres} {estudiante.persona?.apellidoPaterno}
+                          </span>
+                          <span className="block truncate text-xs text-gray-500">
+                            CI {estudiante.persona?.ci} · {estudiante.codigoInscripcion}
+                          </span>
+                        </span>
+                      </button>
                     ))}
                   </div>
                 )}
@@ -424,104 +622,101 @@ export default function PaginaPagos() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Concepto *</label>
-              <select
-                className="w-full h-10 px-3 border rounded-lg text-sm"
-                value={datosFormulario.conceptoId}
-                onChange={(e) => setDatosFormulario({ ...datosFormulario, conceptoId: e.target.value })}
-              >
-                <option value="">Seleccionar...</option>
-                {conceptos.map(c => (
-                  <option key={c.id} value={c.id}>{c.nombre} ({c.tipo})</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Monto *</label>
-              <Entrada
-                type="number"
-                value={datosFormulario.monto}
-                onChange={(e) => setDatosFormulario({ ...datosFormulario, monto: e.target.value })}
-                placeholder="0.00"
-              />
-            </div>
+          {/* Concepto y monto */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Selector
+              etiqueta="Concepto *"
+              placeholder="Seleccionar..."
+              value={datosFormulario.conceptoId}
+              onChange={(e) => seleccionarConcepto(e.target.value)}
+              opciones={conceptos.map((c) => ({
+                value: c.id,
+                etiqueta: `${c.nombre} · ${etiquetasTipoConcepto[c.tipo] || c.tipo}`,
+              }))}
+            />
+            <Entrada
+              etiqueta="Monto (Bs.) *"
+              type="number"
+              value={datosFormulario.monto}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, monto: e.target.value })}
+              placeholder="0.00"
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Pago *</label>
-              <Entrada
-                type="date"
-                value={datosFormulario.fechaPago}
-                onChange={(e) => setDatosFormulario({ ...datosFormulario, fechaPago: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Gestión *</label>
-              <Entrada
-                value={datosFormulario.gestion}
-                onChange={(e) => setDatosFormulario({ ...datosFormulario, gestion: e.target.value })}
-              />
-            </div>
+          {/* Fecha, gestión y período */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Entrada
+              etiqueta="Fecha de pago *"
+              type="date"
+              value={datosFormulario.fechaPago}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, fechaPago: e.target.value })}
+            />
+            <Entrada
+              etiqueta="Gestión *"
+              value={datosFormulario.gestion}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, gestion: e.target.value })}
+              placeholder="2026"
+            />
+            <Selector
+              etiqueta="Período *"
+              value={datosFormulario.periodo}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, periodo: e.target.value })}
+              opciones={OPCIONES_PERIODO}
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label>
-              <select
-                className="w-full h-10 px-3 border rounded-lg text-sm"
-                value={datosFormulario.metodoPago}
-                onChange={(e) => setDatosFormulario({ ...datosFormulario, metodoPago: e.target.value })}
-              >
-                <option value="efectivo">Efectivo</option>
-                <option value="transferencia">Transferencia</option>
-                <option value="qr">QR</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Número de Recibo</label>
-              <Entrada
-                value={datosFormulario.numeroRecibo}
-                onChange={(e) => setDatosFormulario({ ...datosFormulario, numeroRecibo: e.target.value })}
-                placeholder="R-001"
-              />
-            </div>
+          {/* Método y recibo */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Selector
+              etiqueta="Método de pago"
+              value={datosFormulario.metodoPago}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, metodoPago: e.target.value })}
+              opciones={[
+                { value: 'efectivo', etiqueta: 'Efectivo' },
+                { value: 'transferencia', etiqueta: 'Transferencia' },
+                { value: 'qr', etiqueta: 'QR' },
+              ]}
+            />
+            <Entrada
+              etiqueta="Número de recibo"
+              value={datosFormulario.numeroRecibo}
+              onChange={(e) => setDatosFormulario({ ...datosFormulario, numeroRecibo: e.target.value })}
+              placeholder="R-001"
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notas</label>
-            <textarea
-              className="w-full h-20 px-3 py-2 border rounded-lg text-sm"
+            <label className="mb-1 block text-sm font-medium text-gray-700">Notas</label>
+            <AreaTexto
+              className="h-20"
               value={datosFormulario.notas}
               onChange={(e) => setDatosFormulario({ ...datosFormulario, notas: e.target.value })}
               placeholder="Observaciones..."
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-4">
-            <Boton variante="contorno" onClick={() => setModalAbierto(false)}>
+          {errorModal && (
+            <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{errorModal}</div>
+          )}
+
+          <div className="flex justify-end gap-3 border-t border-gray-100 pt-4">
+            <Boton variante="contorno" onClick={() => setModalAbierto(false)} disabled={cargandoGuardado}>
               Cancelar
             </Boton>
-            <Boton onClick={crear} disabled={cargandoGuardado || !datosFormulario.estudianteId || !datosFormulario.conceptoId || !datosFormulario.monto}>
-              {cargandoGuardado ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                'Guardar'
-              )}
+            <Boton onClick={crear} cargando={cargandoGuardado}>
+              Guardar pago
             </Boton>
           </div>
         </div>
       </Modal>
 
       <ModalConfirmacion
-        abierto={!!pagoEliminando}
-        alCerrar={() => setPagoEliminando(null)}
-        alConfirmar={eliminar}
-        titulo="Eliminar Pago"
-        mensaje={`¿Está seguro de eliminar este pago de "${pagoEliminando?.estudiante?.persona?.nombres}"?`}
-        textoConfirmar="Eliminar"
+        abierto={!!pagoAnulando}
+        alCerrar={() => setPagoAnulando(null)}
+        alConfirmar={anular}
+        titulo="Anular pago"
+        mensaje={`¿Anular el pago de "${pagoAnulando?.estudiante?.persona?.nombres} ${pagoAnulando?.estudiante?.persona?.apellidoPaterno}"? El registro quedará marcado como anulado.`}
+        textoConfirmar="Anular"
         variante="destructivo"
         cargando={cargandoGuardado}
       />

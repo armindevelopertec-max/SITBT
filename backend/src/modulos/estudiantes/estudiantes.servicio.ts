@@ -135,6 +135,7 @@ export class ServicioEstudiantes {
     limite = 20,
     estado?: EstadoEstudiante,
     carreraId?: number,
+    buscar?: string,
   ): Promise<any> {
     const consulta = this.repositorioEstudiante
       .createQueryBuilder('estudiante')
@@ -148,6 +149,17 @@ export class ServicioEstudiantes {
 
     if (carreraId) {
       consulta.andWhere('estudiante.carreraId = :carreraId', { carreraId });
+    }
+
+    if (buscar && buscar.trim()) {
+      consulta.andWhere(
+        '(LOWER(estudiante.codigoInscripcion) LIKE :buscar' +
+          ' OR LOWER(persona.ci) LIKE :buscar' +
+          ' OR LOWER(persona.nombres) LIKE :buscar' +
+          ' OR LOWER(persona.apellidoPaterno) LIKE :buscar' +
+          ' OR LOWER(persona.apellidoMaterno) LIKE :buscar)',
+        { buscar: `%${buscar.trim().toLowerCase()}%` },
+      );
     }
 
     const [datos, total] = await consulta

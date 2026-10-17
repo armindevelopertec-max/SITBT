@@ -1,21 +1,28 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, DataSource } from 'typeorm';
 import { Estudiante, EstadoEstudiante } from '../../entidades/estudiante.entidad';
 import { Pago, EstadoPago } from '../../entidades/pago.entidad';
-import { ConceptoPago, TipoConceptoPago } from '../../entidades/concepto-pago.entidad';
+import { ConceptoPago, TipoConceptoPago, EstadoConceptoPago } from '../../entidades/concepto-pago.entidad';
 import { Inscripcion, EstadoInscripcion } from '../../entidades/inscripcion.entidad';
 import { MateriaPlan } from '../../entidades/materia-plan.entidad';
 import { Materia } from '../../entidades/materia.entidad';
 import { Grupo } from '../../entidades/grupo.entidad';
+import { GrupoEstudiante } from '../../entidades/grupo-estudiante.entidad';
 import { Turno } from '../../entidades/turno.entidad';
 import { Periodo } from '../../entidades/periodo.entidad';
 import { Gestion, EstadoGestion } from '../../entidades/gestion.entidad';
 import { Calificacion } from '../../entidades/calificacion.entidad';
 import { DocumentoEmitido, TipoDocumento } from '../../entidades/documento-emitido.entidad';
+import { ServicioGrupos } from '../grupos/grupos.servicio';
+import { ServicioMateriasImpartidas } from '../materias-impartidas/materias-impartidas.servicio';
 import { VerificarPagosDto, ResultadoVerificarPagos } from './dto/verificar-pagos.dto';
 import { CalcularMateriasDto, ResultadoCalcularMaterias, MateriaAInscribir } from './dto/calcular-materias.dto';
-import { CrearInscripcionLoteDto, ResultadoCrearInscripcion } from './dto/crear-lote-inscripcion.dto';
+import {
+  CrearInscripcionLoteDto,
+  ResultadoCrearInscripcion,
+  AsignacionGrupoDto,
+} from './dto/crear-lote-inscripcion.dto';
 
 @Injectable()
 export class ServicioPreinscripcion {
@@ -44,6 +51,11 @@ export class ServicioPreinscripcion {
     private repositorioCalificacion: Repository<Calificacion>,
     @InjectRepository(DocumentoEmitido)
     private repositorioDocumento: Repository<DocumentoEmitido>,
+    @InjectRepository(GrupoEstudiante)
+    private repositorioGrupoEstudiante: Repository<GrupoEstudiante>,
+    private readonly servicioGrupos: ServicioGrupos,
+    private readonly servicioMateriasImpartidas: ServicioMateriasImpartidas,
+    private readonly fuenteDatos: DataSource,
   ) {}
 
   async verificarPagos(dto: VerificarPagosDto): Promise<ResultadoVerificarPagos> {
@@ -83,13 +95,20 @@ export class ServicioPreinscripcion {
     });
 
     const conceptos = await this.repositorioConcepto.find({
-      where: { estado: 'activo' as any },
+      where: { estado: EstadoConceptoPago.ACTIVO },
     });
 
     const pagosRealizados: ResultadoVerificarPagos['pagosRealizados'] = [];
     const pagosFaltantes: ResultadoVerificarPagos['pagosFaltantes'] = [];
 
     for (const pago of pagos) {
+      // Un pago semestral solo cuenta si corresponde al período solicitado.
+      if (
+        pago.concepto?.tipo === TipoConceptoPago.SEMESTRAL &&
+        !this.pagoCubrePeriodo(pago, periodoNumero)
+      ) {
+        continue;
+      }
       pagosRealizados.push({
         tipo: pago.concepto?.tipo || 'unknown',
         concepto: pago.concepto?.nombre || 'Desconocido',
@@ -112,13 +131,19 @@ export class ServicioPreinscripcion {
       }
     }
 
-    const tieneSemestral = pagos.some(pago =>
-      pago.concepto?.tipo === TipoConceptoPago.SEMESTRAL &&
-      pago.concepto?.nombre?.toLowerCase().includes(periodoNumero.toLowerCase())
+    const tieneSemestral = pagos.some(
+      (pago) =>
+        pago.concepto?.tipo === TipoConceptoPago.SEMESTRAL &&
+        this.pagoCubrePeriodo(pago, periodoNumero),
     );
 
     if (!tieneSemestral) {
-      const conceptoSemestral = conceptos.find(concepto => concepto.tipo === TipoConceptoPago.SEMESTRAL);
+      const conceptoSemestral =
+        conceptos.find(
+          (concepto) =>
+            concepto.tipo === TipoConceptoPago.SEMESTRAL &&
+            this.nombreCubrePeriodo(concepto.nombre, periodoNumero),
+        ) || conceptos.find((concepto) => concepto.tipo === TipoConceptoPago.SEMESTRAL);
       if (conceptoSemestral) {
         pagosFaltantes.push({
           tipo: TipoConceptoPago.SEMESTRAL,
@@ -211,35 +236,40 @@ export class ServicioPreinscripcion {
     gestion: Gestion,
     periodoNumero: string,
   ): Promise<ResultadoCalcularMaterias> {
-    const numeroPeriodoAnterior = periodoNumero === 'II' ? 'I' : null;
-    const gestionAnterior = numeroPeriodoAnterior ? gestion.anio : String(parseInt(gestion.anio) - 1);
+    // En periodo II lo anterior es el periodo I de la misma gestión; en periodo I,
+    // el periodo II de la gestión anterior. La tabla `inscripciones` no guarda el
+    // periodo, por lo que se toma la gestión anterior completa.
+    const gestionAnterior = periodoNumero === 'II' ? gestion.anio : String(parseInt(gestion.anio) - 1);
 
     const materiasReprobadas: ResultadoCalcularMaterias['materiasReprobadas'] = [];
+    const idsMateriasAprobadas: number[] = [];
     let totalReprobadas = 0;
     let semestreActual = 1;
 
-    if (numeroPeriodoAnterior) {
-      const inscripcionesAnteriores = await this.repositorioInscripcion.find({
-        where: {
-          estudianteId: estudiante.id,
-          gestion: gestionAnterior,
-        },
-        relations: ['materia', 'materiaPlan'],
-      });
+    const inscripcionesAnteriores = await this.repositorioInscripcion.find({
+      where: {
+        estudianteId: estudiante.id,
+        gestion: gestionAnterior,
+      },
+      relations: ['materia', 'materiaPlan'],
+    });
 
-      for (const inscripcion of inscripcionesAnteriores) {
-        if (inscripcion.estado === EstadoInscripcion.REPROBADO) {
-          materiasReprobadas.push({
-            materiaId: inscripcion.materiaId,
-            materiaNombre: inscripcion.materia?.nombre || 'Desconocida',
-            nota: inscripcion.notaFinal || 0,
-            gestionAnterior: gestionAnterior,
-          });
-          totalReprobadas++;
-        }
-        if (inscripcion.materiaPlan?.semestre) {
-          semestreActual = Math.max(semestreActual, inscripcion.materiaPlan.semestre + 1);
-        }
+    for (const inscripcion of inscripcionesAnteriores) {
+      if (inscripcion.estado === EstadoInscripcion.REPROBADO) {
+        materiasReprobadas.push({
+          materiaId: inscripcion.materiaId,
+          materiaNombre: inscripcion.materia?.nombre || 'Desconocida',
+          nota: inscripcion.notaFinal || 0,
+          gestionAnterior: gestionAnterior,
+        });
+        totalReprobadas++;
+      } else if (inscripcion.estado === EstadoInscripcion.APROBADO) {
+        idsMateriasAprobadas.push(inscripcion.materiaId);
+      }
+
+      const semestreCursado = inscripcion.materiaPlan?.semestre ?? inscripcion.semestre;
+      if (semestreCursado) {
+        semestreActual = Math.max(semestreActual, semestreCursado + 1);
       }
     }
 
@@ -281,28 +311,6 @@ export class ServicioPreinscripcion {
         mensaje: `Tienes ${totalReprobadas} materias reprobadas. Solo puedes inscribir las materias reprobadas.`,
       };
     }
-
-    const idsMateriasAprobadas: number[] = [];
-    if (numeroPeriodoAnterior) {
-      const inscripcionesAnteriores = await this.repositorioInscripcion.find({
-        where: {
-          estudianteId: estudiante.id,
-          gestion: gestionAnterior,
-        },
-      });
-
-      for (const inscripcion of inscripcionesAnteriores) {
-        if (inscripcion.estado === EstadoInscripcion.APROBADO) {
-          idsMateriasAprobadas.push(inscripcion.materiaId);
-        }
-      }
-    }
-
-    const semestresCursados = await this.repositorioInscripcion
-      .createQueryBuilder('inscripcion')
-      .select('DISTINCT inscripcion.semestre', 'semestre')
-      .where('inscripcion.estudianteId = :estudianteId', { estudianteId: estudiante.id })
-      .getRawOne();
 
     const semestreAInscribir = materiasReprobadas.length > 0 ? semestreActual - 1 : semestreActual;
 
@@ -414,64 +422,126 @@ export class ServicioPreinscripcion {
       throw new NotFoundException(`Período ${periodoNumero} no encontrado`);
     }
 
-    const grupo = await this.repositorioGrupo.findOne({
-      where: { id: dto.grupoId },
-      relations: ['turno', 'carrera'],
-    });
+    // Contrato nuevo por grupo/semestre; se conserva el contrato anterior
+    // (un único grupo) por compatibilidad.
+    const asignaciones: AsignacionGrupoDto[] =
+      dto.asignaciones && dto.asignaciones.length > 0
+        ? dto.asignaciones
+        : dto.grupoId && dto.materias
+          ? [{ grupoId: dto.grupoId, materias: dto.materias }]
+          : [];
 
-    if (!grupo) {
-      throw new NotFoundException('Grupo no encontrado');
+    if (asignaciones.length === 0) {
+      throw new BadRequestException('Debe indicar al menos un grupo con sus materias');
     }
 
-    const inscripciones: { id: number; materiaNombre: string; nombreGrupo: string }[] = [];
-
-    for (const materia of dto.materias) {
-      const existente = await this.repositorioInscripcion.findOne({
-        where: {
-          estudianteId: dto.estudianteId,
-          materiaId: materia.materiaId,
-          gestion: dto.gestion,
-        },
+    const grupos = new Map<number, Grupo>();
+    for (const asignacion of asignaciones) {
+      const grupo = await this.repositorioGrupo.findOne({
+        where: { id: asignacion.grupoId },
+        relations: ['turno', 'carrera'],
       });
+      if (!grupo) {
+        throw new NotFoundException(`Grupo ${asignacion.grupoId} no encontrado`);
+      }
+      if (estudiante.carreraId && grupo.carreraId !== estudiante.carreraId) {
+        throw new BadRequestException('El grupo seleccionado no pertenece a la carrera del estudiante');
+      }
+      grupos.set(asignacion.grupoId, grupo);
+    }
 
-      if (existente) {
-        continue;
+    // 1) Matricular al estudiante en cada grupo (fuente de verdad del roster que
+    //    consume el módulo de materias impartidas). Es idempotente.
+    let asignadosGrupo = 0;
+    for (const asignacion of asignaciones) {
+      const yaAsignado = await this.repositorioGrupoEstudiante.findOne({
+        where: { grupoId: asignacion.grupoId, estudianteId: dto.estudianteId },
+      });
+      if (!yaAsignado) {
+        await this.servicioGrupos.agregarEstudiante(asignacion.grupoId, dto.estudianteId);
+        asignadosGrupo++;
+      }
+    }
+
+    // 2) Registrar las inscripciones por materia y la boleta en una transacción.
+    const inscripciones: { id: number; materiaNombre: string; nombreGrupo: string }[] = [];
+    let boletaId: string | undefined;
+    let boletaNumero: string | undefined;
+
+    await this.fuenteDatos.transaction(async (gestor) => {
+      for (const asignacion of asignaciones) {
+        const grupo = grupos.get(asignacion.grupoId)!;
+        for (const materia of asignacion.materias) {
+          const existente = await gestor.findOne(Inscripcion, {
+            where: {
+              estudianteId: dto.estudianteId,
+              materiaId: materia.materiaId,
+              grupoId: asignacion.grupoId,
+              gestion: dto.gestion,
+            },
+          });
+
+          if (existente) {
+            continue;
+          }
+
+          const inscripcion = gestor.create(Inscripcion, {
+            estudianteId: dto.estudianteId,
+            materiaId: materia.materiaId,
+            materiaPlanId: materia.materiaPlanId ?? null,
+            grupoId: asignacion.grupoId,
+            gestion: dto.gestion,
+            semestre: materia.semestre,
+            estado: EstadoInscripcion.CURSANDO,
+          });
+
+          const guardada = await gestor.save(inscripcion);
+          inscripciones.push({
+            id: guardada.id,
+            materiaNombre: materia.materiaNombre,
+            nombreGrupo: `${grupo.paralelo}-${dto.gestion}`,
+          });
+        }
       }
 
-      const inscripcion = this.repositorioInscripcion.create({
-        estudianteId: dto.estudianteId,
-        materiaId: materia.materiaId,
-        grupoId: dto.grupoId,
-        gestion: dto.gestion,
-        semestre: materia.semestre,
-        estado: EstadoInscripcion.CURSANDO,
-      });
-
-      const guardada = await this.repositorioInscripcion.save(inscripcion);
-      inscripciones.push({
-        id: guardada.id,
-        materiaNombre: materia.materiaNombre,
-        nombreGrupo: `${grupo.paralelo}-${dto.gestion}`,
-      });
-    }
-
-    const numDocumento = `BOL-INS-${dto.gestion}-${periodoNumero}-${estudiante.codigoInscripcion}-${Date.now()}`;
-
-    const boleta = this.repositorioDocumento.create({
-      estudianteId: dto.estudianteId,
-      tipo: TipoDocumento.BOLETA_INSCRIPCION,
-      numeroDocumento: numDocumento,
-      gestion: dto.gestion,
-      gestionId: gestion.id,
+      // La boleta solo se emite cuando hubo inscripciones nuevas (evita duplicados
+      // al reenviar el mismo formulario).
+      if (inscripciones.length > 0) {
+        const numeroDocumento = `BOL-INS-${dto.gestion}-${periodoNumero}-${estudiante.codigoInscripcion}-${Date.now()}`;
+        const boleta = gestor.create(DocumentoEmitido, {
+          estudianteId: dto.estudianteId,
+          tipo: TipoDocumento.BOLETA_INSCRIPCION,
+          numeroDocumento,
+          gestion: dto.gestion,
+          gestionId: gestion.id,
+        });
+        const boletaGuardada = await gestor.save(boleta);
+        boletaId = boletaGuardada.id;
+        boletaNumero = boletaGuardada.numeroDocumento;
+      }
     });
 
-    const boletaGuardada = await this.repositorioDocumento.save(boleta);
+    // 3) Reflejar al estudiante en el libro de calificaciones de las materias
+    //    impartidas que ya existan para esos grupos.
+    let inscritosLibro = 0;
+    for (const asignacion of asignaciones) {
+      inscritosLibro += await this.servicioMateriasImpartidas.sincronizarEstudianteEnGrupo(
+        asignacion.grupoId,
+        dto.estudianteId,
+      );
+    }
 
     return {
       exito: true,
       inscripciones,
-      boletaId: boletaGuardada.id,
-      mensaje: `Se crearon ${inscripciones.length} inscripciones para ${periodoNumero}/${dto.gestion}`,
+      boletaId,
+      boletaNumero,
+      asignadosGrupo,
+      inscritosLibro,
+      mensaje:
+        inscripciones.length > 0
+          ? `Se crearon ${inscripciones.length} inscripción(es) para ${periodoNumero}/${dto.gestion}`
+          : `El estudiante ya estaba inscrito en las materias seleccionadas (${periodoNumero}/${dto.gestion})`,
     };
   }
 
@@ -547,6 +617,37 @@ export class ServicioPreinscripcion {
     };
   }
 
+  private nombreCubrePeriodo(nombre: string | undefined, periodoNumero: string): boolean {
+    if (!nombre) {
+      return false;
+    }
+    // Se acepta el concepto como genérico (sin número romano) o específico del
+    // periodo. Se compara por tokens para evitar falsos positivos como
+    // "Matrícula I" coincidiendo con el periodo "II".
+    const tokens = nombre
+      .toUpperCase()
+      .split(/[^A-Z0-9]+/)
+      .filter(Boolean);
+    const romanos = tokens.filter((token) => token === 'I' || token === 'II');
+    if (romanos.length === 0) {
+      return true;
+    }
+    const buscado = periodoNumero.toUpperCase();
+    return romanos.some((romano) => romano === buscado);
+  }
+
+  /**
+   * Determina si un pago cubre el período solicitado. Se prefiere el campo
+   * `periodo` del pago; si no estuviera definido (registros antiguos) se
+   * recurre al nombre del concepto como respaldo.
+   */
+  private pagoCubrePeriodo(pago: Pago, periodoNumero: string): boolean {
+    if (pago.periodo) {
+      return pago.periodo.toUpperCase() === periodoNumero.toUpperCase();
+    }
+    return this.nombreCubrePeriodo(pago.concepto?.nombre, periodoNumero);
+  }
+
   private obtenerNumeroPeriodoActual(gestion: Gestion): string {
     const ahora = new Date();
     const periodo = gestion.periodos?.find((periodoEncontrado) => {
@@ -560,7 +661,7 @@ export class ServicioPreinscripcion {
   async obtenerGruposPorCarreraYSemestre(
     carreraId: number,
     gestion: string,
-    semestre: number,
+    semestre?: number,
     turnoId?: number,
   ): Promise<Grupo[]> {
     const consulta = this.repositorioGrupo
@@ -568,14 +669,17 @@ export class ServicioPreinscripcion {
       .leftJoinAndSelect('grupo.turno', 'turno')
       .leftJoinAndSelect('grupo.carrera', 'carrera')
       .where('grupo.carreraId = :carreraId', { carreraId })
-      .andWhere('grupo.gestion = :gestion', { gestion })
-      .andWhere('grupo.semestre = :semestre', { semestre });
+      .andWhere('grupo.gestion = :gestion', { gestion });
+
+    if (semestre) {
+      consulta.andWhere('grupo.semestre = :semestre', { semestre });
+    }
 
     if (turnoId) {
       consulta.andWhere('grupo.turnoId = :turnoId', { turnoId });
     }
 
-    return consulta.getMany();
+    return consulta.orderBy('grupo.semestre', 'ASC').addOrderBy('grupo.paralelo', 'ASC').getMany();
   }
 
   async obtenerPeriodoAbierto(anioGestion: string): Promise<Periodo | null> {

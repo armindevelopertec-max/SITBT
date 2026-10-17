@@ -527,6 +527,43 @@ export class ServicioMateriasImpartidas {
     return { creadas };
   }
 
+  /**
+   * Inscribe a un estudiante en todas las materias impartidas de un grupo y
+   * asegura su libro de calificaciones. Se usa desde la preinscripción para que
+   * el estudiante aparezca de inmediato en el libro de notas.
+   */
+  async sincronizarEstudianteEnGrupo(grupoId: number, estudianteId: number): Promise<number> {
+    const materias = await this.repositorioMateriaImpartida.find({ where: { grupoId } });
+    if (materias.length === 0) {
+      return 0;
+    }
+
+    const existentes = await this.repositorioInscripcionMateria.find({
+      where: { estudianteId, materiaImpartidaId: In(materias.map((m) => m.id)) },
+    });
+    const porMateria = new Map(existentes.map((i) => [i.materiaImpartidaId, i]));
+
+    let creadas = 0;
+    for (const materia of materias) {
+      const existente = porMateria.get(materia.id);
+      if (!existente) {
+        await this.repositorioInscripcionMateria.save(
+          this.repositorioInscripcionMateria.create({
+            estudianteId,
+            materiaImpartidaId: materia.id,
+            estado: EstadoInscripcionMateria.CURSANDO,
+          }),
+        );
+        creadas++;
+      } else if (existente.estado === EstadoInscripcionMateria.RETIRADO) {
+        existente.estado = EstadoInscripcionMateria.CURSANDO;
+        await this.repositorioInscripcionMateria.save(existente);
+      }
+      await this.asegurarLibro(materia.id);
+    }
+    return creadas;
+  }
+
   private async sincronizarInscripciones(materiaImpartidaId: number, grupoId: number): Promise<number> {
     const miembros = await this.repositorioGrupoEstudiante.find({ where: { grupoId } });
     if (miembros.length === 0) {
