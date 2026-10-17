@@ -15,6 +15,7 @@ import { ServicioGrupos, FiltrosGrupo } from './grupos.servicio';
 import { CrearGrupoDto } from './dto/crear-grupo.dto';
 import { ActualizarGrupoDto } from './dto/actualizar-grupo.dto';
 import { GenerarGruposDto } from './dto/generar-grupos.dto';
+import { ClonarGruposDto } from './dto/clonar-grupos.dto';
 import { CambiarEstadoGrupoDto } from './dto/cambiar-estado-grupo.dto';
 import { TrasladarGrupoDto } from './dto/trasladar-grupo.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
@@ -37,6 +38,11 @@ export class ControladorGrupos {
     return this.servicioGrupos.generarGrupos(generarGruposDto);
   }
 
+  @Post('clonar')
+  clonar(@Body() clonarGruposDto: ClonarGruposDto) {
+    return this.servicioGrupos.clonar(clonarGruposDto);
+  }
+
   @Get()
   obtenerTodos(
     @Query('pagina') pagina = 1,
@@ -46,7 +52,7 @@ export class ControladorGrupos {
     @Query('semestre') semestre?: number,
     @Query('turnoId') turnoId?: number,
     @Query('paralelo') paralelo?: string,
-    @Query('periodo') periodo?: string,
+    @Query('periodoId') periodoId?: number,
     @Query('estado') estado?: EstadoGrupo,
     @Query('busqueda') busqueda?: string,
   ) {
@@ -56,7 +62,7 @@ export class ControladorGrupos {
       semestre: semestre ? +semestre : undefined,
       turnoId: turnoId ? +turnoId : undefined,
       paralelo,
-      periodo,
+      periodoId: periodoId ? +periodoId : undefined,
       estado,
       busqueda,
     };
@@ -67,17 +73,15 @@ export class ControladorGrupos {
   @Get('por-carrera-turno')
   buscarPorCarreraYTurno(
     @Query('carreraId') carreraId: number,
-    @Query('gestion') gestion: string,
+    @Query('periodoId') periodoId: number,
     @Query('semestre') semestre: number,
     @Query('turnoId') turnoId: number,
-    @Query('periodo') periodo?: string,
   ) {
     return this.servicioGrupos.buscarPorCarreraYTurno(
       +carreraId,
-      gestion,
+      +periodoId,
       +semestre,
       +turnoId,
-      periodo,
     );
   }
 

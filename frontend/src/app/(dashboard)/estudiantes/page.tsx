@@ -27,6 +27,23 @@ const etiquetasOrigen: Record<string, string> = {
   secretaria: 'Secretaría',
 };
 
+/** Genera la lista de páginas a mostrar, con elipsis si son muchas. */
+const generarPaginas = (actual: number, total: number): (number | '...')[] => {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  const paginas: (number | '...')[] = [1];
+  const inicio = Math.max(2, actual - 1);
+  const fin = Math.min(total - 1, actual + 1);
+  if (inicio > 2) paginas.push('...');
+  for (let p = inicio; p <= fin; p++) paginas.push(p);
+  if (fin < total - 1) paginas.push('...');
+  paginas.push(total);
+  return paginas;
+};
+
+const ESTUDIANTES_POR_PAGINA = 20;
+
 export default function PaginaEstudiantes() {
   const router = useRouter();
   const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
@@ -34,6 +51,7 @@ export default function PaginaEstudiantes() {
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
   const [filtroEstado, setFiltroEstado] = useState<string>('');
   const [filtroOrigen, setFiltroOrigen] = useState<string>('');
+  const [pagina, setPagina] = useState(1);
 
   const [estudianteEliminando, setEstudianteEliminando] = useState<Estudiante | null>(null);
   const [modalCredenciales, setModalCredenciales] = useState<{ nombreUsuario: string; contrasena: string; nombre: string; estudianteId: number; personaId: number } | null>(null);
@@ -46,8 +64,20 @@ export default function PaginaEstudiantes() {
 
   const obtenerEstudiantes = async () => {
     try {
-      const respuesta = await api.get('/estudiantes');
-      setEstudiantes(respuesta.data.datos);
+      // La API pagina (20 por defecto); traemos todas las páginas para poder
+      // filtrar y paginar en el cliente sin perder registros.
+      const limite = 200;
+      const acumulados: Estudiante[] = [];
+      let paginaActual = 1;
+      let total = 0;
+      do {
+        const respuesta = await api.get('/estudiantes', { params: { pagina: paginaActual, limite } });
+        const datos: Estudiante[] = respuesta.data.datos || [];
+        acumulados.push(...datos);
+        total = Number(respuesta.data.total ?? acumulados.length);
+        paginaActual += 1;
+      } while (acumulados.length < total && paginaActual <= 100);
+      setEstudiantes(acumulados);
     } catch (error) {
       console.error('Error al cargar estudiantes:', error);
     } finally {
@@ -66,6 +96,24 @@ export default function PaginaEstudiantes() {
     const coincideOrigen = !filtroOrigen || estudiante.origen === filtroOrigen;
     return coincideBusqueda && coincideEstado && coincideOrigen;
   });
+
+  const totalPaginas = Math.max(1, Math.ceil(estudiantesFiltrados.length / ESTUDIANTES_POR_PAGINA));
+  const inicio = estudiantesFiltrados.length === 0 ? 0 : (pagina - 1) * ESTUDIANTES_POR_PAGINA + 1;
+  const fin = Math.min(pagina * ESTUDIANTES_POR_PAGINA, estudiantesFiltrados.length);
+  const estudiantesPaginados = estudiantesFiltrados.slice(
+    (pagina - 1) * ESTUDIANTES_POR_PAGINA,
+    pagina * ESTUDIANTES_POR_PAGINA,
+  );
+
+  // Volver a la primera página cuando cambian los filtros o la búsqueda
+  useEffect(() => {
+    setPagina(1);
+  }, [terminoBusqueda, filtroEstado, filtroOrigen]);
+
+  // Si la página actual queda fuera de rango (p. ej. al filtrar), ajustarla
+  useEffect(() => {
+    if (pagina > totalPaginas) setPagina(totalPaginas);
+  }, [pagina, totalPaginas]);
 
   const obtenerInsigniaEstado = (estado: string) => {
     const configuracion = etiquetasEstado[estado] || { etiqueta: estado, color: 'bg-gray-100 text-gray-800' };
@@ -209,7 +257,7 @@ export default function PaginaEstudiantes() {
               </FilaTabla>
             </EncabezadoTabla>
             <CuerpoTabla>
-              {estudiantesFiltrados.map((estudiante) => (
+              {estudiantesPaginados.map((estudiante) => (
                 <FilaTabla key={estudiante.id}>
                   <CeldaTabla className="font-medium">
                     {estudiante.persona?.ci}
@@ -247,6 +295,49 @@ export default function PaginaEstudiantes() {
               )}
             </CuerpoTabla>
           </Tabla>
+
+          {estudiantesFiltrados.length > 0 && (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
+              <p className="text-sm text-gray-500">
+                Mostrando {inicio}-{fin} de {estudiantesFiltrados.length} estudiante(s)
+              </p>
+              <div className="flex items-center gap-1">
+                <Boton
+                  variante="contorno"
+                  tamano="pequeno"
+                  onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                  disabled={pagina === 1}
+                >
+                  Anterior
+                </Boton>
+                {generarPaginas(pagina, totalPaginas).map((p, indice) =>
+                  p === '...' ? (
+                    <span key={`puntos-${indice}`} className="px-2 text-gray-400">
+                      …
+                    </span>
+                  ) : (
+                    <Boton
+                      key={p}
+                      variante={p === pagina ? 'primario' : 'contorno'}
+                      tamano="pequeno"
+                      className="min-w-[2.25rem]"
+                      onClick={() => setPagina(p)}
+                    >
+                      {p}
+                    </Boton>
+                  ),
+                )}
+                <Boton
+                  variante="contorno"
+                  tamano="pequeno"
+                  onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                  disabled={pagina >= totalPaginas}
+                >
+                  Siguiente
+                </Boton>
+              </div>
+            </div>
+          )}
         </ContenidoTarjeta>
       </Tarjeta>
 

@@ -12,11 +12,14 @@ import { GrupoHistorial } from '../../entidades/grupo-historial.entidad';
 import { CrearGrupoDto } from './dto/crear-grupo.dto';
 import { ActualizarGrupoDto } from './dto/actualizar-grupo.dto';
 import { GenerarGruposDto } from './dto/generar-grupos.dto';
+import { ClonarGruposDto } from './dto/clonar-grupos.dto';
 import { PlanEstudio, EstadoPlanEstudio } from '../../entidades/plan-estudio.entidad';
 import { MateriaPlan } from '../../entidades/materia-plan.entidad';
 import { Turno } from '../../entidades/turno.entidad';
 import { Carrera } from '../../entidades/carrera.entidad';
 import { Estudiante, EstadoEstudiante } from '../../entidades/estudiante.entidad';
+import { Periodo } from '../../entidades/periodo.entidad';
+import { Gestion } from '../../entidades/gestion.entidad';
 
 export interface FiltrosGrupo {
   gestion?: string;
@@ -24,7 +27,7 @@ export interface FiltrosGrupo {
   semestre?: number;
   turnoId?: number;
   paralelo?: string;
-  periodo?: string;
+  periodoId?: number;
   estado?: EstadoGrupo;
   busqueda?: string;
 }
@@ -48,6 +51,10 @@ export class ServicioGrupos {
     private repositorioMateriaPlan: Repository<MateriaPlan>,
     @InjectRepository(Estudiante)
     private repositorioEstudiante: Repository<Estudiante>,
+    @InjectRepository(Periodo)
+    private repositorioPeriodo: Repository<Periodo>,
+    @InjectRepository(Gestion)
+    private repositorioGestion: Repository<Gestion>,
     private readonly fuenteDatos: DataSource,
   ) {}
 
@@ -115,6 +122,20 @@ export class ServicioGrupos {
     return plan;
   }
 
+  private async resolverPeriodo(periodoId?: number): Promise<Periodo> {
+    if (!periodoId) {
+      throw new BadRequestException('El periodo es obligatorio');
+    }
+    const periodo = await this.repositorioPeriodo.findOne({
+      where: { id: periodoId },
+      relations: ['gestion'],
+    });
+    if (!periodo) {
+      throw new NotFoundException(`Periodo con ID ${periodoId} no encontrado`);
+    }
+    return periodo;
+  }
+
   async crear(crearGrupoDto: CrearGrupoDto): Promise<Grupo> {
     const carrera = await this.repositorioCarrera.findOne({ where: { id: crearGrupoDto.carreraId } });
     if (!carrera) {
@@ -128,13 +149,17 @@ export class ServicioGrupos {
 
     const plan = await this.resolverPlanDeCarrera(crearGrupoDto.carreraId, crearGrupoDto.planEstudioId);
 
-    const periodo = (crearGrupoDto.periodo || 'I').trim().toUpperCase();
+    const periodo = await this.resolverPeriodo(crearGrupoDto.periodoId);
+    const gestion = periodo.gestion?.anio;
+    if (!gestion) {
+      throw new BadRequestException(`El periodo ${periodo.numero} no tiene una gestión asociada`);
+    }
 
     const existente = await this.repositorioGrupo.findOne({
       where: {
-        gestion: crearGrupoDto.gestion,
+        gestion,
         carreraId: crearGrupoDto.carreraId,
-        periodo,
+        periodoId: periodo.id,
         semestre: crearGrupoDto.semestre,
         turnoId: crearGrupoDto.turnoId,
         paralelo: crearGrupoDto.paralelo,
@@ -142,7 +167,7 @@ export class ServicioGrupos {
     });
     if (existente) {
       throw new ConflictException(
-        `Ya existe un grupo para la combinación gestión ${crearGrupoDto.gestion}, periodo ${periodo}, carrera ${carrera.codigo}, semestre ${crearGrupoDto.semestre}, turno ${turno.codigo}, paralelo ${crearGrupoDto.paralelo}`,
+        `Ya existe un grupo para la combinación gestión ${gestion}, periodo ${periodo.numero}, carrera ${carrera.codigo}, semestre ${crearGrupoDto.semestre}, turno ${turno.codigo}, paralelo ${crearGrupoDto.paralelo}`,
       );
     }
 
@@ -151,8 +176,8 @@ export class ServicioGrupos {
       crearGrupoDto.semestre,
       turno,
       crearGrupoDto.paralelo,
-      crearGrupoDto.gestion,
-      periodo,
+      gestion,
+      periodo.numero,
     );
 
     const grupo = this.repositorioGrupo.create({
@@ -162,8 +187,8 @@ export class ServicioGrupos {
       semestre: crearGrupoDto.semestre,
       turnoId: crearGrupoDto.turnoId,
       paralelo: crearGrupoDto.paralelo,
-      gestion: crearGrupoDto.gestion,
-      periodo,
+      gestion,
+      periodoId: periodo.id,
       capacidad: crearGrupoDto.capacidad ?? 30,
       estado: EstadoGrupo.ACTIVO,
       ...(crearGrupoDto.materiaId ? { materiaId: crearGrupoDto.materiaId } : {}),
@@ -191,7 +216,11 @@ export class ServicioGrupos {
     }
 
     const capacidad = parseInt(dto.capacidad || '30', 10) || 30;
-    const periodo = (dto.periodo || 'I').trim().toUpperCase();
+    const periodo = await this.resolverPeriodo(dto.periodoId);
+    const gestion = periodo.gestion?.anio;
+    if (!gestion) {
+      throw new BadRequestException(`El periodo ${periodo.numero} no tiene una gestión asociada`);
+    }
     let creados = 0;
     let existentes = 0;
 
@@ -200,9 +229,9 @@ export class ServicioGrupos {
         for (const paralelo of dto.paralelos) {
           const existe = await this.repositorioGrupo.findOne({
             where: {
-              gestion: dto.gestion,
+              gestion,
               carreraId: plan.carreraId,
-              periodo,
+              periodoId: periodo.id,
               semestre,
               turnoId,
               paralelo,
@@ -218,7 +247,7 @@ export class ServicioGrupos {
             continue;
           }
 
-          const codigo = await this.generarCodigo(carrera, semestre, turno, paralelo, dto.gestion, periodo);
+          const codigo = await this.generarCodigo(carrera, semestre, turno, paralelo, gestion, periodo.numero);
 
           await this.repositorioGrupo.save(
             this.repositorioGrupo.create({
@@ -228,8 +257,8 @@ export class ServicioGrupos {
               semestre,
               turnoId,
               paralelo,
-              gestion: dto.gestion,
-              periodo,
+              gestion,
+              periodoId: periodo.id,
               capacidad,
               estado: EstadoGrupo.ACTIVO,
             }),
@@ -278,7 +307,9 @@ export class ServicioGrupos {
       .leftJoinAndSelect('grupo.carrera', 'carrera')
       .leftJoinAndSelect('grupo.plan_estudio', 'plan_estudio')
       .leftJoinAndSelect('grupo.turno', 'turno')
-      .leftJoinAndSelect('grupo.materia', 'materia');
+      .leftJoinAndSelect('grupo.materia', 'materia')
+      .leftJoinAndSelect('grupo.periodo', 'periodo')
+      .leftJoinAndSelect('periodo.gestion', 'periodo_gestion');
 
     if (filtros.gestion) {
       consulta.andWhere('grupo.gestion = :gestion', { gestion: filtros.gestion });
@@ -295,8 +326,8 @@ export class ServicioGrupos {
     if (filtros.paralelo) {
       consulta.andWhere('grupo.paralelo = :paralelo', { paralelo: filtros.paralelo });
     }
-    if (filtros.periodo) {
-      consulta.andWhere('grupo.periodo = :periodo', { periodo: filtros.periodo });
+    if (filtros.periodoId) {
+      consulta.andWhere('grupo.periodoId = :periodoId', { periodoId: filtros.periodoId });
     }
     if (filtros.estado) {
       consulta.andWhere('grupo.estado = :estado', { estado: filtros.estado });
@@ -309,7 +340,7 @@ export class ServicioGrupos {
 
     const [datos, total] = await consulta
       .orderBy('grupo.gestion', 'DESC')
-      .addOrderBy('grupo.periodo', 'ASC')
+      .addOrderBy('grupo.periodoId', 'ASC')
       .addOrderBy('grupo.semestre', 'ASC')
       .addOrderBy('grupo.paralelo', 'ASC')
       .skip((pagina - 1) * limite)
@@ -329,7 +360,7 @@ export class ServicioGrupos {
   async obtenerUno(id: number): Promise<Grupo> {
     const grupo = await this.repositorioGrupo.findOne({
       where: { id },
-      relations: ['carrera', 'plan_estudio', 'turno', 'materia'],
+      relations: ['carrera', 'plan_estudio', 'turno', 'materia', 'periodo', 'periodo.gestion'],
     });
     if (!grupo) {
       throw new NotFoundException(`Grupo con ID ${id} no encontrado`);
@@ -346,10 +377,16 @@ export class ServicioGrupos {
       throw new NotFoundException(`Grupo con ID ${id} no encontrado`);
     }
 
+    const periodo =
+      actualizarGrupoDto.periodoId != null
+        ? await this.resolverPeriodo(actualizarGrupoDto.periodoId)
+        : await this.resolverPeriodo(grupo.periodoId);
+    const gestion = periodo.gestion?.anio ?? grupo.gestion;
+
     const nuevaCombinacion = {
-      gestion: actualizarGrupoDto.gestion ?? grupo.gestion,
+      gestion,
       carreraId: actualizarGrupoDto.carreraId ?? grupo.carreraId,
-      periodo: (actualizarGrupoDto.periodo ?? grupo.periodo ?? 'I').trim().toUpperCase(),
+      periodoId: periodo.id,
       semestre: actualizarGrupoDto.semestre ?? grupo.semestre,
       turnoId: actualizarGrupoDto.turnoId ?? grupo.turnoId,
       paralelo: actualizarGrupoDto.paralelo ?? grupo.paralelo,
@@ -358,7 +395,7 @@ export class ServicioGrupos {
     const combinacionCambia =
       nuevaCombinacion.gestion !== grupo.gestion ||
       nuevaCombinacion.carreraId !== grupo.carreraId ||
-      nuevaCombinacion.periodo !== grupo.periodo ||
+      nuevaCombinacion.periodoId !== grupo.periodoId ||
       nuevaCombinacion.semestre !== grupo.semestre ||
       nuevaCombinacion.turnoId !== grupo.turnoId ||
       nuevaCombinacion.paralelo !== grupo.paralelo;
@@ -388,12 +425,13 @@ export class ServicioGrupos {
         turno,
         nuevaCombinacion.paralelo,
         nuevaCombinacion.gestion,
-        nuevaCombinacion.periodo,
+        periodo.numero,
       );
     }
 
     Object.assign(grupo, actualizarGrupoDto);
-    grupo.periodo = nuevaCombinacion.periodo;
+    grupo.gestion = nuevaCombinacion.gestion;
+    grupo.periodoId = nuevaCombinacion.periodoId;
     await this.repositorioGrupo.save(grupo);
     return this.obtenerUno(id);
   }
@@ -650,14 +688,108 @@ export class ServicioGrupos {
 
   async buscarPorCarreraYTurno(
     carreraId: number,
-    gestion: string,
+    periodoId: number,
     semestre: number,
     turnoId: number,
-    periodo?: string,
   ): Promise<Grupo[]> {
     return this.repositorioGrupo.find({
-      where: { carreraId, gestion, semestre, turnoId, periodo },
-      relations: ['turno', 'carrera', 'plan_estudio', 'materia'],
+      where: { carreraId, periodoId, semestre, turnoId },
+      relations: ['turno', 'carrera', 'plan_estudio', 'materia', 'periodo'],
     });
+  }
+
+  /**
+   * Clona la estructura de los grupos de un periodo origen a un periodo destino.
+   * NO copia estudiantes (ellos cambian de semestre); solo recrea los grupos
+   * (carrera, plan, semestre, turno, paralelo y capacidad) con el nuevo código.
+   */
+  async clonar(dto: ClonarGruposDto): Promise<{
+    creados: number;
+    existentes: number;
+    total: number;
+    periodoOrigen: string;
+    periodoDestino: string;
+    mensaje: string;
+  }> {
+    const origen = await this.resolverPeriodo(dto.periodoOrigenId);
+    const destino = await this.resolverPeriodo(dto.periodoDestinoId);
+
+    if (origen.id === destino.id) {
+      throw new BadRequestException('El periodo de origen y destino deben ser distintos');
+    }
+
+    const gestionDestino = destino.gestion?.anio;
+    if (!gestionDestino) {
+      throw new BadRequestException(`El periodo ${destino.numero} no tiene una gestión asociada`);
+    }
+
+    const etiqueta = (p: Periodo) => `${p.gestion?.anio ?? '?'} · Periodo ${p.numero}`;
+
+    const filtro: Record<string, number> = { periodoId: origen.id };
+    if (dto.carreraId) {
+      filtro.carreraId = dto.carreraId;
+    }
+
+    const gruposOrigen = await this.repositorioGrupo.find({ where: filtro });
+
+    let creados = 0;
+    let existentes = 0;
+
+    for (const original of gruposOrigen) {
+      const yaExiste = await this.repositorioGrupo.findOne({
+        where: {
+          gestion: gestionDestino,
+          carreraId: original.carreraId,
+          periodoId: destino.id,
+          semestre: original.semestre,
+          turnoId: original.turnoId,
+          paralelo: original.paralelo,
+        },
+      });
+      if (yaExiste) {
+        existentes++;
+        continue;
+      }
+
+      const carrera = await this.repositorioCarrera.findOne({ where: { id: original.carreraId } });
+      const turno = await this.repositorioTurno.findOne({ where: { id: original.turnoId } });
+      if (!carrera || !turno) {
+        continue;
+      }
+
+      const codigo = await this.generarCodigo(
+        carrera,
+        original.semestre,
+        turno,
+        original.paralelo,
+        gestionDestino,
+        destino.numero,
+      );
+
+      await this.repositorioGrupo.save(
+        this.repositorioGrupo.create({
+          codigo,
+          carreraId: original.carreraId,
+          planEstudioId: original.planEstudioId,
+          semestre: original.semestre,
+          turnoId: original.turnoId,
+          paralelo: original.paralelo,
+          gestion: gestionDestino,
+          periodoId: destino.id,
+          capacidad: original.capacidad,
+          estado: EstadoGrupo.ACTIVO,
+        }),
+      );
+      creados++;
+    }
+
+    return {
+      creados,
+      existentes,
+      total: gruposOrigen.length,
+      periodoOrigen: etiqueta(origen),
+      periodoDestino: etiqueta(destino),
+      mensaje: `Se clonaron ${creados} grupo(s) de ${etiqueta(origen)} a ${etiqueta(destino)}; ${existentes} ya existían`,
+    };
   }
 }

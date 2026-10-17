@@ -124,6 +124,20 @@ async function sembrarGrupos() {
       }
     }
 
+    // 3b. Periodo (gestión 2026 · periodo I) para vincular periodo_id
+    const periodoFila: any[] = await ejecutor.query(
+      `SELECT p.id
+       FROM periodos p
+       JOIN gestiones ge ON ge.id = p."gestionId"
+       WHERE ge.anio = $1 AND p.numero = $2
+       LIMIT 1`,
+      [GESTION, PERIODO],
+    );
+    if (periodoFila.length === 0) {
+      throw new Error(`No existe el periodo ${PERIODO} de la gestión ${GESTION}`);
+    }
+    const periodoId = periodoFila[0].id;
+
     // 4. Combinaciones únicas (gestión, carrera, semestre, turno, paralelo)
     interface Combinacion {
       carreraId: number;
@@ -174,25 +188,25 @@ async function sembrarGrupos() {
 
       const existente: any[] = await ejecutor.query(
         `SELECT id FROM grupos
-         WHERE gestion = $1 AND carrera_id = $2 AND semestre = $3 AND turno_id = $4 AND paralelo = $5 AND periodo = $6`,
-        [GESTION, combo.carreraId, combo.semestre, combo.turnoId, combo.paralelo, PERIODO],
+         WHERE gestion = $1 AND carrera_id = $2 AND semestre = $3 AND turno_id = $4 AND paralelo = $5 AND periodo_id = $6`,
+        [GESTION, combo.carreraId, combo.semestre, combo.turnoId, combo.paralelo, periodoId],
       );
 
       if (existente.length > 0) {
         const grupoId = existente[0].id;
         await ejecutor.query(
           `UPDATE grupos
-           SET codigo = $1, plan_estudio_id = $2, periodo = $3, capacidad = $4,
+           SET codigo = $1, plan_estudio_id = $2, periodo_id = $3, capacidad = $4,
                estado = 'activo', materia_id = NULL, actualizado_en = now()
            WHERE id = $5`,
-          [codigo, planEstudioId, PERIODO, CAPACIDAD, grupoId],
+          [codigo, planEstudioId, periodoId, CAPACIDAD, grupoId],
         );
         mapaGrupos.set(clave, grupoId);
         gruposActualizados++;
       } else {
         const insertado: any[] = await ejecutor.query(
           `INSERT INTO grupos
-             (codigo, carrera_id, plan_estudio_id, semestre, turno_id, paralelo, gestion, periodo, capacidad, estado)
+             (codigo, carrera_id, plan_estudio_id, semestre, turno_id, paralelo, gestion, periodo_id, capacidad, estado)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'activo')
            RETURNING id`,
           [
@@ -203,7 +217,7 @@ async function sembrarGrupos() {
             combo.turnoId,
             combo.paralelo,
             GESTION,
-            PERIODO,
+            periodoId,
             CAPACIDAD,
           ],
         );

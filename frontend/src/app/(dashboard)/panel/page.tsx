@@ -1,20 +1,114 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { Migas } from '@/componentes/iu/migas';
-import { Users, GraduationCap, UserCog, BookOpen, TrendingUp, Calendar, DollarSign, Award } from 'lucide-react';
-import { etiquetaRol } from '@/libreria/autenticacion';
+import { Users, GraduationCap, UserCog, BookOpen, Clock, Fingerprint } from 'lucide-react';
+import { api } from '@/libreria/api';
+import { EstadoPersonalHoy } from '@/tipos';
+
+const formatearHora = (iso?: string | null) =>
+  iso
+    ? new Date(iso).toLocaleTimeString('es-BO', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+    : '—';
+
+const etiquetaCargo = (cargo: string) =>
+  (cargo || '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+/** Cuenta los elementos de una respuesta que puede ser un arreglo o `{ datos: [] }`. */
+const contarLista = (datos: unknown): number => {
+  if (Array.isArray(datos)) return datos.length;
+  const lista = (datos as { datos?: unknown[] } | null)?.datos;
+  return Array.isArray(lista) ? lista.length : 0;
+};
 
 export default function PaginaPanel() {
   const { usuario } = usarAlmacenAutenticacion();
 
-  const estadisticas = [
-    { titulo: 'Total Estudiantes', valor: '1,234', icono: GraduationCap, color: 'text-blue-600', colorFondo: 'bg-blue-100' },
-    { titulo: 'Personal Activo', valor: '156', icono: UserCog, color: 'text-green-600', colorFondo: 'bg-green-100' },
-    { titulo: 'Carreras', valor: '12', icono: BookOpen, color: 'text-purple-600', colorFondo: 'bg-purple-100' },
-    { titulo: 'Ingresos del Mes', valor: 'Bs. 45,230', icono: DollarSign, color: 'text-emerald-600', colorFondo: 'bg-emerald-100' },
-  ];
+  const [estadisticas, setEstadisticas] = useState([
+    { titulo: 'Total Estudiantes', valor: '—', detalle: 'Cargando…', icono: GraduationCap, color: 'text-blue-600', colorFondo: 'bg-blue-100' },
+    { titulo: 'Personal Activo', valor: '—', detalle: 'Cargando…', icono: UserCog, color: 'text-green-600', colorFondo: 'bg-green-100' },
+    { titulo: 'Carreras', valor: '—', detalle: 'Cargando…', icono: BookOpen, color: 'text-purple-600', colorFondo: 'bg-purple-100' },
+  ]);
+
+  const [estadoPersonal, setEstadoPersonal] = useState<EstadoPersonalHoy[]>([]);
+  const [resumenAsistencia, setResumenAsistencia] = useState({ total: 0, dentro: 0 });
+  const [cargandoAsistencia, setCargandoAsistencia] = useState(true);
+
+  useEffect(() => {
+    const cargarAsistencia = async () => {
+      try {
+        const respuesta = await api.get('/asistencias-personal/estado-hoy');
+        setEstadoPersonal(respuesta.data.personal ?? []);
+        setResumenAsistencia({
+          total: respuesta.data.total ?? 0,
+          dentro: respuesta.data.dentro ?? 0,
+        });
+      } catch (error) {
+        console.error('Error al cargar asistencias del panel:', error);
+      } finally {
+        setCargandoAsistencia(false);
+      }
+    };
+
+    cargarAsistencia();
+  }, []);
+
+  useEffect(() => {
+    const cargarEstadisticas = async () => {
+      try {
+        const [resEstudiantes, resPersonalActivos, resDocentes, resCarreras] = await Promise.all([
+          api.get('/estudiantes/estadisticas'),
+          api.get('/personal/activos'),
+          api.get('/personal/docentes'),
+          api.get('/carreras/activos'),
+        ]);
+
+        const totalEstudiantes = Number(resEstudiantes.data?.total ?? 0);
+        const estudiantesActivos = Number(resEstudiantes.data?.activos ?? 0);
+        const personalActivo = contarLista(resPersonalActivos.data);
+        const docentes = contarLista(resDocentes.data);
+        const carrerasActivas = contarLista(resCarreras.data);
+
+        setEstadisticas([
+          {
+            titulo: 'Total Estudiantes',
+            valor: totalEstudiantes.toLocaleString('es-BO'),
+            detalle: `${estudiantesActivos.toLocaleString('es-BO')} activos`,
+            icono: GraduationCap,
+            color: 'text-blue-600',
+            colorFondo: 'bg-blue-100',
+          },
+          {
+            titulo: 'Personal Activo',
+            valor: personalActivo.toLocaleString('es-BO'),
+            detalle: `${docentes.toLocaleString('es-BO')} docentes`,
+            icono: UserCog,
+            color: 'text-green-600',
+            colorFondo: 'bg-green-100',
+          },
+          {
+            titulo: 'Carreras',
+            valor: carrerasActivas.toLocaleString('es-BO'),
+            detalle: `${carrerasActivas.toLocaleString('es-BO')} activas`,
+            icono: BookOpen,
+            color: 'text-purple-600',
+            colorFondo: 'bg-purple-100',
+          },
+        ]);
+      } catch (error) {
+        console.error('Error al cargar estadísticas del panel:', error);
+      }
+    };
+
+    cargarEstadisticas();
+  }, []);
 
   const actividadReciente = [
     { id: 1, accion: 'Nuevo estudiante registrado', usuario: 'Maria Lopez', hora: 'Hace 5 minutos' },
@@ -35,28 +129,87 @@ export default function PaginaPanel() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {estadisticas.map((estadistica) => (
           <Tarjeta key={estadistica.titulo} variante="conBorde">
-            <ContenidoTarjeta className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{estadistica.titulo}</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{estadistica.valor}</p>
+            <ContenidoTarjeta className="px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-medium text-gray-500">{estadistica.titulo}</p>
+                  <p className="text-xl font-bold leading-tight text-gray-900">{estadistica.valor}</p>
+                  <p className="truncate text-xs text-gray-500">{estadistica.detalle}</p>
                 </div>
-                <div className={`p-3 rounded-full ${estadistica.colorFondo}`}>
-                  <estadistica.icono className={`w-6 h-6 ${estadistica.color}`} />
+                <div className={`shrink-0 rounded-lg p-2 ${estadistica.colorFondo}`}>
+                  <estadistica.icono className={`h-5 w-5 ${estadistica.color}`} />
                 </div>
-              </div>
-              <div className="mt-4 flex items-center text-sm text-gray-500">
-                <TrendingUp className="w-4 h-4 mr-1 text-green-500" />
-                <span className="text-green-600 font-medium">+12%</span>
-                <span className="ml-1">vs mes anterior</span>
               </div>
             </ContenidoTarjeta>
           </Tarjeta>
         ))}
       </div>
+
+      <Tarjeta variante="conBorde">
+        <EncabezadoTarjeta>
+          <div className="flex items-center justify-between">
+            <TituloTarjeta>
+              Personal en la Institución{' '}
+              <span className="font-normal text-gray-500">
+                ({resumenAsistencia.dentro} de {resumenAsistencia.total})
+              </span>
+            </TituloTarjeta>
+            <Link
+              href="/asistencias"
+              className="flex items-center gap-1 text-sm font-medium text-primary-600 hover:text-primary-700"
+            >
+              <Fingerprint className="h-4 w-4" />
+              Ver asistencias
+            </Link>
+          </div>
+        </EncabezadoTarjeta>
+        <ContenidoTarjeta>
+          {cargandoAsistencia ? (
+            <p className="py-6 text-center text-sm text-gray-500">Cargando…</p>
+          ) : estadoPersonal.length === 0 ? (
+            <p className="py-6 text-center text-sm text-gray-500">
+              No hay personal activo registrado.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {estadoPersonal.map((p) => (
+                <div
+                  key={p.personalId}
+                  className="flex items-center gap-3 rounded-lg border border-gray-200 p-3"
+                >
+                  <span
+                    className={`h-3.5 w-3.5 shrink-0 rounded-full ${
+                      p.dentro
+                        ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.8)]'
+                        : 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]'
+                    }`}
+                    title={p.dentro ? 'En la institución' : 'Fuera'}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-gray-900">
+                      {p.nombres} {p.apellidoPaterno}
+                    </p>
+                    <p className="truncate text-xs text-gray-500">
+                      {etiquetaCargo(p.cargo)}
+                    </p>
+                    <p className="flex items-center gap-1 text-xs text-gray-500">
+                      <Clock className="h-3 w-3" />
+                      {p.dentro
+                        ? `Llegó ${formatearHora(p.horaEntrada)}`
+                        : p.horaSalida
+                          ? `Salió ${formatearHora(p.horaSalida)}`
+                          : 'Sin marcación hoy'}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </ContenidoTarjeta>
+      </Tarjeta>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Tarjeta variante="conBorde">

@@ -5,6 +5,7 @@ import { ModuloAutenticacion } from './modulos/autenticacion/autenticacion.modul
 import { ModuloPersonas } from './modulos/personas/personas.modulo';
 import { ModuloEstudiantes } from './modulos/estudiantes/estudiantes.modulo';
 import { ModuloPersonal } from './modulos/personal/personal.modulo';
+import { ModuloAsistencias } from './modulos/asistencias/asistencias.modulo';
 import { ModuloUsuarios } from './modulos/usuarios/usuarios.modulo';
 import { ModuloRoles } from './modulos/roles/roles.modulo';
 import { ModuloCarreras } from './modulos/carreras/carreras.modulo';
@@ -55,6 +56,7 @@ import { ModuloPreinscripcion } from './modulos/preinscripcion/preinscripcion.mo
     ModuloPersonas,
     ModuloEstudiantes,
     ModuloPersonal,
+    ModuloAsistencias,
     ModuloUsuarios,
     ModuloRoles,
     ModuloCarreras,

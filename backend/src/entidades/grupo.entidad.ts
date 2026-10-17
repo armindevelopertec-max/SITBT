@@ -12,13 +12,14 @@ import { Carrera } from './carrera.entidad';
 import { PlanEstudio } from './plan-estudio.entidad';
 import { Turno } from './turno.entidad';
 import { Materia } from './materia.entidad';
+import { Periodo } from './periodo.entidad';
 
 export enum EstadoGrupo {
   ACTIVO = 'activo',
   CERRADO = 'cerrado',
 }
 
-@Unique('UQ_grupo_combinacion', ['gestion', 'carreraId', 'periodo', 'semestre', 'turnoId', 'paralelo'])
+@Unique('UQ_grupo_combinacion', ['gestion', 'carreraId', 'periodoId', 'semestre', 'turnoId', 'paralelo'])
 @Entity('grupos')
 export class Grupo {
   @PrimaryGeneratedColumn()
@@ -64,8 +65,12 @@ export class Grupo {
   @Column({ type: 'varchar', length: 10 })
   gestion: string;
 
-  @Column({ type: 'varchar', length: 2, default: 'I' })
-  periodo: string;
+  @Column({ name: 'periodo_id' })
+  periodoId: number;
+
+  @ManyToOne(() => Periodo)
+  @JoinColumn({ name: 'periodo_id' })
+  periodo: Periodo;
 
   @Column({ type: 'int', default: 30, name: 'capacidad' })
   capacidad: number;

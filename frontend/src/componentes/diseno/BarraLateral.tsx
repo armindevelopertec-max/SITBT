@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/libreria/utilidades';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { usarConfiguracionInstitucional } from '@/ganchos/usarConfiguracionInstitucional';
-import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, ClipboardList, Award, CreditCard, FileText, RefreshCw, BarChart3, Shield, User, BookMarked, CalendarCheck, Settings, Building2, Calendar, ClipboardCheck, FileBadge } from 'lucide-react';
+import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, ClipboardList, Award, CreditCard, FileText, RefreshCw, BarChart3, Shield, User, BookMarked, CalendarCheck, Settings, Building2, Calendar, ClipboardCheck, FileBadge, Fingerprint } from 'lucide-react';
 import { Rol } from '@/tipos';
 
 interface ElementoMenu {
@@ -53,6 +53,12 @@ const seccionesMenu: SeccionMenu[] = [
         href: '/personal',
         icono: <UserCog className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'rector'],
+      },
+      {
+        titulo: 'Asistencias',
+        href: '/asistencias',
+        icono: <Fingerprint className="w-5 h-5" />,
+        roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'apoyo'],
       },
       {
         titulo: 'Carreras',

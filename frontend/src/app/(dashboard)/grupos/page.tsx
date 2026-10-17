@@ -11,7 +11,16 @@ import { Insignia } from '@/componentes/iu/insignia';
 import { Modal, ModalConfirmacion } from '@/componentes/iu/modal';
 import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/componentes/iu/tabla';
 import { api } from '@/libreria/api';
-import { Search, Plus, Edit2, Trash2, Loader2, Eye, Wand2 } from 'lucide-react';
+import { Search, Plus, Lock, Unlock, Trash2, Loader2, Eye, Wand2, CopyPlus } from 'lucide-react';
+
+interface Periodo {
+  id: number;
+  gestionId: number;
+  numero: string;
+  nombre?: string | null;
+  estado?: string;
+  gestion?: { id: number; anio: string } | null;
+}
 
 interface Grupo {
   id: number;
@@ -23,7 +32,8 @@ interface Grupo {
   turnoId: number;
   paralelo: string;
   gestion: string;
-  periodo: string;
+  periodoId: number | null;
+  periodo?: Periodo | null;
   capacidad: number;
   estado: 'activo' | 'cerrado';
   carrera?: { id: number; codigo: string; nombre: string };
@@ -44,7 +54,27 @@ interface Gestion {
   id: number;
   anio: string;
   esActual: boolean;
+  periodos?: Periodo[];
 }
+
+/** Periodo aplanado con su gestión, listo para los selectores. */
+interface OpcionPeriodo {
+  id: number;
+  numero: string;
+  gestion: string;
+  etiqueta: string;
+}
+
+/** Arma la lista de periodos (con su gestión) a partir de las gestiones. */
+const construirOpcionesPeriodo = (gestiones: Gestion[]): OpcionPeriodo[] =>
+  gestiones.flatMap((gestion) =>
+    (gestion.periodos || []).map((periodo) => ({
+      id: periodo.id,
+      numero: periodo.numero,
+      gestion: gestion.anio,
+      etiqueta: `${gestion.anio} · Periodo ${periodo.numero}`,
+    })),
+  );
 
 interface Turno {
   id: number;
@@ -67,7 +97,7 @@ interface ResultadoGenerar {
 }
 
 const obtenerSemestres = () =>
-  Array.from({ length: 10 }, (_, i) => ({
+  Array.from({ length: 6 }, (_, i) => ({
     value: (i + 1).toString(),
     etiqueta: `${i + 1}.º semestre`,
   }));
@@ -78,12 +108,11 @@ export default function PaginaGrupos() {
   const [grupos, setGrupos] = useState<Grupo[]>([]);
   const [total, setTotal] = useState(0);
   const [carreras, setCarreras] = useState<Carrera[]>([]);
-  const [gestiones, setGestiones] = useState<Gestion[]>([]);
+  const [periodos, setPeriodos] = useState<OpcionPeriodo[]>([]);
   const [turnos, setTurnos] = useState<Turno[]>([]);
   const [cargando, setCargando] = useState(true);
 
   // Filtros
-  const [filtroGestion, setFiltroGestion] = useState('');
   const [filtroCarrera, setFiltroCarrera] = useState('');
   const [filtroSemestre, setFiltroSemestre] = useState('');
   const [filtroPeriodo, setFiltroPeriodo] = useState('');
@@ -102,15 +131,17 @@ export default function PaginaGrupos() {
   const [resultadoGenerar, setResultadoGenerar] = useState<ResultadoGenerar | null>(null);
   const [planesGenerar, setPlanesGenerar] = useState<PlanEstudio[]>([]);
   const [formularioGenerar, setFormularioGenerar] = useState({
-    gestion: new Date().getFullYear().toString(),
-    periodo: 'I',
+    periodoId: '',
     carreraId: '',
     planEstudioId: '',
-    semestres: [] as number[],
-    turnoIds: [] as number[],
-    paralelos: ['A'] as string[],
-    capacidad: '30',
   });
+
+  // Modal clonar periodo
+  const [modalClonarAbierto, setModalClonarAbierto] = useState(false);
+  const [periodoOrigenId, setPeriodoOrigenId] = useState('');
+  const [periodoDestinoId, setPeriodoDestinoId] = useState('');
+  const [carreraClonarId, setCarreraClonarId] = useState('');
+  const [resultadoClonar, setResultadoClonar] = useState<ResultadoGenerar | null>(null);
 
   // Carga inicial de catálogos
   useEffect(() => {
@@ -121,7 +152,7 @@ export default function PaginaGrupos() {
   useEffect(() => {
     obtenerGrupos();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filtroGestion, filtroCarrera, filtroSemestre, filtroPeriodo, filtroTurno, filtroParalelo, filtroEstado, busquedaAplicada]);
+  }, [filtroCarrera, filtroSemestre, filtroPeriodo, filtroTurno, filtroParalelo, filtroEstado, busquedaAplicada]);
 
   // Debounce del buscador
   useEffect(() => {
@@ -138,13 +169,8 @@ export default function PaginaGrupos() {
       ]);
       setCarreras(respuestaCarreras.data || []);
       const todasLasGestiones = respuestaGestiones.data.datos || respuestaGestiones.data || [];
-      setGestiones(todasLasGestiones);
+      setPeriodos(construirOpcionesPeriodo(todasLasGestiones));
       setTurnos(respuestaTurnos.data.datos || respuestaTurnos.data || []);
-
-      const gestionActual = todasLasGestiones.find((g: Gestion) => g.esActual);
-      if (gestionActual) {
-        setFiltroGestion(gestionActual.anio);
-      }
     } catch (error) {
       console.error('Error al obtener datos:', error);
     }
@@ -154,10 +180,9 @@ export default function PaginaGrupos() {
     try {
       setCargando(true);
       const parametros: Record<string, string | number> = { pagina: 1, limite: 100 };
-      if (filtroGestion) parametros.gestion = filtroGestion;
       if (filtroCarrera) parametros.carreraId = Number(filtroCarrera);
       if (filtroSemestre) parametros.semestre = Number(filtroSemestre);
-      if (filtroPeriodo) parametros.periodo = filtroPeriodo;
+      if (filtroPeriodo) parametros.periodoId = Number(filtroPeriodo);
       if (filtroTurno) parametros.turnoId = Number(filtroTurno);
       if (filtroParalelo) parametros.paralelo = filtroParalelo.toUpperCase();
       if (filtroEstado) parametros.estado = filtroEstado;
@@ -180,14 +205,9 @@ export default function PaginaGrupos() {
     setResultadoGenerar(null);
     setPlanesGenerar([]);
     setFormularioGenerar({
-      gestion: filtroGestion || new Date().getFullYear().toString(),
-      periodo: 'I',
+      periodoId: filtroPeriodo || '',
       carreraId: '',
       planEstudioId: '',
-      semestres: [],
-      turnoIds: [],
-      paralelos: ['A'],
-      capacidad: '30',
     });
     setModalGenerarAbierto(true);
   };
@@ -211,33 +231,80 @@ export default function PaginaGrupos() {
     }
   };
 
-  const alternarEnArray = <T,>(lista: T[], valor: T): T[] =>
-    lista.includes(valor) ? lista.filter((elemento) => elemento !== valor) : [...lista, valor];
-
   const generar = async () => {
-    if (!formularioGenerar.planEstudioId) {
-      setResultadoGenerar({ creados: 0, existentes: 0, mensaje: 'Selecciona un plan de estudios.' });
+    if (!formularioGenerar.periodoId) {
+      setResultadoGenerar({ creados: 0, existentes: 0, mensaje: 'Selecciona un periodo.' });
       return;
     }
+    if (!formularioGenerar.planEstudioId) {
+      setResultadoGenerar({ creados: 0, existentes: 0, mensaje: 'Selecciona un plan de estudios (RM).' });
+      return;
+    }
+    // Por defecto se generan los 6 semestres en el turno Mañana, paralelo A,
+    // cubriendo todas las materias del plan de estudios.
+    const turnoManana = turnos.find((turno) => turno.codigo?.toUpperCase() === 'MAÑANA')?.id ?? 1;
     setGuardando(true);
     try {
       const respuesta = await api.post('/grupos/generar', {
-        gestion: formularioGenerar.gestion,
-        periodo: formularioGenerar.periodo,
+        periodoId: Number(formularioGenerar.periodoId),
         planEstudioId: Number(formularioGenerar.planEstudioId),
-        semestres: formularioGenerar.semestres,
-        turnoIds: formularioGenerar.turnoIds,
-        paralelos: formularioGenerar.paralelos,
-        capacidad: formularioGenerar.capacidad,
+        semestres: [1, 2, 3, 4, 5, 6],
+        turnoIds: [turnoManana],
+        paralelos: ['A'],
+        capacidad: '30',
       });
       setResultadoGenerar(respuesta.data);
       if (respuesta.data.creados > 0) {
+        setFiltroPeriodo(formularioGenerar.periodoId);
         obtenerGrupos();
       }
     } catch (error) {
       console.error('Error al generar grupos:', error);
       import('@/libreria/utilidades').then(({ mensajeDeError }) =>
         setResultadoGenerar({ creados: 0, existentes: 0, mensaje: mensajeDeError(error, 'Error al generar grupos') }),
+      );
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  const abrirClonar = () => {
+    setResultadoClonar(null);
+    setPeriodoOrigenId(filtroPeriodo || '');
+    setPeriodoDestinoId('');
+    setCarreraClonarId('');
+    setModalClonarAbierto(true);
+  };
+
+  const clonar = async () => {
+    if (!periodoOrigenId || !periodoDestinoId) {
+      setResultadoClonar({ creados: 0, existentes: 0, mensaje: 'Selecciona el periodo de origen y el de destino.' });
+      return;
+    }
+    if (periodoOrigenId === periodoDestinoId) {
+      setResultadoClonar({ creados: 0, existentes: 0, mensaje: 'El periodo de origen y el de destino deben ser distintos.' });
+      return;
+    }
+    setGuardando(true);
+    try {
+      const respuesta = await api.post('/grupos/clonar', {
+        periodoOrigenId: Number(periodoOrigenId),
+        periodoDestinoId: Number(periodoDestinoId),
+        ...(carreraClonarId ? { carreraId: Number(carreraClonarId) } : {}),
+      });
+      setResultadoClonar({
+        creados: respuesta.data.creados,
+        existentes: respuesta.data.existentes,
+        mensaje: respuesta.data.mensaje,
+      });
+      if (respuesta.data.creados > 0) {
+        setFiltroPeriodo(periodoDestinoId);
+        obtenerGrupos();
+      }
+    } catch (error) {
+      console.error('Error al clonar grupos:', error);
+      import('@/libreria/utilidades').then(({ mensajeDeError }) =>
+        setResultadoClonar({ creados: 0, existentes: 0, mensaje: mensajeDeError(error, 'Error al clonar grupos') }),
       );
     } finally {
       setGuardando(false);
@@ -285,7 +352,11 @@ export default function PaginaGrupos() {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Grupos y Paralelos</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Boton variante="contorno" onClick={abrirClonar}>
+            <CopyPlus className="w-4 h-4 mr-2" />
+            Clonar periodo
+          </Boton>
           <Boton variante="contorno" onClick={abrirGenerar}>
             <Wand2 className="w-4 h-4 mr-2" />
             Generar grupos
@@ -305,15 +376,6 @@ export default function PaginaGrupos() {
               <DescripcionTarjeta>Busca y filtra los grupos y paralelos registrados.</DescripcionTarjeta>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Selector
-                etiqueta="Gestión"
-                value={filtroGestion}
-                onChange={(e) => setFiltroGestion(e.target.value)}
-                opciones={[
-                  { value: '', etiqueta: 'Todas las gestiones' },
-                  ...gestiones.map((gestion) => ({ value: gestion.anio, etiqueta: gestion.anio })),
-                ]}
-              />
               <Selector
                 etiqueta="Carrera"
                 value={filtroCarrera}
@@ -335,8 +397,7 @@ export default function PaginaGrupos() {
                 onChange={(e) => setFiltroPeriodo(e.target.value)}
                 opciones={[
                   { value: '', etiqueta: 'Todos los periodos' },
-                  { value: 'I', etiqueta: 'Periodo I' },
-                  { value: 'II', etiqueta: 'Periodo II' },
+                  ...periodos.map((periodo) => ({ value: periodo.id.toString(), etiqueta: periodo.etiqueta })),
                 ]}
               />
               <Selector
@@ -427,7 +488,9 @@ export default function PaginaGrupos() {
                         </CeldaTabla>
                         <CeldaTabla>{grupo.semestre}.º semestre</CeldaTabla>
                         <CeldaTabla>
-                          <Insignia variante="primario">Periodo {grupo.periodo || 'I'}</Insignia>
+                          <Insignia variante="primario">
+                            {grupo.periodo ? `${grupo.periodo.gestion?.anio || ''} · ${grupo.periodo.numero}` : '-'}
+                          </Insignia>
                         </CeldaTabla>
                         <CeldaTabla>
                           <div className="text-sm">{grupo.turno?.nombre || '-'}</div>
@@ -460,7 +523,11 @@ export default function PaginaGrupos() {
                               title={grupo.estado === 'activo' ? 'Cerrar grupo' : 'Reactivar grupo'}
                               onClick={() => setGrupoCambiandoEstado(grupo)}
                             >
-                              <Edit2 className="w-4 h-4" />
+                              {grupo.estado === 'activo' ? (
+                                <Lock className="w-4 h-4" />
+                              ) : (
+                                <Unlock className="w-4 h-4" />
+                              )}
                             </Boton>
                             <Boton
                               variante="fantasma"
@@ -497,28 +564,11 @@ export default function PaginaGrupos() {
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            Genera automáticamente los grupos para los semestres, turnos y paralelos seleccionados de un plan de estudios.
+            Genera automáticamente los <strong>6 grupos</strong> (uno por semestre) del plan de estudios, en el turno
+            <strong> Mañana</strong> y paralelo <strong>A</strong>, cubriendo todas las materias de la carrera.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Entrada
-              etiqueta="Gestión *"
-              value={formularioGenerar.gestion}
-              onChange={(e) => setFormularioGenerar({ ...formularioGenerar, gestion: e.target.value })}
-              placeholder="2024"
-            />
-            <Selector
-              etiqueta="Periodo *"
-              value={formularioGenerar.periodo}
-              onChange={(e) => setFormularioGenerar({ ...formularioGenerar, periodo: e.target.value })}
-              opciones={[
-                { value: 'I', etiqueta: 'Periodo I' },
-                { value: 'II', etiqueta: 'Periodo II' },
-              ]}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Selector
               etiqueta="Carrera *"
               value={formularioGenerar.carreraId}
@@ -532,7 +582,7 @@ export default function PaginaGrupos() {
               ]}
             />
             <Selector
-              etiqueta="Plan de estudios *"
+              etiqueta="Plan de estudios (RM) *"
               value={formularioGenerar.planEstudioId}
               onChange={(e) => setFormularioGenerar({ ...formularioGenerar, planEstudioId: e.target.value })}
               disabled={!formularioGenerar.carreraId}
@@ -541,104 +591,14 @@ export default function PaginaGrupos() {
                 ...planesGenerar.map((plan) => ({ value: plan.id.toString(), etiqueta: `RM ${plan.numeroRm}` })),
               ]}
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Semestres *</label>
-            <div className="flex flex-wrap gap-2">
-              {obtenerSemestres().map((semestre) => {
-                const valor = Number(semestre.value);
-                const activo = formularioGenerar.semestres.includes(valor);
-                return (
-                  <button
-                    key={semestre.value}
-                    type="button"
-                    onClick={() =>
-                      setFormularioGenerar({
-                        ...formularioGenerar,
-                        semestres: alternarEnArray(formularioGenerar.semestres, valor),
-                      })
-                    }
-                    className={
-                      'px-3 py-1.5 rounded-full border text-sm transition-colors ' +
-                      (activo
-                        ? 'bg-primary-600 border-primary-600 text-white'
-                        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50')
-                    }
-                  >
-                    {semestre.etiqueta}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Turnos *</label>
-            <div className="flex flex-wrap gap-2">
-              {turnos.map((turno) => {
-                const activo = formularioGenerar.turnoIds.includes(turno.id);
-                return (
-                  <button
-                    key={turno.id}
-                    type="button"
-                    onClick={() =>
-                      setFormularioGenerar({
-                        ...formularioGenerar,
-                        turnoIds: alternarEnArray(formularioGenerar.turnoIds, turno.id),
-                      })
-                    }
-                    className={
-                      'px-3 py-1.5 rounded-full border text-sm transition-colors ' +
-                      (activo
-                        ? 'bg-primary-600 border-primary-600 text-white'
-                        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50')
-                    }
-                  >
-                    {turno.codigo} ({turno.nombre})
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Paralelos *</label>
-            <div className="flex flex-wrap gap-2">
-              {['A', 'B', 'C'].map((paralelo) => {
-                const activo = formularioGenerar.paralelos.includes(paralelo);
-                return (
-                  <button
-                    key={paralelo}
-                    type="button"
-                    onClick={() =>
-                      setFormularioGenerar({
-                        ...formularioGenerar,
-                        paralelos: alternarEnArray(formularioGenerar.paralelos, paralelo),
-                      })
-                    }
-                    className={
-                      'px-3 py-1.5 rounded-full border text-sm transition-colors ' +
-                      (activo
-                        ? 'bg-primary-600 border-primary-600 text-white'
-                        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50')
-                    }
-                  >
-                    {paralelo}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="md:w-1/3">
-            <Entrada
-              etiqueta="Capacidad por grupo"
-              type="number"
-              min={1}
-              value={formularioGenerar.capacidad}
-              onChange={(e) => setFormularioGenerar({ ...formularioGenerar, capacidad: e.target.value })}
-              placeholder="30"
+            <Selector
+              etiqueta="Periodo *"
+              value={formularioGenerar.periodoId}
+              onChange={(e) => setFormularioGenerar({ ...formularioGenerar, periodoId: e.target.value })}
+              opciones={[
+                { value: '', etiqueta: 'Seleccionar periodo...' },
+                ...periodos.map((periodo) => ({ value: periodo.id.toString(), etiqueta: periodo.etiqueta })),
+              ]}
             />
           </div>
 
@@ -669,14 +629,94 @@ export default function PaginaGrupos() {
             <Boton
               onClick={generar}
               cargando={guardando}
-              disabled={
-                !formularioGenerar.planEstudioId ||
-                formularioGenerar.semestres.length === 0 ||
-                formularioGenerar.turnoIds.length === 0 ||
-                formularioGenerar.paralelos.length === 0
-              }
+              disabled={!formularioGenerar.periodoId || !formularioGenerar.planEstudioId}
             >
               Generar grupos
+            </Boton>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Modal Clonar grupos de un periodo a otro */}
+      <Modal
+        abierto={modalClonarAbierto}
+        alCerrar={() => {
+          setModalClonarAbierto(false);
+          setResultadoClonar(null);
+        }}
+        titulo="Clonar grupos de un periodo"
+        tamano="grande"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            Copia la <strong>estructura</strong> de los grupos (carrera, semestre, turno, paralelo y capacidad)
+            desde un periodo a otro, regenerando el código. <strong>No se copian los estudiantes.</strong>
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Selector
+              etiqueta="Periodo de origen *"
+              value={periodoOrigenId}
+              onChange={(e) => setPeriodoOrigenId(e.target.value)}
+              opciones={[
+                { value: '', etiqueta: 'Seleccionar periodo...' },
+                ...periodos.map((periodo) => ({ value: periodo.id.toString(), etiqueta: periodo.etiqueta })),
+              ]}
+            />
+            <Selector
+              etiqueta="Periodo de destino *"
+              value={periodoDestinoId}
+              onChange={(e) => setPeriodoDestinoId(e.target.value)}
+              opciones={[
+                { value: '', etiqueta: 'Seleccionar periodo...' },
+                ...periodos.map((periodo) => ({ value: periodo.id.toString(), etiqueta: periodo.etiqueta })),
+              ]}
+            />
+          </div>
+
+          <Selector
+            etiqueta="Carrera (opcional)"
+            value={carreraClonarId}
+            onChange={(e) => setCarreraClonarId(e.target.value)}
+            opciones={[
+              { value: '', etiqueta: 'Todas las carreras' },
+              ...carreras.map((carrera) => ({
+                value: carrera.id.toString(),
+                etiqueta: `${carrera.codigo} - ${carrera.nombre}`,
+              })),
+            ]}
+          />
+
+          {resultadoClonar && (
+            <div
+              className={
+                'p-3 rounded-lg text-sm ' +
+                (resultadoClonar.creados > 0 ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700')
+              }
+            >
+              <p>{resultadoClonar.mensaje}</p>
+              <p className="mt-1 font-medium">
+                Creados: {resultadoClonar.creados} · Existentes: {resultadoClonar.existentes}
+              </p>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3 pt-4">
+            <Boton
+              variante="contorno"
+              onClick={() => {
+                setModalClonarAbierto(false);
+                setResultadoClonar(null);
+              }}
+            >
+              Cerrar
+            </Boton>
+            <Boton
+              onClick={clonar}
+              cargando={guardando}
+              disabled={!periodoOrigenId || !periodoDestinoId || periodoOrigenId === periodoDestinoId}
+            >
+              Clonar grupos
             </Boton>
           </div>
         </div>

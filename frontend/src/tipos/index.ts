@@ -148,7 +148,8 @@ export interface Grupo {
   turnoId?: number | null;
   paralelo?: string | null;
   gestion: string;
-  periodo?: string | null;
+  periodoId?: number | null;
+  periodo?: Periodo | null;
   capacidad: number;
   creadoEn?: string;
   actualizadoEn?: string;
@@ -250,6 +251,50 @@ export interface Periodo {
   notas?: string | null;
   creadoEn?: string;
   actualizadoEn?: string;
+}
+
+export type EstadoHuella = 'activa' | 'inactiva';
+export type TipoMarcacion = 'entrada' | 'salida';
+export type MetodoMarcacion = 'biometrico' | 'manual';
+
+export interface HuellaPersonal {
+  id: number;
+  personalId: number;
+  personal?: Personal;
+  codigoBiometrico: string;
+  dedo?: string | null;
+  plantilla?: string | null;
+  estado: EstadoHuella;
+  creadoEn?: string;
+  actualizadoEn?: string;
+}
+
+export interface MarcacionPersonal {
+  id: number;
+  personalId: number;
+  personal?: Personal;
+  huellaId?: number | null;
+  huella?: HuellaPersonal | null;
+  tipo: TipoMarcacion;
+  metodo: MetodoMarcacion;
+  dispositivo?: string | null;
+  observacion?: string | null;
+  fechaHora: string;
+  creadoEn?: string;
+}
+
+export interface EstadoPersonalHoy {
+  personalId: number;
+  nombres: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  ci: string;
+  cargo: string;
+  fotoUrl: string | null;
+  dentro: boolean;
+  horaEntrada: string | null;
+  horaSalida: string | null;
+  ultimaMarcacion: string | null;
 }
 
 export interface EstadoAutenticacion {

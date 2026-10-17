@@ -55,6 +55,39 @@ interface PlanEstudio {
   numeroRm: string;
 }
 
+interface Periodo {
+  id: number;
+  gestionId: number;
+  numero: string;
+  nombre?: string | null;
+  gestion?: { id: number; anio: string } | null;
+}
+
+interface Gestion {
+  id: number;
+  anio: string;
+  periodos?: Periodo[];
+}
+
+/** Periodo aplanado con su gestión, listo para el selector. */
+interface OpcionPeriodo {
+  id: number;
+  numero: string;
+  gestion: string;
+  etiqueta: string;
+}
+
+/** Arma la lista de periodos (con su gestión) a partir de las gestiones. */
+const construirOpcionesPeriodo = (gestiones: Gestion[]): OpcionPeriodo[] =>
+  gestiones.flatMap((gestion) =>
+    (gestion.periodos || []).map((periodo) => ({
+      id: periodo.id,
+      numero: periodo.numero,
+      gestion: gestion.anio,
+      etiqueta: `${gestion.anio} · Periodo ${periodo.numero}`,
+    })),
+  );
+
 interface Grupo {
   id: number;
   codigo: string;
@@ -65,7 +98,8 @@ interface Grupo {
   turnoId: number;
   paralelo: string;
   gestion: string;
-  periodo: string;
+  periodoId: number | null;
+  periodo?: Periodo | null;
   capacidad: number;
   estado: 'activo' | 'cerrado';
   carrera?: Carrera;
@@ -128,7 +162,7 @@ interface EntradaHistorial {
 type Pestana = 'estudiantes' | 'materias' | 'horario' | 'historial';
 
 const obtenerSemestres = () =>
-  Array.from({ length: 10 }, (_, i) => ({
+  Array.from({ length: 6 }, (_, i) => ({
     value: (i + 1).toString(),
     etiqueta: `Semestre ${i + 1}`,
   }));
@@ -165,6 +199,7 @@ export default function PaginaDetalleGrupo() {
   // Catálogos para edición y traslados
   const [carreras, setCarreras] = useState<Carrera[]>([]);
   const [turnos, setTurnos] = useState<Turno[]>([]);
+  const [periodos, setPeriodos] = useState<OpcionPeriodo[]>([]);
   const [planesEdit, setPlanesEdit] = useState<PlanEstudio[]>([]);
 
   // Pestaña estudiantes
@@ -188,8 +223,7 @@ export default function PaginaDetalleGrupo() {
     semestre: '',
     turnoId: '',
     paralelo: '',
-    gestion: '',
-    periodo: 'I',
+    periodoId: '',
     capacidad: '30',
   });
 
@@ -220,12 +254,15 @@ export default function PaginaDetalleGrupo() {
 
   const cargarDatosIniciales = async () => {
     try {
-      const [respuestaCarreras, respuestaTurnos] = await Promise.all([
+      const [respuestaCarreras, respuestaTurnos, respuestaGestiones] = await Promise.all([
         api.get('/carreras/activos'),
         api.get('/turnos/todos'),
+        api.get('/gestiones'),
       ]);
       setCarreras(respuestaCarreras.data || []);
       setTurnos(respuestaTurnos.data.datos || respuestaTurnos.data || []);
+      const gestiones: Gestion[] = respuestaGestiones.data.datos || respuestaGestiones.data || [];
+      setPeriodos(construirOpcionesPeriodo(gestiones));
     } catch (error) {
       console.error('Error al obtener catálogos:', error);
     }
@@ -302,8 +339,7 @@ export default function PaginaDetalleGrupo() {
       semestre: grupo.semestre.toString(),
       turnoId: grupo.turnoId.toString(),
       paralelo: grupo.paralelo,
-      gestion: grupo.gestion,
-      periodo: grupo.periodo || 'I',
+      periodoId: grupo.periodoId ? grupo.periodoId.toString() : '',
       capacidad: grupo.capacidad.toString(),
     });
     setModalEditarAbierto(true);
@@ -330,7 +366,7 @@ export default function PaginaDetalleGrupo() {
     if (!datosEditar.semestre) nuevosErrores.semestre = 'El semestre es requerido';
     if (!datosEditar.turnoId) nuevosErrores.turnoId = 'El turno es requerido';
     if (!datosEditar.paralelo.trim()) nuevosErrores.paralelo = 'El paralelo es requerido';
-    if (!datosEditar.gestion.trim()) nuevosErrores.gestion = 'La gestión es requerida';
+    if (!datosEditar.periodoId) nuevosErrores.periodoId = 'El periodo es requerido';
     setErroresEditar(nuevosErrores);
     if (Object.keys(nuevosErrores).length > 0) return;
 
@@ -342,8 +378,7 @@ export default function PaginaDetalleGrupo() {
         semestre: Number(datosEditar.semestre),
         turnoId: Number(datosEditar.turnoId),
         paralelo: datosEditar.paralelo.toUpperCase(),
-        gestion: datosEditar.gestion,
-        periodo: datosEditar.periodo,
+        periodoId: Number(datosEditar.periodoId),
         capacidad: Number(datosEditar.capacidad) || 30,
       });
       setModalEditarAbierto(false);
@@ -561,11 +596,11 @@ export default function PaginaDetalleGrupo() {
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <DatoResumen etiqueta="Gestión" valor={grupo.gestion} />
+            <DatoResumen etiqueta="Gestión" valor={grupo.periodo?.gestion?.anio || grupo.gestion || '-'} />
             <DatoResumen etiqueta="Carrera" valor={grupo.carrera?.nombre || '-'} />
             <DatoResumen etiqueta="Nivel" valor="Técnico Superior" />
             <DatoResumen etiqueta="Semestre" valor={`${grupo.semestre}.º semestre`} />
-            <DatoResumen etiqueta="Periodo" valor={`Periodo ${grupo.periodo || 'I'}`} />
+            <DatoResumen etiqueta="Periodo" valor={grupo.periodo ? `Periodo ${grupo.periodo.numero}` : '-'} />
             <DatoResumen etiqueta="Turno" valor={grupo.turno?.nombre || '-'} />
             <DatoResumen etiqueta="Paralelo" valor={grupo.paralelo} />
             <DatoResumen etiqueta="Código" valor={grupo.codigo} />
@@ -867,20 +902,14 @@ export default function PaginaDetalleGrupo() {
               placeholder="A"
               maxLength={5}
             />
-            <Entrada
-              etiqueta="Gestión *"
-              value={datosEditar.gestion}
-              onChange={(e) => setDatosEditar({ ...datosEditar, gestion: e.target.value })}
-              error={erroresEditar.gestion}
-              placeholder="2024"
-            />
             <Selector
-              etiqueta="Periodo"
-              value={datosEditar.periodo}
-              onChange={(e) => setDatosEditar({ ...datosEditar, periodo: e.target.value })}
+              etiqueta="Periodo *"
+              value={datosEditar.periodoId}
+              onChange={(e) => setDatosEditar({ ...datosEditar, periodoId: e.target.value })}
+              error={erroresEditar.periodoId}
               opciones={[
-                { value: 'I', etiqueta: 'Periodo I' },
-                { value: 'II', etiqueta: 'Periodo II' },
+                { value: '', etiqueta: 'Seleccionar periodo...' },
+                ...periodos.map((periodo) => ({ value: periodo.id.toString(), etiqueta: periodo.etiqueta })),
               ]}
             />
             <Entrada

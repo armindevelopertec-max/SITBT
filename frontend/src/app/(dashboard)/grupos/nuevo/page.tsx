@@ -30,12 +30,44 @@ interface PlanEstudio {
   numeroRm: string;
 }
 
+interface Periodo {
+  id: number;
+  gestionId: number;
+  numero: string;
+}
+
+interface Gestion {
+  id: number;
+  anio: string;
+  periodos?: Periodo[];
+}
+
+/** Periodo aplanado con su gestión, listo para el selector. */
+interface OpcionPeriodo {
+  id: number;
+  numero: string;
+  gestion: string;
+  etiqueta: string;
+}
+
+/** Arma la lista de periodos (con su gestión) a partir de las gestiones. */
+const construirOpcionesPeriodo = (gestiones: Gestion[]): OpcionPeriodo[] =>
+  gestiones.flatMap((gestion) =>
+    (gestion.periodos || []).map((periodo) => ({
+      id: periodo.id,
+      numero: periodo.numero,
+      gestion: gestion.anio,
+      etiqueta: `${gestion.anio} · Periodo ${periodo.numero}`,
+    })),
+  );
+
 export default function PaginaNuevoGrupo() {
   const router = useRouter();
   const [cargando, setCargando] = useState(false);
   const [cargandoDatos, setCargandoDatos] = useState(true);
   const [carreras, setCarreras] = useState<Carrera[]>([]);
   const [turnos, setTurnos] = useState<Turno[]>([]);
+  const [periodos, setPeriodos] = useState<OpcionPeriodo[]>([]);
   const [planesEstudio, setPlanesEstudio] = useState<PlanEstudio[]>([]);
   const [errores, setErrores] = useState<Record<string, string>>({});
 
@@ -45,8 +77,7 @@ export default function PaginaNuevoGrupo() {
     semestre: '',
     turnoId: '',
     paralelo: '',
-    gestion: new Date().getFullYear().toString(),
-    periodo: 'I',
+    periodoId: '',
     capacidad: '30',
   });
 
@@ -63,12 +94,15 @@ export default function PaginaNuevoGrupo() {
   const obtenerDatosIniciales = async () => {
     setCargandoDatos(true);
     try {
-      const [respuestaCarreras, respuestaTurnos] = await Promise.all([
+      const [respuestaCarreras, respuestaTurnos, respuestaGestiones] = await Promise.all([
         api.get('/carreras/activos'),
         api.get('/turnos/todos'),
+        api.get('/gestiones'),
       ]);
       setCarreras(respuestaCarreras.data || []);
       setTurnos(respuestaTurnos.data.datos || respuestaTurnos.data || []);
+      const gestiones: Gestion[] = respuestaGestiones.data.datos || respuestaGestiones.data || [];
+      setPeriodos(construirOpcionesPeriodo(gestiones));
     } catch (error) {
       console.error('Error al obtener los datos:', error);
     } finally {
@@ -98,7 +132,7 @@ export default function PaginaNuevoGrupo() {
     if (!datosFormulario.semestre) nuevosErrores.semestre = 'El semestre es requerido';
     if (!datosFormulario.turnoId) nuevosErrores.turnoId = 'El turno es requerido';
     if (!datosFormulario.paralelo.trim()) nuevosErrores.paralelo = 'El paralelo es requerido';
-    if (!datosFormulario.gestion.trim()) nuevosErrores.gestion = 'La gestión es requerida';
+    if (!datosFormulario.periodoId) nuevosErrores.periodoId = 'El periodo es requerido';
 
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
@@ -117,8 +151,7 @@ export default function PaginaNuevoGrupo() {
         semestre: Number(datosFormulario.semestre),
         turnoId: Number(datosFormulario.turnoId),
         paralelo: datosFormulario.paralelo.toUpperCase(),
-        gestion: datosFormulario.gestion,
-        periodo: datosFormulario.periodo,
+        periodoId: Number(datosFormulario.periodoId),
         capacidad: Number(datosFormulario.capacidad) || 30,
       });
 
@@ -188,7 +221,7 @@ export default function PaginaNuevoGrupo() {
                 error={errores.semestre}
                 opciones={[
                   { value: '', etiqueta: 'Seleccionar semestre...' },
-                  ...Array.from({ length: 10 }, (_, i) => ({
+                  ...Array.from({ length: 6 }, (_, i) => ({
                     value: (i + 1).toString(),
                     etiqueta: `Semestre ${i + 1}`,
                   })),
@@ -219,25 +252,20 @@ export default function PaginaNuevoGrupo() {
                 placeholder="A"
                 maxLength={5}
               />
-              <Entrada
-                etiqueta="Gestión *"
-                value={datosFormulario.gestion}
-                onChange={(e) => setDatosFormulario({ ...datosFormulario, gestion: e.target.value })}
-                error={errores.gestion}
-                placeholder="2024"
+              <Selector
+                etiqueta="Periodo *"
+                value={datosFormulario.periodoId}
+                onChange={(e) => setDatosFormulario({ ...datosFormulario, periodoId: e.target.value })}
+                error={errores.periodoId}
+                opciones={[
+                  { value: '', etiqueta: cargandoDatos ? 'Cargando...' : 'Seleccionar periodo...' },
+                  ...periodos.map((periodo) => ({ value: periodo.id.toString(), etiqueta: periodo.etiqueta })),
+                ]}
+                disabled={cargandoDatos}
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Selector
-                etiqueta="Periodo"
-                value={datosFormulario.periodo}
-                onChange={(e) => setDatosFormulario({ ...datosFormulario, periodo: e.target.value })}
-                opciones={[
-                  { value: 'I', etiqueta: 'Periodo I' },
-                  { value: 'II', etiqueta: 'Periodo II' },
-                ]}
-              />
               <Entrada
                 etiqueta="Capacidad"
                 type="number"

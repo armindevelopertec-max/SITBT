@@ -29,16 +29,9 @@ export class CrearGrupoDto {
   @MaxLength(5)
   paralelo: string;
 
-  @ApiProperty({ example: '2024' })
-  @IsString()
-  @MaxLength(10)
-  gestion: string;
-
-  @ApiPropertyOptional({ example: 'I' })
-  @IsString()
-  @MaxLength(2)
-  @IsOptional()
-  periodo?: string;
+  @ApiProperty({ example: 1, description: 'ID del periodo (gestiones → periodos)' })
+  @IsInt()
+  periodoId: number;
 
   @ApiPropertyOptional({ example: 30 })
   @IsInt()

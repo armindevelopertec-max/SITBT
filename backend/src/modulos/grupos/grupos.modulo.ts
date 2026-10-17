@@ -11,6 +11,8 @@ import { Turno } from '../../entidades/turno.entidad';
 import { MateriaPlan } from '../../entidades/materia-plan.entidad';
 import { Materia } from '../../entidades/materia.entidad';
 import { Estudiante } from '../../entidades/estudiante.entidad';
+import { Periodo } from '../../entidades/periodo.entidad';
+import { Gestion } from '../../entidades/gestion.entidad';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { Estudiante } from '../../entidades/estudiante.entidad';
       MateriaPlan,
       Materia,
       Estudiante,
+      Periodo,
+      Gestion,
     ]),
   ],
   controllers: [ControladorGrupos],
