@@ -14,7 +14,7 @@ import { ModuloMaterias } from './modulos/materias/materias.modulo';
 import { ModuloTurnos } from './modulos/turnos/turnos.modulo';
 import { ModuloGrupos } from './modulos/grupos/grupos.modulo';
 import { ModuloInscripciones } from './modulos/inscripciones/inscripciones.modulo';
-import { ModuloCalificaciones } from './modulos/calificaciones/calificaciones.modulo';
+import { ModuloMateriasImpartidas } from './modulos/materias-impartidas/materias-impartidas.modulo';
 import { ModuloAsignacionesDocentes } from './modulos/asignaciones-docentes/asignaciones-docentes.modulo';
 import { ModuloCertificados } from './modulos/certificados/certificados.modulo';
 import { ModuloCredenciales } from './modulos/credenciales/credenciales.modulo';
@@ -65,7 +65,7 @@ import { ModuloPreinscripcion } from './modulos/preinscripcion/preinscripcion.mo
     ModuloTurnos,
     ModuloGrupos,
     ModuloInscripciones,
-    ModuloCalificaciones,
+    ModuloMateriasImpartidas,
     ModuloAsignacionesDocentes,
     ModuloCertificados,
     ModuloCredenciales,

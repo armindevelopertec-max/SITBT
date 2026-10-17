@@ -142,15 +142,20 @@ export interface Grupo {
   id: number;
   codigo: string;
   carreraId: number;
+  carrera?: Carrera;
   planEstudioId?: number | null;
-  materiaId: number;
+  plan_estudio?: PlanEstudio | null;
+  materiaId?: number | null;
+  materia?: Materia | null;
   semestre: number;
   turnoId?: number | null;
+  turno?: Turno | null;
   paralelo?: string | null;
   gestion: string;
   periodoId?: number | null;
   periodo?: Periodo | null;
   capacidad: number;
+  estado?: 'activo' | 'cerrado';
   creadoEn?: string;
   actualizadoEn?: string;
 }
@@ -169,23 +174,158 @@ export interface Inscripcion {
   actualizadoEn?: string;
 }
 
+export type EstadoRegistroNota = 'sin_registrar' | 'registrado' | 'ausente' | 'justificado';
+export type MetodoPromedio = 'calculado' | 'manual';
+export type EstadoCalificacionRegular =
+  | 'aprobado'
+  | 'reprobado'
+  | 'no_presento'
+  | 'puede_ir_2t'
+  | 'pendiente';
+export type EstadoCalificacion2T =
+  | 'no_corresponde'
+  | 'habilitado'
+  | 'calificado'
+  | 'ausente'
+  | 'justificado';
+export type EstadoCalificacionDefinitivo = 'aprobado' | 'reprobado' | 'no_presento' | 'pendiente';
+export type EstadoRevisionCalificacion = 'sin_iniciar' | 'en_registro' | 'pendiente_revision' | 'cerrado';
+export type CodigoObservacion =
+  | 'aprobo'
+  | 'reprobo'
+  | 'no_se_presento'
+  | 'puede_ir_2t'
+  | 'pendiente';
+
+export type EstadoMateriaImpartida = 'activa' | 'cerrada';
+export type EstadoLibro =
+  | 'borrador'
+  | 'en_registro'
+  | 'pendiente_revision'
+  | 'cerrado'
+  | 'reabierto'
+  | 'sin_iniciar';
+export type EstadoInscripcionMateria = 'cursando' | 'aprobado' | 'reprobado' | 'retirado';
+export type EstadoAsignacionDocente = 'activo' | 'finalizado' | 'anulado';
+export type EstadoDocente = 'pendiente' | 'asignado' | 'requiere_revision';
+
 export interface Calificacion {
   id: number;
-  inscripcionId: number;
+  inscripcionMateriaId: number;
   parcial1?: number | null;
+  parcial1Estado?: EstadoRegistroNota;
   parcial2?: number | null;
+  parcial2Estado?: EstadoRegistroNota;
   promedioFinal?: number | null;
-  observacion?: string | null;
-  estadoRegular?: string | null;
+  promedioMetodo?: MetodoPromedio;
+  observacion?: CodigoObservacion | string | null;
+  estadoRegular?: EstadoCalificacionRegular | null;
   aptoSegundaTurno?: boolean | null;
   notaSegundaTurno?: number | null;
+  estado2T?: EstadoCalificacion2T | null;
   segundaTurnoAplicado?: boolean | null;
-  estado2T?: string | null;
   notaDefinitiva?: number | null;
-  estadoDefinitivo?: string | null;
+  estadoDefinitivo?: EstadoCalificacionDefinitivo | null;
+  estadoRevision?: EstadoRevisionCalificacion;
   registradoPor?: number | null;
+  docenteId?: number | null;
+  creadoPorId?: number | null;
+  modificadoPorId?: number | null;
   registradoEn?: string;
   actualizadoEn?: string;
+}
+
+export interface MateriaImpartida {
+  id: number;
+  materiaId: number;
+  materia?: Materia;
+  grupoId: number;
+  grupo?: Grupo;
+  gestion: string;
+  periodoId: number;
+  estado: EstadoMateriaImpartida;
+  inscritos?: number;
+  docente?: Personal | null;
+  estadoDocente?: EstadoDocente;
+  estadoNotas?: EstadoLibro;
+  libroId?: number | null;
+  libro?: LibroCalificaciones;
+}
+
+export interface InscripcionMateria {
+  id?: number;
+  inscripcionMateriaId?: number;
+  estudianteId: number;
+  estudiante?: Estudiante;
+  materiaImpartidaId: number;
+  estado: EstadoInscripcionMateria;
+}
+
+export interface LibroCalificaciones {
+  id: number;
+  materiaImpartidaId: number;
+  estado: EstadoLibro;
+  observacion?: string | null;
+  cerradoEn?: string | null;
+  cerradoPor?: number | null;
+  creadoEn?: string;
+  actualizadoEn?: string;
+}
+
+export interface AsignacionDocente {
+  id: number;
+  docenteId: number;
+  docente?: Personal;
+  materiaId: number;
+  grupoId: number;
+  materiaImpartidaId?: number | null;
+  gestion: string;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
+  cargaHoraria?: number | null;
+  observacion?: string | null;
+  estado: EstadoAsignacionDocente;
+  creadoEn?: string;
+  actualizadoEn?: string;
+}
+
+export interface CierreAcademico {
+  id: number;
+  libroId: number;
+  accion: 'cerrar' | 'reabrir';
+  motivo?: string | null;
+  autorizadoPor?: number | null;
+  autorizador?: Usuario | null;
+  creadoEn?: string;
+}
+
+export interface FilaLibroCalificaciones {
+  inscripcionMateriaId: number;
+  estudianteId: number;
+  estudiante?: Estudiante;
+  estadoInscripcion: EstadoInscripcionMateria;
+  calificacion: Calificacion | null;
+}
+
+export interface LibroConFilas {
+  materiaImpartida: MateriaImpartida;
+  libro: LibroCalificaciones;
+  filas: FilaLibroCalificaciones[];
+}
+
+export interface HistorialMateriaImpartida {
+  auditoria: {
+    id: number;
+    calificacionId: number;
+    campoCambiado: string;
+    valorAnterior?: string | null;
+    valorNuevo?: string | null;
+    motivo?: string | null;
+    usuarioId?: number | null;
+    usuario?: Usuario | null;
+    cambiadoEn?: string;
+  }[];
+  cierres: CierreAcademico[];
 }
 
 export interface Pago {

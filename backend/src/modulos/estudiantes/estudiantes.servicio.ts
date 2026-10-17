@@ -13,6 +13,7 @@ import { PlanEstudio } from '../../entidades/plan-estudio.entidad';
 import { Credencial } from '../../entidades/credencial.entidad';
 import { Personal } from '../../entidades/personal.entidad';
 import { Inscripcion } from '../../entidades/inscripcion.entidad';
+import { InscripcionMateria } from '../../entidades/inscripcion-materia.entidad';
 import { Calificacion } from '../../entidades/calificacion.entidad';
 import { AuditoriaCalificacion } from '../../entidades/auditoria-calificacion.entidad';
 import { Pago } from '../../entidades/pago.entidad';
@@ -217,7 +218,7 @@ export class ServicioEstudiantes {
         .delete()
         .from(AuditoriaCalificacion)
         .where(
-          'calificacion_id IN (SELECT id FROM calificaciones WHERE inscripcion_id IN (SELECT id FROM inscripciones WHERE estudiante_id = :id))',
+          'calificacion_id IN (SELECT id FROM calificaciones WHERE inscripcion_materia_id IN (SELECT id FROM inscripciones_materia WHERE estudiante_id = :id))',
           { id },
         )
         .execute();
@@ -227,10 +228,12 @@ export class ServicioEstudiantes {
         .delete()
         .from(Calificacion)
         .where(
-          'inscripcion_id IN (SELECT id FROM inscripciones WHERE estudiante_id = :id)',
+          'inscripcion_materia_id IN (SELECT id FROM inscripciones_materia WHERE estudiante_id = :id)',
           { id },
         )
         .execute();
+
+      await gestor.delete(InscripcionMateria, { estudianteId: id });
 
       // Registros que referencian directamente al estudiante.
       await gestor.delete(Inscripcion, { estudianteId: id });

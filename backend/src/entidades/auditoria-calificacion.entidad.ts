@@ -21,21 +21,24 @@ export class AuditoriaCalificacion {
   @JoinColumn({ name: 'calificacion_id' })
   calificacion: Calificacion;
 
-  @Column({ type: 'varchar', length: 30, name: 'campo_cambiado' })
+  @Column({ type: 'varchar', length: 60, name: 'campo_cambiado' })
   campoCambiado: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true, name: 'valor_anterior' })
-  valorAnterior: string;
+  @Column({ type: 'text', nullable: true, name: 'valor_anterior' })
+  valorAnterior: string | null;
 
-  @Column({ type: 'varchar', length: 50, nullable: true, name: 'valor_nuevo' })
-  valorNuevo: string;
+  @Column({ type: 'text', nullable: true, name: 'valor_nuevo' })
+  valorNuevo: string | null;
 
-  @Column({ })
-  usuarioId: number;
+  @Column({ type: 'text', nullable: true, name: 'motivo' })
+  motivo: string | null;
 
-  @ManyToOne(() => Usuario)
-  @JoinColumn({ })
-  usuario: Usuario;
+  @Column({ type: 'int', nullable: true, name: 'usuario_id' })
+  usuarioId: number | null;
+
+  @ManyToOne(() => Usuario, { nullable: true })
+  @JoinColumn({ name: 'usuario_id' })
+  usuario: Usuario | null;
 
   @CreateDateColumn({ name: 'cambiado_en' })
   cambiadoEn: Date;

@@ -85,8 +85,8 @@ const seccionesMenu: SeccionMenu[] = [
         roles: ['administrador', 'secretaria', 'director_academico'],
       },
       {
-        titulo: 'Calificaciones',
-        href: '/calificaciones',
+        titulo: 'Materias Impartidas',
+        href: '/materias-impartidas',
         icono: <ClipboardList className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'docente'],
       },
