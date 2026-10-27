@@ -28,6 +28,8 @@ export * from './pago.entidad';
 export * from './estado-pago-estudiante.entidad';
 export * from './equivalencia.entidad';
 export * from './convalidacion-estudiante.entidad';
+export * from './proceso-convalidacion.entidad';
+export * from './equivalencia-plan.entidad';
 export * from './registro-auditoria.entidad';
 export * from './apoderado.entidad';
 export * from './referencia.entidad';
