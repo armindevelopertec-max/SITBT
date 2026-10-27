@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { etiquetaRol, colorRol } from '@/libreria/autenticacion';
-import { Bell, LogOut, User, Settings, ChevronDown, Menu } from 'lucide-react';
+import { Bell, LogOut, User, Settings, ChevronDown, Menu, UserCircle, Palette } from 'lucide-react';
 import { cn } from '@/libreria/utilidades';
 
 interface PropsEncabezado {
@@ -35,37 +36,37 @@ export default function Encabezado({ titulo, alHacerClicMenu }: PropsEncabezado)
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-gray-200">
+    <header className="sticky top-0 z-30 bg-white dark:bg-card border-b border-gray-200 dark:border-gray-800">
       <div className="flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-4">
           <button
             onClick={alHacerClicMenu}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
           >
-            <Menu className="w-5 h-5 text-gray-600" />
+            <Menu className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
           {titulo && (
-            <h1 className="text-xl font-semibold text-gray-900">{titulo}</h1>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{titulo}</h1>
           )}
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
-            <Bell className="w-5 h-5 text-gray-600" />
+          <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
           </button>
 
           <div className="relative" ref={refDesplegable}>
             <button
               onClick={() => setDesplegableAbierto(!desplegableAbierto)}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-              <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
-                <User className="w-4 h-4 text-primary-600" />
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <User className="w-4 h-4 text-primary" />
               </div>
               <div className="hidden sm:block text-left">
-                <p className="text-sm font-medium text-gray-900">{usuario?.nombreUsuario}</p>
-                <p className="text-xs text-gray-500">{usuario?.correo}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{usuario?.nombreUsuario}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{usuario?.correo}</p>
               </div>
               <ChevronDown
                 className={cn(
@@ -76,10 +77,10 @@ export default function Encabezado({ titulo, alHacerClicMenu }: PropsEncabezado)
             </button>
 
             {desplegableAbierto && (
-              <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900">{usuario?.nombreUsuario}</p>
-                  <p className="text-xs text-gray-500">{usuario?.correo}</p>
+              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-card rounded-lg shadow-lg border border-gray-200 dark:border-gray-800 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{usuario?.nombreUsuario}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{usuario?.correo}</p>
                   <span
                     className={cn(
                       'inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full capitalize',
@@ -91,16 +92,36 @@ export default function Encabezado({ titulo, alHacerClicMenu }: PropsEncabezado)
                 </div>
 
                 <div className="py-1">
-                  <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <Link
+                    href="/perfil"
+                    onClick={() => setDesplegableAbierto(false)}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <UserCircle className="w-4 h-4" />
+                    Mi perfil
+                  </Link>
+                  <Link
+                    href="/configuracion/apariencia"
+                    onClick={() => setDesplegableAbierto(false)}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <Palette className="w-4 h-4" />
+                    Apariencia
+                  </Link>
+                  <Link
+                    href="/configuracion/institucion"
+                    onClick={() => setDesplegableAbierto(false)}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
                     <Settings className="w-4 h-4" />
                     Configuración
-                  </button>
+                  </Link>
                   <button
                     onClick={cerrarSesionUsuario}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                   >
                     <LogOut className="w-4 h-4" />
-                    Cerrar Sesión
+                    Cerrar sesión
                   </button>
                 </div>
               </div>

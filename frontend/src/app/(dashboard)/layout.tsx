@@ -55,7 +55,7 @@ export default function DisenoPanel({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <BarraLateral
         colapsada={esMovil ? false : barraLateralColapsada}
         abierta={esMovil ? barraLateralAbierta : true}

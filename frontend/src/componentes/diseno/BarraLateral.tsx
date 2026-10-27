@@ -28,14 +28,20 @@ interface PropsBarraLateral {
 }
 
 const seccionesMenu: SeccionMenu[] = [
+  // {
+  //   elementos: [
+  //     {
+  //       titulo: 'Panel Principal',
+  //       href: '/panel',
+  //       icono: <Home className="w-5 h-5" />,
+  //       roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente', 'estudiante', 'apoyo'],
+  //     },
+  //   ],
+  // },
   {
+    titulo: 'Gestion de Admisiones y Estudiantes',
     elementos: [
-      {
-        titulo: 'Panel Principal',
-        href: '/panel',
-        icono: <Home className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente', 'estudiante', 'apoyo'],
-      },
+      
       {
         titulo: 'Admisión',
         href: '/panel/admision',
@@ -49,6 +55,40 @@ const seccionesMenu: SeccionMenu[] = [
         roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente'],
       },
       {
+        titulo: 'Preinscripcion',
+        href: '/preinscripcion',
+        icono: <CalendarCheck className="w-5 h-5" />,
+        roles: ['administrador', 'secretaria', 'director_academico'],
+      },
+      {
+        titulo: 'Pagos',
+        href: '/pagos',
+        icono: <CreditCard className="w-5 h-5" />,
+        roles: ['administrador', 'secretaria', 'rector'],
+      },
+    ],
+  },
+  {
+    titulo: 'Gestion Academica',
+    elementos: [
+      {
+        titulo: 'Materias Impartidas',
+        href: '/materias-impartidas',
+        icono: <ClipboardList className="w-5 h-5" />,
+        roles: ['administrador', 'secretaria', 'director_academico', 'docente'],
+      },
+      {
+        titulo: 'Grupos',
+        href: '/grupos',
+        icono: <FolderKanban className="w-5 h-5" />,
+        roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente'],
+      },
+    ],
+  },
+  {
+    titulo: 'Gestion del Personal',
+    elementos: [
+      {
         titulo: 'Personal',
         href: '/personal',
         icono: <UserCog className="w-5 h-5" />,
@@ -60,52 +100,15 @@ const seccionesMenu: SeccionMenu[] = [
         icono: <Fingerprint className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'apoyo'],
       },
-      {
-        titulo: 'Carreras',
-        href: '/panel/carreras',
-        icono: <BookOpen className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico', 'rector'],
-      },
-      {
-        titulo: 'Materias',
-        href: '/materias',
-        icono: <BookMarked className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente'],
-      },
-      {
-        titulo: 'Grupos',
-        href: '/grupos',
-        icono: <FolderKanban className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente'],
-      },
-      {
-        titulo: 'Preinscripcion',
-        href: '/preinscripcion',
-        icono: <CalendarCheck className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico'],
-      },
-      {
-        titulo: 'Materias Impartidas',
-        href: '/materias-impartidas',
-        icono: <ClipboardList className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico', 'docente'],
-      },
-      {
-        titulo: 'Pagos',
-        href: '/pagos',
-        icono: <CreditCard className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'rector'],
-      },
+    ],
+  },
+  {
+    titulo: 'Documentacion y Reportes',
+    elementos: [
       {
         titulo: 'Certificados',
         href: '/certificados',
         icono: <Award className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico'],
-      },
-      {
-        titulo: 'Convalidaciones',
-        href: '/convalidaciones',
-        icono: <RefreshCw className="w-5 h-5" />,
         roles: ['administrador', 'secretaria', 'director_academico'],
       },
       {
@@ -114,50 +117,27 @@ const seccionesMenu: SeccionMenu[] = [
         icono: <BarChart3 className="w-5 h-5" />,
         roles: ['administrador', 'director_academico', 'rector'],
       },
-    ],
-  },
-  {
-    titulo: 'Administración',
-    elementos: [
-      {
-        titulo: 'Usuarios',
-        href: '/usuarios',
-        icono: <Shield className="w-5 h-5" />,
-        roles: ['administrador'],
-      },
-      {
-        titulo: 'Credenciales',
-        href: '/credenciales',
-        icono: <FileText className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria'],
-      },
+      // {
+      //   titulo: 'Credenciales',
+      //   href: '/credenciales',
+      //   icono: <FileText className="w-5 h-5" />,
+      //   roles: ['administrador', 'secretaria'],
+      // },
       {
         titulo: 'Documentos',
         href: '/documentos',
         icono: <FileBadge className="w-5 h-5" />,
         roles: ['administrador', 'secretaria'],
-      },
+      }
     ],
   },
   {
-    titulo: 'Configuración',
+    titulo: 'Administracion del Sistema',
     elementos: [
       {
-        titulo: 'Institución',
-        href: '/configuracion/institucion',
-        icono: <Building2 className="w-5 h-5" />,
-        roles: ['administrador'],
-      },
-      {
-        titulo: 'Gestiones',
-        href: '/configuracion/gestiones',
-        icono: <Calendar className="w-5 h-5" />,
-        roles: ['administrador'],
-      },
-      {
-        titulo: 'Planes de Estudio',
-        href: '/planes-estudio',
-        icono: <BookOpen className="w-5 h-5" />,
+        titulo: 'Usuarios',
+        href: '/usuarios',
+        icono: <Shield className="w-5 h-5" />,
         roles: ['administrador'],
       },
     ],
@@ -188,13 +168,13 @@ export default function BarraLateral({ colapsada, abierta = true, alCerrar, alCo
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 z-40 h-screen bg-white border-r border-gray-200 transition-all duration-300',
+        'fixed left-0 top-0 z-40 h-screen bg-white dark:bg-card border-r border-gray-200 dark:border-gray-800 transition-all duration-300',
         colapsada ? 'w-16' : 'w-64',
         !abierta ? '-translate-x-full lg:translate-x-0' : 'translate-x-0'
       )}
     >
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between h-20 px-4 border-b border-gray-200">
+        <div className="flex items-center justify-between h-20 px-4 border-b border-gray-200 dark:border-gray-800">
           {!colapsada ? (
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-2">
@@ -211,11 +191,11 @@ export default function BarraLateral({ colapsada, abierta = true, alCerrar, alCo
                     </span>
                   </div>
                 )}
-                <span className="text-lg font-bold text-primary-600 truncate">
+                <span className="text-lg font-bold text-primary truncate">
                   {configuracion?.nombreCorto || 'SITBT'}
                 </span>
               </div>
-              <span className="text-xs text-gray-500 truncate mt-0.5" title={configuracion?.lema || ''}>
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5" title={configuracion?.lema || ''}>
                 {configuracion?.lema || 'Instituto Tecnológico'}
               </span>
             </div>
@@ -236,7 +216,7 @@ export default function BarraLateral({ colapsada, abierta = true, alCerrar, alCo
           )}
           <button
             onClick={alColapsar}
-            className="hidden lg:block p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="hidden lg:block p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             {colapsada ? (
               <Menu className="w-5 h-5 text-gray-600" />
@@ -246,7 +226,7 @@ export default function BarraLateral({ colapsada, abierta = true, alCerrar, alCo
           </button>
           <button
             onClick={alCerrar}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <X className="w-5 h-5 text-gray-600" />
           </button>
@@ -268,11 +248,11 @@ export default function BarraLateral({ colapsada, abierta = true, alCerrar, alCo
                       className={cn(
                         'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors',
                         pathname === elemento.href
-                          ? 'bg-primary-50 text-primary-600'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
                       )}
                     >
-                      <span className={cn(pathname === elemento.href && 'text-primary-600')}>
+                      <span className={cn(pathname === elemento.href && 'text-primary')}>
                         {elemento.icono}
                       </span>
                       {!colapsada && (

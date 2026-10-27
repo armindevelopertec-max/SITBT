@@ -8,9 +8,9 @@ interface PropsTarjeta extends HTMLAttributes<HTMLDivElement> {
 const Tarjeta = forwardRef<HTMLDivElement, PropsTarjeta>(
   ({ className, variante = 'predeterminado', ...props }, ref) => {
     const variantes = {
-      predeterminado: 'bg-white',
-      conBorde: 'bg-white border border-gray-200',
-      elevada: 'bg-white shadow-lg',
+      predeterminado: 'bg-card text-card-foreground',
+      conBorde: 'bg-card text-card-foreground border border-border',
+      elevada: 'bg-card text-card-foreground shadow-lg dark:shadow-black/40',
     };
 
     return (
@@ -31,21 +31,21 @@ Tarjeta.displayName = 'Tarjeta';
 
 const EncabezadoTarjeta = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('px-6 py-4 border-b border-gray-200', className)} {...props} />
+    <div ref={ref} className={cn('px-6 py-4 border-b border-border', className)} {...props} />
   )
 );
 EncabezadoTarjeta.displayName = 'EncabezadoTarjeta';
 
 const TituloTarjeta = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn('text-lg font-semibold text-gray-900', className)} {...props} />
+    <h3 ref={ref} className={cn('text-lg font-semibold text-foreground', className)} {...props} />
   )
 );
 TituloTarjeta.displayName = 'TituloTarjeta';
 
 const DescripcionTarjeta = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn('text-sm text-gray-500 mt-1', className)} {...props} />
+    <p ref={ref} className={cn('text-sm text-muted-foreground mt-1', className)} {...props} />
   )
 );
 DescripcionTarjeta.displayName = 'DescripcionTarjeta';
@@ -59,7 +59,7 @@ ContenidoTarjeta.displayName = 'ContenidoTarjeta';
 
 const PieTarjeta = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('px-6 py-4 border-t border-gray-200 bg-gray-50', className)} {...props} />
+    <div ref={ref} className={cn('px-6 py-4 border-t border-border bg-muted/40 dark:bg-muted/20', className)} {...props} />
   )
 );
 PieTarjeta.displayName = 'PieTarjeta';

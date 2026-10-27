@@ -10,7 +10,7 @@ import { Insignia } from '@/componentes/iu/insignia';
 import { Modal, ModalConfirmacion } from '@/componentes/iu/modal';
 import { usarUsuarios, UsuarioRespuesta } from '@/ganchos/usarUsuarios';
 import { Rol } from '@/tipos';
-import { Plus, Search, Edit2, Trash2, Shield, Key, X, Loader2 } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Shield, Key, X, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const coloresRol: Record<string, 'predeterminado' | 'primario' | 'secundario' | 'exito' | 'advertencia' | 'error'> = {
   administrador: 'error',
@@ -33,7 +33,7 @@ const ROLES = [
 ];
 
 export default function PaginaUsuarios() {
-  const { usuarios, cargando, error, paginacion, recargar, crearUsuario, actualizarUsuario, eliminarUsuario, cambiarContrasena } = usarUsuarios();
+  const { usuarios, cargando, error, paginacion, recargar, crearUsuario, actualizarUsuario, eliminarUsuario, cambiarContrasena, obtenerUsuarios } = usarUsuarios();
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
 
   const [modalRestablecer, setModalRestablecer] = useState({ abierto: false, usuario: null as UsuarioRespuesta | null });
@@ -53,6 +53,30 @@ export default function PaginaUsuarios() {
     usuario.persona?.correo?.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
     usuario.persona?.nombres?.toLowerCase().includes(terminoBusqueda.toLowerCase())
   );
+
+  const generarPaginas = (paginaActual: number, totalPag: number): (number | '...')[] => {
+    if (totalPag <= 1) return [1];
+    const paginas: (number | '...')[] = [];
+    const inicio = Math.max(2, paginaActual - 1);
+    const fin = Math.min(totalPag - 1, paginaActual + 1);
+    paginas.push(1);
+    if (inicio > 2) paginas.push('...');
+    for (let p = inicio; p <= fin; p++) {
+      paginas.push(p);
+    }
+    if (fin < totalPag - 1) paginas.push('...');
+    paginas.push(totalPag);
+    return paginas;
+  };
+
+  const totalPaginas = Math.max(1, Math.ceil(paginacion.total / paginacion.limite));
+  const cambiarPagina = (nuevaPagina: number) => {
+    if (nuevaPagina < 1 || nuevaPagina > totalPaginas || nuevaPagina === paginacion.pagina || cargando) return;
+    obtenerUsuarios(nuevaPagina, paginacion.limite);
+  };
+
+  const inicioRango = paginacion.total === 0 ? 0 : (paginacion.pagina - 1) * paginacion.limite + 1;
+  const finRango = Math.min(paginacion.pagina * paginacion.limite, paginacion.total);
 
   const obtenerInsigniaRol = (roles: UsuarioRespuesta['roles']) => {
     if (!roles || roles.length === 0) return <Insignia variante="predeterminado">Sin rol</Insignia>;
@@ -179,7 +203,7 @@ export default function PaginaUsuarios() {
               <EncabezadoTabla>
                 <FilaTabla>
                   <CeldaEncabezado>Usuario</CeldaEncabezado>
-                  <CeldaEncabezado>Correo</CeldaEncabezado>
+                  <CeldaEncabezado>Nombre</CeldaEncabezado>
                   <CeldaEncabezado>Rol</CeldaEncabezado>
                   <CeldaEncabezado>Estado</CeldaEncabezado>
                   <CeldaEncabezado>Acciones</CeldaEncabezado>
@@ -196,7 +220,13 @@ export default function PaginaUsuarios() {
                         <span className="font-medium">{usuario.nombreUsuario}</span>
                       </div>
                     </CeldaTabla>
-                    <CeldaTabla>{usuario.persona?.correo || '-'}</CeldaTabla>
+                    <CeldaTabla>
+                      {usuario.persona
+                        ? [usuario.persona.nombres, usuario.persona.apellidoPaterno, usuario.persona.apellidoMaterno]
+                            .filter(Boolean)
+                            .join(' ')
+                        : '-'}
+                    </CeldaTabla>
                     <CeldaTabla>{obtenerInsigniaRol(usuario.roles)}</CeldaTabla>
                     <CeldaTabla>
                       <Insignia variante={usuario.estado === 'activo' ? 'exito' : 'error'} className="capitalize">
@@ -227,6 +257,50 @@ export default function PaginaUsuarios() {
                 )}
               </CuerpoTabla>
             </Tabla>
+          )}
+          {paginacion.total > 0 && (
+            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+              <div className="text-sm text-gray-500">
+                Mostrando {inicioRango} a {finRango} de {paginacion.total} usuarios
+              </div>
+              <div className="flex items-center gap-2">
+                <Boton
+                  variante="contorno"
+                  tamano="pequeno"
+                  onClick={() => cambiarPagina(paginacion.pagina - 1)}
+                  disabled={paginacion.pagina === 1 || cargando}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Anterior
+                </Boton>
+                {generarPaginas(paginacion.pagina, totalPaginas).map((p, indice) =>
+                  p === '...' ? (
+                    <span key={`ellipsis-${indice}`} className="px-2 text-gray-400">
+                      ...
+                    </span>
+                  ) : (
+                    <Boton
+                      key={p}
+                      variante={p === paginacion.pagina ? 'primario' : 'contorno'}
+                      tamano="pequeno"
+                      onClick={() => cambiarPagina(p as number)}
+                      disabled={cargando}
+                    >
+                      {p}
+                    </Boton>
+                  )
+                )}
+                <Boton
+                  variante="contorno"
+                  tamano="pequeno"
+                  onClick={() => cambiarPagina(paginacion.pagina + 1)}
+                  disabled={paginacion.pagina >= totalPaginas || cargando}
+                >
+                  Siguiente
+                  <ChevronRight className="w-4 h-4" />
+                </Boton>
+              </div>
+            </div>
           )}
         </ContenidoTarjeta>
       </Tarjeta>

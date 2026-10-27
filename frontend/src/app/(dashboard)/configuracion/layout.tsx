@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/libreria/utilidades';
-import { Building2, Shield, Settings as SettingsIcon, Calendar } from 'lucide-react';
+import { Building2, Settings as SettingsIcon, Calendar, BookOpen, BookMarked, GraduationCap, Palette, GitCompare } from 'lucide-react';
 
 interface PropsDisposicionConfiguracion {
   children: ReactNode;
@@ -23,6 +23,36 @@ const enlacesConfiguracion = [
     icono: Calendar,
     descripcion: 'Períodos académicos y estados',
   },
+  {
+    titulo: 'Carreras',
+    href: '/configuracion/carreras',
+    icono: BookOpen,
+    descripcion: 'Catálogo de carreras',
+  },
+  {
+    titulo: 'Materias',
+    href: '/configuracion/materias',
+    icono: BookMarked,
+    descripcion: 'Catálogo de materias',
+  },
+  {
+    titulo: 'Planes de Estudio',
+    href: '/configuracion/planes-estudio',
+    icono: GraduationCap,
+    descripcion: 'Planes, asignaturas y prerrequisitos',
+  },
+  {
+    titulo: 'Convalidaciones',
+    href: '/configuracion/convalidaciones',
+    icono: GitCompare,
+    descripcion: 'Equivalencias entre planes RM',
+  },
+  {
+    titulo: 'Apariencia',
+    href: '/configuracion/apariencia',
+    icono: Palette,
+    descripcion: 'Tema oscuro y color principal',
+  },
 ];
 
 export default function DisposicionConfiguracion({ children }: PropsDisposicionConfiguracion) {
@@ -31,12 +61,12 @@ export default function DisposicionConfiguracion({ children }: PropsDisposicionC
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
-          <SettingsIcon className="w-6 h-6 text-primary-600" />
+        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+          <SettingsIcon className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Configuración</h1>
-          <p className="text-gray-500">Administración del sistema</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Configuración</h1>
+          <p className="text-gray-500 dark:text-gray-400">Administración del sistema</p>
         </div>
       </div>
 

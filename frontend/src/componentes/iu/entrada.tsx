@@ -23,14 +23,14 @@ const Entrada = forwardRef<HTMLInputElement, PropsEntrada>(
           id={idEntrada}
           type={type}
           className={cn(
-            'block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 sm:text-sm',
+            'block w-full rounded-lg border border-input bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm',
             error && 'border-red-500 focus:border-red-500 focus:ring-red-500',
             className
           )}
           {...props}
         />
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-        {textoAyuda && !error && <p className="mt-1 text-sm text-gray-500">{textoAyuda}</p>}
+        {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
+        {textoAyuda && !error && <p className="mt-1 text-sm text-muted-foreground">{textoAyuda}</p>}
       </div>
     );
   }
@@ -44,7 +44,7 @@ const AreaTexto = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTex
       <textarea
         ref={ref}
         className={cn(
-          'block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 sm:text-sm',
+          'block w-full rounded-lg border border-input bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm',
           className
         )}
         {...props}
