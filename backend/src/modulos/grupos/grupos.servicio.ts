@@ -67,7 +67,7 @@ export class ServicioGrupos {
     gestion: string,
     periodo: string,
   ): Promise<string> {
-    const codigoCarrera = (carrera?.codigo || 'XXX').toUpperCase();
+    const codigoCarrera = ((carrera?.codigo || 'XXX').toUpperCase().substring(0, 2));
     const periodoNormalizado = (periodo || 'I').trim().toUpperCase();
     const semestreDosDigitos = String(semestre).padStart(2, '0');
     const inicialTurno = (turno?.codigo || 'X').trim().charAt(0).toUpperCase();
