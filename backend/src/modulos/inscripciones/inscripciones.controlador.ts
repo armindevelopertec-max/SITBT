@@ -15,11 +15,14 @@ import { ServicioInscripciones } from './inscripciones.servicio';
 import { CrearInscripcionDto } from './dto/crear-inscripcion.dto';
 import { ActualizarInscripcionDto } from './dto/actualizar-inscripcion.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoInscripcion } from '../../entidades/inscripcion.entidad';
 
 @ApiTags('Inscripciones')
 @Controller('inscripciones')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico')
 @ApiBearerAuth()
 export class ControladorInscripciones {
   constructor(private readonly servicioInscripciones: ServicioInscripciones) {}

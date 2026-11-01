@@ -9,6 +9,7 @@
     "start:dev": "nest start --watch",
     "start:prod": "node dist/principal",
     "semilla": "ts-node src/semilla.ts",
+    "semilla:admin": "ts-node src/semilla-admin.ts",
     "semilla:docentes": "ts-node src/semilla-docentes.ts",
     "semilla:estudiantes": "ts-node src/semilla-estudiantes.ts",
     "semilla:grupos": "ts-node src/semilla-grupos.ts",

@@ -19,11 +19,14 @@ import { ClonarGruposDto } from './dto/clonar-grupos.dto';
 import { CambiarEstadoGrupoDto } from './dto/cambiar-estado-grupo.dto';
 import { TrasladarGrupoDto } from './dto/trasladar-grupo.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoGrupo } from '../../entidades/grupo.entidad';
 
 @ApiTags('Grupos')
 @Controller('grupos')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico', 'rector', 'docente')
 @ApiBearerAuth()
 export class ControladorGrupos {
   constructor(private readonly servicioGrupos: ServicioGrupos) {}

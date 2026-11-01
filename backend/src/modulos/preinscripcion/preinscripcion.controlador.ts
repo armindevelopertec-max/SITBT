@@ -12,10 +12,13 @@ import { VerificarPagosDto } from './dto/verificar-pagos.dto';
 import { CalcularMateriasDto } from './dto/calcular-materias.dto';
 import { CrearInscripcionLoteDto } from './dto/crear-lote-inscripcion.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 
 @ApiTags('Preinscripcion')
 @Controller('preinscripcion')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico')
 @ApiBearerAuth()
 export class ControladorPreinscripcion {
   constructor(private readonly servicio: ServicioPreinscripcion) {}

@@ -19,6 +19,8 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ServicioAlmacenamiento, ArchivoSubido as ArchivoSubidoType } from './almacenamiento.servicio';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 
 @ApiTags('Almacenamiento')
 @Controller('almacenamiento')
@@ -27,7 +29,8 @@ export class ControladorAlmacenamiento {
   constructor(private readonly servicio: ServicioAlmacenamiento) {}
 
   @Post('subir')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria', 'director_academico', 'rector', 'docente', 'apoyo')
   @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('archivo'))
   async subirArchivo(
@@ -67,7 +70,8 @@ export class ControladorAlmacenamiento {
   }
 
   @Get(':nombreArchivo/url')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria', 'director_academico', 'rector', 'docente', 'apoyo')
   @ApiBearerAuth()
   async obtenerUrlArchivo(@Param('nombreArchivo') nombreArchivo: string) {
     const url = await this.servicio.obtenerUrlArchivo(nombreArchivo);
@@ -75,7 +79,8 @@ export class ControladorAlmacenamiento {
   }
 
   @Delete(':nombreArchivo')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria', 'director_academico', 'rector', 'docente', 'apoyo')
   @ApiBearerAuth()
   async eliminarArchivo(@Param('nombreArchivo') nombreArchivo: string) {
     await this.servicio.eliminarArchivo(nombreArchivo);
@@ -83,7 +88,8 @@ export class ControladorAlmacenamiento {
   }
 
   @Get()
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria', 'director_academico', 'rector', 'docente', 'apoyo')
   @ApiBearerAuth()
   async listarArchivos(@Query('prefijo') prefijo: string = '') {
     const archivos = await this.servicio.listarArchivos(prefijo);

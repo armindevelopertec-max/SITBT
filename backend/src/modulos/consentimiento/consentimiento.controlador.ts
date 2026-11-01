@@ -14,11 +14,14 @@ import { ServicioConsentimiento } from './consentimiento.servicio';
 import { CrearConsentimientoDto } from './dto/crear-consentimiento.dto';
 import { ActualizarConsentimientoDto } from './dto/actualizar-consentimiento.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { TipoConsentimiento } from '../../entidades/registro-consentimiento.entidad';
 
 @ApiTags('Consentimiento')
 @Controller('consentimiento')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico')
 @ApiBearerAuth()
 export class ControladorConsentimiento {
   constructor(private readonly servicio: ServicioConsentimiento) {}

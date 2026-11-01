@@ -15,10 +15,15 @@ import { ServicioPersonas } from './personas.servicio';
 import { CrearPersonaDto } from './dto/crear-persona.dto';
 import { ActualizarPersonaDto } from './dto/actualizar-persona.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoPersona } from '../../entidades/persona.entidad';
 
 @ApiTags('Personas')
 @Controller('personas')
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico')
+@ApiBearerAuth()
 export class ControladorPersonas {
   constructor(private readonly servicioPersonas: ServicioPersonas) {}
 
@@ -57,14 +62,16 @@ export class ControladorPersonas {
   }
 
   @Patch(':id')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria', 'director_academico')
   @ApiBearerAuth()
   actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarPersonaDto: ActualizarPersonaDto) {
     return this.servicioPersonas.actualizar(id, actualizarPersonaDto);
   }
 
   @Delete(':id')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria', 'director_academico')
   @ApiBearerAuth()
   eliminar(@Param('id', ParseIntPipe) id: number) {
     return this.servicioPersonas.eliminar(id);

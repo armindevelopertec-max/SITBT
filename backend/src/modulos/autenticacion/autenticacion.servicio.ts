@@ -1,12 +1,13 @@
 import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Usuario } from '../../entidades/usuario.entidad';
 import { Persona } from '../../entidades/persona.entidad';
 import { UsuarioRol } from '../../entidades/usuario-rol.entidad';
-import { Rol } from '../../entidades/rol.entidad';
+import { EstadoRol, Rol } from '../../entidades/rol.entidad';
+import { EstadoPermiso, Permiso } from '../../entidades/permiso.entidad';
 
 @Injectable()
 export class AutenticacionServicio {
@@ -19,6 +20,8 @@ export class AutenticacionServicio {
     private repositorioUsuarioRol: Repository<UsuarioRol>,
     @InjectRepository(Rol)
     private repositorioRol: Repository<Rol>,
+    @InjectRepository(Permiso)
+    private repositorioPermiso: Repository<Permiso>,
     private servicioJwt: JwtService,
   ) {}
 
@@ -87,10 +90,18 @@ export class AutenticacionServicio {
     usuario.ultimoAcceso = new Date();
     await this.repositorioUsuario.save(usuario);
 
-    const roles = await this.repositorioUsuarioRol.find({
+    const rolesAsignados = await this.repositorioUsuarioRol.find({
       where: { usuarioId: usuario.id },
       relations: ['rol'],
     });
+
+    const roles = rolesAsignados.filter(
+      (usuarioRol) => usuarioRol.rol?.estado === EstadoRol.ACTIVO,
+    );
+
+    const permisos = await this.obtenerPermisosDeRoles(
+      roles.map((usuarioRol) => usuarioRol.rol.id),
+    );
 
     const cargaUtil = {
       usuarioId: usuario.id,
@@ -106,7 +117,9 @@ export class AutenticacionServicio {
         nombreUsuario: usuario.nombreUsuario as any,
         personaId: usuario.personaId,
         persona: usuario.persona,
+        estado: usuario.estado,
         roles: roles.map((usuarioRol) => usuarioRol.rol),
+        permisos,
       },
     };
   }
@@ -121,18 +134,45 @@ export class AutenticacionServicio {
       throw new UnauthorizedException('Usuario no encontrado');
     }
 
-    const roles = await this.repositorioUsuarioRol.find({
+    const rolesAsignados = await this.repositorioUsuarioRol.find({
       where: { usuarioId: usuario.id },
       relations: ['rol'],
     });
+
+    const roles = rolesAsignados.filter(
+      (usuarioRol) => usuarioRol.rol?.estado === EstadoRol.ACTIVO,
+    );
+
+    const permisos = await this.obtenerPermisosDeRoles(
+      roles.map((usuarioRol) => usuarioRol.rol.id),
+    );
 
     return {
       id: usuario.id,
       nombreUsuario: usuario.nombreUsuario as any,
       personaId: usuario.personaId,
       persona: usuario.persona,
+      estado: usuario.estado,
       roles: roles.map((usuarioRol) => usuarioRol.rol),
+      permisos,
     };
+  }
+
+  private async obtenerPermisosDeRoles(rolIds: number[]): Promise<string[]> {
+    if (rolIds.length === 0) {
+      return [];
+    }
+
+    const permisos = await this.repositorioPermiso.find({
+      where: {
+        rolId: In(rolIds),
+        estado: EstadoPermiso.ACTIVO,
+      },
+    });
+
+    return [
+      ...new Set(permisos.map((permiso) => `${permiso.modulo}:${permiso.accion}`)),
+    ];
   }
 
   async validarUsuario(usuarioId: number): Promise<Usuario> {

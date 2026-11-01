@@ -15,11 +15,14 @@ import { ServicioPagos } from './pagos.servicio';
 import { CrearPagoDto } from './dto/crear-pago.dto';
 import { ActualizarPagoDto } from './dto/actualizar-pago.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoPago } from '../../entidades/pago.entidad';
 
 @ApiTags('Pagos')
 @Controller('pagos')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'rector')
 @ApiBearerAuth()
 export class ControladorPagos {
   constructor(private readonly servicio: ServicioPagos) {}

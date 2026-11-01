@@ -51,11 +51,28 @@ export interface Usuario {
   correo?: string;
   rol: Rol;
   roles?: RolSistema[];
+  permisos?: string[];
   personaId?: number;
   persona?: Persona;
   estado: string;
   creadoEn?: string;
   actualizadoEn?: string;
+}
+
+export interface ModuloPermiso {
+  modulo: string;
+  nombre: string;
+  descripcion?: string;
+  grupo?: string;
+  acciones: string[];
+}
+
+export interface PermisoRol {
+  id: number;
+  rolId: number;
+  modulo: string;
+  accion: string;
+  estado?: string;
 }
 
 export interface Carrera {
@@ -453,7 +470,8 @@ export interface ElementoMenu {
   titulo: string;
   href: string;
   icono: string;
-  roles: Rol[];
+  modulo: string;
+  soloAdministrador?: boolean;
   hijos?: ElementoMenu[];
 }
 

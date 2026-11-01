@@ -2,6 +2,8 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Rol, EstadoRol } from '../../entidades/rol.entidad';
+import { UsuarioRol } from '../../entidades/usuario-rol.entidad';
+import { Permiso } from '../../entidades/permiso.entidad';
 import { CrearRolDto } from './dto/crear-rol.dto';
 import { ActualizarRolDto } from './dto/actualizar-rol.dto';
 
@@ -23,7 +25,7 @@ export class ServicioRoles {
       codigo: crearRolDto.codigo,
       nombre: crearRolDto.nombre,
       descripcion: crearRolDto.descripcion,
-      estado: crearRolDto.estado,
+      estado: crearRolDto.estado ?? EstadoRol.ACTIVO,
     });
     return this.repositorioRol.save(rol);
   }
@@ -66,12 +68,36 @@ export class ServicioRoles {
 
   async actualizar(id: number, actualizarRolDto: ActualizarRolDto): Promise<Rol> {
     const rol = await this.obtenerUno(id);
+
+    if (rol.codigo === 'administrador' && actualizarRolDto.estado === EstadoRol.INACTIVO) {
+      throw new ConflictException('El rol administrador no se puede desactivar');
+    }
+
     Object.assign(rol, actualizarRolDto);
     return this.repositorioRol.save(rol);
   }
 
   async eliminar(id: number): Promise<void> {
     const rol = await this.obtenerUno(id);
+
+    if (rol.codigo === 'administrador') {
+      throw new ConflictException('El rol administrador no se puede eliminar');
+    }
+
+    const asignaciones = await this.repositorioRol.manager
+      .getRepository(UsuarioRol)
+      .count({ where: { rolId: id } });
+
+    if (asignaciones > 0) {
+      throw new ConflictException(
+        'No se puede eliminar un rol que está asignado a usuarios',
+      );
+    }
+
+    await this.repositorioRol.manager
+      .getRepository(Permiso)
+      .delete({ rolId: id });
+
     await this.repositorioRol.remove(rol);
   }
 

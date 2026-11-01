@@ -15,6 +15,8 @@ import { ServicioAdmision } from './admision.servicio';
 import { CrearAdmisionDto } from './dto/crear-admision.dto';
 import { ActualizarAdmisionDto } from './dto/actualizar-admision.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoAdmision } from '../../entidades/solicitud-admision.entidad';
 
 @ApiTags('Admision')
@@ -28,7 +30,8 @@ export class ControladorAdmision {
   }
 
   @Get()
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria')
   obtenerTodos(
     @Query('pagina') pagina = 1,
     @Query('limite') limite = 20,
@@ -39,25 +42,29 @@ export class ControladorAdmision {
   }
 
   @Get('estadisticas')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria')
   obtenerEstadisticas() {
     return this.servicio.obtenerEstadisticas();
   }
 
   @Get(':id')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria')
   obtenerUno(@Param('id') id: string) {
     return this.servicio.obtenerUno(id);
   }
 
   @Patch(':id')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria')
   actualizar(@Param('id') id: string, @Body() actualizarAdmisionDto: ActualizarAdmisionDto) {
     return this.servicio.actualizar(id, actualizarAdmisionDto);
   }
 
   @Post(':id/verificar')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria')
   @HttpCode(200)
   verificar(
     @Param('id') id: string,
@@ -68,7 +75,8 @@ export class ControladorAdmision {
   }
 
   @Post(':id/rechazar')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria')
   @HttpCode(200)
   rechazar(
     @Param('id') id: string,
@@ -79,7 +87,8 @@ export class ControladorAdmision {
   }
 
   @Post(':id/convertir-estudiante')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria')
   @HttpCode(200)
   convertirAEstudiante(
     @Param('id') id: string,
@@ -89,7 +98,8 @@ export class ControladorAdmision {
   }
 
   @Delete(':id')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria')
   eliminar(@Param('id') id: string) {
     return this.servicio.eliminar(id);
   }

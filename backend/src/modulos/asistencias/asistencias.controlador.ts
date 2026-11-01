@@ -13,6 +13,8 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ServicioAsistencias } from './asistencias.servicio';
 import { MarcarAsistenciaDto } from './dto/marcar-asistencia.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { TipoMarcacion } from '../../entidades/marcacion-personal.entidad';
 
 @ApiTags('Asistencias del Personal')
@@ -31,21 +33,24 @@ export class ControladorAsistencias {
   }
 
   @Get('estado-hoy')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria', 'director_academico', 'rector', 'apoyo')
   @ApiBearerAuth()
   estadoHoy() {
     return this.servicioAsistencias.estadoHoy();
   }
 
   @Get('hoy')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria', 'director_academico', 'rector', 'apoyo')
   @ApiBearerAuth()
   marcacionesHoy() {
     return this.servicioAsistencias.marcacionesHoy();
   }
 
   @Get('historial')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria', 'director_academico', 'rector', 'apoyo')
   @ApiBearerAuth()
   historial(
     @Query('pagina') pagina = '1',
@@ -68,7 +73,8 @@ export class ControladorAsistencias {
   }
 
   @Delete('marcacion/:id')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'secretaria', 'director_academico', 'rector', 'apoyo')
   @ApiBearerAuth()
   eliminarMarcacion(@Param('id', ParseIntPipe) id: number) {
     return this.servicioAsistencias.eliminarMarcacion(id);

@@ -15,11 +15,14 @@ import { ServicioUsuarios } from './usuarios.servicio';
 import { CrearUsuarioDto } from './dto/crear-usuario.dto';
 import { ActualizarUsuarioDto } from './dto/actualizar-usuario.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoUsuario } from '../../entidades/usuario.entidad';
 
 @ApiTags('Usuarios')
 @Controller('usuarios')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador')
 @ApiBearerAuth()
 export class ControladorUsuarios {
   constructor(private readonly servicioUsuarios: ServicioUsuarios) {}

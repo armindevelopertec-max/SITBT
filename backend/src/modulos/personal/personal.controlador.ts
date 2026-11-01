@@ -15,11 +15,14 @@ import { ServicioPersonal } from './personal.servicio';
 import { CrearPersonalDto } from './dto/crear-personal.dto';
 import { ActualizarPersonalDto } from './dto/actualizar-personal.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoPersonal, CargoPersonal } from '../../entidades/personal.entidad';
 
 @ApiTags('Personal')
 @Controller('personal')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico', 'rector')
 @ApiBearerAuth()
 export class ControladorPersonal {
   constructor(private readonly servicioPersonal: ServicioPersonal) {}

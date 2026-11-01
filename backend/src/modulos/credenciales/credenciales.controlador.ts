@@ -17,11 +17,14 @@ import { ServicioCredenciales } from './credenciales.servicio';
 import { CrearCredencialDto } from './dto/crear-credencial.dto';
 import { ActualizarCredencialDto } from './dto/actualizar-credencial.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoCredencial } from '../../entidades/credencial.entidad';
 
 @ApiTags('Credenciales')
 @Controller('credenciales')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria')
 @ApiBearerAuth()
 export class ControladorCredenciales {
   constructor(private readonly servicio: ServicioCredenciales) {}

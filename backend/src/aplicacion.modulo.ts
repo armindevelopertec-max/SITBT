@@ -8,6 +8,7 @@ import { ModuloPersonal } from './modulos/personal/personal.modulo';
 import { ModuloAsistencias } from './modulos/asistencias/asistencias.modulo';
 import { ModuloUsuarios } from './modulos/usuarios/usuarios.modulo';
 import { ModuloRoles } from './modulos/roles/roles.modulo';
+import { ModuloPermisos } from './modulos/permisos/permisos.modulo';
 import { ModuloCarreras } from './modulos/carreras/carreras.modulo';
 import { ModuloPlanesEstudio } from './modulos/planes-estudio/planes-estudio.modulo';
 import { ModuloMaterias } from './modulos/materias/materias.modulo';
@@ -59,6 +60,7 @@ import { ModuloPreinscripcion } from './modulos/preinscripcion/preinscripcion.mo
     ModuloAsistencias,
     ModuloUsuarios,
     ModuloRoles,
+    ModuloPermisos,
     ModuloCarreras,
     ModuloPlanesEstudio,
     ModuloMaterias,

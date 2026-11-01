@@ -2,6 +2,8 @@ import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common'
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AutenticacionServicio } from './autenticacion.servicio';
 import { GuardaJwt } from './guarda-jwt';
+import { GuardaRoles } from './guarda-roles';
+import { Roles } from './roles.decorador';
 
 @ApiTags('Autenticacion')
 @Controller('autenticacion')
@@ -14,6 +16,9 @@ export class ControladorAutenticacion {
   }
 
   @Post('registrar')
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador')
+  @ApiBearerAuth()
   async registrar(@Body() cuerpo: { nombreUsuario: string; contrasena: string; personaId: number }) {
     return this.autenticacionServicio.registrar(cuerpo);
   }

@@ -13,10 +13,13 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ServicioAuditoria } from './auditoria.servicio';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 
 @ApiTags('Auditoria')
 @Controller('auditoria')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador')
 @ApiBearerAuth()
 export class ControladorAuditoria {
   constructor(private readonly servicio: ServicioAuditoria) {}

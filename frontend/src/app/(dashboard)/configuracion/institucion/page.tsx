@@ -31,9 +31,10 @@ const esquemaConfiguracion = z.object({
 type FormularioConfiguracion = z.infer<typeof esquemaConfiguracion>;
 
 export default function PaginaConfiguracion() {
-  const { configuracion, cargando, recargar } = usarConfiguracionInstitucional();
+  const { configuracion, cargando, recargar, recargarSilencioso } = usarConfiguracionInstitucional();
   const [esEditando, setEsEditando] = useState(false);
   const [guardando, setGuardando] = useState(false);
+  const [guardandoLogo, setGuardandoLogo] = useState(false);
   const [mensaje, setMensaje] = useState<{ type: 'success' | 'error'; texto: string } | null>(null);
   const [logoUrl, setLogoUrl] = useState('');
 
@@ -67,7 +68,12 @@ export default function PaginaConfiguracion() {
     try {
       setGuardando(true);
       setMensaje(null);
-      const datosEnviar = { ...datos, logoUrl: logoUrl };
+
+      // El logo se guarda aparte con PATCH /logo en cuanto termina la subida.
+      // Así el guardado del formulario no puede pisarlo con un valor viejo.
+      const datosEnviar = { ...datos };
+      delete datosEnviar.logoUrl;
+
       await api.put('/configuracion-institucional', datosEnviar);
       setMensaje({ type: 'success', texto: 'Configuración guardada correctamente' });
       setEsEditando(false);
@@ -97,7 +103,7 @@ export default function PaginaConfiguracion() {
         sitioWeb: configuracion.sitioWeb || '',
         ciudad: configuracion.ciudad || '',
         pais: configuracion.pais || '',
-        descripcion: '',
+        descripcion: configuracion.descripcion || '',
       });
     }
     setEsEditando(true);
@@ -107,6 +113,40 @@ export default function PaginaConfiguracion() {
   const cancelar = () => {
     setEsEditando(false);
     setMensaje(null);
+  };
+
+  /**
+   * Guarda el logo en cuanto termina la subida.
+   *
+   * Se usa un endpoint que solo modifica `logoUrl` para no pisar los demás
+   * campos que el usuario todavía tiene sin guardar en el formulario.
+   */
+  const guardarLogo = async (nuevaUrl: string) => {
+    const anterior = logoUrl;
+    setLogoUrl(nuevaUrl);
+    setGuardandoLogo(true);
+    setMensaje(null);
+
+    try {
+      await api.patch('/configuracion-institucional/logo', { logoUrl: nuevaUrl });
+      await recargarSilencioso();
+      setMensaje({
+        type: 'success',
+        texto: nuevaUrl
+          ? 'Logo subido y guardado automáticamente'
+          : 'Logo eliminado y guardado automáticamente',
+      });
+    } catch (error: any) {
+      setLogoUrl(anterior);
+      setMensaje({
+        type: 'error',
+        texto:
+          error.response?.data?.mensaje ||
+          'No se pudo guardar el logo automáticamente. Intenta de nuevo.',
+      });
+    } finally {
+      setGuardandoLogo(false);
+    }
   };
 
   return (
@@ -192,9 +232,14 @@ export default function PaginaConfiguracion() {
               <CargarImagen
                 etiqueta="Logo de la Institución"
                 value={logoUrl}
-                onChange={(url) => setLogoUrl(url)}
-                textoAyuda="PNG, JPG o WEBP (máx. 5MB). El logo se subirá a MinIO automáticamente."
+                onChange={(url) => guardarLogo(url)}
+                textoAyuda="PNG, JPG o WEBP (máx. 5MB). El logo se sube y se guarda automáticamente."
               />
+              {guardandoLogo && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Guardando logo automáticamente...
+                </p>
+              )}
             </ContenidoTarjeta>
           </Tarjeta>
 
@@ -265,7 +310,7 @@ export default function PaginaConfiguracion() {
               <X className="w-4 h-4 mr-2" />
               Cancelar
             </Boton>
-            <Boton type="submit" cargando={guardando}>
+            <Boton type="submit" cargando={guardando || guardandoLogo}>
               <Save className="w-4 h-4 mr-2" />
               Guardar Cambios
             </Boton>

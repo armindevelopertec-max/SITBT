@@ -15,15 +15,19 @@ import { ServicioMaterias } from './materias.servicio';
 import { CrearMateriaDto } from './dto/crear-materia.dto';
 import { ActualizarMateriaDto } from './dto/actualizar-materia.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 
 @ApiTags('Materias')
 @Controller('materias')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico', 'rector', 'docente')
 @ApiBearerAuth()
 export class ControladorMaterias {
   constructor(private readonly servicioMaterias: ServicioMaterias) {}
 
   @Post()
+  @Roles('administrador', 'director_academico')
   crear(@Body() crearMateriaDto: CrearMateriaDto) {
     return this.servicioMaterias.crear(crearMateriaDto);
   }
@@ -54,11 +58,13 @@ export class ControladorMaterias {
   }
 
   @Patch(':id')
+  @Roles('administrador', 'director_academico')
   actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarMateriaDto: ActualizarMateriaDto) {
     return this.servicioMaterias.actualizar(id, actualizarMateriaDto);
   }
 
   @Delete(':id')
+  @Roles('administrador', 'director_academico')
   eliminar(@Param('id', ParseIntPipe) id: number) {
     return this.servicioMaterias.eliminar(id);
   }

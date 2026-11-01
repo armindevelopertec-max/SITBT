@@ -9,10 +9,13 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ServicioNotificaciones } from './notificaciones.servicio';
 import { EnviarCorreoDto, EnviarNotificacionDto } from './dto/enviar-notificacion.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 
 @ApiTags('Notificaciones')
 @Controller('notificaciones')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria')
 @ApiBearerAuth()
 export class ControladorNotificaciones {
   constructor(private readonly servicio: ServicioNotificaciones) {}

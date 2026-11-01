@@ -5,14 +5,14 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/libreria/utilidades';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { usarConfiguracionInstitucional } from '@/ganchos/usarConfiguracionInstitucional';
-import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, ClipboardList, Award, CreditCard, FileText, RefreshCw, BarChart3, Shield, User, BookMarked, CalendarCheck, Settings, Building2, Calendar, ClipboardCheck, FileBadge, Fingerprint } from 'lucide-react';
-import { Rol } from '@/tipos';
+import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, ClipboardList, Award, CreditCard, FileText, RefreshCw, BarChart3, Shield, ShieldCheck, User, BookMarked, CalendarCheck, Settings, Building2, Calendar, ClipboardCheck, FileBadge, Fingerprint } from 'lucide-react';
 
 interface ElementoMenu {
   titulo: string;
   href: string;
   icono: React.ReactNode;
-  roles: Rol[];
+  modulo: string;
+  soloAdministrador?: boolean;
 }
 
 interface SeccionMenu {
@@ -34,7 +34,7 @@ const seccionesMenu: SeccionMenu[] = [
   //       titulo: 'Panel Principal',
   //       href: '/panel',
   //       icono: <Home className="w-5 h-5" />,
-  //       roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente', 'estudiante', 'apoyo'],
+  //       modulo: 'panel',
   //     },
   //   ],
   // },
@@ -44,27 +44,27 @@ const seccionesMenu: SeccionMenu[] = [
       
       {
         titulo: 'Admisión',
-        href: '/panel/admision',
+        href: '/admision-gestion',
         icono: <ClipboardCheck className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria'],
+        modulo: 'admision',
       },
       {
         titulo: 'Estudiantes',
         href: '/estudiantes',
         icono: <GraduationCap className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente'],
+        modulo: 'estudiantes',
       },
       {
         titulo: 'Preinscripcion',
         href: '/preinscripcion',
         icono: <CalendarCheck className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico'],
+        modulo: 'preinscripcion',
       },
       {
         titulo: 'Pagos',
         href: '/pagos',
         icono: <CreditCard className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'rector'],
+        modulo: 'pagos',
       },
     ],
   },
@@ -75,13 +75,13 @@ const seccionesMenu: SeccionMenu[] = [
         titulo: 'Materias Impartidas',
         href: '/materias-impartidas',
         icono: <ClipboardList className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico', 'docente'],
+        modulo: 'materias_impartidas',
       },
       {
         titulo: 'Grupos',
         href: '/grupos',
         icono: <FolderKanban className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'docente'],
+        modulo: 'grupos',
       },
     ],
   },
@@ -92,13 +92,13 @@ const seccionesMenu: SeccionMenu[] = [
         titulo: 'Personal',
         href: '/personal',
         icono: <UserCog className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico', 'rector'],
+        modulo: 'personal',
       },
       {
         titulo: 'Asistencias',
         href: '/asistencias',
         icono: <Fingerprint className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico', 'rector', 'apoyo'],
+        modulo: 'asistencias',
       },
     ],
   },
@@ -109,25 +109,25 @@ const seccionesMenu: SeccionMenu[] = [
         titulo: 'Certificados',
         href: '/certificados',
         icono: <Award className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria', 'director_academico'],
+        modulo: 'certificados',
       },
       {
         titulo: 'Reportes',
         href: '/reportes',
         icono: <BarChart3 className="w-5 h-5" />,
-        roles: ['administrador', 'director_academico', 'rector'],
+        modulo: 'reportes',
       },
       // {
       //   titulo: 'Credenciales',
       //   href: '/credenciales',
       //   icono: <FileText className="w-5 h-5" />,
-      //   roles: ['administrador', 'secretaria'],
+      //   modulo: 'credenciales',
       // },
       {
         titulo: 'Documentos',
         href: '/documentos',
         icono: <FileBadge className="w-5 h-5" />,
-        roles: ['administrador', 'secretaria'],
+        modulo: 'documentos',
       }
     ],
   },
@@ -138,7 +138,15 @@ const seccionesMenu: SeccionMenu[] = [
         titulo: 'Usuarios',
         href: '/usuarios',
         icono: <Shield className="w-5 h-5" />,
-        roles: ['administrador'],
+        modulo: 'usuarios',
+        soloAdministrador: true,
+      },
+      {
+        titulo: 'Roles',
+        href: '/roles',
+        icono: <ShieldCheck className="w-5 h-5" />,
+        modulo: 'roles',
+        soloAdministrador: true,
       },
     ],
   },
@@ -154,13 +162,19 @@ export default function BarraLateral({ colapsada, abierta = true, alCerrar, alCo
         ? [usuario.rol]
         : [];
   const { configuracion } = usarConfiguracionInstitucional();
+  const permisosUsuario: string[] = usuario?.permisos ?? [];
+  const esAdministrador = rolesUsuario.includes('administrador');
 
   const seccionesFiltradas = seccionesMenu
     .map((seccion) => ({
       ...seccion,
       elementos: seccion.elementos.filter((elemento) => {
         if (!usuario) return false;
-        return elemento.roles.some((r) => rolesUsuario.includes(r));
+        if (elemento.soloAdministrador) return esAdministrador;
+        return (
+          esAdministrador ||
+          permisosUsuario.includes(`${elemento.modulo}:leer`)
+        );
       }),
     }))
     .filter((seccion) => seccion.elementos.length > 0);

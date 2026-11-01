@@ -15,15 +15,19 @@ import { ServicioTurnos } from './turnos.servicio';
 import { CrearTurnoDto } from './dto/crear-turno.dto';
 import { ActualizarTurnoDto } from './dto/actualizar-turno.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 
 @ApiTags('Turnos')
 @Controller('turnos')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico', 'rector', 'docente')
 @ApiBearerAuth()
 export class ControladorTurnos {
   constructor(private readonly servicioTurnos: ServicioTurnos) {}
 
   @Post()
+  @Roles('administrador', 'director_academico')
   crear(@Body() crearTurnoDto: CrearTurnoDto) {
     return this.servicioTurnos.crear(crearTurnoDto);
   }
@@ -49,11 +53,13 @@ export class ControladorTurnos {
   }
 
   @Patch(':id')
+  @Roles('administrador', 'director_academico')
   actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarTurnoDto: ActualizarTurnoDto) {
     return this.servicioTurnos.actualizar(id, actualizarTurnoDto);
   }
 
   @Delete(':id')
+  @Roles('administrador', 'director_academico')
   eliminar(@Param('id', ParseIntPipe) id: number) {
     return this.servicioTurnos.eliminar(id);
   }

@@ -14,10 +14,13 @@ import { ServicioAsistencias } from './asistencias.servicio';
 import { CrearHuellaDto } from './dto/crear-huella.dto';
 import { ActualizarHuellaDto } from './dto/actualizar-huella.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 
 @ApiTags('Huellas del Personal')
 @Controller('huellas-personal')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico', 'rector', 'apoyo')
 @ApiBearerAuth()
 export class ControladorHuellasPersonal {
   constructor(private readonly servicioAsistencias: ServicioAsistencias) {}

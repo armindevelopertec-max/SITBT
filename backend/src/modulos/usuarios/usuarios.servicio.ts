@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Usuario, EstadoUsuario } from '../../entidades/usuario.entidad';
 import { UsuarioRol } from '../../entidades/usuario-rol.entidad';
+import { Rol } from '../../entidades/rol.entidad';
 import { CrearUsuarioDto } from './dto/crear-usuario.dto';
 import { ActualizarUsuarioDto } from './dto/actualizar-usuario.dto';
 
@@ -140,6 +145,25 @@ export class ServicioUsuarios {
   }
 
   async removerRol(usuarioId: number, rolId: number): Promise<void> {
+    const rol = await this.usuarioRolRepository.manager
+      .getRepository(Rol)
+      .findOne({ where: { id: rolId } });
+
+    if (rol?.codigo === 'administrador') {
+      const administradoresActivos = await this.usuarioRolRepository
+        .createQueryBuilder('usuarioRol')
+        .innerJoin('usuarioRol.usuario', 'usuario')
+        .where('usuarioRol.rolId = :rolId', { rolId })
+        .andWhere('usuario.estado = :estado', { estado: EstadoUsuario.ACTIVO })
+        .getCount();
+
+      if (administradoresActivos <= 1) {
+        throw new ConflictException(
+          'No se puede quitar el rol administrador al último administrador activo',
+        );
+      }
+    }
+
     const usuarioRol = await this.usuarioRolRepository.findOne({
       where: { usuarioId: usuarioId, rolId: rolId },
     });

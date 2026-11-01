@@ -15,11 +15,14 @@ import { ServicioConvalidaciones } from './convalidaciones.servicio';
 import { CrearConvalidacionDto } from './dto/crear-convalidacion.dto';
 import { ActualizarConvalidacionDto } from './dto/actualizar-convalidacion.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoConvalidacion, TipoConvalidacion } from '../../entidades/convalidacion-estudiante.entidad';
 
 @ApiTags('Convalidaciones')
 @Controller('convalidaciones')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico')
 @ApiBearerAuth()
 export class ControladorConvalidaciones {
   constructor(private readonly servicio: ServicioConvalidaciones) {}

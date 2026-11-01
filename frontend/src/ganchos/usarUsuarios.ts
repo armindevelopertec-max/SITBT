@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
 import api from '@/libreria/api';
-import { Rol } from '@/tipos';
 
 export interface UsuarioRespuesta {
   id: number;
@@ -22,13 +21,6 @@ export interface UsuarioRespuesta {
   }>;
   creadoEn?: string;
   actualizadoEn?: string;
-}
-
-export interface CrearUsuarioDatos {
-  personaId: number;
-  nombreUsuario: string;
-  contrasena: string;
-  codigoRol?: Rol;
 }
 
 export interface ActualizarUsuarioDatos {
@@ -97,20 +89,6 @@ export function usarUsuarios() {
     }
   }, []);
 
-  const crearUsuario = useCallback(async (datosUsuario: CrearUsuarioDatos) => {
-    try {
-      setCargando(true);
-      const respuesta = await api.post('/usuarios', datosUsuario);
-      await obtenerUsuarios(paginacion.pagina, paginacion.limite);
-      return respuesta.data;
-    } catch (err: any) {
-      console.error('Error al crear usuario:', err);
-      throw err;
-    } finally {
-      setCargando(false);
-    }
-  }, [obtenerUsuarios, paginacion.pagina, paginacion.limite]);
-
   const actualizarUsuario = useCallback(async (id: number, datosUsuario: ActualizarUsuarioDatos) => {
     try {
       setCargando(true);
@@ -156,6 +134,15 @@ export function usarUsuarios() {
     }
   }, []);
 
+  const removerRol = useCallback(async (usuarioId: number, rolId: number) => {
+    try {
+      await api.delete(`/usuarios/${usuarioId}/remover-rol/${rolId}`);
+    } catch (err: any) {
+      console.error('Error al remover rol:', err);
+      throw err;
+    }
+  }, []);
+
   useEffect(() => {
     obtenerUsuarios();
   }, [obtenerUsuarios]);
@@ -170,10 +157,10 @@ export function usarUsuarios() {
     obtenerUsuariosActivos,
     obtenerUsuarioPorId,
     obtenerRolesUsuario,
-    crearUsuario,
     actualizarUsuario,
     eliminarUsuario,
     cambiarContrasena,
     asignarRol,
+    removerRol,
   };
 }

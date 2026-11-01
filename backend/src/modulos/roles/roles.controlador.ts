@@ -15,11 +15,14 @@ import { ServicioRoles } from './roles.servicio';
 import { CrearRolDto } from './dto/crear-rol.dto';
 import { ActualizarRolDto } from './dto/actualizar-rol.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoRol } from '../../entidades/rol.entidad';
 
 @ApiTags('Roles')
 @Controller('roles')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador')
 @ApiBearerAuth()
 export class ControladorRoles {
   constructor(private readonly servicioRoles: ServicioRoles) {}

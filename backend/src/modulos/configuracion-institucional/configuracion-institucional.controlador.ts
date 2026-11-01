@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Body,
   UseGuards,
 } from '@nestjs/common';
@@ -10,7 +11,10 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ServicioConfiguracionInstitucional } from './configuracion-institucional.servicio';
 import { CrearConfiguracionInstitucionalDto } from './dto/crear-configuracion-institucional.dto';
 import { ActualizarConfiguracionInstitucionalDto } from './dto/actualizar-configuracion-institucional.dto';
+import { ActualizarLogoDto } from './dto/actualizar-logo.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 
 @ApiTags('Institution Settings')
 @Controller('configuracion-institucional')
@@ -36,7 +40,8 @@ export class ControladorConfiguracionInstitucional {
   }
 
   @Post()
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Crear configuración institucional' })
   crear(@Body() crearDto: CrearConfiguracionInstitucionalDto) {
@@ -44,10 +49,20 @@ export class ControladorConfiguracionInstitucional {
   }
 
   @Put()
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Actualizar configuración institucional' })
   actualizar(@Body() actualizarDto: ActualizarConfiguracionInstitucionalDto) {
     return this.servicioConfiguracion.actualizar(1, actualizarDto);
+  }
+
+  @Patch('logo')
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Actualizar solo el logo institucional' })
+  actualizarLogo(@Body() cuerpo: ActualizarLogoDto) {
+    return this.servicioConfiguracion.actualizarLogo(cuerpo.logoUrl ?? '');
   }
 }

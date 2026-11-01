@@ -2,9 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
+import {
+  normalizarUsuario,
+  usarAlmacenAutenticacion,
+} from '@/almacen/almacen-autenticacion';
 import BarraLateral from '@/componentes/diseno/BarraLateral';
 import Encabezado from '@/componentes/diseno/Encabezado';
+import api from '@/libreria/api';
 import { cn } from '@/libreria/utilidades';
 
 export default function DisenoPanel({
@@ -16,7 +20,28 @@ export default function DisenoPanel({
   const [barraLateralColapsada, setBarraLateralColapsada] = useState(false);
   const [esMovil, setEsMovil] = useState(false);
   const router = useRouter();
-  const { estaAutenticado, _hidratado } = usarAlmacenAutenticacion();
+  const { estaAutenticado, _hidratado, establecerUsuario } =
+    usarAlmacenAutenticacion();
+
+  useEffect(() => {
+    if (!estaAutenticado) return;
+
+    let activo = true;
+    api
+      .get('/autenticacion/perfil')
+      .then((respuesta) => {
+        if (activo && respuesta.data) {
+          establecerUsuario(normalizarUsuario(respuesta.data));
+        }
+      })
+      .catch(() => {
+        // Si el token ya no es válido, el interceptor de la API cierra la sesión.
+      });
+
+    return () => {
+      activo = false;
+    };
+  }, [estaAutenticado, establecerUsuario]);
 
   useEffect(() => {
     const verificarMovil = () => {

@@ -18,6 +18,8 @@ import { ActualizarProcesoConvalidacionDto } from './dto/actualizar-proceso-conv
 import { GuardarEquivalenciaPlanDto } from './dto/guardar-equivalencia-plan.dto';
 import { AprobarProcesoConvalidacionDto } from './dto/aprobar-proceso-convalidacion.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoProcesoConvalidacion } from '../../entidades/proceso-convalidacion.entidad';
 
 /**
@@ -27,7 +29,8 @@ import { EstadoProcesoConvalidacion } from '../../entidades/proceso-convalidacio
  */
 @ApiTags('Convalidaciones entre planes')
 @Controller('convalidaciones-planes')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico')
 @ApiBearerAuth()
 export class ControladorProcesosConvalidacion {
   constructor(private readonly servicio: ServicioProcesosConvalidacion) {}

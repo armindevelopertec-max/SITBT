@@ -22,12 +22,15 @@ import { CerrarLibroDto } from './dto/cerrar-libro.dto';
 import { ReabrirLibroDto } from './dto/reabrir-libro.dto';
 import { InscribirEstudianteDto } from './dto/inscribir-estudiante.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoMateriaImpartida } from '../../entidades/materia-impartida.entidad';
 import { EstadoLibro } from '../../entidades/libro-calificaciones.entidad';
 
 @ApiTags('MateriasImpartidas')
 @Controller('materias-impartidas')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico', 'docente')
 @ApiBearerAuth()
 export class ControladorMateriasImpartidas {
   constructor(private readonly servicio: ServicioMateriasImpartidas) {}

@@ -15,6 +15,8 @@ import { ServicioCarreras } from './carreras.servicio';
 import { CrearCarreraDto } from './dto/crear-carrera.dto';
 import { ActualizarCarreraDto } from './dto/actualizar-carrera.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoCarrera } from '../../entidades/carrera.entidad';
 
 @ApiTags('Carreras')
@@ -24,7 +26,8 @@ export class ControladorCarreras {
   constructor(private readonly servicioCarreras: ServicioCarreras) {}
 
   @Post()
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'director_academico')
   crear(@Body() crearCarreraDto: CrearCarreraDto) {
     return this.servicioCarreras.crear(crearCarreraDto);
   }
@@ -55,13 +58,15 @@ export class ControladorCarreras {
   }
 
   @Patch(':id')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'director_academico')
   actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarCarreraDto: ActualizarCarreraDto) {
     return this.servicioCarreras.actualizar(id, actualizarCarreraDto);
   }
 
   @Delete(':id')
-  @UseGuards(GuardaJwt)
+  @UseGuards(GuardaJwt, GuardaRoles)
+  @Roles('administrador', 'director_academico')
   eliminar(@Param('id', ParseIntPipe) id: number) {
     return this.servicioCarreras.eliminar(id);
   }

@@ -21,9 +21,11 @@ export function usarConfiguracionInstitucional() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const obtenerConfiguracion = async () => {
+  const obtenerConfiguracion = async (mostrarCargando = true) => {
     try {
-      setCargando(true);
+      if (mostrarCargando) {
+        setCargando(true);
+      }
       setError(null);
       const respuesta = await api.get('/configuracion-institucional/publico');
       setConfiguracion(respuesta.data);
@@ -45,7 +47,9 @@ export function usarConfiguracionInstitucional() {
         descripcion: null,
       });
     } finally {
-      setCargando(false);
+      if (mostrarCargando) {
+        setCargando(false);
+      }
     }
   };
 
@@ -57,6 +61,7 @@ export function usarConfiguracionInstitucional() {
     configuracion,
     cargando,
     error,
-    recargar: obtenerConfiguracion,
+    recargar: () => obtenerConfiguracion(true),
+    recargarSilencioso: () => obtenerConfiguracion(false),
   };
 }

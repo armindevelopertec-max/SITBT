@@ -39,3 +39,6 @@ sitbt-files/
 # Temporary files
 *.tmp
 *.temp
+
+# Backups completos (contienen datos personales, no versionar)
+backups/completo_*/

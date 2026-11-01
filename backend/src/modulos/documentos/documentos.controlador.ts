@@ -14,11 +14,14 @@ import { ServicioDocumentos } from './documentos.servicio';
 import { CrearDocumentoEmitidoDto } from './dto/crear-documento-emitido.dto';
 import { ActualizarDocumentoEmitidoDto } from './dto/actualizar-documento-emitido.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { TipoDocumento, EstadoDocumento } from '../../entidades/documento-emitido.entidad';
 
 @ApiTags('Documentos')
 @Controller('documentos')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria')
 @ApiBearerAuth()
 export class ControladorDocumentos {
   constructor(private readonly servicio: ServicioDocumentos) {}

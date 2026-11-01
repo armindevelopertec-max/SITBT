@@ -9,8 +9,9 @@ import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaT
 import { Insignia } from '@/componentes/iu/insignia';
 import { Modal, ModalConfirmacion } from '@/componentes/iu/modal';
 import { usarUsuarios, UsuarioRespuesta } from '@/ganchos/usarUsuarios';
-import { Rol } from '@/tipos';
-import { Plus, Search, Edit2, Trash2, Shield, Key, X, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { usarRoles } from '@/ganchos/usarRoles';
+import { mensajeDeError } from '@/libreria/utilidades';
+import { Search, Edit2, Trash2, Shield, Key, X, Loader2, ChevronLeft, ChevronRight, UserCog } from 'lucide-react';
 
 const coloresRol: Record<string, 'predeterminado' | 'primario' | 'secundario' | 'exito' | 'advertencia' | 'error'> = {
   administrador: 'error',
@@ -22,26 +23,22 @@ const coloresRol: Record<string, 'predeterminado' | 'primario' | 'secundario' | 
   apoyo: 'predeterminado',
 };
 
-const ROLES = [
-  { codigo: 'administrador', nombre: 'Administrador' },
-  { codigo: 'secretaria', nombre: 'Secretaría' },
-  { codigo: 'director_academico', nombre: 'Director Académico' },
-  { codigo: 'rector', nombre: 'Rector' },
-  { codigo: 'docente', nombre: 'Docente' },
-  { codigo: 'estudiante', nombre: 'Estudiante' },
-  { codigo: 'apoyo', nombre: 'Apoyo' },
-];
-
 export default function PaginaUsuarios() {
-  const { usuarios, cargando, error, paginacion, recargar, crearUsuario, actualizarUsuario, eliminarUsuario, cambiarContrasena, obtenerUsuarios } = usarUsuarios();
+  const { usuarios, cargando, error, paginacion, recargar, actualizarUsuario, eliminarUsuario, cambiarContrasena, obtenerUsuarios, asignarRol, removerRol } = usarUsuarios();
+  const { roles, cargando: cargandoRoles, error: errorCatalogoRoles } = usarRoles();
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
+  const [mensaje, setMensaje] = useState<{ tipo: 'exito' | 'error'; texto: string } | null>(null);
+
+  const [modalRoles, setModalRoles] = useState<UsuarioRespuesta | null>(null);
+  const [rolesSeleccionados, setRolesSeleccionados] = useState<number[]>([]);
+  const [guardandoRoles, setGuardandoRoles] = useState(false);
+  const [errorRoles, setErrorRoles] = useState<string | null>(null);
 
   const [modalRestablecer, setModalRestablecer] = useState({ abierto: false, usuario: null as UsuarioRespuesta | null });
   const [modalEliminar, setModalEliminar] = useState({ abierto: false, usuario: null as UsuarioRespuesta | null });
-  const [modalCrear, setModalCrear] = useState(false);
   const [modalEditar, setModalEditar] = useState<UsuarioRespuesta | null>(null);
 
-  const [datosFormulario, setDatosFormulario] = useState({ nombreUsuario: '', contrasena: '', personaId: 1, codigoRol: 'estudiante' });
+  const [datosFormulario, setDatosFormulario] = useState({ nombreUsuario: '' });
   const [cargandoFormulario, setCargandoFormulario] = useState(false);
 
   const [nuevaContrasena, setNuevaContrasena] = useState('');
@@ -86,19 +83,6 @@ export default function PaginaUsuarios() {
         {rolPrincipal.nombre}
       </Insignia>
     );
-  };
-
-  const crear = async () => {
-    try {
-      setCargandoFormulario(true);
-      await crearUsuario({ ...datosFormulario, codigoRol: datosFormulario.codigoRol as Rol });
-      setModalCrear(false);
-      setDatosFormulario({ nombreUsuario: '', contrasena: '', personaId: 1, codigoRol: 'estudiante' });
-    } catch (error) {
-      console.error('Error al crear usuario:', error);
-    } finally {
-      setCargandoFormulario(false);
-    }
   };
 
   const editar = async () => {
@@ -156,6 +140,54 @@ export default function PaginaUsuarios() {
     setModalEditar(usuario);
   };
 
+  const abrirRoles = (usuario: UsuarioRespuesta) => {
+    setMensaje(null);
+    setErrorRoles(null);
+    setRolesSeleccionados((usuario.roles ?? []).map((rol) => rol.id));
+    setModalRoles(usuario);
+  };
+
+  const alternarRol = (rolId: number) => {
+    setRolesSeleccionados((actual) =>
+      actual.includes(rolId)
+        ? actual.filter((id) => id !== rolId)
+        : [...actual, rolId],
+    );
+  };
+
+  const guardarRoles = async () => {
+    if (!modalRoles) return;
+
+    setGuardandoRoles(true);
+    setErrorRoles(null);
+
+    try {
+      const actuales = new Set((modalRoles.roles ?? []).map((rol) => rol.id));
+      const nuevos = new Set(rolesSeleccionados);
+      const agregar = Array.from(nuevos).filter((id) => !actuales.has(id));
+      const quitar = Array.from(actuales).filter((id) => !nuevos.has(id));
+
+      for (const rolId of agregar) {
+        await asignarRol(modalRoles.id, rolId);
+      }
+
+      for (const rolId of quitar) {
+        await removerRol(modalRoles.id, rolId);
+      }
+
+      await recargar();
+      setMensaje({
+        tipo: 'exito',
+        texto: `Roles de "${modalRoles.nombreUsuario}" actualizados correctamente`,
+      });
+      setModalRoles(null);
+    } catch (err) {
+      setErrorRoles(mensajeDeError(err, 'No se pudieron actualizar los roles'));
+    } finally {
+      setGuardandoRoles(false);
+    }
+  };
+
   if (error) {
     return (
       <div className="space-y-6">
@@ -170,13 +202,19 @@ export default function PaginaUsuarios() {
     <div className="space-y-6">
       <Migas elementos={[{ etiqueta: 'Usuarios' }]} />
 
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
-        <Boton onClick={() => setModalCrear(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Nuevo Usuario
-        </Boton>
-      </div>
+      <h1 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
+
+      {mensaje && (
+        <div
+          className={`rounded-lg border px-4 py-3 text-sm ${
+            mensaje.tipo === 'exito'
+              ? 'border-green-200 bg-green-50 text-green-800'
+              : 'border-red-200 bg-red-50 text-red-800'
+          }`}
+        >
+          {mensaje.texto}
+        </div>
+      )}
 
       <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
@@ -235,6 +273,9 @@ export default function PaginaUsuarios() {
                     </CeldaTabla>
                     <CeldaTabla>
                       <div className="flex items-center gap-2">
+                        <Boton variante="fantasma" tamano="icono" title="Asignar roles" onClick={() => abrirRoles(usuario)}>
+                          <UserCog className="w-4 h-4" />
+                        </Boton>
                         <Boton variante="fantasma" tamano="icono" title="Restablecer contraseña" onClick={() => setModalRestablecerContrasena({ abierto: true, usuario })}>
                           <Key className="w-4 h-4" />
                         </Boton>
@@ -305,44 +346,6 @@ export default function PaginaUsuarios() {
         </ContenidoTarjeta>
       </Tarjeta>
 
-      <Modal abierto={modalCrear} alCerrar={() => setModalCrear(false)} titulo="Nuevo Usuario" tamano="mediano">
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Nombre de usuario</label>
-            <Entrada
-              value={datosFormulario.nombreUsuario}
-              onChange={(e) => setDatosFormulario({ ...datosFormulario, nombreUsuario: e.target.value })}
-              placeholder="juan.perez"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Contraseña</label>
-            <Entrada
-              type="password"
-              value={datosFormulario.contrasena}
-              onChange={(e) => setDatosFormulario({ ...datosFormulario, contrasena: e.target.value })}
-              placeholder="Contraseña segura"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Rol</label>
-            <select
-              className="w-full p-2 border rounded-md"
-              value={datosFormulario.codigoRol}
-              onChange={(e) => setDatosFormulario({ ...datosFormulario, codigoRol: e.target.value })}
-            >
-              {ROLES.map((role) => (
-                <option key={role.codigo} value={role.codigo}>{role.nombre}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex justify-end gap-3 pt-4">
-            <Boton variante="contorno" onClick={() => setModalCrear(false)}>Cancelar</Boton>
-            <Boton onClick={crear} cargando={cargandoFormulario}>Crear Usuario</Boton>
-          </div>
-        </div>
-      </Modal>
-
       <Modal abierto={!!modalEditar} alCerrar={() => setModalEditar(null)} titulo="Editar Usuario" tamano="mediano">
         <div className="space-y-4">
           <div>
@@ -388,6 +391,91 @@ export default function PaginaUsuarios() {
           <div className="flex justify-end gap-3 pt-4">
             <Boton variante="contorno" onClick={() => setModalRestablecerContrasena({ abierto: false, usuario: null })}>Cancelar</Boton>
             <Boton onClick={restablecerContrasena} cargando={cargandoRestablecer}>Restablecer</Boton>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        abierto={!!modalRoles}
+        alCerrar={() => setModalRoles(null)}
+        titulo={`Roles de ${modalRoles?.nombreUsuario ?? ''}`}
+        descripcion="Los permisos del usuario se suman según los roles que tenga asignados."
+        tamano="mediano"
+      >
+        <div className="space-y-4">
+          {errorCatalogoRoles && (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+              {errorCatalogoRoles}
+            </div>
+          )}
+
+          {cargandoRoles ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            </div>
+          ) : roles.length === 0 ? (
+            <p className="py-4 text-center text-sm text-gray-500">
+              No hay roles registrados. Crea uno desde la sección Roles.
+            </p>
+          ) : (
+            <div className="max-h-[50vh] space-y-2 overflow-y-auto pr-1">
+              {roles.map((rol) => {
+                const seleccionado = rolesSeleccionados.includes(rol.id);
+                const inactivo = rol.estado === 'inactivo';
+
+                return (
+                  <label
+                    key={rol.id}
+                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
+                      seleccionado
+                        ? 'border-primary bg-primary/5'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary disabled:cursor-not-allowed disabled:opacity-40"
+                      checked={seleccionado}
+                      onChange={() => alternarRol(rol.id)}
+                      disabled={inactivo && !seleccionado}
+                    />
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-medium text-gray-900">{rol.nombre}</span>
+                        <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
+                          {rol.codigo}
+                        </code>
+                        {inactivo && (
+                          <Insignia variante="predeterminado">Inactivo</Insignia>
+                        )}
+                      </div>
+                      {rol.descripcion && (
+                        <p className="mt-1 text-xs text-gray-500">{rol.descripcion}</p>
+                      )}
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+          )}
+
+          {errorRoles && (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+              {errorRoles}
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Boton
+              variante="contorno"
+              onClick={() => setModalRoles(null)}
+              disabled={guardandoRoles}
+            >
+              Cancelar
+            </Boton>
+            <Boton onClick={guardarRoles} cargando={guardandoRoles}>
+              Guardar Roles
+            </Boton>
           </div>
         </div>
       </Modal>

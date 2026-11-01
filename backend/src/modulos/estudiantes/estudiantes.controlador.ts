@@ -15,11 +15,14 @@ import { ServicioEstudiantes } from './estudiantes.servicio';
 import { CrearEstudianteDto } from './dto/crear-estudiante.dto';
 import { ActualizarEstudianteDto } from './dto/actualizar-estudiante.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoEstudiante } from '../../entidades/estudiante.entidad';
 
 @ApiTags('Estudiantes')
 @Controller('estudiantes')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico', 'rector', 'docente')
 @ApiBearerAuth()
 export class ControladorEstudiantes {
   constructor(private readonly servicioEstudiantes: ServicioEstudiantes) {}

@@ -15,11 +15,14 @@ import { ServicioAsignacionesDocentes } from './asignaciones-docentes.servicio';
 import { CrearAsignacionDocenteDto } from './dto/crear-asignacion-docente.dto';
 import { ActualizarAsignacionDocenteDto } from './dto/actualizar-asignacion-docente.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoAsignacionDocente } from '../../entidades/asignacion-docente.entidad';
 
 @ApiTags('AsignacionesDocentes')
 @Controller('asignaciones-docentes')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico')
 @ApiBearerAuth()
 export class ControladorAsignacionesDocentes {
   constructor(private readonly servicio: ServicioAsignacionesDocentes) {}

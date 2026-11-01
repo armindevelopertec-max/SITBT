@@ -15,16 +15,20 @@ import { ServicioPlanesEstudio } from './planes-estudio.servicio';
 import { CrearPlanEstudioDto } from './dto/crear-plan-estudio.dto';
 import { ActualizarPlanEstudioDto } from './dto/actualizar-plan-estudio.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
+import { GuardaRoles } from '../autenticacion/guarda-roles';
+import { Roles } from '../autenticacion/roles.decorador';
 import { EstadoPlanEstudio } from '../../entidades/plan-estudio.entidad';
 
 @ApiTags('PlanesEstudio')
 @Controller('planes-estudio')
-@UseGuards(GuardaJwt)
+@UseGuards(GuardaJwt, GuardaRoles)
+@Roles('administrador', 'secretaria', 'director_academico', 'rector', 'docente')
 @ApiBearerAuth()
 export class ControladorPlanesEstudio {
   constructor(private readonly servicioPlanesEstudio: ServicioPlanesEstudio) {}
 
   @Post()
+  @Roles('administrador', 'director_academico')
   crear(@Body() crearPlanEstudioDto: CrearPlanEstudioDto) {
     return this.servicioPlanesEstudio.crear(crearPlanEstudioDto);
   }
@@ -60,16 +64,19 @@ export class ControladorPlanesEstudio {
   }
 
   @Patch(':id')
+  @Roles('administrador', 'director_academico')
   actualizar(@Param('id', ParseIntPipe) id: number, @Body() actualizarPlanEstudioDto: ActualizarPlanEstudioDto) {
     return this.servicioPlanesEstudio.actualizar(id, actualizarPlanEstudioDto);
   }
 
   @Delete(':id')
+  @Roles('administrador', 'director_academico')
   eliminar(@Param('id', ParseIntPipe) id: number) {
     return this.servicioPlanesEstudio.eliminar(id);
   }
 
   @Post(':id/materias')
+  @Roles('administrador', 'director_academico')
   agregarMateria(
     @Param('id', ParseIntPipe) id: number,
     @Body() cuerpo: { materiaId: number; semestre: number; horasSemanales: number; prerrequisitoId?: number },
@@ -78,6 +85,7 @@ export class ControladorPlanesEstudio {
   }
 
   @Delete(':id/materias/:materiaPlanId')
+  @Roles('administrador', 'director_academico')
   eliminarMateria(
     @Param('id', ParseIntPipe) id: number,
     @Param('materiaPlanId', ParseIntPipe) materiaPlanId: number,
@@ -86,6 +94,7 @@ export class ControladorPlanesEstudio {
   }
 
   @Patch(':id/materias/:materiaPlanId')
+  @Roles('administrador', 'director_academico')
   actualizarMateria(
     @Param('id', ParseIntPipe) id: number,
     @Param('materiaPlanId', ParseIntPipe) materiaPlanId: number,

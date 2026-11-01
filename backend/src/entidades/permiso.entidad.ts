@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { Rol } from './rol.entidad';
 
@@ -19,6 +20,7 @@ export enum EstadoPermiso {
   INACTIVO = 'inactivo',
 }
 
+@Index(['rolId', 'modulo', 'accion'], { unique: true })
 @Entity('permissions')
 export class Permiso {
   @PrimaryGeneratedColumn()
@@ -27,7 +29,7 @@ export class Permiso {
   @Column({ name: 'rol_id' })
   rolId: number;
 
-  @ManyToOne(() => Rol)
+  @ManyToOne(() => Rol, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'rol_id' })
   rol: Rol;
 

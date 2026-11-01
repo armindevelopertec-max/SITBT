@@ -30,8 +30,40 @@ export class ServicioConfiguracionInstitucional {
   }
 
   async actualizar(id: number, actualizarDto: ActualizarConfiguracionInstitucionalDto): Promise<ConfiguracionInstitucional> {
-    const configuracion = await this.obtenerUno();
+    let configuracion = await this.repositorioConfiguracion.findOne({ where: {} });
+
+    // Si aún no existe configuración (BD nueva), la creamos en vez de fallar con 404.
+    if (!configuracion) {
+      configuracion = this.repositorioConfiguracion.create({
+        nombre: actualizarDto.nombre ?? 'Instituto Tecnológico Boliviana de Tecnología',
+        nombreCorto: actualizarDto.nombreCorto ?? 'SITBT',
+        pais: actualizarDto.pais ?? 'Bolivia',
+      });
+    }
+
     Object.assign(configuracion, actualizarDto);
+    return this.repositorioConfiguracion.save(configuracion);
+  }
+
+  /**
+   * Actualiza únicamente el logo institucional.
+   *
+   * Se usa desde la pantalla de configuración para guardar el logo en cuanto
+   * termina la subida, sin tocar el resto de campos que el usuario todavía
+   * puede tener sin guardar en el formulario.
+   */
+  async actualizarLogo(logoUrl: string): Promise<ConfiguracionInstitucional> {
+    let configuracion = await this.repositorioConfiguracion.findOne({ where: {} });
+
+    if (!configuracion) {
+      configuracion = this.repositorioConfiguracion.create({
+        nombre: 'Instituto Tecnológico Boliviana de Tecnología',
+        nombreCorto: 'SITBT',
+        pais: 'Bolivia',
+      });
+    }
+
+    configuracion.logoUrl = logoUrl;
     return this.repositorioConfiguracion.save(configuracion);
   }
 
@@ -45,7 +77,27 @@ export class ServicioConfiguracionInstitucional {
   }
 
   async obtenerConfiguracionPublica(): Promise<Partial<ConfiguracionInstitucional>> {
-    const configuracion = await this.obtenerUno();
+    const configuracion = await this.repositorioConfiguracion.findOne({ where: {} });
+
+    // Endpoint público: si todavía no hay configuración cargada, devolvemos
+    // valores por defecto en lugar de un 404 (el frontend lo usa en cada página).
+    if (!configuracion) {
+      return {
+        nombre: 'Instituto Tecnológico Boliviana de Tecnología',
+        nombreCorto: 'SITBT',
+        lema: '',
+        logoUrl: '',
+        direccion: '',
+        telefono: '',
+        departamento: '',
+        correo: '',
+        sitioWeb: '',
+        ciudad: '',
+        pais: 'Bolivia',
+        descripcion: '',
+      };
+    }
+
     let urlLogo = configuracion.logoUrl;
     if (urlLogo && urlLogo.startsWith('http')) {
       const coincidencia = urlLogo.match(/\/sitbt-files\/(.+)$/);
@@ -65,6 +117,7 @@ export class ServicioConfiguracionInstitucional {
       sitioWeb: configuracion.sitioWeb,
       ciudad: configuracion.ciudad,
       pais: configuracion.pais,
+      descripcion: configuracion.descripcion,
     };
   }
 }

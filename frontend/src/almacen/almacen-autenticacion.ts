@@ -4,9 +4,12 @@ import { Usuario, EstadoAutenticacion } from '@/tipos';
 import api from '@/libreria/api';
 
 // Normaliza el objeto de usuario que devuelve la API (campos en español)
-function normalizarUsuario(usuarioApi: any): Usuario {
+export function normalizarUsuario(usuarioApi: any): Usuario {
   const roles = (usuarioApi?.roles || []) as Array<{ id: number; codigo: string; nombre: string }>;
   const rolPrincipal = roles.length > 0 ? roles[0].codigo : 'administrador';
+  const permisos = Array.isArray(usuarioApi?.permisos)
+    ? usuarioApi.permisos.filter((permiso: any) => typeof permiso === 'string')
+    : [];
 
   return {
     id: usuarioApi.id,
@@ -14,6 +17,7 @@ function normalizarUsuario(usuarioApi: any): Usuario {
     correo: usuarioApi.persona?.correo || usuarioApi.correo || '',
     rol: rolPrincipal as any,
     roles,
+    permisos,
     personaId: usuarioApi.personaId ?? usuarioApi.person_id,
     estado: usuarioApi.estado || 'activo',
     persona: usuarioApi.persona,
