@@ -47,18 +47,58 @@ export class ControladorPreinscripcion {
     return this.servicio.obtenerBoletaInscripcion(estudianteId, gestion, periodo);
   }
 
+  @Get('inscritos')
+  listarInscritos(
+    @Query('gestion') gestion: string,
+    @Query('pagina') pagina = 1,
+    @Query('limite') limite = 20,
+    @Query('buscar') buscar?: string,
+    @Query('carreraId') carreraId?: number,
+  ) {
+    return this.servicio.listarInscritos(
+      gestion,
+      Number(pagina),
+      Number(limite),
+      buscar,
+      carreraId ? Number(carreraId) : undefined,
+    );
+  }
+
+  @Get('estado-inscripcion')
+  obtenerEstadoInscripcion(
+    @Query('estudianteId') estudianteId: number,
+    @Query('gestion') gestion: string,
+    @Query('periodo') periodo?: string,
+  ) {
+    return this.servicio.obtenerEstadoInscripcion(
+      Number(estudianteId),
+      gestion,
+      periodo,
+    );
+  }
+
   @Get('grupos')
   obtenerGruposPorCarreraYSemestre(
     @Query('carreraId') carreraId: number,
     @Query('gestion') gestion: string,
     @Query('semestre') semestre?: number,
     @Query('turnoId') turnoId?: number,
+    @Query('planEstudioId') planEstudioId?: number,
+    @Query('semestres') semestres?: string,
   ) {
     return this.servicio.obtenerGruposPorCarreraYSemestre(
       carreraId,
       gestion,
       semestre ? +semestre : undefined,
       turnoId ? +turnoId : undefined,
+      true,
+      planEstudioId ? +planEstudioId : undefined,
+      semestres
+        ? semestres
+            .split(',')
+            .map((valor) => Number(valor.trim()))
+            .filter((valor) => Number.isFinite(valor))
+        : undefined,
     );
   }
 

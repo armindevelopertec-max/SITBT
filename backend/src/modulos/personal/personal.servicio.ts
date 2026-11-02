@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Personal, EstadoPersonal, CargoPersonal } from '../../entidades/personal.entidad';
+import { Personal, EstadoPersonal } from '../../entidades/personal.entidad';
 import { Persona } from '../../entidades/persona.entidad';
 import { Usuario } from '../../entidades/usuario.entidad';
 import { UsuarioRol } from '../../entidades/usuario-rol.entidad';
@@ -17,6 +17,9 @@ export interface PersonalCreadoConUsuario {
     contrasena: string;
   };
 }
+
+/** Roles del sistema que no se ofrecen como cargo de personal. */
+const ROLES_EXCLUIDOS_COMO_CARGO = new Set(['administrador', 'estudiante']);
 
 @Injectable()
 export class ServicioPersonal {
@@ -34,8 +37,21 @@ export class ServicioPersonal {
   ) {}
 
   async crear(crearPersonalDto: CrearPersonalDto): Promise<PersonalCreadoConUsuario> {
+    // El cargo ES el código de un rol activo: una sola fuente de verdad.
+    // Se valida antes de crear nada para no dejar personal sin rol.
+    const rol = await this.repositorioRol.findOne({
+      where: { codigo: crearPersonalDto.cargo, estado: 'activo' as any },
+    });
+    if (!rol) {
+      throw new BadRequestException(
+        `El cargo "${crearPersonalDto.cargo}" no corresponde a ningún rol activo. ` +
+          'Crea el rol desde /roles y vuelve a intentarlo.',
+      );
+    }
+
     const personal = this.repositorioPersonal.create({
       ...crearPersonalDto,
+      cargo: rol.codigo,
       estado: crearPersonalDto.estado ?? EstadoPersonal.ACTIVO,
     });
     const personalGuardado = await this.repositorioPersonal.save(personal);
@@ -58,15 +74,12 @@ export class ServicioPersonal {
     });
     const usuarioGuardado = await this.repositorioUsuario.save(usuario);
 
-    const codigoRol = this.mapearCargoARol(personalGuardado.cargo);
-    const rol = await this.repositorioRol.findOne({ where: { codigo: codigoRol } });
-    if (rol) {
-      const usuarioRol = this.repositorioUsuarioRol.create({
-        usuarioId: usuarioGuardado.id,
-        rolId: rol.id,
-      });
-      await this.repositorioUsuarioRol.save(usuarioRol);
-    }
+    // El rol del cargo es el que se asigna al usuario.
+    const usuarioRol = this.repositorioUsuarioRol.create({
+      usuarioId: usuarioGuardado.id,
+      rolId: rol.id,
+    });
+    await this.repositorioUsuarioRol.save(usuarioRol);
 
     return {
       personal: personalGuardado,
@@ -77,23 +90,17 @@ export class ServicioPersonal {
     };
   }
 
-  private mapearCargoARol(cargo: CargoPersonal): string {
-    const mapaCargoRol: Record<CargoPersonal, string> = {
-      [CargoPersonal.DOCENTE]: 'docente',
-      [CargoPersonal.SECRETARIA]: 'secretaria',
-      [CargoPersonal.DIRECTOR_ACADEMICO]: 'director_academico',
-      [CargoPersonal.RECTOR]: 'rector',
-      [CargoPersonal.APOYO]: 'apoyo',
-      [CargoPersonal.BIBLIOTECARIO]: 'apoyo',
-    };
-    return mapaCargoRol[cargo] || 'apoyo';
+  private async buscarRolActivoPorCodigo(codigo: string): Promise<Rol | null> {
+    return this.repositorioRol.findOne({
+      where: { codigo, estado: 'activo' as any },
+    });
   }
 
   async obtenerTodos(
     pagina = 1,
     limite = 20,
     estado?: EstadoPersonal,
-    cargo?: CargoPersonal,
+    cargo?: string,
   ): Promise<{ datos: Personal[]; total: number; pagina: number; limite: number }> {
     const consulta = this.repositorioPersonal
       .createQueryBuilder('personal')
@@ -116,6 +123,30 @@ export class ServicioPersonal {
     return { datos, total, pagina, limite };
   }
 
+  /**
+   * Roles que pueden usarse como cargo de personal.
+   *
+   * El cargo del personal ES el código de un rol, por eso la lista se arma
+   * desde la tabla `roles`. Se excluyen los roles del sistema que no son
+   * cargos de personal: `administrador` y `estudiante`.
+   */
+  async obtenerCargosDisponibles(): Promise<
+    Array<{ codigo: string; nombre: string; descripcion: string | null }>
+  > {
+    const roles = await this.repositorioRol.find({
+      where: { estado: 'activo' as any },
+      order: { nombre: 'ASC' },
+    });
+
+    return roles
+      .filter((rol) => !ROLES_EXCLUIDOS_COMO_CARGO.has(rol.codigo))
+      .map((rol) => ({
+        codigo: rol.codigo,
+        nombre: rol.nombre,
+        descripcion: rol.descripcion ?? null,
+      }));
+  }
+
   async obtenerUno(id: number): Promise<Personal> {
     const personal = await this.repositorioPersonal.findOne({
       where: { id },
@@ -129,8 +160,56 @@ export class ServicioPersonal {
 
   async actualizar(id: number, actualizarPersonalDto: ActualizarPersonalDto): Promise<Personal> {
     const personal = await this.obtenerUno(id);
+    const cargoAnterior = personal.cargo;
+
+    // Si cambia el cargo, el nuevo cargo debe ser un rol activo existente.
+    let rolNuevo: Rol | null = null;
+    if (actualizarPersonalDto.cargo && actualizarPersonalDto.cargo !== cargoAnterior) {
+      rolNuevo = await this.buscarRolActivoPorCodigo(actualizarPersonalDto.cargo);
+      if (!rolNuevo) {
+        throw new BadRequestException(
+          `El cargo "${actualizarPersonalDto.cargo}" no corresponde a ningún rol activo. ` +
+            'Crea el rol desde /roles y vuelve a intentarlo.',
+        );
+      }
+    }
+
     Object.assign(personal, actualizarPersonalDto);
-    return this.repositorioPersonal.save(personal);
+    const personalGuardado = await this.repositorioPersonal.save(personal);
+
+    // Se sincroniza el rol del usuario con el cargo del personal:
+    // el rol del cargo anterior se retira y se asigna el nuevo.
+    if (rolNuevo) {
+      const usuario = await this.repositorioUsuario.findOne({
+        where: { personaId: personalGuardado.personaId },
+      });
+      if (usuario) {
+        const rolAnterior = await this.repositorioRol.findOne({
+          where: { codigo: cargoAnterior },
+        });
+
+        if (rolAnterior) {
+          await this.repositorioUsuarioRol.delete({
+            usuarioId: usuario.id,
+            rolId: rolAnterior.id,
+          });
+        }
+
+        const yaTieneRol = await this.repositorioUsuarioRol.findOne({
+          where: { usuarioId: usuario.id, rolId: rolNuevo.id },
+        });
+        if (!yaTieneRol) {
+          await this.repositorioUsuarioRol.save(
+            this.repositorioUsuarioRol.create({
+              usuarioId: usuario.id,
+              rolId: rolNuevo.id,
+            }),
+          );
+        }
+      }
+    }
+
+    return personalGuardado;
   }
 
   async eliminar(id: number): Promise<void> {
@@ -153,7 +232,7 @@ export class ServicioPersonal {
     }
   }
 
-  async buscarPorCargo(cargo: CargoPersonal): Promise<Personal[]> {
+  async buscarPorCargo(cargo: string): Promise<Personal[]> {
     return this.repositorioPersonal.find({
       where: { cargo: cargo, estado: EstadoPersonal.ACTIVO },
       relations: ['persona'],
@@ -170,6 +249,6 @@ export class ServicioPersonal {
   }
 
   async obtenerDocentes(): Promise<Personal[]> {
-    return this.buscarPorCargo(CargoPersonal.DOCENTE);
+    return this.buscarPorCargo('docente');
   }
 }

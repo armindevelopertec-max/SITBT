@@ -43,6 +43,24 @@ export class CrearInscripcionLoteDto {
   @IsOptional()
   periodo?: string;
 
+  /**
+   * Usuario que registra los pagos de la inscripción. Si se envía, los
+   * conceptos pendientes de pago se registran automáticamente al confirmar
+   * la inscripción.
+   */
+  @ApiPropertyOptional({ description: 'Usuario que recibe los pagos' })
+  @IsOptional()
+  @IsInt()
+  recibidoPor?: number;
+
+  /**
+   * Registrar automáticamente los pagos pendientes (matrícula y matrícula
+   * semestral) al confirmar la inscripción.
+   */
+  @ApiPropertyOptional({ default: true })
+  @IsOptional()
+  registrarPagos?: boolean;
+
   @ApiPropertyOptional({ type: [AsignacionGrupoDto] })
   @IsArray()
   @ValidateNested({ each: true })
@@ -78,5 +96,7 @@ export class ResultadoCrearInscripcion {
   boletaNumero?: string;
   asignadosGrupo: number;
   inscritosLibro: number;
+  /** Pagos registrados automáticamente al confirmar la inscripción. */
+  pagosRegistrados?: Array<{ concepto: string; monto: number }>;
   mensaje: string;
 }

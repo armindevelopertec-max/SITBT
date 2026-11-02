@@ -20,6 +20,10 @@ import { Carrera } from '../../entidades/carrera.entidad';
 import { Estudiante, EstadoEstudiante } from '../../entidades/estudiante.entidad';
 import { Periodo } from '../../entidades/periodo.entidad';
 import { Gestion } from '../../entidades/gestion.entidad';
+import { Inscripcion } from '../../entidades/inscripcion.entidad';
+import { MateriaImpartida } from '../../entidades/materia-impartida.entidad';
+import { LibroCalificaciones } from '../../entidades/libro-calificaciones.entidad';
+import { ServicioMateriasImpartidas } from '../materias-impartidas/materias-impartidas.servicio';
 
 export interface FiltrosGrupo {
   gestion?: string;
@@ -39,6 +43,13 @@ export class ServicioGrupos {
     private repositorioGrupo: Repository<Grupo>,
     @InjectRepository(GrupoEstudiante)
     private repositorioGrupoEstudiante: Repository<GrupoEstudiante>,
+    @InjectRepository(Inscripcion)
+    private repositorioInscripcion: Repository<Inscripcion>,
+    @InjectRepository(MateriaImpartida)
+    private repositorioMateriaImpartida: Repository<MateriaImpartida>,
+    @InjectRepository(LibroCalificaciones)
+    private repositorioLibroCalificaciones: Repository<LibroCalificaciones>,
+    private readonly servicioMateriasImpartidas: ServicioMateriasImpartidas,
     @InjectRepository(GrupoHistorial)
     private repositorioHistorial: Repository<GrupoHistorial>,
     @InjectRepository(Carrera)
@@ -195,6 +206,17 @@ export class ServicioGrupos {
     } as any);
 
     const guardado = await this.repositorioGrupo.save(grupo as any);
+
+    // Las materias impartidas se generan automáticamente: una por cada materia
+    // de su plan y semestre, con su libro de calificaciones.
+    await this.asegurarMateriasImpartidas(
+      guardado.id,
+      plan.id,
+      crearGrupoDto.semestre,
+      periodo.id,
+      gestion,
+    );
+
     return this.obtenerUno(guardado.id);
   }
 
@@ -249,7 +271,7 @@ export class ServicioGrupos {
 
           const codigo = await this.generarCodigo(carrera, semestre, turno, paralelo, gestion, periodo.numero);
 
-          await this.repositorioGrupo.save(
+          const grupoGuardado = await this.repositorioGrupo.save(
             this.repositorioGrupo.create({
               codigo,
               carreraId: plan.carreraId,
@@ -264,6 +286,16 @@ export class ServicioGrupos {
             }),
           );
           creados++;
+
+          // Las materias impartidas del grupo se generan automáticamente: una
+          // por cada materia de su plan y semestre, con su libro de notas.
+          await this.asegurarMateriasImpartidas(
+            grupoGuardado.id,
+            plan.id,
+            semestre,
+            periodo.id,
+            gestion,
+          );
         }
       }
     }
@@ -273,6 +305,85 @@ export class ServicioGrupos {
       existentes,
       mensaje: `Se crearon ${creados} grupos y ya existían ${existentes}`,
     };
+  }
+
+  /**
+   * Genera automáticamente las materias impartidas de un grupo: una por
+   * cada materia de su plan de estudio y semestre. Así el grupo tiene su
+   * "malla" dictándose y sus libros de calificaciones listos, sin que nadie
+   * tenga que pulsar "Generar materias impartidas".
+   *
+   * Es idempotente: si la materia impartida ya existe, no se duplica.
+   */
+  private async asegurarMateriasImpartidas(
+    grupoId: number,
+    planEstudioId: number,
+    semestre: number,
+    periodoId: number,
+    gestion: string,
+  ): Promise<number> {
+    const materiasPlan = await this.repositorioMateriaPlan.find({
+      where: { planEstudioId, semestre },
+    });
+
+    if (materiasPlan.length === 0) {
+      return 0;
+    }
+
+    let creadas = 0;
+
+    for (const materiaPlan of materiasPlan) {
+      const existente = await this.repositorioMateriaImpartida.findOne({
+        where: { grupoId, materiaId: materiaPlan.materiaId, periodoId },
+      });
+
+      if (existente) {
+        continue;
+      }
+
+      const materiaImpartida = await this.repositorioMateriaImpartida.save(
+        this.repositorioMateriaImpartida.create({
+          grupoId,
+          materiaId: materiaPlan.materiaId,
+          materiaPlanId: materiaPlan.id,
+          periodoId,
+          gestion,
+          estado: 'activa' as any,
+        }),
+      );
+      creadas++;
+
+      // Libro de calificaciones de la materia impartida.
+      const libroExistente = await this.repositorioLibroCalificaciones.findOne({
+        where: { materiaImpartidaId: materiaImpartida.id },
+      });
+      if (!libroExistente) {
+        await this.repositorioLibroCalificaciones.save(
+          this.repositorioLibroCalificaciones.create({
+            materiaImpartidaId: materiaImpartida.id,
+            estado: 'abierto' as any,
+          }),
+        );
+      }
+    }
+
+    // Inscribe a los estudiantes que ya estaban en el grupo.
+    if (creadas > 0) {
+      await this.sincronizarInscripcionesDelGrupo(grupoId);
+    }
+
+    return creadas;
+  }
+
+  /** Sincroniza las inscripciones de los miembros del grupo con sus materias. */
+  private async sincronizarInscripcionesDelGrupo(grupoId: number): Promise<void> {
+    const miembros = await this.repositorioGrupoEstudiante.find({ where: { grupoId } });
+    for (const miembro of miembros) {
+      await this.servicioMateriasImpartidas.sincronizarEstudianteEnGrupo(
+        grupoId,
+        miembro.estudianteId,
+      );
+    }
   }
 
   private async contarInscritos(grupoId: number): Promise<number> {
@@ -295,6 +406,54 @@ export class ServicioGrupos {
       mapa.set(Number(fila.grupoId), Number(fila.inscritos));
     }
     return mapa;
+  }
+
+  /**
+   * Limpia el roster de los grupos indicados: elimina las asignaciones de
+   * estudiantes que no tienen ninguna inscripción (materia) en ese grupo.
+   *
+   * El roster (`grupos_estudiantes`) y las inscripciones (`inscripciones`)
+   * deben ir de la mano. Si una inscripción se elimina o se revierte, el
+   * registro del roster queda huérfano y el grupo muestra un inscrito que en
+   * realidad no cursa ninguna materia.
+   */
+  private async sincronizarRosterConInscripciones(idsGrupo: number[]): Promise<void> {
+    if (idsGrupo.length === 0) {
+      return;
+    }
+
+    const asignaciones = await this.repositorioGrupoEstudiante.find({
+      where: idsGrupo.map((grupoId) => ({ grupoId })),
+    });
+
+    if (asignaciones.length === 0) {
+      return;
+    }
+
+    const idsEstudiante = asignaciones.map((asignacion) => asignacion.estudianteId);
+    const inscripciones = await this.repositorioInscripcion
+      .createQueryBuilder('i')
+      .select('i.grupoId', 'grupoId')
+      .addSelect('i.estudianteId', 'estudianteId')
+      .where('i.grupoId IN (:...idsGrupo)', { idsGrupo })
+      .andWhere('i.estudianteId IN (:...idsEstudiante)', { idsEstudiante })
+      .getRawMany();
+
+    const conInscripcion = new Set(
+      inscripciones.map(
+        (fila: any) => `${fila.grupoId}|${fila.estudianteId}`,
+      ),
+    );
+
+    const huerfanos = asignaciones.filter(
+      (asignacion) => !conInscripcion.has(`${asignacion.grupoId}|${asignacion.estudianteId}`),
+    );
+
+    if (huerfanos.length === 0) {
+      return;
+    }
+
+    await this.repositorioGrupoEstudiante.remove(huerfanos);
   }
 
   async obtenerTodos(
@@ -347,6 +506,10 @@ export class ServicioGrupos {
       .take(limite)
       .getManyAndCount();
 
+    // Sincroniza el roster con las inscripciones: elimina las asignaciones
+    // de estudiantes que no tienen ninguna materia inscrita en el grupo.
+    await this.sincronizarRosterConInscripciones(datos.map((grupo) => grupo.id));
+
     const conteos = await this.contarInscritosPorGrupo(datos.map((grupo) => grupo.id));
     for (const grupo of datos) {
       const inscritos = conteos.get(grupo.id) || 0;
@@ -365,6 +528,7 @@ export class ServicioGrupos {
     if (!grupo) {
       throw new NotFoundException(`Grupo con ID ${id} no encontrado`);
     }
+    await this.sincronizarRosterConInscripciones([id]);
     const inscritos = await this.contarInscritos(id);
     (grupo as any).inscritos = inscritos;
     (grupo as any).cuposDisponibles = Math.max(grupo.capacidad - inscritos, 0);
@@ -766,7 +930,7 @@ export class ServicioGrupos {
         destino.numero,
       );
 
-      await this.repositorioGrupo.save(
+      const grupoGuardado = await this.repositorioGrupo.save(
         this.repositorioGrupo.create({
           codigo,
           carreraId: original.carreraId,
@@ -781,6 +945,15 @@ export class ServicioGrupos {
         }),
       );
       creados++;
+
+      // Materias impartidas del grupo clonado, generadas automáticamente.
+      await this.asegurarMateriasImpartidas(
+        grupoGuardado.id,
+        original.planEstudioId,
+        original.semestre,
+        destino.id,
+        gestionDestino,
+      );
     }
 
     return {

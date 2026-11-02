@@ -15,6 +15,7 @@ import { Periodo } from '../../entidades/periodo.entidad';
 import { Gestion } from '../../entidades/gestion.entidad';
 import { Calificacion } from '../../entidades/calificacion.entidad';
 import { DocumentoEmitido } from '../../entidades/documento-emitido.entidad';
+import { PlanEstudio } from '../../entidades/plan-estudio.entidad';
 import { ModuloGrupos } from '../grupos/grupos.modulo';
 import { ModuloMateriasImpartidas } from '../materias-impartidas/materias-impartidas.modulo';
 
@@ -34,6 +35,7 @@ import { ModuloMateriasImpartidas } from '../materias-impartidas/materias-impart
       Gestion,
       Calificacion,
       DocumentoEmitido,
+      PlanEstudio,
     ]),
     ModuloGrupos,
     ModuloMateriasImpartidas,

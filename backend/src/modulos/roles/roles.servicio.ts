@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Rol, EstadoRol } from '../../entidades/rol.entidad';
 import { UsuarioRol } from '../../entidades/usuario-rol.entidad';
 import { Permiso } from '../../entidades/permiso.entidad';
+import { Personal } from '../../entidades/personal.entidad';
 import { CrearRolDto } from './dto/crear-rol.dto';
 import { ActualizarRolDto } from './dto/actualizar-rol.dto';
 
@@ -12,6 +13,8 @@ export class ServicioRoles {
   constructor(
     @InjectRepository(Rol)
     private repositorioRol: Repository<Rol>,
+    @InjectRepository(Personal)
+    private repositorioPersonal: Repository<Personal>,
   ) {}
 
   async crear(crearRolDto: CrearRolDto): Promise<Rol> {
@@ -91,6 +94,19 @@ export class ServicioRoles {
     if (asignaciones > 0) {
       throw new ConflictException(
         'No se puede eliminar un rol que está asignado a usuarios',
+      );
+    }
+
+    // El cargo del personal ES el código del rol: si hay personal con este
+    // cargo, el rol es su identidad y no se puede eliminar.
+    const personalConCargo = await this.repositorioPersonal.count({
+      where: { cargo: rol.codigo },
+    });
+
+    if (personalConCargo > 0) {
+      throw new ConflictException(
+        `No se puede eliminar el rol "${rol.codigo}" porque ${personalConCargo} ` +
+          'registro(s) de personal lo usan como cargo',
       );
     }
 

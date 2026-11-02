@@ -12,6 +12,7 @@ import { GrupoEstudiante } from '../../entidades/grupo-estudiante.entidad';
 import { Turno } from '../../entidades/turno.entidad';
 import { Periodo } from '../../entidades/periodo.entidad';
 import { Gestion, EstadoGestion } from '../../entidades/gestion.entidad';
+import { PlanEstudio } from '../../entidades/plan-estudio.entidad';
 import { Calificacion } from '../../entidades/calificacion.entidad';
 import { DocumentoEmitido, TipoDocumento } from '../../entidades/documento-emitido.entidad';
 import { ServicioGrupos } from '../grupos/grupos.servicio';
@@ -53,6 +54,8 @@ export class ServicioPreinscripcion {
     private repositorioDocumento: Repository<DocumentoEmitido>,
     @InjectRepository(GrupoEstudiante)
     private repositorioGrupoEstudiante: Repository<GrupoEstudiante>,
+    @InjectRepository(PlanEstudio)
+    private repositorioPlanEstudio: Repository<PlanEstudio>,
     private readonly servicioGrupos: ServicioGrupos,
     private readonly servicioMateriasImpartidas: ServicioMateriasImpartidas,
     private readonly fuenteDatos: DataSource,
@@ -396,6 +399,72 @@ export class ServicioPreinscripcion {
     };
   }
 
+  /**
+   * Registra los pagos pendientes del estudiante para el período indicado.
+   *
+   * Se usa al confirmar la preinscripción: así el estudiante queda con la
+   * matrícula y la matrícula semestral pagadas y no hay que registrarlas por
+   * separado en la pantalla de Pagos.
+   *
+   * Devuelve los pagos registrados (los que faltaban).
+   */
+  async registrarPagosPendientes(
+    estudianteId: number,
+    gestion: string,
+    periodo: string,
+    recibidoPor: number,
+  ): Promise<Array<{ concepto: string; monto: number }>> {
+    const verificador = await this.verificarPagos({
+      estudianteId,
+      gestion,
+      periodo,
+    } as any);
+
+    if (verificador.pagosFaltantes.length === 0) {
+      return [];
+    }
+
+    const conceptos = await this.repositorioConcepto.find({
+      where: { estado: EstadoConceptoPago.ACTIVO },
+    });
+
+    const registrados: Array<{ concepto: string; monto: number }> = [];
+
+    for (const faltante of verificador.pagosFaltantes) {
+      const tipo = faltante.tipo as TipoConceptoPago;
+
+      // Para el concepto semestral se busca el que corresponda al período; si
+      // no hay uno específico, se usa el semestral genérico.
+      const concepto =
+        conceptos.find((c) => c.tipo === tipo && this.nombreCubrePeriodo(c.nombre, periodo)) ||
+        conceptos.find((c) => c.tipo === tipo);
+
+      if (!concepto) {
+        continue;
+      }
+
+      const monto = Number(concepto.montoPredeterminado);
+
+      await this.repositorioPago.save(
+        this.repositorioPago.create({
+          estudianteId,
+          conceptoId: concepto.id,
+          gestion,
+          periodo: tipo === TipoConceptoPago.SEMESTRAL ? periodo : undefined,
+          monto,
+          fechaPago: new Date(),
+          metodoPago: 'efectivo' as any,
+          estado: EstadoPago.PAGADO,
+          recibidoPor,
+        } as any),
+      );
+
+      registrados.push({ concepto: concepto.nombre, monto });
+    }
+
+    return registrados;
+  }
+
   async crearInscripcionLote(dto: CrearInscripcionLoteDto): Promise<ResultadoCrearInscripcion> {
     const estudiante = await this.repositorioEstudiante.findOne({
       where: { id: dto.estudianteId },
@@ -450,28 +519,121 @@ export class ServicioPreinscripcion {
       grupos.set(asignacion.grupoId, grupo);
     }
 
-    // 1) Matricular al estudiante en cada grupo (fuente de verdad del roster que
-    //    consume el módulo de materias impartidas). Es idempotente.
-    let asignadosGrupo = 0;
+    // Un estudiante no puede llevar dos grupos del mismo turno en el mismo
+    // semestre: las materias se imparten a la misma hora y se chocarían.
+    // Sí puede llevar materias de turnos distintos en paralelo.
+    const claveTurnoSemestre = new Map<string, number>();
     for (const asignacion of asignaciones) {
-      const yaAsignado = await this.repositorioGrupoEstudiante.findOne({
-        where: { grupoId: asignacion.grupoId, estudianteId: dto.estudianteId },
+      const grupo = grupos.get(asignacion.grupoId)!;
+      const clave = `${grupo.turnoId}|${grupo.semestre}`;
+
+      const existente = claveTurnoSemestre.get(clave);
+      if (existente) {
+        const grupoExistente = grupos.get(existente)!;
+        throw new BadRequestException(
+          `Los grupos "${grupoExistente.codigo}" y "${grupo.codigo}" son del mismo turno ` +
+            `(${grupo.turno?.nombre ?? 'sin turno'}) y semestre ${grupo.semestre}: ` +
+            'sus materias se imparten a la misma hora y no pueden llevar ambos.',
+        );
+      }
+      claveTurnoSemestre.set(clave, asignacion.grupoId);
+    }
+
+    // Un estudiante no puede llevar dos grupos del mismo turno en el mismo
+    // semestre por más Assignment de asignaciones.
+    for (const asignacion of asignaciones) {
+      const grupo = grupos.get(asignacion.grupoId)!;
+      const yaEnEseTurno = await this.repositorioGrupoEstudiante.find({
+        where: { estudianteId: dto.estudianteId },
+        relations: ['grupo'],
       });
-      if (!yaAsignado) {
-        await this.servicioGrupos.agregarEstudiante(asignacion.grupoId, dto.estudianteId);
-        asignadosGrupo++;
+
+      const choca = yaEnEseTurno.find((inscripcionGrupo) => {
+        const otroGrupo = inscripcionGrupo.grupo;
+        return (
+          otroGrupo &&
+          otroGrupo.turnoId === grupo.turnoId &&
+          otroGrupo.semestre === grupo.semestre &&
+          otroGrupo.gestion === dto.gestion &&
+          otroGrupo.id !== grupo.id
+        );
+      });
+
+      if (choca) {
+        throw new BadRequestException(
+          `El estudiante ya está en el grupo "${choca.grupo!.codigo}", del mismo turno ` +
+            `(${grupo.turno?.nombre ?? 'sin turno'}) y semestre ${grupo.semestre}. ` +
+            'No puede llevar dos grupos del mismo turno a la vez.',
+        );
       }
     }
 
-    // 2) Registrar las inscripciones por materia y la boleta en una transacción.
+    // Un estudiante ya inscrito en el período no puede volver a preinscribirse.
+    const idsGrupoDelPeriodo = await this.obtenerIdsGrupoDelPeriodo(
+      dto.gestion,
+      periodoNumero,
+    );
+    const inscripcionesDelPeriodo = await this.repositorioInscripcion.find({
+      where: { estudianteId: dto.estudianteId, gestion: dto.gestion },
+    });
+    const yaInscritoEnElPeriodo = inscripcionesDelPeriodo.filter((inscripcion) =>
+      idsGrupoDelPeriodo.has(inscripcion.grupoId),
+    );
+
+    if (yaInscritoEnElPeriodo.length > 0) {
+      throw new BadRequestException(
+        `El estudiante ya está inscrito en ${yaInscritoEnElPeriodo.length} ` +
+          `materia${yaInscritoEnElPeriodo.length === 1 ? '' : 's'} del período ` +
+          `${periodoNumero}/${dto.gestion}. No se puede volver a preinscribir.`,
+      );
+    }
+
+    // 1) Registrar las inscripciones por materia y la boleta en una transacción.
+    //    La matriculación en el grupo (roster) se hace dentro de la misma
+    //    transacción: si algo falla, no queda el estudiante en un grupo sin
+    //    materias inscritas.
     const inscripciones: { id: number; materiaNombre: string; nombreGrupo: string }[] = [];
     let boletaId: string | undefined;
     let boletaNumero: string | undefined;
+    let asignadosGrupo = 0;
 
     await this.fuenteDatos.transaction(async (gestor) => {
+      // Materias ya inscritas en la gestión (en cualquier grupo): una misma
+      // materia no puede cursarse dos veces en la misma gestión, aunque se
+      // elijan grupos de turnos distintos.
+      const inscripcionesPrevias = await gestor.find(Inscripcion, {
+        where: { estudianteId: dto.estudianteId, gestion: dto.gestion },
+      });
+      const materiasYaInscritas = new Set(
+        inscripcionesPrevias.map((inscripcion) => inscripcion.materiaId),
+      );
+
       for (const asignacion of asignaciones) {
         const grupo = grupos.get(asignacion.grupoId)!;
+
+        // Matricular al estudiante en el grupo (roster). Se hace dentro de la
+        // transacción para que no quede en un grupo si la inscripción falla.
+        const yaAsignado = await gestor.findOne(GrupoEstudiante, {
+          where: { grupoId: asignacion.grupoId, estudianteId: dto.estudianteId },
+        });
+        if (!yaAsignado) {
+          await gestor.save(
+            gestor.create(GrupoEstudiante, {
+              grupoId: asignacion.grupoId,
+              estudianteId: dto.estudianteId,
+            }),
+          );
+          asignadosGrupo++;
+        }
+
         for (const materia of asignacion.materias) {
+          if (materiasYaInscritas.has(materia.materiaId)) {
+            throw new BadRequestException(
+              `La materia "${materia.materiaNombre}" ya está inscrita en la gestión ${dto.gestion}. ` +
+                'Una materia solo se puede cursar una vez por gestión.',
+            );
+          }
+
           const existente = await gestor.findOne(Inscripcion, {
             where: {
               estudianteId: dto.estudianteId,
@@ -496,6 +658,7 @@ export class ServicioPreinscripcion {
           });
 
           const guardada = await gestor.save(inscripcion);
+          materiasYaInscritas.add(materia.materiaId);
           inscripciones.push({
             id: guardada.id,
             materiaNombre: materia.materiaNombre,
@@ -531,6 +694,26 @@ export class ServicioPreinscripcion {
       );
     }
 
+    // 4) Registrar los pagos pendientes del período (matrícula y matrícula
+    //    semestral) para que el estudiante quede al día al inscribed.
+    const pagosRegistrados: Array<{ concepto: string; monto: number }> = [];
+    if (dto.registrarPagos !== false && dto.recibidoPor) {
+      const registrados = await this.registrarPagosPendientes(
+        dto.estudianteId,
+        dto.gestion,
+        periodoNumero,
+        dto.recibidoPor,
+      );
+      pagosRegistrados.push(...registrados);
+    }
+
+    const detallePagos =
+      pagosRegistrados.length > 0
+        ? ` Se registraron ${pagosRegistrados.length} pago(s) por Bs ${pagosRegistrados
+            .reduce((suma, pago) => suma + pago.monto, 0)
+            .toFixed(2)}.`
+        : '';
+
     return {
       exito: true,
       inscripciones,
@@ -538,10 +721,12 @@ export class ServicioPreinscripcion {
       boletaNumero,
       asignadosGrupo,
       inscritosLibro,
+      pagosRegistrados,
       mensaje:
-        inscripciones.length > 0
+        (inscripciones.length > 0
           ? `Se crearon ${inscripciones.length} inscripción(es) para ${periodoNumero}/${dto.gestion}`
-          : `El estudiante ya estaba inscrito en las materias seleccionadas (${periodoNumero}/${dto.gestion})`,
+          : `El estudiante ya estaba inscrito en las materias seleccionadas (${periodoNumero}/${dto.gestion})`) +
+        detallePagos,
     };
   }
 
@@ -658,12 +843,281 @@ export class ServicioPreinscripcion {
     return periodo?.numero || 'I';
   }
 
+  /**
+   * Estado de inscripción del estudiante en la gestión y período indicados.
+   *
+   * Se usa en la pantalla de preinscripción para avisar desde el inicio, al
+   * buscar al estudiante, que ya está inscrito y no necesita repetir el
+   * proceso.
+   */
+  /**
+   * Estudiantes inscritos en el período actual, con paginación.
+   *
+   * Se usa en la pantalla de preinscripción para listar a quién ya se le
+   * hizo la inscripción, sin necesidad de buscarlos uno por uno.
+   */
+  async listarInscritos(
+    gestion: string,
+    pagina = 1,
+    limite = 20,
+    buscar?: string,
+    carreraId?: number,
+  ): Promise<{
+    datos: Array<{
+      id: number;
+      codigoInscripcion: string;
+      nombres: string;
+      apellidos: string;
+      ci: string;
+      carrera: string;
+      carreraId: number;
+      totalMaterias: number;
+      grupos: Array<{ id: number; codigo: string; paralelo: string; semestre: number }>;
+    }>;
+    total: number;
+    pagina: number;
+    limite: number;
+    totalPaginas: number;
+  }> {
+    // Un estudiante puede tener varias inscripciones: se listan una sola vez.
+    // Se usa SQL directo porque el orden por columnas de la persona unida no
+    // se puede resolver con el mapeo de entidades de TypeORM.
+    const condiciones: string[] = [
+      'gestion.anio = $1',
+      'periodo.numero = $2',
+    ];
+    const parametros: unknown[] = [
+      gestion,
+      await this.obtenerNumeroPeriodoDeGestion(gestion),
+    ];
+
+    if (carreraId) {
+      parametros.push(carreraId);
+      condiciones.push(`estudiante.carrera_id = $${parametros.length}`);
+    }
+
+    if (buscar && buscar.trim()) {
+      const texto = `%${buscar.trim().toLowerCase()}%`;
+      parametros.push(texto);
+      const p = parametros.length;
+      condiciones.push(
+        '(LOWER(estudiante.codigo_inscripcion) LIKE ' + p +
+          ' OR LOWER(persona.ci) LIKE ' + p +
+          ' OR LOWER(persona.nombres) LIKE ' + p +
+          ' OR LOWER(persona.apellido_paterno) LIKE ' + p +
+          ' OR LOWER(persona.apellido_materno) LIKE ' + p + ')',
+      );
+    }
+
+    const clausulaWhere = condiciones.join(' AND ');
+
+    const consultaBase = `
+      FROM inscripciones inscripcion
+      JOIN estudiantes estudiante ON estudiante.id = inscripcion.estudiante_id
+      JOIN personas persona ON persona.id = estudiante."personaId"
+      LEFT JOIN carreras carrera ON carrera.id = estudiante.carrera_id
+      JOIN grupos grupo ON grupo.id = inscripcion.grupo_id
+      JOIN periodos periodo ON periodo.id = grupo.periodo_id
+      JOIN gestiones gestion ON gestion.id = periodo."gestionId"
+      WHERE ${clausulaWhere}
+    `;
+
+    const [{ total }] = (await this.fuenteDatos.query(
+      `SELECT COUNT(DISTINCT estudiante.id) AS total ${consultaBase}`,
+      parametros,
+    )) as [{ total: string }];
+    const totalNumero = Number(total) || 0;
+
+    const filas = (await this.fuenteDatos.query(
+      `SELECT DISTINCT ON (estudiante.id)
+          estudiante.id,
+          estudiante."codigo_inscripcion" AS "codigoInscripcion",
+          estudiante.carrera_id AS "carreraId",
+          persona.nombres AS nombres,
+          persona.apellido_paterno AS "apellidoPaterno",
+          persona.apellido_materno AS "apellidoMaterno",
+          persona.ci AS ci,
+          carrera.nombre AS carrera
+       ${consultaBase}
+       ORDER BY estudiante.id, persona.apellido_paterno, persona.apellido_materno, persona.nombres
+       LIMIT ${limite} OFFSET ${(pagina - 1) * limite}`,
+      parametros,
+    )) as Array<{
+      id: number;
+      codigoInscripcion: string;
+      carreraId: number;
+      nombres: string;
+      apellidoPaterno: string;
+      apellidoMaterno: string;
+      ci: string;
+      carrera: string | null;
+    }>;
+
+    // Materias y grupos por estudiante de la página actual.
+    const idsEstudiante = filas.map((fila) => fila.id);
+    const inscriptionsDeEstudiantes =
+      idsEstudiante.length > 0
+        ? await this.repositorioInscripcion.find({
+            where: { estudianteId: In(idsEstudiante), gestion },
+            relations: ['grupo'],
+          })
+        : [];
+
+    const porEstudiante = new Map<
+      number,
+      { totalMaterias: number; grupos: Map<number, { id: number; codigo: string; paralelo: string; semestre: number }> }
+    >();
+
+    for (const inscripcion of inscriptionsDeEstudiantes) {
+      const grupo = inscripcion.grupo;
+      if (!grupo) continue;
+
+      const registro = porEstudiante.get(inscripcion.estudianteId) ?? {
+        totalMaterias: 0,
+        grupos: new Map(),
+      };
+      registro.totalMaterias++;
+      if (!registro.grupos.has(grupo.id)) {
+        registro.grupos.set(grupo.id, {
+          id: grupo.id,
+          codigo: grupo.codigo ?? '',
+          paralelo: grupo.paralelo,
+          semestre: grupo.semestre,
+        });
+      }
+      porEstudiante.set(inscripcion.estudianteId, registro);
+    }
+
+    return {
+      datos: filas.map((fila) => {
+        const registro = porEstudiante.get(fila.id);
+        return {
+          id: fila.id,
+          codigoInscripcion: fila.codigoInscripcion ?? '',
+          nombres: fila.nombres ?? '',
+          apellidos: `${fila.apellidoPaterno ?? ''} ${fila.apellidoMaterno ?? ''}`.trim(),
+          ci: fila.ci ?? '',
+          carrera: fila.carrera ?? '',
+          carreraId: fila.carreraId ?? 0,
+          totalMaterias: registro?.totalMaterias ?? 0,
+          grupos: registro ? Array.from(registro.grupos.values()) : [],
+        };
+      }),
+      total: totalNumero,
+      pagina,
+      limite,
+      totalPaginas: Math.max(1, Math.ceil(totalNumero / limite)),
+    };
+  }
+
+  /** Número del período abierto de la gestión. */
+  private async obtenerNumeroPeriodoDeGestion(gestion: string): Promise<string> {
+    const periodo = await this.obtenerPeriodoAbierto(gestion);
+    return periodo?.numero ?? 'I';
+  }
+
+  async obtenerEstadoInscripcion(
+    estudianteId: number,
+    gestion: string,
+    periodo?: string,
+  ): Promise<{
+    yaInscrito: boolean;
+    totalInscripciones: number;
+    grupos: Array<{
+      id: number;
+      codigo: string;
+      paralelo: string;
+      semestre: number;
+      turnoId: number;
+      turnoNombre: string;
+    }>;
+    materias: Array<{ id: number; materiaId: number; nombre: string; estado: string }>;
+  }> {
+    const inscritos = await this.repositorioInscripcion.find({
+      where: { estudianteId, gestion },
+      relations: ['materia', 'grupo', 'grupo.turno'],
+      order: { id: 'ASC' },
+    });
+
+    // Cuando se indica período, se filtran las inscripciones por el período
+    // del grupo al que pertenecen.
+    let delPeriodo = inscritos;
+    if (periodo) {
+      const idsGrupoDelPeriodo = await this.obtenerIdsGrupoDelPeriodo(gestion, periodo);
+      delPeriodo = inscritos.filter((inscripcion) =>
+        idsGrupoDelPeriodo.has(inscripcion.grupoId),
+      );
+    }
+
+    const gruposUnicos = new Map<
+      number,
+      {
+        id: number;
+        codigo: string;
+        paralelo: string;
+        semestre: number;
+        turnoId: number;
+        turnoNombre: string;
+      }
+    >();
+    for (const inscripcion of delPeriodo) {
+      const grupo = inscripcion.grupo;
+      if (grupo && !gruposUnicos.has(grupo.id)) {
+        gruposUnicos.set(grupo.id, {
+          id: grupo.id,
+          codigo: grupo.codigo ?? '',
+          paralelo: grupo.paralelo,
+          semestre: grupo.semestre,
+          turnoId: grupo.turnoId,
+          turnoNombre: grupo.turno?.nombre ?? '',
+        });
+      }
+    }
+
+    return {
+      yaInscrito: delPeriodo.length > 0,
+      totalInscripciones: delPeriodo.length,
+      grupos: Array.from(gruposUnicos.values()),
+      materias: delPeriodo.map((inscripcion) => ({
+        id: inscripcion.id,
+        materiaId: inscripcion.materiaId,
+        nombre: inscripcion.materia?.nombre ?? '',
+        estado: inscripcion.estado,
+      })),
+    };
+  }
+
+  /** Ids de los grupos que pertenecen al período indicado de la gestión. */
+  private async obtenerIdsGrupoDelPeriodo(
+    gestion: string,
+    periodo: string,
+  ): Promise<Set<number>> {
+    const grupos = await this.repositorioGrupo
+      .createQueryBuilder('grupo')
+      .innerJoin('periodos', 'periodo', 'periodo.id = grupo.periodo_id')
+      .innerJoin('gestiones', 'gestion', 'gestion.id = periodo."gestionId"')
+      .where('gestion.anio = :gestion', { gestion })
+      .andWhere('periodo.numero = :periodo', { periodo })
+      .getMany();
+
+    return new Set(grupos.map((grupo) => grupo.id));
+  }
+
   async obtenerGruposPorCarreraYSemestre(
     carreraId: number,
     gestion: string,
     semestre?: number,
     turnoId?: number,
+    crearSiFaltan?: boolean,
+    planEstudioId?: number,
+    semestres?: number[],
   ): Promise<Grupo[]> {
+    // Si no hay grupos para los semestres solicitados, se crean
+    // automáticamente: un grupo por turno y paralelo A.
+    if (crearSiFaltan !== false) {
+      await this.asegurarGrupos(carreraId, gestion, semestre, planEstudioId, semestres);
+    }
+
     const consulta = this.repositorioGrupo
       .createQueryBuilder('grupo')
       .leftJoinAndSelect('grupo.turno', 'turno')
@@ -680,6 +1134,92 @@ export class ServicioPreinscripcion {
     }
 
     return consulta.orderBy('grupo.semestre', 'ASC').addOrderBy('grupo.paralelo', 'ASC').getMany();
+  }
+
+  /**
+   * Crea los grupos que falten para los semestres indicados.
+   *
+   * Se generan un grupo por cada turno activo con paralelo 'A', siguiendo el
+   * mismo criterio que la generación manual de grupos. Es idempotente: si el
+   * grupo ya existe no se duplica.
+   */
+  private async asegurarGrupos(
+    carreraId: number,
+    gestion: string,
+    semestre?: number,
+    planEstudioId?: number,
+    semestres?: number[],
+  ): Promise<void> {
+    const periodo = await this.obtenerPeriodoAbierto(gestion);
+    if (!periodo) {
+      return;
+    }
+
+    const semestresObjetivo = semestres?.length
+      ? semestres
+      : semestre
+        ? [semestre]
+        : [];
+
+    if (semestresObjetivo.length === 0) {
+      return;
+    }
+
+    // Plan de estudio del estudiante: el más bajo de la carrera.
+    let planId = planEstudioId;
+    if (!planId) {
+      const plan = await this.repositorioPlanEstudio.findOne({
+        where: { carreraId },
+        order: { id: 'ASC' },
+      });
+      planId = plan?.id;
+    }
+    if (!planId) {
+      return;
+    }
+
+    const turnos = await this.repositorioTurno.find({ order: { id: 'ASC' } });
+    if (turnos.length === 0) {
+      return;
+    }
+
+    const existentes = await this.repositorioGrupo.find({
+      where: { carreraId, gestion },
+    });
+    const clavesExistentes = new Set(
+      existentes.map(
+        (grupo) => `${grupo.semestre}|${grupo.turnoId}|${grupo.paralelo}`,
+      ),
+    );
+
+    for (const semestre of semestresObjetivo) {
+      for (const turno of turnos) {
+        const clave = `${semestre}|${turno.id}|A`;
+        if (clavesExistentes.has(clave)) {
+          continue;
+        }
+        clavesExistentes.add(clave);
+
+        // Se delega la creación al servicio de grupos para que el código y las
+        // validaciones sean los mismos que en la generación manual.
+        try {
+          await this.servicioGrupos.crear({
+            carreraId,
+            planEstudioId: planId,
+            semestre,
+            turnoId: turno.id,
+            paralelo: 'A',
+            periodoId: periodo.id,
+            capacidad: 30,
+          } as any);
+        } catch (error) {
+          console.warn(
+            `  ! No se pudo crear el grupo del semestre ${semestre}, turno ${turno.codigo}:`,
+            (error as Error).message,
+          );
+        }
+      }
+    }
   }
 
   async obtenerPeriodoAbierto(anioGestion: string): Promise<Periodo | null> {

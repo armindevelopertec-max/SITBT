@@ -17,7 +17,7 @@ import { ActualizarPersonalDto } from './dto/actualizar-personal.dto';
 import { GuardaJwt } from '../autenticacion/guarda-jwt';
 import { GuardaRoles } from '../autenticacion/guarda-roles';
 import { Roles } from '../autenticacion/roles.decorador';
-import { EstadoPersonal, CargoPersonal } from '../../entidades/personal.entidad';
+import { EstadoPersonal } from '../../entidades/personal.entidad';
 
 @ApiTags('Personal')
 @Controller('personal')
@@ -37,7 +37,7 @@ export class ControladorPersonal {
     @Query('pagina') pagina = 1,
     @Query('limite') limite = 20,
     @Query('estado') estado?: EstadoPersonal,
-    @Query('cargo') cargo?: CargoPersonal,
+    @Query('cargo') cargo?: string,
   ) {
     return this.servicioPersonal.obtenerTodos(+pagina, +limite, estado, cargo);
   }
@@ -47,13 +47,22 @@ export class ControladorPersonal {
     return this.servicioPersonal.obtenerActivos();
   }
 
+  /**
+   * Roles disponibles para asignar como cargo de personal.
+   * El cargo ES el código de un rol activo.
+   */
+  @Get('cargos')
+  obtenerCargos() {
+    return this.servicioPersonal.obtenerCargosDisponibles();
+  }
+
   @Get('docentes')
   obtenerDocentes() {
     return this.servicioPersonal.obtenerDocentes();
   }
 
   @Get('por-cargo/:cargo')
-  buscarPorCargo(@Param('cargo') cargo: CargoPersonal) {
+  buscarPorCargo(@Param('cargo') cargo: string) {
     return this.servicioPersonal.buscarPorCargo(cargo);
   }
 

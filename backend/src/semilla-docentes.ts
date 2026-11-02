@@ -2,6 +2,22 @@ import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
+/**
+ * Semilla de docentes.
+ *
+ * Inserta únicamente los docentes que estaban registrados en el respaldo
+ * `backups/completo_20261101_130109/bd_sitbt.sql.gz` (personas 5 a 10 y
+ * personal 3 a 8). No inserta estudiantes ni otras personas.
+ *
+ * También crea el usuario de cada docente con el mismo formato que usa el
+ * alta de personal desde la aplicación: `doc_<CI>` / `<CI>-<año actual>`.
+ *
+ * El rol `docente` no se crea aquí. Si ya existe y está activo se asigna
+ * automáticamente; si no, los usuarios quedan sin rol para que el
+ * administrador los asigne desde /usuarios.
+ *
+ * Uso: npm run semilla:docentes
+ */
 const fuenteDatos = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
@@ -54,15 +70,18 @@ async function sembrarDocentes() {
   let existentes = 0;
 
   try {
+    // El rol NO se crea aquí: el administrador lo crea desde /roles.
+    // Si ya existe y está activo, se asigna a los docentes.
     const rolDocente: any[] = await ejecutorConsultas.query(
-      `SELECT id FROM roles WHERE codigo = 'docente'`
+      `SELECT id FROM roles WHERE codigo = 'docente' AND estado = 'activo'`
     );
-    if (rolDocente.length === 0) {
-      throw new Error(
-        "No existe el rol 'docente'. Ejecuta primero la semilla principal (npm run semilla)."
+    const idRolDocente: number | null = rolDocente.length > 0 ? rolDocente[0].id : null;
+    if (idRolDocente === null) {
+      console.warn(
+        "  ! No existe el rol activo 'docente': los docentes se crearán SIN rol."
       );
+      console.warn("    Créalo desde /roles y asígnalo desde /usuarios.");
     }
-    const idRolDocente = rolDocente[0].id;
 
     for (const docente of DOCENTES) {
       const nombreCompleto = `${docente.apellidoPaterno} ${docente.apellidoMaterno}, ${docente.nombres}`;
@@ -120,7 +139,7 @@ async function sembrarDocentes() {
       if (usuarioExistente.length > 0) {
         idUsuario = usuarioExistente[0].id;
       } else {
-        const nombreUsuario = `doc_${docente.ci}`;
+        const nombreUsuario = `doc_${docente.ci.replace(/[^a-zA-Z0-9]/g, '')}`;
         const contrasena = `${docente.ci}-${anioActual}`;
         const hashContrasena = await bcrypt.hash(contrasena, 10);
         const usuarioInsertado: any[] = await ejecutorConsultas.query(
@@ -133,15 +152,18 @@ async function sembrarDocentes() {
         console.log(`      ↳ Usuario: ${nombreUsuario} / ${contrasena}`);
       }
 
-      const rolAsignado: any[] = await ejecutorConsultas.query(
-        `SELECT id FROM usuario_roles WHERE usuario_id = $1 AND rol_id = $2`,
-        [idUsuario, idRolDocente]
-      );
-      if (rolAsignado.length === 0) {
-        await ejecutorConsultas.query(
-          `INSERT INTO usuario_roles (usuario_id, rol_id) VALUES ($1, $2)`,
+      if (idRolDocente !== null) {
+        const rolAsignado: any[] = await ejecutorConsultas.query(
+          `SELECT id FROM usuario_roles WHERE usuario_id = $1 AND rol_id = $2`,
           [idUsuario, idRolDocente]
         );
+        if (rolAsignado.length === 0) {
+          await ejecutorConsultas.query(
+            `INSERT INTO usuario_roles (usuario_id, rol_id) VALUES ($1, $2)`,
+            [idUsuario, idRolDocente]
+          );
+          console.log(`      ↳ Rol asignado: docente`);
+        }
       }
     }
 
@@ -151,6 +173,11 @@ async function sembrarDocentes() {
     console.log(`Docentes creados: ${creados}`);
     console.log(`Docentes ya existentes: ${existentes}`);
     console.log(`Acceso de docentes: usuario doc_<CI> / contraseña <CI>-${anioActual}`);
+    if (idRolDocente === null) {
+      console.log("Roles asignados: ninguno (falta crear el rol 'docente' desde /roles)");
+    } else {
+      console.log("Roles asignados: docente");
+    }
     console.log('\n=== Semilla de docentes completada ===');
   } catch (error) {
     await ejecutorConsultas.rollbackTransaction();

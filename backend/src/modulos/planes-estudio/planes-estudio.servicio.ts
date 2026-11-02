@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PlanEstudio, EstadoPlanEstudio } from '../../entidades/plan-estudio.entidad';
@@ -141,6 +141,7 @@ export class ServicioPlanesEstudio {
     if (existente) {
       throw new NotFoundException('Esta materia ya existe en el plan de estudio');
     }
+    await this.validarPrerrequisito(planId, semestre, prerrequisitoId);
     const materiaPlan = this.repositorioMateriaPlan.create({
       planEstudioId: planId,
       materiaId,
@@ -149,6 +150,41 @@ export class ServicioPlanesEstudio {
       prerrequisitoId: prerrequisitoId ?? null,
     });
     return this.repositorioMateriaPlan.save(materiaPlan);
+  }
+
+  /**
+   * El prerrequisito debe ser una materia del MISMO plan de estudio y de un
+   * semestre anterior o igual. No puede ser de otro plan ni de un semestre
+   * posterior (el prerrequisito se cursa antes).
+   */
+  private async validarPrerrequisito(
+    planId: number,
+    semestre: number,
+    prerrequisitoId?: number,
+  ): Promise<void> {
+    if (!prerrequisitoId) {
+      return;
+    }
+
+    const prerrequisito = await this.repositorioMateriaPlan.findOne({
+      where: { id: prerrequisitoId },
+    });
+
+    if (!prerrequisito) {
+      throw new BadRequestException('El prerrequisito indicado no existe');
+    }
+
+    if (prerrequisito.planEstudioId !== planId) {
+      throw new BadRequestException(
+        'El prerrequisito debe pertenecer al mismo plan de estudio',
+      );
+    }
+
+    if (prerrequisito.semestre > semestre) {
+      throw new BadRequestException(
+        'El prerrequisito no puede ser de un semestre posterior al de la materia',
+      );
+    }
   }
 
   async eliminarMateria(materiaPlanId: number): Promise<void> {
@@ -168,6 +204,7 @@ export class ServicioPlanesEstudio {
     if (!materiaPlan) {
       throw new NotFoundException(`MateriaPlan con ID ${materiaPlanId} no encontrado`);
     }
+    await this.validarPrerrequisito(materiaPlan.planEstudioId, semestre, prerrequisitoId);
     materiaPlan.semestre = semestre;
     materiaPlan.horasSemanales = horasSemanales;
     materiaPlan.prerrequisitoId = prerrequisitoId ?? null;

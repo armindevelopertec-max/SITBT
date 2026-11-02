@@ -20,6 +20,17 @@ const fuenteDatos = new DataSource({
  * NO modifica el modulo de estudiantes: inserta personas, estudiantes y usuarios
  * siguiendo el mismo patron que ServicioEstudiantes.crear().
  *
+ * Por defecto inserta una cantidad pequeña y ALEATORIA de estudiantes (5) para
+ * poder probar el sistema sin llenar la base. Se puede cambiar con la variable
+ * de entorno CANTIDAD_ESTUDIANTES:
+ *
+ *   npm run semilla:estudiantes                       -> 5 aleatorios
+ *   CANTIDAD_ESTUDIANTES=20 npm run semilla:estudiantes -> 20 aleatorios
+ *   CANTIDAD_ESTUDIANTES=0 npm run semilla:estudiantes  -> todos (188)
+ *
+ * Requiere las carreras y planes de estudio vigentes:
+ *   npm run semilla:carreras
+ *
  * El JSON de origen no trae genero ni fecha de nacimiento; se resuelven asi:
  *  - genero: lista explicita de CI femeninas (el resto se asume M).
  *  - fecha_nacimiento: valor provisional (la columna no admite nulos).
@@ -31,6 +42,15 @@ const RUTA_JSON =
 const GESTION = process.env.GESTION_SEMILLA || '2026';
 const FECHA_ADMISION = `${GESTION}-02-02`;
 const FECHA_NACIMIENTO_PROVISIONAL = '2005-01-01';
+
+/**
+ * Cantidad de estudiantes a insertar.
+ * 0 significa "todos los del archivo".
+ */
+const CANTIDAD_ESTUDIANTES = parseInt(
+  process.env.CANTIDAD_ESTUDIANTES ?? '5',
+  10,
+);
 
 // Estudiantes con nombre femenino (segun revisión del padrón).
 const CIS_FEMENINAS = new Set<string>([
@@ -113,6 +133,7 @@ async function sembrarEstudiantes() {
   let estudiantesCreados = 0;
   let usuariosCreados = 0;
   let omitidos = 0;
+  let ya_existentes = 0;
   const advertencias: string[] = [];
 
   try {
@@ -131,13 +152,19 @@ async function sembrarEstudiantes() {
       }
     });
 
+    // El rol NO se crea aquí: el administrador lo crea desde /roles.
+    // Si ya existe y está activo, se asigna a los estudiantes.
     const rolEstudiante: any[] = await ejecutor.query(
-      `SELECT id FROM roles WHERE codigo = 'estudiante'`
+      `SELECT id FROM roles WHERE codigo = 'estudiante' AND estado = 'activo'`
     );
-    if (rolEstudiante.length === 0) {
-      throw new Error("No existe el rol 'estudiante'. Ejecuta primero la semilla principal.");
+    const idRolEstudiante: number | null =
+      rolEstudiante.length > 0 ? rolEstudiante[0].id : null;
+    if (idRolEstudiante === null) {
+      console.warn(
+        "  ! No existe el rol activo 'estudiante': los estudiantes se crearán SIN rol."
+      );
+      console.warn('    Créalo desde /roles y asígnalo desde /usuarios.');
     }
-    const idRolEstudiante = rolEstudiante[0].id;
 
     const codigosUsados = new Set<string>(
       (await ejecutor.query(`SELECT codigo_inscripcion FROM estudiantes`)).map(
@@ -145,7 +172,46 @@ async function sembrarEstudiantes() {
       )
     );
 
-    for (const item of estudiantesJson) {
+    // Selección aleatoria: se mezcla el archivo para no insertar siempre los
+    // primeros.
+    const candidatos = [...estudiantesJson];
+    for (let i = candidatos.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [candidatos[i], candidatos[j]] = [candidatos[j], candidatos[i]];
+    }
+
+    // CANTIDAD_ESTUDIANTES es el TOTAL objetivo, no la cantidad a insertar en
+    // esta ejecución: si ya hay estudiantes del archivo, solo se crean los
+    // que falten. Así el seed se puede reejecutar sin duplicar ni crecer.
+    const objetivo =
+      CANTIDAD_ESTUDIANTES > 0
+        ? Math.min(CANTIDAD_ESTUDIANTES, candidatos.length)
+        : candidatos.length;
+
+    const existentes: any[] = await ejecutor.query(
+      `SELECT DISTINCT pe.ci FROM estudiantes e JOIN personas pe ON pe.id = e."personaId"`
+    );
+    const ciExistentes = new Set<string>(
+      existentes.map((fila: any) => String(fila.ci).trim())
+    );
+
+    const yaEnBase = candidatos.filter((item) =>
+      ciExistentes.has(String(item.ci).trim()),
+    ).length;
+
+    const faltantes = Math.max(0, objetivo - yaEnBase);
+
+    console.log(
+      `→ Objetivo: ${objetivo} estudiante(s). Ya en la base: ${yaEnBase}. ` +
+        `Se crearán ${faltantes} (selección aleatoria de ${candidatos.length} disponibles)`
+    );
+
+    for (const item of candidatos) {
+      // Ya se alcanzó la cantidad pedida: se corta el recorrido.
+      if (estudiantesCreados >= faltantes) {
+        break;
+      }
+
       const ci = String(item.ci).trim();
       const carrera = carreraPorNombre.get(normalizar(item.carrera));
       if (!carrera) {
@@ -188,7 +254,8 @@ async function sembrarEstudiantes() {
         [idPersona, carrera.id, planEstudioId]
       );
       if (existeEstudiante.length > 0) {
-        omitidos++;
+        // Ya estaba en la base: no cuenta para el límite pedido.
+        ya_existentes++;
       } else {
         // Codigo de inscripcion: INICIALES-CARRERAaa-XX (desambigua con -n)
         const codigoCarrera = normalizar(carrera.nombre).substring(0, 2);
@@ -235,26 +302,36 @@ async function sembrarEstudiantes() {
         usuariosCreados++;
       }
 
-      const rolAsignado: any[] = await ejecutor.query(
-        `SELECT id FROM usuario_roles WHERE usuario_id = $1 AND rol_id = $2`,
-        [idUsuario, idRolEstudiante]
-      );
-      if (rolAsignado.length === 0) {
-        await ejecutor.query(
-          `INSERT INTO usuario_roles (usuario_id, rol_id) VALUES ($1, $2)`,
+      if (idRolEstudiante !== null) {
+        const rolAsignado: any[] = await ejecutor.query(
+          `SELECT id FROM usuario_roles WHERE usuario_id = $1 AND rol_id = $2`,
           [idUsuario, idRolEstudiante]
         );
+        if (rolAsignado.length === 0) {
+          await ejecutor.query(
+            `INSERT INTO usuario_roles (usuario_id, rol_id) VALUES ($1, $2)`,
+            [idUsuario, idRolEstudiante]
+          );
+          console.log(`      ↳ Rol asignado: estudiante`);
+        }
       }
     }
 
     await ejecutor.commitTransaction();
 
     console.log('\n=== Resumen ===');
+    console.log(`Objetivo de estudiantes: ${objetivo}`);
     console.log(`Personas creadas:    ${personasCreadas}`);
     console.log(`Estudiantes creados: ${estudiantesCreados}`);
     console.log(`Usuarios creados:    ${usuariosCreados}`);
-    console.log(`Omitidos (ya existian): ${omitidos}`);
+    console.log(`Omitidos (sin carrera o plan): ${omitidos}`);
+    console.log(`Ya existentes (no contados): ${ya_existentes}`);
     console.log(`Acceso estudiantes: usuario est_<codigo> / contraseña <CI>-${GESTION}`);
+    if (idRolEstudiante === null) {
+      console.log("Roles asignados: ninguno (falta crear el rol 'estudiante' desde /roles)");
+    } else {
+      console.log('Roles asignados: estudiante');
+    }
     if (advertencias.length > 0) {
       console.log(`\nAdvertencias (${advertencias.length}):`);
       advertencias.forEach((a) => console.log('  - ' + a));

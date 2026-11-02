@@ -319,6 +319,14 @@ export class ServicioProcesosConvalidacion {
           'La materia de destino no pertenece al plan de destino del proceso',
         );
       }
+
+      // La equivalencia es entre materias del mismo semestre.
+      if (destino.semestre !== origen.semestre) {
+        throw new BadRequestException(
+          `La materia de destino debe ser del mismo semestre que la de origen ` +
+            `(origen: semestre ${origen.semestre}, destino: semestre ${destino.semestre})`,
+        );
+      }
     }
 
     if (resultado === ResultadoEquivalencia.SIN_CORRESPONDENCIA && destino) {

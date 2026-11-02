@@ -2,12 +2,11 @@ import {
   IsInt,
   IsString,
   IsOptional,
-  IsEnum,
   IsDateString,
   MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { CargoPersonal, EstadoPersonal } from '../../../entidades/personal.entidad';
+import { EstadoPersonal } from '../../../entidades/personal.entidad';
 
 export class CrearPersonalDto {
   @ApiProperty()
@@ -20,16 +19,22 @@ export class CrearPersonalDto {
   @MaxLength(100)
   profesion?: string;
 
-  @ApiProperty({ enum: CargoPersonal })
-  @IsEnum(CargoPersonal)
-  cargo: CargoPersonal;
+  /**
+   * Cargo del personal. Debe coincidir con el `codigo` de un rol activo
+   * (ver /roles). El servicio valida la existencia del rol y lo asigna
+   * al usuario creado.
+   */
+  @ApiProperty({ example: 'docente', description: 'Código de un rol activo' })
+  @IsString()
+  @MaxLength(50)
+  cargo: string;
 
   @ApiProperty({ example: '2020-02-01' })
   @IsDateString()
   fechaContrato: string;
 
   @ApiPropertyOptional({ enum: EstadoPersonal })
-  @IsEnum(EstadoPersonal)
+  @IsString()
   @IsOptional()
   estado?: EstadoPersonal;
 }
