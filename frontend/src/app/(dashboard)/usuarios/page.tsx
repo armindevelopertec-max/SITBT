@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Migas } from '@/componentes/iu/migas';
+import { BuscadorFiltro } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
@@ -202,14 +203,14 @@ export default function PaginaUsuarios() {
     <div className="space-y-6">
       <Migas elementos={[{ etiqueta: 'Usuarios' }]} />
 
-      <h1 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
+      <h1 className="text-2xl font-bold text-foreground">Gestión de Usuarios</h1>
 
       {mensaje && (
         <div
           className={`rounded-lg border px-4 py-3 text-sm ${
             mensaje.tipo === 'exito'
-              ? 'border-green-200 bg-green-50 text-green-800'
-              : 'border-red-200 bg-red-50 text-red-800'
+              ? 'border-green-200 bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+              : 'border-red-200 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300'
           }`}
         >
           {mensaje.texto}
@@ -220,15 +221,11 @@ export default function PaginaUsuarios() {
         <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
             <TituloTarjeta>Lista de Usuarios del Sistema</TituloTarjeta>
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Entrada
-                placeholder="Buscar usuario..."
-                className="pl-10"
-                value={terminoBusqueda}
-                onChange={(e) => setTerminoBusqueda(e.target.value)}
-              />
-            </div>
+            <BuscadorFiltro
+              placeholder="Buscar usuario..."
+              value={terminoBusqueda}
+              onChange={setTerminoBusqueda}
+            />
           </div>
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
@@ -252,8 +249,8 @@ export default function PaginaUsuarios() {
                   <FilaTabla key={usuario.id}>
                     <CeldaTabla>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
-                          <Shield className="w-4 h-4 text-primary-600" />
+                        <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                          <Shield className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                         </div>
                         <span className="font-medium">{usuario.nombreUsuario}</span>
                       </div>
@@ -291,7 +288,7 @@ export default function PaginaUsuarios() {
                 ))}
                 {usuariosFiltrados.length === 0 && (
                   <FilaTabla>
-                    <CeldaTabla colSpan={5} className="text-center py-8 text-gray-500">
+                    <CeldaTabla colSpan={5} className="text-center py-8 text-muted-foreground">
                       No se encontraron usuarios
                     </CeldaTabla>
                   </FilaTabla>
@@ -300,8 +297,8 @@ export default function PaginaUsuarios() {
             </Tabla>
           )}
           {paginacion.total > 0 && (
-            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-              <div className="text-sm text-gray-500">
+            <div className="flex items-center justify-between px-6 py-4 border-t border-border">
+              <div className="text-sm text-muted-foreground">
                 Mostrando {inicioRango} a {finRango} de {paginacion.total} usuarios
               </div>
               <div className="flex items-center gap-2">
@@ -316,7 +313,7 @@ export default function PaginaUsuarios() {
                 </Boton>
                 {generarPaginas(paginacion.pagina, totalPaginas).map((p, indice) =>
                   p === '...' ? (
-                    <span key={`ellipsis-${indice}`} className="px-2 text-gray-400">
+                    <span key={`ellipsis-${indice}`} className="px-2 text-muted-foreground">
                       ...
                     </span>
                   ) : (
@@ -376,7 +373,7 @@ export default function PaginaUsuarios() {
 
       <Modal abierto={modalRestablecerContrasena.abierto} alCerrar={() => setModalRestablecerContrasena({ abierto: false, usuario: null })} titulo="Restablecer Contraseña" tamano="pequeno">
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Ingrese la nueva contraseña para el usuario &quot;{modalRestablecerContrasena.usuario?.nombreUsuario}&quot;:
           </p>
           <div>
@@ -404,7 +401,7 @@ export default function PaginaUsuarios() {
       >
         <div className="space-y-4">
           {errorCatalogoRoles && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+            <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/30 px-3 py-2 text-sm text-red-800 dark:text-red-300">
               {errorCatalogoRoles}
             </div>
           )}
@@ -414,11 +411,11 @@ export default function PaginaUsuarios() {
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
             </div>
           ) : roles.length === 0 ? (
-            <p className="py-4 text-center text-sm text-gray-500">
+            <p className="py-4 text-center text-sm text-muted-foreground">
               No hay roles registrados. Crea uno desde la sección Roles.
             </p>
           ) : (
-            <div className="max-h-[50vh] space-y-2 overflow-y-auto pr-1">
+            <div className="max-h-[50vh] space-y-2 overflow-y-auto scrollarea-tema pr-1">
               {roles.map((rol) => {
                 const seleccionado = rolesSeleccionados.includes(rol.id);
                 const inactivo = rol.estado === 'inactivo';
@@ -429,20 +426,20 @@ export default function PaginaUsuarios() {
                     className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
                       seleccionado
                         ? 'border-primary bg-primary/5'
-                        : 'border-gray-200 hover:bg-gray-50'
+                        : 'border-border hover:bg-muted/40'
                     }`}
                   >
                     <input
                       type="checkbox"
-                      className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary disabled:cursor-not-allowed disabled:opacity-40"
+                      className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary disabled:cursor-not-allowed disabled:opacity-40"
                       checked={seleccionado}
                       onChange={() => alternarRol(rol.id)}
                       disabled={inactivo && !seleccionado}
                     />
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-medium text-gray-900">{rol.nombre}</span>
-                        <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
+                        <span className="font-medium text-foreground">{rol.nombre}</span>
+                        <code className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
                           {rol.codigo}
                         </code>
                         {inactivo && (
@@ -450,7 +447,7 @@ export default function PaginaUsuarios() {
                         )}
                       </div>
                       {rol.descripcion && (
-                        <p className="mt-1 text-xs text-gray-500">{rol.descripcion}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{rol.descripcion}</p>
                       )}
                     </div>
                   </label>
@@ -460,7 +457,7 @@ export default function PaginaUsuarios() {
           )}
 
           {errorRoles && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+            <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/30 px-3 py-2 text-sm text-red-800 dark:text-red-300">
               {errorRoles}
             </div>
           )}

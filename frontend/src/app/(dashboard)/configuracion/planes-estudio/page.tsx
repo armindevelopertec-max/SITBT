@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Migas } from '@/componentes/iu/migas';
+import { BuscadorFiltro } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
@@ -109,7 +110,7 @@ export default function PaginaPlanesEstudio() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -119,7 +120,7 @@ export default function PaginaPlanesEstudio() {
       <Migas elementos={[{ etiqueta: 'Configuración', href: '/configuracion' }, { etiqueta: 'Planes de Estudio' }]} />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Planes de Estudio</h1>
+        <h1 className="text-2xl font-bold text-foreground">Planes de Estudio</h1>
         <Boton onClick={() => router.push('/configuracion/planes-estudio/nuevo')}>
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Plan
@@ -131,15 +132,12 @@ export default function PaginaPlanesEstudio() {
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <TituloTarjeta>Lista de Planes</TituloTarjeta>
             <div className="flex-1 flex flex-col md:flex-row gap-4 md:justify-end">
-              <div className="relative w-full md:w-48">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Entrada
-                  placeholder="Buscar plan..."
-                  className="pl-10"
-                  value={consultaBusqueda}
-                  onChange={(e) => setConsultaBusqueda(e.target.value)}
-                />
-              </div>
+              <BuscadorFiltro
+                placeholder="Buscar plan..."
+                value={consultaBusqueda}
+                onChange={setConsultaBusqueda}
+                className="w-full md:w-48"
+              />
               <Selector
                 value={filtroCarrera}
                 onChange={(e) => setFiltroCarrera(e.target.value)}
@@ -176,7 +174,7 @@ export default function PaginaPlanesEstudio() {
             <CuerpoTabla>
               {planesFiltrados.length === 0 ? (
                 <FilaTabla>
-                  <CeldaTabla colSpan={5} className="text-center py-8 text-gray-500">
+                  <CeldaTabla colSpan={5} className="text-center py-8 text-muted-foreground">
                     No se encontraron planes de estudio
                   </CeldaTabla>
                 </FilaTabla>

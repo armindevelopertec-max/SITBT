@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Migas } from '@/componentes/iu/migas';
+import { BuscadorFiltro } from '@/componentes/iu/barra-filtros';
 import {
   Tarjeta,
   ContenidoTarjeta,
@@ -509,7 +510,7 @@ export default function PaginaDetalleGrupo() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -518,7 +519,7 @@ export default function PaginaDetalleGrupo() {
     return (
       <div className="space-y-6">
         <Migas elementos={[{ etiqueta: 'Grupos', href: '/grupos' }, { etiqueta: 'Grupo no encontrado' }]} />
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
           No se encontró el grupo solicitado.
         </div>
         <Boton variante="contorno" onClick={() => router.push('/grupos')}>
@@ -555,7 +556,7 @@ export default function PaginaDetalleGrupo() {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-gray-900">{grupo.codigo}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{grupo.codigo}</h1>
           <Insignia variante={grupo.estado === 'activo' ? 'exito' : 'secundario'}>
             {grupo.estado === 'activo' ? 'Activo' : 'Cerrado'}
           </Insignia>
@@ -616,7 +617,7 @@ export default function PaginaDetalleGrupo() {
 
       {/* Pestañas */}
       <Tarjeta variante="conBorde">
-        <div className="border-b border-gray-200 px-2">
+        <div className="border-b border-border px-2">
           <nav className="flex flex-wrap gap-1">
             {pestanas.map((item) => (
               <button
@@ -625,8 +626,8 @@ export default function PaginaDetalleGrupo() {
                 className={
                   'inline-flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ' +
                   (pestana === item.clave
-                    ? 'border-primary-600 text-primary-700'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300')
+                    ? 'border-primary-600 text-primary-700 dark:text-primary-300'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border')
                 }
               >
                 {item.icono}
@@ -642,8 +643,8 @@ export default function PaginaDetalleGrupo() {
             <div className="space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h3 className="font-semibold text-gray-900">Estudiantes del grupo</h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className="font-semibold text-foreground">Estudiantes del grupo</h3>
+                  <p className="text-sm text-muted-foreground">
                     {grupo.inscritos ?? estudiantes.length} de {grupo.capacidad} cupos ocupados
                   </p>
                 </div>
@@ -654,14 +655,14 @@ export default function PaginaDetalleGrupo() {
               </div>
 
               {sinCupo && (
-                <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2 rounded-lg text-sm">
+                <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 text-amber-700 dark:text-amber-300 px-4 py-2 rounded-lg text-sm">
                   El grupo alcanzó su capacidad máxima. No hay cupos disponibles.
                 </div>
               )}
 
               {cargandoEstudiantes ? (
                 <div className="flex justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+                  <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
                 </div>
               ) : (
                 <Tabla>
@@ -677,7 +678,7 @@ export default function PaginaDetalleGrupo() {
                   <CuerpoTabla>
                     {estudiantes.length === 0 ? (
                       <FilaTabla>
-                        <CeldaTabla colSpan={5} className="text-center py-8 text-gray-500">
+                        <CeldaTabla colSpan={5} className="text-center py-8 text-muted-foreground">
                           No hay estudiantes asignados a este grupo.
                         </CeldaTabla>
                       </FilaTabla>
@@ -686,7 +687,7 @@ export default function PaginaDetalleGrupo() {
                         <FilaTabla key={registro.id}>
                           <CeldaTabla>
                             <div className="text-sm font-medium">{registro.estudiante?.persona?.ci || '-'}</div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-muted-foreground">
                               {registro.estudiante?.codigoInscripcion || ''}
                             </div>
                           </CeldaTabla>
@@ -730,14 +731,14 @@ export default function PaginaDetalleGrupo() {
           {pestana === 'materias' && (
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900">Materias del semestre</h3>
-                <p className="text-sm text-gray-500">
+                <h3 className="font-semibold text-foreground">Materias del semestre</h3>
+                <p className="text-sm text-muted-foreground">
                   Materias correspondientes al semestre {grupo.semestre} del plan de estudios.
                 </p>
               </div>
               {cargandoMaterias ? (
                 <div className="flex justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+                  <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
                 </div>
               ) : (
                 <Tabla>
@@ -752,7 +753,7 @@ export default function PaginaDetalleGrupo() {
                   <CuerpoTabla>
                     {materias.length === 0 ? (
                       <FilaTabla>
-                        <CeldaTabla colSpan={4} className="text-center py-8 text-gray-500">
+                        <CeldaTabla colSpan={4} className="text-center py-8 text-muted-foreground">
                           No hay materias registradas para este semestre.
                         </CeldaTabla>
                       </FilaTabla>
@@ -776,15 +777,15 @@ export default function PaginaDetalleGrupo() {
           {pestana === 'horario' && (
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900">Horario del turno</h3>
-                <p className="text-sm text-gray-500">Franja horaria correspondiente al turno del grupo.</p>
+                <h3 className="font-semibold text-foreground">Horario del turno</h3>
+                <p className="text-sm text-muted-foreground">Franja horaria correspondiente al turno del grupo.</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <DatoResumen etiqueta="Turno" valor={grupo.turno?.nombre || '-'} />
                 <DatoResumen etiqueta="Hora de inicio" valor={grupo.turno?.horaInicio || '-'} />
                 <DatoResumen etiqueta="Hora de fin" valor={grupo.turno?.horaFin || '-'} />
               </div>
-              <div className="bg-gray-50 border border-gray-200 text-gray-600 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-muted/40 border border-border text-muted-foreground px-4 py-3 rounded-lg text-sm">
                 Programación detallada de horarios próximamente.
               </div>
             </div>
@@ -794,12 +795,12 @@ export default function PaginaDetalleGrupo() {
           {pestana === 'historial' && (
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900">Historial de movimientos</h3>
-                <p className="text-sm text-gray-500">Registro de asignaciones, retiros y cambios de estado.</p>
+                <h3 className="font-semibold text-foreground">Historial de movimientos</h3>
+                <p className="text-sm text-muted-foreground">Registro de asignaciones, retiros y cambios de estado.</p>
               </div>
               {cargandoHistorial ? (
                 <div className="flex justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+                  <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
                 </div>
               ) : (
                 <Tabla>
@@ -814,7 +815,7 @@ export default function PaginaDetalleGrupo() {
                   <CuerpoTabla>
                     {historial.length === 0 ? (
                       <FilaTabla>
-                        <CeldaTabla colSpan={4} className="text-center py-8 text-gray-500">
+                        <CeldaTabla colSpan={4} className="text-center py-8 text-muted-foreground">
                           No hay movimientos registrados.
                         </CeldaTabla>
                       </FilaTabla>
@@ -830,7 +831,7 @@ export default function PaginaDetalleGrupo() {
                           <CeldaTabla className="text-sm">
                             {registro.estudiante?.persona ? nombreCompleto(registro.estudiante.persona) : '-'}
                           </CeldaTabla>
-                          <CeldaTabla className="text-sm text-gray-600">{registro.detalle || '-'}</CeldaTabla>
+                          <CeldaTabla className="text-sm text-muted-foreground">{registro.detalle || '-'}</CeldaTabla>
                         </FilaTabla>
                       ))
                     )}
@@ -923,7 +924,7 @@ export default function PaginaDetalleGrupo() {
           </div>
 
           {erroresEditar.submit && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm">
               {erroresEditar.submit}
             </div>
           )}
@@ -948,35 +949,31 @@ export default function PaginaDetalleGrupo() {
         tamano="grande"
       >
         <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Entrada
-              placeholder="Buscar por nombre o CI..."
-              className="pl-10"
-              value={busquedaEstudiante}
-              onChange={(e) => setBusquedaEstudiante(e.target.value)}
-            />
-          </div>
+          <BuscadorFiltro
+            placeholder="Buscar por nombre o CI..."
+            value={busquedaEstudiante}
+            onChange={setBusquedaEstudiante}
+          />
 
           {cargandoDisponibles ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+              <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
             </div>
           ) : estudiantesDisponibles.length === 0 ? (
-            <p className="text-center py-8 text-gray-500 text-sm">
+            <p className="text-center py-8 text-muted-foreground text-sm">
               No hay estudiantes disponibles para asignar.
             </p>
           ) : (
-            <div className="max-h-80 overflow-y-auto divide-y divide-gray-100">
+            <div className="max-h-80 overflow-y-auto scrollarea-tema divide-y divide-gray-100">
               {estudiantesDisponibles.map((estudiante) => (
                 <div key={estudiante.id} className="flex items-center justify-between py-3 gap-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-foreground">
                       {estudiante.persona
                         ? `${estudiante.persona.nombres} ${estudiante.persona.apellidoPaterno} ${estudiante.persona.apellidoMaterno}`
                         : 'Estudiante'}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       CI: {estudiante.persona?.ci || '-'} · {estudiante.codigoInscripcion}
                     </p>
                   </div>
@@ -1012,7 +1009,7 @@ export default function PaginaDetalleGrupo() {
         <div className="space-y-4">
           {cargandoDestinos ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+              <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
             </div>
           ) : (
             <Selector
@@ -1029,7 +1026,7 @@ export default function PaginaDetalleGrupo() {
             />
           )}
           {!cargandoDestinos && gruposDestino.length === 0 && (
-            <p className="text-sm text-gray-500">No hay otros grupos de la misma carrera disponibles.</p>
+            <p className="text-sm text-muted-foreground">No hay otros grupos de la misma carrera disponibles.</p>
           )}
           <div className="flex justify-end gap-3 pt-2">
             <Boton variante="contorno" onClick={() => setEstudianteTrasladar(null)}>
@@ -1074,8 +1071,8 @@ export default function PaginaDetalleGrupo() {
       />
 
       {/* Pie con código */}
-      <PieTarjeta className="rounded-lg border border-gray-200 text-sm text-gray-500">
-        Código de grupo: <span className="font-medium text-gray-700">{grupo.codigo}</span>
+      <PieTarjeta className="rounded-lg border border-border text-sm text-muted-foreground">
+        Código de grupo: <span className="font-medium text-foreground">{grupo.codigo}</span>
       </PieTarjeta>
     </div>
   );
@@ -1084,8 +1081,8 @@ export default function PaginaDetalleGrupo() {
 function DatoResumen({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-wide text-gray-500">{etiqueta}</p>
-      <p className="mt-1 text-sm font-medium text-gray-900">{valor}</p>
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">{etiqueta}</p>
+      <p className="mt-1 text-sm font-medium text-foreground">{valor}</p>
     </div>
   );
 }

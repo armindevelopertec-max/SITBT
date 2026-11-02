@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Migas } from '@/componentes/iu/migas';
+import { BuscadorFiltro, CampoFiltro, FilaFiltros } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
@@ -13,10 +14,10 @@ import { api } from '@/libreria/api';
 import { Selector } from '@/componentes/iu/selector';
 
 const etiquetasEstado: Record<string, { etiqueta: string; color: string }> = {
-  pendiente: { etiqueta: 'Pendiente', color: 'bg-yellow-100 text-yellow-800' },
-  verificado: { etiqueta: 'Verificado', color: 'bg-blue-100 text-blue-800' },
-  rechazado: { etiqueta: 'Rechazado', color: 'bg-red-100 text-red-800' },
-  convertido: { etiqueta: 'Convertido', color: 'bg-green-100 text-green-800' },
+  pendiente: { etiqueta: 'Pendiente', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' },
+  verificado: { etiqueta: 'Verificado', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' },
+  rechazado: { etiqueta: 'Rechazado', color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' },
+  convertido: { etiqueta: 'Convertido', color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' },
 };
 
 const etiquetasOrigen: Record<string, string> = {
@@ -229,7 +230,7 @@ export default function PaginaAdmision() {
   });
 
   const obtenerInsigniaEstado = (estado: string) => {
-    const configuracionInsignia = etiquetasEstado[estado] || { etiqueta: estado, color: 'bg-gray-100 text-gray-800' };
+    const configuracionInsignia = etiquetasEstado[estado] || { etiqueta: estado, color: 'bg-muted text-foreground' };
     return <Insignia className={configuracionInsignia.color}>{configuracionInsignia.etiqueta}</Insignia>;
   };
 
@@ -347,7 +348,7 @@ export default function PaginaAdmision() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -357,48 +358,45 @@ export default function PaginaAdmision() {
       <Migas elementos={[{ etiqueta: 'Admisión' }]} />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gestión de Admisión</h1>
+        <h1 className="text-2xl font-bold text-foreground">Gestión de Admisión</h1>
       </div>
 
       <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <TituloTarjeta>Pre-registros ({solicitudesFiltradas.length})</TituloTarjeta>
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex gap-2">
-                <Selector
-                  value={filtroEstado}
-                  onChange={(e) => setFiltroEstado(e.target.value)}
-                  opciones={[
-                    { value: '', etiqueta: 'Todos' },
-                    { value: 'pendiente', etiqueta: 'Pendiente' },
-                    { value: 'verificado', etiqueta: 'Verificado' },
-                    { value: 'rechazado', etiqueta: 'Rechazado' },
-                    { value: 'convertido', etiqueta: 'Convertido' },
-                  ]}
-                  placeholder="Estado"
-                />
-                <Selector
-                  value={filtroOrigen}
-                  onChange={(e) => setFiltroOrigen(e.target.value)}
-                  opciones={[
-                    { value: '', etiqueta: 'Todos' },
-                    { value: 'web', etiqueta: 'Web' },
-                    { value: 'secretaria', etiqueta: 'Secretaría' },
-                  ]}
-                  placeholder="Origen"
-                />
-              </div>
-              <div className="relative w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Entrada
-                  placeholder="Buscar por nombre o CI..."
-                  className="pl-10"
-                  value={terminoBusqueda}
-                  onChange={(e) => setTerminoBusqueda(e.target.value)}
-                />
-              </div>
-            </div>
+            <FilaFiltros>
+              <CampoFiltro
+                etiqueta="Estado"
+                value={filtroEstado}
+                onChange={setFiltroEstado}
+                placeholder="Todos"
+                className="w-full sm:w-40"
+                opciones={[
+                  { value: 'pendiente', etiqueta: 'Pendiente' },
+                  { value: 'verificado', etiqueta: 'Verificado' },
+                  { value: 'rechazado', etiqueta: 'Rechazado' },
+                  { value: 'convertido', etiqueta: 'Convertido' },
+                ]}
+              />
+              <CampoFiltro
+                etiqueta="Origen"
+                value={filtroOrigen}
+                onChange={setFiltroOrigen}
+                placeholder="Todos"
+                className="w-full sm:w-40"
+                opciones={[
+                  { value: 'web', etiqueta: 'Web' },
+                  { value: 'secretaria', etiqueta: 'Secretaría' },
+                ]}
+              />
+              <BuscadorFiltro
+                placeholder="Buscar por nombre o CI..."
+                value={terminoBusqueda}
+                onChange={setTerminoBusqueda}
+                className="w-full sm:w-64"
+              />
+            </FilaFiltros>
           </div>
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
@@ -458,7 +456,7 @@ export default function PaginaAdmision() {
               ))}
               {solicitudesFiltradas.length === 0 && (
                 <FilaTabla>
-                  <CeldaTabla colSpan={7} className="text-center py-8 text-gray-500">
+                  <CeldaTabla colSpan={7} className="text-center py-8 text-muted-foreground">
                     {terminoBusqueda || filtroEstado || filtroOrigen ? 'No se encontraron registros' : 'No hay pre-registros'}
                   </CeldaTabla>
                 </FilaTabla>
@@ -482,31 +480,31 @@ export default function PaginaAdmision() {
             {modalDetalle.modoEdicion && formularioEdicion ? (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-gray-500">Nombres</label>
+                  <label className="text-sm text-muted-foreground">Nombres</label>
                   <Entrada value={formularioEdicion.nombre} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, nombre: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">Apellido Paterno</label>
+                  <label className="text-sm text-muted-foreground">Apellido Paterno</label>
                   <Entrada value={formularioEdicion.apellidoPaterno} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, apellidoPaterno: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">Apellido Materno</label>
+                  <label className="text-sm text-muted-foreground">Apellido Materno</label>
                   <Entrada value={formularioEdicion.apellidoMaterno} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, apellidoMaterno: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">CI</label>
+                  <label className="text-sm text-muted-foreground">CI</label>
                   <Entrada value={formularioEdicion.ci} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, ci: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">Fecha de nacimiento</label>
+                  <label className="text-sm text-muted-foreground">Fecha de nacimiento</label>
                   <Entrada type="date" value={formularioEdicion.fechaNacimiento} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, fechaNacimiento: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">Lugar de nacimiento</label>
+                  <label className="text-sm text-muted-foreground">Lugar de nacimiento</label>
                   <Entrada value={formularioEdicion.lugarNacimiento} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, lugarNacimiento: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500 block mb-2">Género</label>
+                  <label className="text-sm text-muted-foreground block mb-2">Género</label>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2">
                       <input type="radio" name="genero" value="M" checked={formularioEdicion.genero === 'M'} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, genero: e.target.value })} />
@@ -519,7 +517,7 @@ export default function PaginaAdmision() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500 block mb-2">Estado civil</label>
+                  <label className="text-sm text-muted-foreground block mb-2">Estado civil</label>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2">
                       <input type="radio" name="estadoCivil" value="Soltera(o)" checked={formularioEdicion.estadoCivil === 'Soltera(o)'} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, estadoCivil: e.target.value })} />
@@ -532,24 +530,24 @@ export default function PaginaAdmision() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">Nacionalidad</label>
+                  <label className="text-sm text-muted-foreground">Nacionalidad</label>
                   <Entrada value={formularioEdicion.nacionalidad} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, nacionalidad: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">Teléfono</label>
+                  <label className="text-sm text-muted-foreground">Teléfono</label>
                   <Entrada value={formularioEdicion.telefono} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, telefono: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">Correo</label>
+                  <label className="text-sm text-muted-foreground">Correo</label>
                   <Entrada type="email" value={formularioEdicion.correo} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, correo: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">Dirección</label>
+                  <label className="text-sm text-muted-foreground">Dirección</label>
                   <Entrada value={formularioEdicion.direccion} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, direccion: e.target.value })} />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-500">Carrera</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg" value={formularioEdicion.carreraId} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, carreraId: parseInt(e.target.value) })}>
+                  <label className="text-sm text-muted-foreground">Carrera</label>
+                  <select className="w-full px-3 py-2 border border-border rounded-lg" value={formularioEdicion.carreraId} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, carreraId: parseInt(e.target.value) })}>
                     <option value={0}>Seleccionar carrera</option>
                     {carreras.map((c) => (
                       <option key={c.id} value={c.id}>{c.nombre}</option>
@@ -559,18 +557,18 @@ export default function PaginaAdmision() {
                 {esMenor(formularioEdicion.fechaNacimiento) && (
                   <>
                     <div className="col-span-2 border-t pt-4 mt-2">
-                      <p className="text-sm font-semibold text-gray-700">Datos del Tutor</p>
+                      <p className="text-sm font-semibold text-foreground">Datos del Tutor</p>
                     </div>
                     <div>
-                      <label className="text-sm text-gray-500">Nombre del tutor</label>
+                      <label className="text-sm text-muted-foreground">Nombre del tutor</label>
                       <Entrada value={formularioEdicion.nombreTutor} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, nombreTutor: e.target.value })} />
                     </div>
                     <div>
-                      <label className="text-sm text-gray-500">CI del tutor</label>
+                      <label className="text-sm text-muted-foreground">CI del tutor</label>
                       <Entrada value={formularioEdicion.ciTutor} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, ciTutor: e.target.value })} />
                     </div>
                     <div>
-                      <label className="text-sm text-gray-500">Teléfono del tutor</label>
+                      <label className="text-sm text-muted-foreground">Teléfono del tutor</label>
                       <Entrada value={formularioEdicion.telefonoTutor} onChange={(e) => setFormularioEdicion({ ...formularioEdicion, telefonoTutor: e.target.value })} />
                     </div>
                   </>
@@ -583,64 +581,64 @@ export default function PaginaAdmision() {
             ) : (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Nombre completo</p>
+                  <p className="text-sm text-muted-foreground">Nombre completo</p>
                   <p className="font-medium">{modalDetalle.solicitud.nombre} {modalDetalle.solicitud.apellidoPaterno} {modalDetalle.solicitud.apellidoMaterno}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">CI</p>
+                  <p className="text-sm text-muted-foreground">CI</p>
                   <p className="font-medium">{modalDetalle.solicitud.ci} {modalDetalle.solicitud.ciExpedido && `- ${modalDetalle.solicitud.ciExpedido}`}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Fecha de nacimiento</p>
+                  <p className="text-sm text-muted-foreground">Fecha de nacimiento</p>
                   <p className="font-medium">{new Date(modalDetalle.solicitud.fechaNacimiento).toLocaleDateString('es-BO')}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Lugar de nacimiento</p>
+                  <p className="text-sm text-muted-foreground">Lugar de nacimiento</p>
                   <p className="font-medium">{modalDetalle.solicitud.lugarNacimiento || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Género</p>
+                  <p className="text-sm text-muted-foreground">Género</p>
                   <p className="font-medium">{modalDetalle.solicitud.genero === 'M' ? 'Masculino' : modalDetalle.solicitud.genero === 'F' ? 'Femenino' : '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Estado civil</p>
+                  <p className="text-sm text-muted-foreground">Estado civil</p>
                   <p className="font-medium">{modalDetalle.solicitud.estadoCivil || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Nacionalidad</p>
+                  <p className="text-sm text-muted-foreground">Nacionalidad</p>
                   <p className="font-medium">{modalDetalle.solicitud.nacionalidad || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Teléfono</p>
+                  <p className="text-sm text-muted-foreground">Teléfono</p>
                   <p className="font-medium">{modalDetalle.solicitud.telefono || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Correo</p>
+                  <p className="text-sm text-muted-foreground">Correo</p>
                   <p className="font-medium">{modalDetalle.solicitud.correo}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Dirección</p>
+                  <p className="text-sm text-muted-foreground">Dirección</p>
                   <p className="font-medium">{modalDetalle.solicitud.direccion || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Carrera</p>
+                  <p className="text-sm text-muted-foreground">Carrera</p>
                   <p className="font-medium">{modalDetalle.solicitud.carrera?.nombre || '-'}</p>
                 </div>
                 {esMenor(modalDetalle.solicitud.fechaNacimiento) && modalDetalle.solicitud.nombreTutor && (
                   <>
                     <div className="col-span-2 border-t pt-4 mt-2">
-                      <p className="text-sm font-semibold text-gray-700">Datos del Tutor (menor de edad)</p>
+                      <p className="text-sm font-semibold text-foreground">Datos del Tutor (menor de edad)</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Nombre del tutor</p>
+                      <p className="text-sm text-muted-foreground">Nombre del tutor</p>
                       <p className="font-medium">{modalDetalle.solicitud.nombreTutor}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">CI del tutor</p>
+                      <p className="text-sm text-muted-foreground">CI del tutor</p>
                       <p className="font-medium">{modalDetalle.solicitud.ciTutor || '-'}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Teléfono del tutor</p>
+                      <p className="text-sm text-muted-foreground">Teléfono del tutor</p>
                       <p className="font-medium">{modalDetalle.solicitud.telefonoTutor || '-'}</p>
                     </div>
                   </>
@@ -661,15 +659,15 @@ export default function PaginaAdmision() {
         cargando={cargandoFormulario}
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             ¿Está seguro de verificar el pre-registro de <strong>{modalVerificar?.nombre} {modalVerificar?.apellidoPaterno}</strong>?
           </p>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones (opcional)</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Observaciones (opcional)</label>
             <textarea
               value={observaciones}
               onChange={(e) => setObservaciones(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               rows={3}
               placeholder="Observaciones..."
             />
@@ -688,15 +686,15 @@ export default function PaginaAdmision() {
         cargando={cargandoFormulario}
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             ¿Está seguro de rechazar el pre-registro de <strong>{modalRechazar?.nombre} {modalRechazar?.apellidoPaterno}</strong>?
           </p>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Motivo del rechazo *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Motivo del rechazo *</label>
             <textarea
               value={observaciones}
               onChange={(e) => setObservaciones(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
               rows={3}
               placeholder="Motivo del rechazo..."
               required
@@ -709,8 +707,8 @@ export default function PaginaAdmision() {
       <Modal abierto={!!modalConvertir} alCerrar={() => setModalConvertir(null)} titulo="Crear Estudiante" tamano="grande">
         {modalConvertir && (
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
+            <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800 dark:text-blue-300">
                 <strong>Datos del pre-registro:</strong> {modalConvertir.nombre} {modalConvertir.apellidoPaterno} {modalConvertir.apellidoMaterno}<br />
                 CI: {modalConvertir.ci} {modalConvertir.ciExpedido && `- ${modalConvertir.ciExpedido}`}
               </p>
@@ -718,7 +716,7 @@ export default function PaginaAdmision() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Gestión de ingreso *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Gestión de ingreso *</label>
                 <Selector
                   value={formularioConversion.gestionAdmision}
                   onChange={(e) => setFormularioConversion({ ...formularioConversion, gestionAdmision: e.target.value })}
@@ -726,7 +724,7 @@ export default function PaginaAdmision() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de ingreso *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Fecha de ingreso *</label>
                 <Entrada
                   type="date"
                   value={formularioConversion.fechaAdmision}
@@ -734,7 +732,7 @@ export default function PaginaAdmision() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Carrera *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Carrera *</label>
                 <Selector
                   value={formularioConversion.carreraId.toString()}
                   onChange={(e) => {
@@ -746,7 +744,7 @@ export default function PaginaAdmision() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Plan de estudio *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Plan de estudio *</label>
                 <Selector
                   value={formularioConversion.planEstudioId.toString()}
                   onChange={(e) => setFormularioConversion({ ...formularioConversion, planEstudioId: parseInt(e.target.value) })}
@@ -755,7 +753,7 @@ export default function PaginaAdmision() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Número de carpeta</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Número de carpeta</label>
                 <Entrada
                   value={formularioConversion.numeroFolder}
                   onChange={(e) => setFormularioConversion({ ...formularioConversion, numeroFolder: e.target.value })}
@@ -763,7 +761,7 @@ export default function PaginaAdmision() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Código Formulario 01</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Código Formulario 01</label>
                 <Entrada
                   value={formularioConversion.codigoFormulario01}
                   onChange={(e) => setFormularioConversion({ ...formularioConversion, codigoFormulario01: e.target.value })}
@@ -771,7 +769,7 @@ export default function PaginaAdmision() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Número de Título Bachiller</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Número de Título Bachiller</label>
                 <Entrada
                   value={formularioConversion.numeroTituloBachiller}
                   onChange={(e) => setFormularioConversion({ ...formularioConversion, numeroTituloBachiller: e.target.value })}
@@ -779,7 +777,7 @@ export default function PaginaAdmision() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Título Bachiller</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Fecha de Título Bachiller</label>
                 <Entrada
                   type="date"
                   value={formularioConversion.fechaTituloBachiller}

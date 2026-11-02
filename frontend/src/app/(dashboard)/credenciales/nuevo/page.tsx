@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Migas } from '@/componentes/iu/migas';
+import { BuscadorFiltro } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
@@ -179,7 +180,7 @@ export default function PaginaNuevaCredencial() {
       </div>
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Nueva Credencial</h1>
+        <h1 className="text-2xl font-bold text-foreground">Nueva Credencial</h1>
       </div>
 
       <form onSubmit={enviarFormulario} className="space-y-6">
@@ -189,19 +190,19 @@ export default function PaginaNuevaCredencial() {
           </EncabezadoTarjeta>
           <ContenidoTarjeta className="space-y-4">
             {estudianteSeleccionado ? (
-              <div className="flex items-center justify-between p-4 bg-primary-50 border border-primary-200 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold">
                     {estudianteSeleccionado.persona?.nombres?.charAt(0) || '?'}{estudianteSeleccionado.persona?.apellidoPaterno?.charAt(0) || ''}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">
+                    <p className="font-semibold text-foreground">
                       {estudianteSeleccionado.persona?.nombres} {estudianteSeleccionado.persona?.apellidoPaterno} {estudianteSeleccionado.persona?.apellidoMaterno}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       {estudianteSeleccionado.persona?.ci} · {estudianteSeleccionado.codigoInscripcion}
                     </p>
-                    <p className="text-sm text-gray-500">{estudianteSeleccionado.carrera?.nombre || 'Sin carrera'}</p>
+                    <p className="text-sm text-muted-foreground">{estudianteSeleccionado.carrera?.nombre || 'Sin carrera'}</p>
                   </div>
                 </div>
                 <Boton type="button" variante="fantasma" tamano="icono" onClick={deseleccionarEstudiante}>
@@ -210,26 +211,22 @@ export default function PaginaNuevaCredencial() {
               </div>
             ) : (
               <div>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Entrada
-                    placeholder="Buscar estudiante por nombre, CI o código..."
-                    className="pl-10"
-                    value={busquedaEstudiante}
-                    onChange={(e) => setBusquedaEstudiante(e.target.value)}
-                  />
-                </div>
-                {errores.estudianteId && <p className="text-sm text-red-600 mt-1">{errores.estudianteId}</p>}
+                <BuscadorFiltro
+                  placeholder="Buscar estudiante por nombre, CI o código..."
+                  value={busquedaEstudiante}
+                  onChange={setBusquedaEstudiante}
+                />
+                {errores.estudianteId && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errores.estudianteId}</p>}
 
                 {busquedaEstudiante && (
                   <div className="mt-2 border rounded-lg overflow-hidden shadow-lg">
                     {cargandoEstudiantes ? (
-                      <div className="p-4 text-center text-gray-500 text-sm">
+                      <div className="p-4 text-center text-muted-foreground text-sm">
                         <Loader2 className="w-4 h-4 animate-spin inline mr-2" />
                         Buscando...
                       </div>
                     ) : estudiantesFiltrados.length === 0 ? (
-                      <div className="p-4 text-center text-gray-500 text-sm">
+                      <div className="p-4 text-center text-muted-foreground text-sm">
                         No se encontraron estudiantes
                       </div>
                     ) : (
@@ -237,16 +234,16 @@ export default function PaginaNuevaCredencial() {
                         <div
                           key={estudiante.id}
                           onClick={() => seleccionarEstudiante(estudiante)}
-                          className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
+                          className="flex items-center gap-3 p-3 hover:bg-muted/40 cursor-pointer border-b last:border-b-0"
                         >
-                          <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xs">
+                          <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-700 dark:text-primary-300 font-bold text-xs">
                             {estudiante.persona?.nombres?.charAt(0) || '?'}{estudiante.persona?.apellidoPaterno?.charAt(0) || ''}
                           </div>
                           <div className="flex-1">
                             <p className="font-medium text-sm">
                               {estudiante.persona?.nombres} {estudiante.persona?.apellidoPaterno} {estudiante.persona?.apellidoMaterno}
                             </p>
-                            <p className="text-xs text-gray-500">{estudiante.codigoInscripcion}</p>
+                            <p className="text-xs text-muted-foreground">{estudiante.codigoInscripcion}</p>
                           </div>
                         </div>
                       ))
@@ -265,11 +262,11 @@ export default function PaginaNuevaCredencial() {
           <ContenidoTarjeta className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Gestión *
                 </label>
 <select
-                  className={`w-full h-10 px-3 border rounded-lg text-sm ${errores.gestion ? 'border-red-500' : ''}`}
+                  className={`w-full h-10 px-3 border rounded-lg text-sm bg-card text-foreground border-border dark:border-gray-600 ${errores.gestion ? 'border-red-500 dark:border-red-500' : ''}`}
                   value={datosFormulario.gestion ? `${datosFormulario.gestion}-${datosFormulario.semestre}` : ''}
                   onChange={(e) => {
                     const [anio, sem] = e.target.value.split('-');
@@ -286,14 +283,14 @@ export default function PaginaNuevaCredencial() {
                     ))
                   )}
                 </select>
-                {errores.gestion && <p className="text-sm text-red-600 mt-1">{errores.gestion}</p>}
+                {errores.gestion && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errores.gestion}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Semestre *
                 </label>
                 <select
-                  className={`w-full h-10 px-3 border rounded-lg text-sm ${errores.semestre ? 'border-red-500' : ''}`}
+                  className={`w-full h-10 px-3 border rounded-lg text-sm bg-card text-foreground border-border dark:border-gray-600 ${errores.semestre ? 'border-red-500 dark:border-red-500' : ''}`}
                   value={datosFormulario.semestre || ''}
                   onChange={(e) => setDatosFormulario({ ...datosFormulario, semestre: e.target.value ? parseInt(e.target.value) : null })}
                 >
@@ -305,7 +302,7 @@ export default function PaginaNuevaCredencial() {
                   <option value="5">5° Semestre</option>
                   <option value="6">6° Semestre</option>
                 </select>
-                {errores.semestre && <p className="text-sm text-red-600 mt-1">{errores.semestre}</p>}
+                {errores.semestre && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errores.semestre}</p>}
               </div>
               <div>
                 <Entrada
@@ -337,9 +334,9 @@ export default function PaginaNuevaCredencial() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Notas</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Notas</label>
               <textarea
-                className="w-full h-20 px-3 py-2 border rounded-lg text-sm"
+                className="w-full h-20 px-3 py-2 border rounded-lg text-sm bg-card text-foreground border-border dark:border-gray-600"
                 value={datosFormulario.notas}
                 onChange={(e) => setDatosFormulario({ ...datosFormulario, notas: e.target.value })}
                 placeholder="Observaciones adicionales..."
@@ -349,7 +346,7 @@ export default function PaginaNuevaCredencial() {
         </Tarjeta>
 
         {errores.submit && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-sm">
             {errores.submit}
           </div>
         )}

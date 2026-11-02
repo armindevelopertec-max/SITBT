@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Migas } from '@/componentes/iu/migas';
+import { BuscadorFiltro, CampoFiltro, FilaFiltros } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
@@ -15,11 +16,11 @@ import { Estudiante } from '@/tipos';
 import { Selector } from '@/componentes/iu/selector';
 
 const etiquetasEstado: Record<string, { etiqueta: string; color: string }> = {
-  pre_registro: { etiqueta: 'Pre-registro', color: 'bg-purple-100 text-purple-800' },
-  verificado: { etiqueta: 'Verificado', color: 'bg-blue-100 text-blue-800' },
-  matriculado: { etiqueta: 'Matriculado', color: 'bg-green-100 text-green-800' },
-  egresado: { etiqueta: 'Egresado', color: 'bg-gray-100 text-gray-800' },
-  retirado: { etiqueta: 'Retirado', color: 'bg-red-100 text-red-800' },
+  pre_registro: { etiqueta: 'Pre-registro', color: 'bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-200' },
+  verificado: { etiqueta: 'Verificado', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' },
+  matriculado: { etiqueta: 'Matriculado', color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' },
+  egresado: { etiqueta: 'Egresado', color: 'bg-muted text-foreground' },
+  retirado: { etiqueta: 'Retirado', color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' },
 };
 
 const etiquetasOrigen: Record<string, string> = {
@@ -116,7 +117,7 @@ export default function PaginaEstudiantes() {
   }, [pagina, totalPaginas]);
 
   const obtenerInsigniaEstado = (estado: string) => {
-    const configuracion = etiquetasEstado[estado] || { etiqueta: estado, color: 'bg-gray-100 text-gray-800' };
+    const configuracion = etiquetasEstado[estado] || { etiqueta: estado, color: 'bg-muted text-foreground' };
     return <Insignia className={configuracion.color}>{configuracion.etiqueta}</Insignia>;
   };
 
@@ -184,7 +185,7 @@ export default function PaginaEstudiantes() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -194,7 +195,7 @@ export default function PaginaEstudiantes() {
       <Migas elementos={[{ etiqueta: 'Estudiantes' }]} />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gestión de Estudiantes</h1>
+        <h1 className="text-2xl font-bold text-foreground">Gestión de Estudiantes</h1>
         <Boton onClick={() => router.push('/estudiantes/nuevo')}>
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Estudiante
@@ -205,42 +206,39 @@ export default function PaginaEstudiantes() {
         <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <TituloTarjeta>Lista de Estudiantes ({estudiantesFiltrados.length})</TituloTarjeta>
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex gap-2">
-                <Selector
-                  value={filtroEstado}
-                  onChange={(e) => setFiltroEstado(e.target.value)}
-                  opciones={[
-                    { value: '', etiqueta: 'Todos' },
-                    { value: 'pre_registro', etiqueta: 'Pre-registro' },
-                    { value: 'verificado', etiqueta: 'Verificado' },
-                    { value: 'matriculado', etiqueta: 'Matriculado' },
-                    { value: 'egresado', etiqueta: 'Egresado' },
-                    { value: 'retirado', etiqueta: 'Retirado' },
-                  ]}
-                  placeholder="Estado"
-                />
-                <Selector
-                  value={filtroOrigen}
-                  onChange={(e) => setFiltroOrigen(e.target.value)}
-                  opciones={[
-                    { value: '', etiqueta: 'Todos' },
-                    { value: 'web', etiqueta: 'Web' },
-                    { value: 'secretaria', etiqueta: 'Secretaría' },
-                  ]}
-                  placeholder="Origen"
-                />
-              </div>
-              <div className="relative w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Entrada
-                  placeholder="Buscar por nombre o CI..."
-                  className="pl-10"
-                  value={terminoBusqueda}
-                  onChange={(e) => setTerminoBusqueda(e.target.value)}
-                />
-              </div>
-            </div>
+            <FilaFiltros>
+              <CampoFiltro
+                etiqueta="Estado"
+                value={filtroEstado}
+                onChange={setFiltroEstado}
+                placeholder="Todos"
+                className="w-full sm:w-40"
+                opciones={[
+                  { value: 'pre_registro', etiqueta: 'Pre-registro' },
+                  { value: 'verificado', etiqueta: 'Verificado' },
+                  { value: 'matriculado', etiqueta: 'Matriculado' },
+                  { value: 'egresado', etiqueta: 'Egresado' },
+                  { value: 'retirado', etiqueta: 'Retirado' },
+                ]}
+              />
+              <CampoFiltro
+                etiqueta="Origen"
+                value={filtroOrigen}
+                onChange={setFiltroOrigen}
+                placeholder="Todos"
+                className="w-full sm:w-40"
+                opciones={[
+                  { value: 'web', etiqueta: 'Web' },
+                  { value: 'secretaria', etiqueta: 'Secretaría' },
+                ]}
+              />
+              <BuscadorFiltro
+                placeholder="Buscar por nombre o CI..."
+                value={terminoBusqueda}
+                onChange={setTerminoBusqueda}
+                className="w-full sm:w-64"
+              />
+            </FilaFiltros>
           </div>
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
@@ -288,7 +286,7 @@ export default function PaginaEstudiantes() {
               ))}
               {estudiantesFiltrados.length === 0 && (
                 <FilaTabla>
-                  <CeldaTabla colSpan={7} className="text-center py-8 text-gray-500">
+                  <CeldaTabla colSpan={7} className="text-center py-8 text-muted-foreground">
                     {terminoBusqueda || filtroEstado || filtroOrigen ? 'No se encontraron estudiantes' : 'No hay estudiantes registrados'}
                   </CeldaTabla>
                 </FilaTabla>
@@ -298,7 +296,7 @@ export default function PaginaEstudiantes() {
 
           {estudiantesFiltrados.length > 0 && (
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Mostrando {inicio}-{fin} de {estudiantesFiltrados.length} estudiante(s)
               </p>
               <div className="flex items-center gap-1">
@@ -312,7 +310,7 @@ export default function PaginaEstudiantes() {
                 </Boton>
                 {generarPaginas(pagina, totalPaginas).map((p, indice) =>
                   p === '...' ? (
-                    <span key={`puntos-${indice}`} className="px-2 text-gray-400">
+                    <span key={`puntos-${indice}`} className="px-2 text-muted-foreground">
                       …
                     </span>
                   ) : (
@@ -355,26 +353,26 @@ export default function PaginaEstudiantes() {
       <Modal abierto={!!modalCredenciales} alCerrar={() => setModalCredenciales(null)} titulo="Credenciales del Estudiante" tamano="mediano">
         {modalCredenciales && (
           <div className="space-y-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Credenciales de acceso para <strong>{modalCredenciales.nombre}</strong>:
             </p>
-            <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+            <div className="bg-muted/40 p-4 rounded-lg space-y-3">
               <div className="flex items-center gap-3">
-                <User className="w-5 h-5 text-gray-400" />
+                <User className="w-5 h-5 text-muted-foreground" />
                 <div>
-                  <p className="text-xs text-gray-500">Nombre de usuario</p>
+                  <p className="text-xs text-muted-foreground">Nombre de usuario</p>
                   <p className="font-mono font-medium">{modalCredenciales.nombreUsuario}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Key className="w-5 h-5 text-gray-400" />
+                <Key className="w-5 h-5 text-muted-foreground" />
                 <div>
-                  <p className="text-xs text-gray-500">Contraseña temporal</p>
-                  <p className="font-mono font-medium text-green-600">{modalCredenciales.contrasena}</p>
+                  <p className="text-xs text-muted-foreground">Contraseña temporal</p>
+                  <p className="font-mono font-medium text-green-600 dark:text-green-400">{modalCredenciales.contrasena}</p>
                 </div>
               </div>
             </div>
-            <p className="text-xs text-amber-600">
+            <p className="text-xs text-amber-600 dark:text-amber-400">
               ⚠️ Esta contraseña es temporal. El estudiante debe cambiarla después de iniciar sesión.
             </p>
             <div className="flex justify-end gap-3">

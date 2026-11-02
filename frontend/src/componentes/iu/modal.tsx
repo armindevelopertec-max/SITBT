@@ -35,7 +35,7 @@ export function Modal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto scrollarea-tema">
       <div className="flex min-h-full items-center justify-center p-4">
         <div
           className="fixed inset-0 bg-black/50 transition-opacity"
@@ -45,26 +45,27 @@ export function Modal({
         <div
           className={cn(
             'relative w-full bg-white rounded-lg shadow-xl',
+            'dark:bg-gray-800 dark:shadow-black/50',
             tamanos[tamano],
             'animate-in fade-in zoom-in-95 duration-200'
           )}
         >
           {(titulo || mostrarBotonCerrar) && (
-            <div className="flex items-start justify-between p-4 border-b border-gray-200">
+            <div className="flex items-start justify-between p-4 border-b border-gray-200 dark:border-gray-700">
               <div>
                 {titulo && (
-                  <h3 className="text-lg font-semibold text-gray-900">{titulo}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{titulo}</h3>
                 )}
                 {descripcion && (
-                  <p className="mt-1 text-sm text-gray-500">{descripcion}</p>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{descripcion}</p>
                 )}
               </div>
               {mostrarBotonCerrar && (
                 <button
                   onClick={alCerrar}
-                  className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="p-1 rounded-lg hover:bg-gray-100 transition-colors dark:hover:bg-gray-700"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </button>
               )}
             </div>

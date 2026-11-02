@@ -13,9 +13,9 @@ const Boton = forwardRef<HTMLButtonElement, PropsBoton>(
 
     const variantes = {
       primario: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500',
-      secundario: 'bg-secondary-100 text-secondary-900 hover:bg-secondary-200 focus:ring-secondary-500',
-      contorno: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-primary-500',
-      fantasma: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500',
+      secundario: 'bg-secondary-100 text-secondary-900 hover:bg-secondary-200 focus:ring-secondary-500 dark:bg-secondary-900/40 dark:text-secondary-100 dark:hover:bg-secondary-900/60',
+      contorno: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700',
+      fantasma: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500 dark:text-gray-200 dark:hover:bg-gray-800',
       destructivo: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
     };
 

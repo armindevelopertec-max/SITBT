@@ -9,10 +9,12 @@ import { Entrada } from '@/componentes/iu/entrada';
 import { Selector } from '@/componentes/iu/selector';
 import { Modal } from '@/componentes/iu/modal';
 import { api } from '@/libreria/api';
+import { usarCargosPersonal } from '@/ganchos/usarCargosPersonal';
 import { ArrowLeft, Save, Loader2, User, Key } from 'lucide-react';
 
 export default function PaginaNuevoPersonal() {
   const router = useRouter();
+  const { cargos, cargando: cargandoCargos } = usarCargosPersonal();
   const [guardando, setGuardando] = useState(false);
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [modalCredenciales, setModalCredenciales] = useState<{ nombreUsuario: string; contrasena: string } | null>(null);
@@ -131,7 +133,7 @@ export default function PaginaNuevoPersonal() {
       </div>
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Nuevo Personal</h1>
+        <h1 className="text-2xl font-bold text-foreground">Nuevo Personal</h1>
       </div>
 
       <form onSubmit={enviarFormulario} className="space-y-6">
@@ -218,7 +220,7 @@ export default function PaginaNuevoPersonal() {
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Género *</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Género *</label>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -227,9 +229,9 @@ export default function PaginaNuevoPersonal() {
                       value="M"
                       checked={datosPersona.genero === 'M'}
                       onChange={(e) => setDatosPersona({ ...datosPersona, genero: e.target.value })}
-                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-700">Masculino</span>
+                    <span className="text-sm text-foreground">Masculino</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -238,15 +240,15 @@ export default function PaginaNuevoPersonal() {
                       value="F"
                       checked={datosPersona.genero === 'F'}
                       onChange={(e) => setDatosPersona({ ...datosPersona, genero: e.target.value })}
-                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-700">Femenino</span>
+                    <span className="text-sm text-foreground">Femenino</span>
                   </label>
                 </div>
                 {errores.genero && <p className="text-xs text-red-500 mt-1">{errores.genero}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Estado Civil</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Estado Civil</label>
                 <div className="flex flex-wrap gap-4">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -255,9 +257,9 @@ export default function PaginaNuevoPersonal() {
                       value="Soltera(o)"
                       checked={datosPersona.estadoCivil === 'Soltera(o)'}
                       onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
-                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-700">Soltero(a)</span>
+                    <span className="text-sm text-foreground">Soltero(a)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -266,9 +268,9 @@ export default function PaginaNuevoPersonal() {
                       value="Casada(o)"
                       checked={datosPersona.estadoCivil === 'Casada(o)'}
                       onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
-                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-700">Casado(a)</span>
+                    <span className="text-sm text-foreground">Casado(a)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -277,9 +279,9 @@ export default function PaginaNuevoPersonal() {
                       value="Viuda(o)"
                       checked={datosPersona.estadoCivil === 'Viuda(o)'}
                       onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
-                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-700">Viudo(a)</span>
+                    <span className="text-sm text-foreground">Viudo(a)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -288,9 +290,9 @@ export default function PaginaNuevoPersonal() {
                       value="Divorciada(o)"
                       checked={datosPersona.estadoCivil === 'Divorciada(o)'}
                       onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
-                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-700">Divorciado(a)</span>
+                    <span className="text-sm text-foreground">Divorciado(a)</span>
                   </label>
                 </div>
               </div>
@@ -373,16 +375,22 @@ export default function PaginaNuevoPersonal() {
                   value={datosPersonal.cargo}
                   onChange={(e) => setDatosPersonal({ ...datosPersonal, cargo: e.target.value })}
                   error={errores.cargo}
-                  opciones={[
-                    { value: 'docente', etiqueta: 'Docente' },
-                    { value: 'secretaria', etiqueta: 'Secretaria' },
-                    { value: 'director_academico', etiqueta: 'Director Académico' },
-                    { value: 'rector', etiqueta: 'Rector' },
-                    { value: 'apoyo', etiqueta: 'Personal de Apoyo' },
-                    { value: 'bibliotecario', etiqueta: 'Bibliotecario' },
-                  ]}
-                  placeholder="Seleccionar cargo..."
+                  opciones={cargos.map((cargo) => ({
+                    value: cargo.codigo,
+                    etiqueta: cargo.nombre,
+                  }))}
+                  disabled={cargandoCargos}
+                  placeholder={
+                    cargandoCargos
+                      ? 'Cargando cargos...'
+                      : 'Seleccionar cargo...'
+                  }
                 />
+                {cargos.length === 0 && !cargandoCargos && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                    No hay cargos disponibles. Crea un rol activo en /roles.
+                  </p>
+                )}
               </div>
               <div>
                 <Entrada
@@ -398,7 +406,7 @@ export default function PaginaNuevoPersonal() {
         </Tarjeta>
 
         {errores.submit && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
             {errores.submit}
           </div>
         )}
@@ -429,26 +437,26 @@ export default function PaginaNuevoPersonal() {
           router.push('/personal');
         }} titulo="Usuario Creado" tamano="mediano">
           <div className="space-y-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               El personal ha sido registrado exitosamente. A continuación encontrará las credenciales de acceso al sistema:
             </p>
-            <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+            <div className="bg-muted/40 p-4 rounded-lg space-y-3">
               <div className="flex items-center gap-3">
-                <User className="w-5 h-5 text-gray-400" />
+                <User className="w-5 h-5 text-muted-foreground" />
                 <div>
-                  <p className="text-xs text-gray-500">Nombre de usuario</p>
+                  <p className="text-xs text-muted-foreground">Nombre de usuario</p>
                   <p className="font-mono font-medium">{modalCredenciales.nombreUsuario}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Key className="w-5 h-5 text-gray-400" />
+                <Key className="w-5 h-5 text-muted-foreground" />
                 <div>
-                  <p className="text-xs text-gray-500">Contraseña temporal</p>
+                  <p className="text-xs text-muted-foreground">Contraseña temporal</p>
                   <p className="font-mono font-medium">{modalCredenciales.contrasena}</p>
                 </div>
               </div>
             </div>
-            <p className="text-xs text-amber-600">
+            <p className="text-xs text-amber-600 dark:text-amber-400">
               ⚠️ Se recomienda que el usuario cambie su contraseña después de iniciar sesión.
             </p>
             <div className="flex justify-end">

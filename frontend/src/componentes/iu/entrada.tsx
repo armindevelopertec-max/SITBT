@@ -14,7 +14,7 @@ const Entrada = forwardRef<HTMLInputElement, PropsEntrada>(
     return (
       <div className="w-full">
         {etiqueta && (
-          <label htmlFor={idEntrada} className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor={idEntrada} className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
             {etiqueta}
           </label>
         )}

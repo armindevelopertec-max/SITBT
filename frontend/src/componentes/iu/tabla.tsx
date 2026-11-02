@@ -3,7 +3,7 @@ import { HTMLAttributes, forwardRef, TableHTMLAttributes, TdHTMLAttributes, ThHT
 
 const Tabla = forwardRef<HTMLTableElement, TableHTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
-    <div className="w-full overflow-auto">
+    <div className="w-full overflow-auto scrollarea-tema">
       <table ref={ref} className={cn('w-full caption-bottom text-sm text-foreground', className)} {...props} />
     </div>
   )

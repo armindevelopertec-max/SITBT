@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Migas } from '@/componentes/iu/migas';
+import { CampoFiltro } from '@/componentes/iu/barra-filtros';
 import {
   Tarjeta,
   ContenidoTarjeta,
@@ -230,10 +231,10 @@ export default function PaginaAsistencias() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-foreground">
             Control de Asistencias del Personal
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Ingresos y salidas del personal mediante lector biométrico dactilar
             (o marcación manual).
           </p>
@@ -248,41 +249,41 @@ export default function PaginaAsistencias() {
         <Tarjeta variante="conBorde">
           <ContenidoTarjeta className="flex items-center justify-between p-4">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-sm font-medium text-muted-foreground">
                 En la institución
               </p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {resumen.dentro}
               </p>
             </div>
-            <div className="rounded-full bg-green-100 p-3">
-              <LogIn className="h-6 w-6 text-green-600" />
+            <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-3">
+              <LogIn className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
           </ContenidoTarjeta>
         </Tarjeta>
         <Tarjeta variante="conBorde">
           <ContenidoTarjeta className="flex items-center justify-between p-4">
             <div>
-              <p className="text-sm font-medium text-gray-600">Ya salieron</p>
-              <p className="text-2xl font-bold text-red-600">
+              <p className="text-sm font-medium text-muted-foreground">Ya salieron</p>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                 {Math.max(0, resumen.total - resumen.dentro)}
               </p>
             </div>
-            <div className="rounded-full bg-red-100 p-3">
-              <LogOut className="h-6 w-6 text-red-600" />
+            <div className="rounded-full bg-red-100 dark:bg-red-900/30 p-3">
+              <LogOut className="h-6 w-6 text-red-600 dark:text-red-400" />
             </div>
           </ContenidoTarjeta>
         </Tarjeta>
         <Tarjeta variante="conBorde">
           <ContenidoTarjeta className="flex items-center justify-between p-4">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-sm font-medium text-muted-foreground">
                 Personal activo
               </p>
-              <p className="text-2xl font-bold text-gray-900">{resumen.total}</p>
+              <p className="text-2xl font-bold text-foreground">{resumen.total}</p>
             </div>
-            <div className="rounded-full bg-primary-100 p-3">
-              <Users className="h-6 w-6 text-primary-600" />
+            <div className="rounded-full bg-primary-100 dark:bg-primary-900/30 p-3">
+              <Users className="h-6 w-6 text-primary-600 dark:text-primary-400" />
             </div>
           </ContenidoTarjeta>
         </Tarjeta>
@@ -295,10 +296,10 @@ export default function PaginaAsistencias() {
         <ContenidoTarjeta>
           {cargandoEstado ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-primary-600" />
+              <Loader2 className="h-6 w-6 animate-spin text-primary-600 dark:text-primary-400" />
             </div>
           ) : estado.length === 0 ? (
-            <p className="py-8 text-center text-gray-500">
+            <p className="py-8 text-center text-muted-foreground">
               No hay personal activo registrado.
             </p>
           ) : (
@@ -306,7 +307,7 @@ export default function PaginaAsistencias() {
               {estado.map((p) => (
                 <div
                   key={p.personalId}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 p-3"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-border p-3"
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <span
@@ -318,13 +319,13 @@ export default function PaginaAsistencias() {
                       title={p.dentro ? 'En la institución' : 'Fuera'}
                     />
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-gray-900">
+                      <p className="truncate text-sm font-medium text-foreground">
                         {p.nombres} {p.apellidoPaterno}
                       </p>
-                      <p className="truncate text-xs text-gray-500">
+                      <p className="truncate text-xs text-muted-foreground">
                         {etiquetaCargo(p.cargo)} · {p.ci}
                       </p>
-                      <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
+                      <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
                         <Clock className="h-3 w-3" />
                         Entrada: {formatearHora(p.horaEntrada)}
                         {p.horaSalida ? ` · Salida: ${formatearHora(p.horaSalida)}` : ''}
@@ -339,7 +340,7 @@ export default function PaginaAsistencias() {
                       disabled={marcando === p.personalId}
                       onClick={() => marcar(p.personalId, 'entrada')}
                     >
-                      <LogIn className="h-4 w-4 text-green-600" />
+                      <LogIn className="h-4 w-4 text-green-600 dark:text-green-400" />
                     </Boton>
                     <Boton
                       variante="fantasma"
@@ -348,7 +349,7 @@ export default function PaginaAsistencias() {
                       disabled={marcando === p.personalId}
                       onClick={() => marcar(p.personalId, 'salida')}
                     >
-                      <LogOut className="h-4 w-4 text-red-600" />
+                      <LogOut className="h-4 w-4 text-red-600 dark:text-red-400" />
                     </Boton>
                   </div>
                 </div>
@@ -373,7 +374,7 @@ export default function PaginaAsistencias() {
         <ContenidoTarjeta>
           {cargandoHuellas ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-primary-600" />
+              <Loader2 className="h-6 w-6 animate-spin text-primary-600 dark:text-primary-400" />
             </div>
           ) : (
             <Tabla>
@@ -418,7 +419,7 @@ export default function PaginaAsistencias() {
                 ))}
                 {huellas.length === 0 && (
                   <FilaTabla>
-                    <CeldaTabla colSpan={5} className="py-8 text-center text-gray-500">
+                    <CeldaTabla colSpan={5} className="py-8 text-center text-muted-foreground">
                       Aún no hay huellas registradas.
                     </CeldaTabla>
                   </FilaTabla>
@@ -435,18 +436,19 @@ export default function PaginaAsistencias() {
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
           <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Selector
+            <CampoFiltro
               etiqueta="Personal"
               value={filtroPersonal}
-              onChange={(e) => setFiltroPersonal(e.target.value)}
-              opciones={[{ value: '', etiqueta: 'Todo el personal' }, ...opcionesPersonal]}
+              onChange={setFiltroPersonal}
+              placeholder="Todo el personal"
+              opciones={opcionesPersonal}
             />
-            <Selector
+            <CampoFiltro
               etiqueta="Tipo"
               value={filtroTipo}
-              onChange={(e) => setFiltroTipo(e.target.value)}
+              onChange={setFiltroTipo}
+              placeholder="Entradas y salidas"
               opciones={[
-                { value: '', etiqueta: 'Entradas y salidas' },
                 { value: 'entrada', etiqueta: 'Entradas' },
                 { value: 'salida', etiqueta: 'Salidas' },
               ]}
@@ -467,7 +469,7 @@ export default function PaginaAsistencias() {
 
           {cargandoHistorial ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-primary-600" />
+              <Loader2 className="h-6 w-6 animate-spin text-primary-600 dark:text-primary-400" />
             </div>
           ) : (
             <>
@@ -512,7 +514,7 @@ export default function PaginaAsistencias() {
                   ))}
                   {historial.length === 0 && (
                     <FilaTabla>
-                      <CeldaTabla colSpan={6} className="py-8 text-center text-gray-500">
+                      <CeldaTabla colSpan={6} className="py-8 text-center text-muted-foreground">
                         No hay marcaciones registradas con esos filtros.
                       </CeldaTabla>
                     </FilaTabla>
@@ -521,7 +523,7 @@ export default function PaginaAsistencias() {
               </Tabla>
 
               <div className="mt-4 flex items-center justify-between">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Mostrando {historial.length} de {totalHistorial} marcaciones
                 </p>
                 <div className="flex items-center gap-2">
@@ -533,7 +535,7 @@ export default function PaginaAsistencias() {
                   >
                     Anterior
                   </Boton>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-muted-foreground">
                     Página {pagina} de {totalPaginas}
                   </span>
                   <Boton
@@ -558,7 +560,7 @@ export default function PaginaAsistencias() {
         tamano="mediano"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Asocie un código biométrico (ID de usuario en el lector) a una
             persona del personal. Cuando el lector envíe ese código, la
             marcación se registrará automáticamente.

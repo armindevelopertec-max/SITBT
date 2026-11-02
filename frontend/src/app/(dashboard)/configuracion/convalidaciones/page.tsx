@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { Migas } from '@/componentes/iu/migas';
+import { CampoFiltro } from '@/componentes/iu/barra-filtros';
 import {
   Tarjeta,
   ContenidoTarjeta,
@@ -302,10 +303,38 @@ export default function PaginaConvalidaciones() {
     [comparacion],
   );
 
-  const opcionesDestino = useMemo(
-    () => materiasDestino.map((materia) => ({ value: materia.id, etiqueta: etiquetaMateria(materia) })),
-    [materiasDestino],
-  );
+  /**
+   * Materias de destino agrupadas por semestre.
+   *
+   * La equivalencia es entre materias del mismo semestre: una materia del
+   * semestre 1 del plan de origen solo puede equivaler con una materia del
+   * semestre 1 del plan de destino.
+   */
+  const destinoPorSemestre = useMemo(() => {
+    const mapa = new Map<number, MateriaPlana[]>();
+    for (const grupo of comparacion?.destinoPorSemestre ?? []) {
+      mapa.set(grupo.semestre, grupo.materias);
+    }
+    return mapa;
+  }, [comparacion]);
+
+  /**
+   * Opciones de materia de destino para una fila, según el semestre de su
+   * materia de origen. Si el origen no tiene semestre conocido, se ofrecen
+   * todas las materias del plan de destino.
+   */
+  const opcionesDestinoParaFila = (materiaPlanOrigenId: number) => {
+    const semestre = semestrePorOrigen.get(materiaPlanOrigenId);
+    const candidatas =
+      semestre !== undefined
+        ? (destinoPorSemestre.get(semestre) ?? [])
+        : materiasDestino;
+
+    return candidatas.map((materia) => ({
+      value: materia.id,
+      etiqueta: etiquetaMateria(materia),
+    }));
+  };
 
   const esEditable = comparacion?.proceso.estado === 'borrador';
 
@@ -490,7 +519,7 @@ export default function PaginaConvalidaciones() {
             </Boton>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold text-foreground">
                   {planOrigen?.numeroRm} → {planDestino?.numeroRm}
                 </h2>
                 <Insignia variante={VARIANTE_ESTADO[proceso.estado]}>
@@ -498,7 +527,7 @@ export default function PaginaConvalidaciones() {
                 </Insignia>
                 <Insignia variante="contorno">Versión {proceso.version}</Insignia>
               </div>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 {proceso.carrera?.nombre ?? ''}
                 {proceso.numeroResolucion ? ` · Resolución ${proceso.numeroResolucion}` : ''}
               </p>
@@ -527,37 +556,37 @@ export default function PaginaConvalidaciones() {
           <Resumen
             valor={resumen.totalOrigen}
             etiqueta="Materias de origen"
-            color="text-gray-900"
+            color="text-foreground"
             icono={<ListChecks className="w-5 h-5" />}
           />
           <Resumen
             valor={resumen.equivalentes}
             etiqueta="Equivalentes"
-            color="text-green-600"
+            color="text-green-600 dark:text-green-400"
             icono={<CheckCircle2 className="w-5 h-5" />}
           />
           <Resumen
             valor={resumen.requierenValidacion}
             etiqueta="Requieren validación"
-            color="text-amber-600"
+            color="text-amber-600 dark:text-amber-400"
             icono={<AlertTriangle className="w-5 h-5" />}
           />
           <Resumen
             valor={resumen.sinCorrespondencia}
             etiqueta="Sin correspondencia"
-            color="text-red-600"
+            color="text-red-600 dark:text-red-400"
             icono={<XCircle className="w-5 h-5" />}
           />
           <Resumen
             valor={resumen.sinClasificar}
             etiqueta="Sin clasificar"
-            color="text-gray-500"
+            color="text-muted-foreground"
             icono={<Info className="w-5 h-5" />}
           />
         </div>
 
         {!esEditable && (
-          <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 flex items-start gap-2">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-900/30 px-4 py-3 text-sm text-blue-800 dark:text-blue-300 flex items-start gap-2">
             <Info className="w-4 h-4 mt-0.5 shrink-0" />
             <span>
               Esta matriz está {ETIQUETA_ESTADO[proceso.estado].toLowerCase()}. Para modificarla, crea
@@ -574,7 +603,7 @@ export default function PaginaConvalidaciones() {
             <Tarjeta key={grupo.semestre} variante="conBorde">
               <EncabezadoTarjeta className="flex items-center justify-between">
                 <TituloTarjeta>Semestre {grupo.semestre}</TituloTarjeta>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-muted-foreground">
                   {grupo.materias.length} materia(s) en el plan de origen
                 </span>
               </EncabezadoTarjeta>
@@ -596,18 +625,18 @@ export default function PaginaConvalidaciones() {
                       return (
                         <FilaTabla key={fila.key}>
                           <CeldaTabla className="w-64">
-                            <div className="font-medium text-gray-900">
+                            <div className="font-medium text-foreground">
                               {materiaOrigen?.codigo} {materiaOrigen?.nombre}
                             </div>
                             {esNueva && !fila.resultado && (
-                              <span className="text-xs text-gray-400">Sin clasificar</span>
+                              <span className="text-xs text-muted-foreground">Sin clasificar</span>
                             )}
                           </CeldaTabla>
                           <CeldaTabla className="w-72">
                             <Selector
                               opciones={[
                                 { value: '', etiqueta: '— Sin destino —' },
-                                ...opcionesDestino,
+                                ...opcionesDestinoParaFila(fila.materiaPlanOrigenId),
                               ]}
                               value={fila.materiaPlanDestinoId ?? ''}
                               disabled={!esEditable || fila.resultado === 'sin_correspondencia'}
@@ -674,7 +703,7 @@ export default function PaginaConvalidaciones() {
                                 </Boton>
                                 <Boton
                                   variante="fantasma"
-                                  className="text-red-600 hover:text-red-700"
+                                  className="text-red-600 dark:text-red-400 hover:text-red-700 dark:text-red-300"
                                   onClick={() => eliminarFila(fila)}
                                   disabled={guardandoKey === fila.key}
                                   title="Eliminar"
@@ -732,7 +761,7 @@ export default function PaginaConvalidaciones() {
                   return (
                     <FilaTabla key={materia.id}>
                       <CeldaTabla>{materia.semestre}</CeldaTabla>
-                      <CeldaTabla className="font-medium text-gray-900">
+                      <CeldaTabla className="font-medium text-foreground">
                         {materia.codigo} {materia.nombre}
                       </CeldaTabla>
                       <CeldaTabla>
@@ -762,24 +791,24 @@ export default function PaginaConvalidaciones() {
       <Tarjeta variante="conBorde">
         <ContenidoTarjeta>
           <div className="flex flex-wrap items-end gap-4">
-            <div className="w-80">
-              <Selector
-                etiqueta="Carrera"
-                opciones={[
-                  { value: '', etiqueta: '— Seleccionar carrera —' },
-                  ...carreras.map((carrera) => ({ value: carrera.id, etiqueta: carrera.nombre })),
-                ]}
-                value={carreraId}
-                onChange={(e) => setCarreraId(e.target.value ? Number(e.target.value) : '')}
-              />
-            </div>
+            <CampoFiltro
+              etiqueta="Carrera"
+              value={carreraId}
+              onChange={(valor) => setCarreraId(valor ? Number(valor) : '')}
+              placeholder="Seleccionar carrera"
+              className="w-80"
+              opciones={carreras.map((carrera) => ({
+                value: carrera.id,
+                etiqueta: carrera.nombre,
+              }))}
+            />
             <Boton onClick={abrirModalNueva} disabled={!carreraId}>
               <GitCompare className="w-4 h-4 mr-2" />
               Nueva comparación de planes
             </Boton>
           </div>
           {carreraId && planes.length < 2 && (
-            <p className="mt-3 text-sm text-amber-700 flex items-center gap-2">
+            <p className="mt-3 text-sm text-amber-700 dark:text-amber-300 flex items-center gap-2">
               <AlertTriangle className="w-4 h-4" />
               Esta carrera tiene {planes.length} plan(es) registrado(s). Necesitas al menos dos planes
               RM para comparar.
@@ -807,16 +836,16 @@ export default function PaginaConvalidaciones() {
         </EncabezadoTarjeta>
         <ContenidoTarjeta className="p-0">
           {cargandoProcesos ? (
-            <div className="flex items-center justify-center py-12 text-gray-500">
+            <div className="flex items-center justify-center py-12 text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin mr-2" />
               Cargando…
             </div>
           ) : !carreraId ? (
-            <div className="py-12 text-center text-gray-500">
+            <div className="py-12 text-center text-muted-foreground">
               Selecciona una carrera para ver sus matrices.
             </div>
           ) : procesos.length === 0 ? (
-            <div className="py-12 text-center text-gray-500">
+            <div className="py-12 text-center text-muted-foreground">
               Aún no hay matrices de convalidación para esta carrera.
             </div>
           ) : (
@@ -834,10 +863,10 @@ export default function PaginaConvalidaciones() {
               <CuerpoTabla>
                 {procesos.map((proceso) => (
                   <FilaTabla key={proceso.id}>
-                    <CeldaTabla className="font-medium text-gray-900">
+                    <CeldaTabla className="font-medium text-foreground">
                       {proceso.plan_origen?.numeroRm ?? `Plan ${proceso.planOrigenId}`}
                     </CeldaTabla>
-                    <CeldaTabla className="font-medium text-gray-900">
+                    <CeldaTabla className="font-medium text-foreground">
                       {proceso.plan_destino?.numeroRm ?? `Plan ${proceso.planDestinoId}`}
                     </CeldaTabla>
                     <CeldaTabla>{proceso.version}</CeldaTabla>
@@ -846,7 +875,7 @@ export default function PaginaConvalidaciones() {
                         {ETIQUETA_ESTADO[proceso.estado]}
                       </Insignia>
                     </CeldaTabla>
-                    <CeldaTabla className="text-gray-500">
+                    <CeldaTabla className="text-muted-foreground">
                       {proceso.numeroResolucion ?? '—'}
                     </CeldaTabla>
                     <CeldaTabla className="text-right">
@@ -874,8 +903,8 @@ export default function PaginaConvalidaciones() {
       />
 
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Convalidaciones entre planes RM</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-3xl font-bold text-foreground">Convalidaciones entre planes RM</h1>
+        <p className="text-muted-foreground mt-1">
           Define la matriz general de equivalencias entre las asignaturas de dos planes de estudio de
           una misma carrera. La matriz se aprueba con su versión y luego se aplica a los estudiantes
           que migran de plan; sus notas e historial originales se conservan intactos.
@@ -884,7 +913,7 @@ export default function PaginaConvalidaciones() {
 
       {procesoId ? (
         cargandoDetalle && !comparacion ? (
-          <div className="flex items-center justify-center py-16 text-gray-500">
+          <div className="flex items-center justify-center py-16 text-muted-foreground">
             <Loader2 className="w-5 h-5 animate-spin mr-2" />
             Cargando comparación…
           </div>
@@ -1010,7 +1039,7 @@ function Resumen({
       <ContenidoTarjeta>
         <div className={`flex items-center gap-2 ${color}`}>{icono}</div>
         <p className={`text-2xl font-bold mt-2 ${color}`}>{valor}</p>
-        <p className="text-xs text-gray-500">{etiqueta}</p>
+        <p className="text-xs text-muted-foreground">{etiqueta}</p>
       </ContenidoTarjeta>
     </Tarjeta>
   );

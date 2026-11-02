@@ -171,7 +171,7 @@ export default function PaginaNuevoGrupo() {
       <Migas elementos={[{ etiqueta: 'Grupos', href: '/grupos' }, { etiqueta: 'Nuevo grupo' }]} />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Nuevo grupo</h1>
+        <h1 className="text-2xl font-bold text-foreground">Nuevo grupo</h1>
       </div>
 
       <form onSubmit={enviarFormulario} className="space-y-6">
@@ -279,7 +279,7 @@ export default function PaginaNuevoGrupo() {
         </Tarjeta>
 
         {errores.submit && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
             {errores.submit}
           </div>
         )}

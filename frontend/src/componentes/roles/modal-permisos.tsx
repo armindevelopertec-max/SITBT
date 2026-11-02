@@ -210,17 +210,17 @@ export function ModalPermisos({
             </div>
           </div>
 
-          <div className="max-h-[55vh] overflow-y-auto rounded-lg border border-gray-200">
+          <div className="max-h-[55vh] overflow-y-auto scrollarea-tema rounded-lg border border-border">
             <table className="w-full text-sm">
-              <thead className="sticky top-0 z-10 bg-gray-50">
+              <thead className="sticky top-0 z-10 bg-muted dark:bg-gray-800">
                 <tr>
-                  <th className="px-4 py-2 text-left font-medium text-gray-600">
+                  <th className="px-4 py-2 text-left font-medium text-muted-foreground">
                     Módulo
                   </th>
                   {ACCIONES.map((accion) => (
                     <th
                       key={accion.clave}
-                      className="px-2 py-2 text-center font-medium text-gray-600"
+                      className="px-2 py-2 text-center font-medium text-muted-foreground"
                     >
                       {accion.etiqueta}
                     </th>
@@ -230,10 +230,10 @@ export function ModalPermisos({
               <tbody>
                 {grupos.map(([grupo, modulos]) => (
                   <Fragment key={grupo}>
-                    <tr className="bg-gray-50/70">
+                    <tr className="bg-muted/40 dark:bg-muted/20">
                       <td
                         colSpan={ACCIONES.length + 1}
-                        className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-gray-500"
+                        className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
                       >
                         {grupo}
                       </td>
@@ -248,7 +248,7 @@ export function ModalPermisos({
                         seleccionadosModulo === modulo.acciones.length;
 
                       return (
-                        <tr key={modulo.modulo} className="border-t border-gray-100">
+                        <tr key={modulo.modulo} className="border-t border-border">
                           <td className="px-4 py-2">
                             <div className="flex items-start gap-2">
                               <input
@@ -262,11 +262,11 @@ export function ModalPermisos({
                                 title="Marcar o desmarcar todas las acciones del módulo"
                               />
                               <div>
-                                <p className="font-medium text-gray-800">
+                                <p className="font-medium text-foreground">
                                   {modulo.nombre}
                                 </p>
                                 {modulo.descripcion && (
-                                  <p className="text-xs text-gray-500">
+                                  <p className="text-xs text-muted-foreground">
                                     {modulo.descripcion}
                                   </p>
                                 )}

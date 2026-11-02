@@ -67,17 +67,24 @@ export function SelectorBuscable({
       <div
         className={cn(
           'flex items-center w-full rounded-lg border border-gray-300 bg-white px-3 py-2 cursor-pointer hover:border-gray-400 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500',
-          estaAbierto && 'border-primary-500 ring-1 ring-primary-500'
+          'dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-500 dark:focus-within:border-primary-400 dark:focus-within:ring-primary-400',
+          estaAbierto && 'border-primary-500 ring-1 ring-primary-500 dark:border-primary-400 dark:ring-primary-400'
         )}
         onClick={() => setEstaAbierto(!estaAbierto)}
       >
         <Search className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
-        <span className={cn('flex-1 truncate text-sm', !opcionSeleccionada && 'text-gray-400')}>
+        <span
+          className={cn(
+            'flex-1 truncate text-sm',
+            !opcionSeleccionada && 'text-gray-400 dark:text-gray-500',
+            opcionSeleccionada && 'text-gray-900 dark:text-gray-100',
+          )}
+        >
           {opcionSeleccionada?.etiqueta || placeholder}
         </span>
         {value && (
           <X
-            className="w-4 h-4 text-gray-400 hover:text-gray-600 mr-1 flex-shrink-0"
+            className="w-4 h-4 text-gray-400 hover:text-gray-600 mr-1 flex-shrink-0 dark:hover:text-gray-200"
             onClick={limpiar}
           />
         )}
@@ -85,21 +92,21 @@ export function SelectorBuscable({
       </div>
 
       {estaAbierto && (
-        <div className="absolute z-50 w-full mt-1 bg-white rounded-lg border border-gray-200 shadow-lg">
-          <div className="p-2 border-b border-gray-100">
+        <div className="absolute z-50 w-full mt-1 bg-white rounded-lg border border-gray-200 shadow-lg dark:bg-gray-800 dark:border-gray-700 dark:shadow-black/50">
+          <div className="p-2 border-b border-gray-100 dark:border-gray-700">
             <input
               ref={refEntrada}
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               placeholder="Escribe para buscar..."
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-primary-500"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-primary-500 bg-white text-gray-900 dark:bg-gray-900 dark:border-gray-600 dark:text-gray-100 dark:focus:border-primary-400"
             />
           </div>
 
-          <div className="max-h-48 overflow-y-auto">
+          <div className="max-h-48 overflow-y-auto scrollarea-tema">
             {opcionesFiltradas.length === 0 ? (
-              <div className="px-4 py-3 text-sm text-gray-500 text-center">
+              <div className="px-4 py-3 text-sm text-gray-500 text-center dark:text-gray-400">
                 No se encontraron materias
               </div>
             ) : (
@@ -107,8 +114,9 @@ export function SelectorBuscable({
                 <div
                   key={opcion.value}
                   className={cn(
-                    'px-4 py-2 cursor-pointer hover:bg-gray-50 text-sm',
-                    opcion.value.toString() === value.toString() && 'bg-primary-50 text-primary-600'
+                    'px-4 py-2 cursor-pointer hover:bg-gray-50 text-sm text-gray-900 dark:text-gray-100 dark:hover:bg-gray-700',
+                    opcion.value.toString() === value.toString() &&
+                      'bg-primary-50 text-primary-600 dark:bg-primary-900/40 dark:text-primary-200'
                   )}
                   onClick={() => seleccionar(opcion.value)}
                 >

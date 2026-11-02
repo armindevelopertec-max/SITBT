@@ -220,7 +220,7 @@ export default function PaginaGestiones() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -231,8 +231,8 @@ export default function PaginaGestiones() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestiones Académicas</h1>
-          <p className="text-gray-500">Administra los períodos académicos</p>
+          <h1 className="text-2xl font-bold text-foreground">Gestiones Académicas</h1>
+          <p className="text-muted-foreground">Administra los períodos académicos</p>
         </div>
         <Boton onClick={() => abrirModal()}>
           <Plus className="w-4 h-4 mr-2" />
@@ -246,8 +246,8 @@ export default function PaginaGestiones() {
             <EncabezadoTarjeta className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-primary-600" />
+                  <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                   </div>
                   <div>
                     <TituloTarjeta className="text-lg flex items-center gap-2">
@@ -256,7 +256,7 @@ export default function PaginaGestiones() {
                         <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                       )}
                     </TituloTarjeta>
-                    <p className="text-sm text-gray-500">{gestion.tipoPeriodo}</p>
+                    <p className="text-sm text-muted-foreground">{gestion.tipoPeriodo}</p>
                   </div>
                 </div>
                 {obtenerInsigniaEstado(gestion.estado)}
@@ -265,15 +265,15 @@ export default function PaginaGestiones() {
             <ContenidoTarjeta>
               {gestion.periodos && gestion.periodos.length > 0 && (
                 <div className="space-y-2 mb-4">
-                  <p className="text-sm font-medium text-gray-700">Períodos:</p>
+                  <p className="text-sm font-medium text-foreground">Períodos:</p>
                   {[...gestion.periodos].sort((a, b) => a.numero.localeCompare(b.numero)).map((periodo) => (
                     <div
                       key={periodo.id}
-                      className="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-sm"
+                      className="flex items-center justify-between p-2 bg-muted/40 rounded-lg text-sm"
                     >
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{periodo.numero}</span>
-                        <span className="text-gray-500">({periodo.nombre || 'Sin nombre'})</span>
+                        <span className="text-muted-foreground">({periodo.nombre || 'Sin nombre'})</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {obtenerInsigniaEstado(periodo.estado)}
@@ -314,10 +314,10 @@ export default function PaginaGestiones() {
               )}
 
               {gestion.notas && (
-                <p className="text-sm text-gray-500 mb-4">{gestion.notas}</p>
+                <p className="text-sm text-muted-foreground mb-4">{gestion.notas}</p>
               )}
 
-              <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
+              <div className="flex items-center gap-2 pt-4 border-t border-border">
                 {gestion.estado === 'pendiente' && (
                   <Boton tamano="pequeno" variante="contorno" className="flex-1" onClick={() => abrirGestion(gestion)}>
                     <Unlock className="w-4 h-4 mr-1" />
@@ -365,8 +365,8 @@ export default function PaginaGestiones() {
         ))}
 
         {gestiones.length === 0 && (
-          <div className="col-span-full text-center py-12 text-gray-500">
-            <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <div className="col-span-full text-center py-12 text-muted-foreground">
+            <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground/70" />
             <p>No hay gestiones registradas</p>
             <Boton variante="contorno" className="mt-4" onClick={() => abrirModal()}>
               <Plus className="w-4 h-4 mr-2" />
@@ -408,17 +408,17 @@ export default function PaginaGestiones() {
               id="esActual"
               checked={datosFormulario.esActual}
               onChange={(e) => setDatosFormulario({ ...datosFormulario, esActual: e.target.checked })}
-              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              className="rounded border-border text-primary-600 dark:text-primary-400 focus:ring-primary-500"
             />
-            <label htmlFor="esActual" className="text-sm text-gray-700">
+            <label htmlFor="esActual" className="text-sm text-foreground">
               Marcar como gestión actual (se mostrará por defecto en formularios)
             </label>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Observaciones</label>
             <textarea
-              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="block w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground dark:border-gray-600 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               rows={3}
               value={datosFormulario.notas}
               onChange={(e) => setDatosFormulario({ ...datosFormulario, notas: e.target.value })}
@@ -427,7 +427,7 @@ export default function PaginaGestiones() {
           </div>
 
           {!gestionEditando && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
+            <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 rounded-lg p-3 text-sm text-blue-700 dark:text-blue-300">
               <p className="font-medium">Períodos que se crearán:</p>
               {datosFormulario.tipoPeriodo === 'semestral' && (
                 <>

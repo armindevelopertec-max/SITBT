@@ -65,8 +65,8 @@ export default function DisposicionConfiguracion({ children }: PropsDisposicionC
           <SettingsIcon className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Configuración</h1>
-          <p className="text-gray-500 dark:text-gray-400">Administración del sistema</p>
+          <h1 className="text-2xl font-bold text-foreground dark:text-gray-100">Configuración</h1>
+          <p className="text-muted-foreground dark:text-muted-foreground">Administración del sistema</p>
         </div>
       </div>
 
@@ -82,14 +82,14 @@ export default function DisposicionConfiguracion({ children }: PropsDisposicionC
                   className={cn(
                     'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
                     esActivo
-                      ? 'bg-primary-50 text-primary-600 border-l-4 border-primary-600'
-                      : 'text-gray-600 hover:bg-gray-50'
+                      ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border-l-4 border-primary-600'
+                      : 'text-muted-foreground hover:bg-muted/40'
                   )}
                 >
                   <enlace.icono className="w-5 h-5" />
                   <div>
                     <p className="font-medium">{enlace.titulo}</p>
-                    <p className="text-xs text-gray-400">{enlace.descripcion}</p>
+                    <p className="text-xs text-muted-foreground">{enlace.descripcion}</p>
                   </div>
                 </Link>
               );

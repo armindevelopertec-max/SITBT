@@ -1,6 +1,7 @@
 'use client';
 
 import { Migas } from '@/componentes/iu/migas';
+import { BuscadorFiltro } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
@@ -20,7 +21,7 @@ export default function PaginaPersonas() {
       <Migas elementos={[{ etiqueta: 'Personas' }]} />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gestión de Personas</h1>
+        <h1 className="text-2xl font-bold text-foreground">Gestión de Personas</h1>
         <Boton>
           <Plus className="w-4 h-4 mr-2" />
           Nueva Persona
@@ -31,11 +32,10 @@ export default function PaginaPersonas() {
         <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
             <TituloTarjeta>Lista de Personas</TituloTarjeta>
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Entrada placeholder="Buscar persona..." className="pl-10" />
+            <BuscadorFiltro
+              placeholder="Buscar persona..."
+            />
             </div>
-          </div>
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
           <Tabla>

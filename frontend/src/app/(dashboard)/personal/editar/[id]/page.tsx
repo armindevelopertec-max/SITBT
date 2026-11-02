@@ -8,6 +8,7 @@ import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
 import { Selector } from '@/componentes/iu/selector';
 import { api } from '@/libreria/api';
+import { usarCargosPersonal } from '@/ganchos/usarCargosPersonal';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
 interface DatosPersonal {
@@ -44,6 +45,7 @@ export default function PaginaEditarPersonal() {
   const router = useRouter();
   const parametros = useParams();
   const idPersonal = parametros.id as string;
+  const { cargos, cargando: cargandoCargos } = usarCargosPersonal();
 
   const [guardando, setGuardando] = useState(false);
   const [cargandoInicial, setCargandoInicial] = useState(true);
@@ -186,7 +188,7 @@ export default function PaginaEditarPersonal() {
   if (cargandoInicial) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -204,7 +206,7 @@ export default function PaginaEditarPersonal() {
       </div>
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Editar Personal</h1>
+        <h1 className="text-2xl font-bold text-foreground">Editar Personal</h1>
       </div>
 
       <form onSubmit={enviarFormulario} className="space-y-6">
@@ -286,7 +288,7 @@ export default function PaginaEditarPersonal() {
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Género *</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Género *</label>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -295,9 +297,9 @@ export default function PaginaEditarPersonal() {
                       value="M"
                       checked={datosPersona.genero === 'M'}
                       onChange={(e) => setDatosPersona({ ...datosPersona, genero: e.target.value })}
-                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-700">Masculino</span>
+                    <span className="text-sm text-foreground">Masculino</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -306,15 +308,15 @@ export default function PaginaEditarPersonal() {
                       value="F"
                       checked={datosPersona.genero === 'F'}
                       onChange={(e) => setDatosPersona({ ...datosPersona, genero: e.target.value })}
-                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-700">Femenino</span>
+                    <span className="text-sm text-foreground">Femenino</span>
                   </label>
                 </div>
                 {errores.genero && <p className="text-xs text-red-500 mt-1">{errores.genero}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Estado Civil</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Estado Civil</label>
                 <div className="flex flex-wrap gap-4">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -323,9 +325,9 @@ export default function PaginaEditarPersonal() {
                       value="Soltera(o)"
                       checked={datosPersona.estadoCivil === 'Soltera(o)'}
                       onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
-                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-700">Soltero(a)</span>
+                    <span className="text-sm text-foreground">Soltero(a)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -334,9 +336,9 @@ export default function PaginaEditarPersonal() {
                       value="Casada(o)"
                       checked={datosPersona.estadoCivil === 'Casada(o)'}
                       onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
-                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-700">Casado(a)</span>
+                    <span className="text-sm text-foreground">Casado(a)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -345,9 +347,9 @@ export default function PaginaEditarPersonal() {
                       value="Viuda(o)"
                       checked={datosPersona.estadoCivil === 'Viuda(o)'}
                       onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
-                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-700">Viudo(a)</span>
+                    <span className="text-sm text-foreground">Viudo(a)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -356,9 +358,9 @@ export default function PaginaEditarPersonal() {
                       value="Divorciada(o)"
                       checked={datosPersona.estadoCivil === 'Divorciada(o)'}
                       onChange={(e) => setDatosPersona({ ...datosPersona, estadoCivil: e.target.value })}
-                      className="w-4 h-4 text-primary-600 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-700">Divorciado(a)</span>
+                    <span className="text-sm text-foreground">Divorciado(a)</span>
                   </label>
                 </div>
               </div>
@@ -434,16 +436,22 @@ export default function PaginaEditarPersonal() {
                   value={datosPersonal.cargo}
                   onChange={(e) => setDatosPersonal({ ...datosPersonal, cargo: e.target.value })}
                   error={errores.cargo}
-                  opciones={[
-                    { value: 'docente', etiqueta: 'Docente' },
-                    { value: 'secretaria', etiqueta: 'Secretaria' },
-                    { value: 'director_academico', etiqueta: 'Director Académico' },
-                    { value: 'rector', etiqueta: 'Rector' },
-                    { value: 'apoyo', etiqueta: 'Personal de Apoyo' },
-                    { value: 'bibliotecario', etiqueta: 'Bibliotecario' },
-                  ]}
-                  placeholder="Seleccionar cargo..."
+                  opciones={cargos.map((cargo) => ({
+                    value: cargo.codigo,
+                    etiqueta: cargo.nombre,
+                  }))}
+                  disabled={cargandoCargos}
+                  placeholder={
+                    cargandoCargos
+                      ? 'Cargando cargos...'
+                      : 'Seleccionar cargo...'
+                  }
                 />
+                {cargos.length === 0 && !cargandoCargos && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                    No hay cargos disponibles. Crea un rol activo en /roles.
+                  </p>
+                )}
               </div>
               <div>
                 <Entrada
@@ -472,7 +480,7 @@ export default function PaginaEditarPersonal() {
         </Tarjeta>
 
         {errores.submit && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
             {errores.submit}
           </div>
         )}

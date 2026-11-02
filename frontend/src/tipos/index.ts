@@ -1,11 +1,10 @@
-export type Rol =
-  | 'administrador'
-  | 'secretaria'
-  | 'director_academico'
-  | 'rector'
-  | 'docente'
-  | 'estudiante'
-  | 'apoyo';
+/**
+ * Código de un rol.
+ *
+ * Los roles son configurables desde /roles, así que el código es un texto
+ * libre: no existe una lista cerrada de roles válidos en el sistema.
+ */
+export type Rol = string;
 
 export interface RolSistema {
   id: number;

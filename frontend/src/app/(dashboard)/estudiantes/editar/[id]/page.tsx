@@ -283,7 +283,7 @@ export default function PaginaEditarEstudiante() {
   if (cargandoInicial) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -301,7 +301,7 @@ export default function PaginaEditarEstudiante() {
       </div>
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Editar Estudiante</h1>
+        <h1 className="text-2xl font-bold text-foreground">Editar Estudiante</h1>
       </div>
 
       <form onSubmit={enviarFormulario} className="space-y-6">
@@ -448,7 +448,7 @@ export default function PaginaEditarEstudiante() {
                   value={datosEstudiante.codigoInscripcion}
                   error={errores.codigoInscripcion}
                   readOnly
-                  className="bg-gray-50"
+                  className="bg-muted/40"
                 />
               </div>
               <div>
@@ -547,7 +547,7 @@ export default function PaginaEditarEstudiante() {
         </Tarjeta>
 
         {errores.submit && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
             {errores.submit}
           </div>
         )}

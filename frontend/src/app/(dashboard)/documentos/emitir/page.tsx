@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { usarDocumentos } from '@/ganchos/usarDocumentos';
 import { api } from '@/libreria/api';
 import { Boton } from '@/componentes/iu/boton';
+import { BuscadorFiltro } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { Entrada } from '@/componentes/iu/entrada';
 import { Selector } from '@/componentes/iu/selector';
@@ -78,13 +79,13 @@ export default function PaginaEmitirDocumento() {
           </Boton>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Emitir Documento</h1>
-          <p className="text-gray-500">Generar nuevo documento</p>
+          <h1 className="text-2xl font-bold text-foreground">Emitir Documento</h1>
+          <p className="text-muted-foreground">Generar nuevo documento</p>
         </div>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 rounded-lg text-red-700 dark:text-red-300">
           {error}
         </div>
       )}
@@ -99,7 +100,7 @@ export default function PaginaEmitirDocumento() {
         <ContenidoTarjeta>
           <form onSubmit={enviarFormulario} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Tipo de documento *
               </label>
               <Selector
@@ -118,24 +119,20 @@ export default function PaginaEmitirDocumento() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Estudiante *
               </label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Entrada
-                  placeholder="Buscar por nombre o CI..."
-                  className="pl-10"
-                  value={busquedaEstudiante}
-                  onChange={(e) => {
-                    setBusquedaEstudiante(e.target.value);
-                    setEstudianteId('');
-                  }}
-                />
-              </div>
+              <BuscadorFiltro
+                placeholder="Buscar por nombre o CI..."
+                value={busquedaEstudiante}
+                onChange={(valor) => {
+                  setBusquedaEstudiante(valor);
+                  setEstudianteId('');
+                }}
+              />
 
               {estudiantes.length > 0 && (
-                <div className="mt-2 border rounded-lg max-h-48 overflow-y-auto">
+                <div className="mt-2 border rounded-lg max-h-48 overflow-y-auto scrollarea-tema">
                   {estudiantes.map((estudiante) => (
                     <button
                       key={estudiante.id}
@@ -147,12 +144,12 @@ export default function PaginaEmitirDocumento() {
                         );
                         setEstudiantes([]);
                       }}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-50 border-b last:border-b-0"
+                      className="w-full px-4 py-2 text-left hover:bg-muted/40 border-b last:border-b-0"
                     >
                       <p className="font-medium">
                         {estudiante.persona?.nombres} {estudiante.persona?.apellidoPaterno} {estudiante.persona?.apellidoMaterno}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         CI: {estudiante.persona?.ci} - Código: {estudiante.codigoInscripcion}
                       </p>
                     </button>
@@ -161,14 +158,14 @@ export default function PaginaEmitirDocumento() {
               )}
 
               {estudianteId && (
-                <p className="mt-2 text-sm text-green-600">
+                <p className="mt-2 text-sm text-green-600 dark:text-green-400">
                   ✓ Estudiante seleccionado
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Gestión *
               </label>
               <Selector

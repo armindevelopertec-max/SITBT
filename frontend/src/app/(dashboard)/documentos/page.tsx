@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { usarDocumentos, DocumentoEmitido } from '@/ganchos/usarDocumentos';
 import { Boton } from '@/componentes/iu/boton';
 import { Insignia } from '@/componentes/iu/insignia';
+import { CampoFiltro } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import {
   Tabla,
@@ -20,19 +21,19 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 const etiquetasTipo: Record<string, { etiqueta: string; color: string }> = {
-  boleta_inscripcion: { etiqueta: 'Boleta Inscripción', color: 'bg-blue-100 text-blue-800' },
-  recibo_pago: { etiqueta: 'Recibo Pago', color: 'bg-green-100 text-green-800' },
-  carnet: { etiqueta: 'Carnet', color: 'bg-purple-100 text-purple-800' },
-  certificado: { etiqueta: 'Certificado', color: 'bg-yellow-100 text-yellow-800' },
-  constancia: { etiqueta: 'Constancia', color: 'bg-cyan-100 text-cyan-800' },
-  record_academico: { etiqueta: 'Record Académico', color: 'bg-orange-100 text-orange-800' },
+  boleta_inscripcion: { etiqueta: 'Boleta Inscripción', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' },
+  recibo_pago: { etiqueta: 'Recibo Pago', color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' },
+  carnet: { etiqueta: 'Carnet', color: 'bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-200' },
+  certificado: { etiqueta: 'Certificado', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' },
+  constancia: { etiqueta: 'Constancia', color: 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-800 dark:text-cyan-200' },
+  record_academico: { etiqueta: 'Record Académico', color: 'bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-200' },
 };
 
 const etiquetasEstado: Record<string, { etiqueta: string; color: string }> = {
-  generado: { etiqueta: 'Generado', color: 'bg-gray-100 text-gray-800' },
-  impreso: { etiqueta: 'Impreso', color: 'bg-blue-100 text-blue-800' },
-  entregado: { etiqueta: 'Entregado', color: 'bg-green-100 text-green-800' },
-  anulado: { etiqueta: 'Anulado', color: 'bg-red-100 text-red-800' },
+  generado: { etiqueta: 'Generado', color: 'bg-muted text-foreground' },
+  impreso: { etiqueta: 'Impreso', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' },
+  entregado: { etiqueta: 'Entregado', color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' },
+  anulado: { etiqueta: 'Anulado', color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' },
 };
 
 export default function PaginaDocumentos() {
@@ -64,8 +65,8 @@ export default function PaginaDocumentos() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Documentos</h1>
-          <p className="text-gray-600">Gestión de documentos emitidos</p>
+          <h1 className="text-2xl font-bold text-foreground">Documentos</h1>
+          <p className="text-muted-foreground">Gestión de documentos emitidos</p>
         </div>
         <Link href="/documentos/emitir">
           <Boton className="flex items-center gap-2">
@@ -78,27 +79,27 @@ export default function PaginaDocumentos() {
       {/* Stats */}
       {estadisticas && (
         <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-gray-900">{estadisticas.total || 0}</div>
-            <div className="text-sm text-gray-500">Total documentos</div>
+          <div className="bg-card rounded-lg shadow-sm p-4">
+            <div className="text-2xl font-bold text-foreground">{estadisticas.total || 0}</div>
+            <div className="text-sm text-muted-foreground">Total documentos</div>
           </div>
-          <div className="bg-blue-50 rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-blue-600">
+          <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg shadow-sm p-4">
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {estadisticas.porTipo?.find((elemento: any) => elemento.tipo === 'boleta_inscripcion')?.cantidad || 0}
             </div>
-            <div className="text-sm text-blue-600">Boletas</div>
+            <div className="text-sm text-blue-600 dark:text-blue-400">Boletas</div>
           </div>
-          <div className="bg-green-50 rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-green-600">
+          <div className="bg-green-50 dark:bg-green-900/30 rounded-lg shadow-sm p-4">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {estadisticas.porTipo?.find((elemento: any) => elemento.tipo === 'recibo_pago')?.cantidad || 0}
             </div>
-            <div className="text-sm text-green-600">Recibos</div>
+            <div className="text-sm text-green-600 dark:text-green-400">Recibos</div>
           </div>
-          <div className="bg-purple-50 rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-purple-600">
+          <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg shadow-sm p-4">
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               {estadisticas.porTipo?.find((elemento: any) => elemento.tipo === 'carnet')?.cantidad || 0}
             </div>
-            <div className="text-sm text-purple-600">Carnets</div>
+            <div className="text-sm text-purple-600 dark:text-purple-400">Carnets</div>
           </div>
         </div>
       )}
@@ -106,30 +107,32 @@ export default function PaginaDocumentos() {
       {/* Filters */}
       <Tarjeta className="mb-6">
         <ContenidoTarjeta className="pt-6">
-          <div className="flex gap-4">
-            <Selector
+          <div className="flex flex-wrap gap-4">
+            <CampoFiltro
+              etiqueta="Tipo de documento"
               value={filtroTipo}
-              onChange={(e) => setFiltroTipo(e.target.value)}
+              onChange={setFiltroTipo}
+              placeholder="Todos los tipos"
+              className="w-full sm:w-56"
               opciones={[
-                { value: '', etiqueta: 'Todos los tipos' },
                 { value: 'boleta_inscripcion', etiqueta: 'Boleta Inscripción' },
                 { value: 'recibo_pago', etiqueta: 'Recibo Pago' },
                 { value: 'carnet', etiqueta: 'Carnet' },
                 { value: 'certificado', etiqueta: 'Certificado' },
               ]}
-              placeholder="Tipo de documento"
             />
-            <Selector
+            <CampoFiltro
+              etiqueta="Estado"
               value={filtroEstado}
-              onChange={(e) => setFiltroEstado(e.target.value)}
+              onChange={setFiltroEstado}
+              placeholder="Todos"
+              className="w-full sm:w-48"
               opciones={[
-                { value: '', etiqueta: 'Todos' },
                 { value: 'generado', etiqueta: 'Generado' },
                 { value: 'impreso', etiqueta: 'Impreso' },
                 { value: 'entregado', etiqueta: 'Entregado' },
                 { value: 'anulado', etiqueta: 'Anulado' },
               ]}
-              placeholder="Estado"
             />
           </div>
         </ContenidoTarjeta>
@@ -159,7 +162,7 @@ export default function PaginaDocumentos() {
                 </FilaTabla>
               ) : documentos.length === 0 ? (
                 <FilaTabla>
-                  <CeldaTabla colSpan={7} className="text-center py-8 text-gray-500">
+                  <CeldaTabla colSpan={7} className="text-center py-8 text-muted-foreground">
                     No hay documentos
                   </CeldaTabla>
                 </FilaTabla>
@@ -201,7 +204,7 @@ export default function PaginaDocumentos() {
                           </Boton>
                         )}
                         {documento.estado === 'impreso' && (
-                          <Boton variante="fantasma" tamano="pequeno" title="Registrar entrega" className="text-green-600">
+                          <Boton variante="fantasma" tamano="pequeno" title="Registrar entrega" className="text-green-600 dark:text-green-400">
                             <CheckCircle className="w-4 h-4" />
                           </Boton>
                         )}
@@ -217,7 +220,7 @@ export default function PaginaDocumentos() {
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-muted-foreground">
           Mostrando {documentos.length} documentos
         </div>
         <div className="flex gap-2">

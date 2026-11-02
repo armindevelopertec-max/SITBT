@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Migas } from '@/componentes/iu/migas';
+import { BuscadorFiltro } from '@/componentes/iu/barra-filtros';
 import {
   Tarjeta,
   ContenidoTarjeta,
@@ -160,7 +161,7 @@ export default function PaginaRoles() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -171,8 +172,8 @@ export default function PaginaRoles() {
 
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Roles</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Gestión de Roles</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Crea y administra los roles que se asignan a los usuarios del sistema.
           </p>
         </div>
@@ -186,8 +187,8 @@ export default function PaginaRoles() {
         <div
           className={`rounded-lg border px-4 py-3 text-sm ${
             mensaje.tipo === 'exito'
-              ? 'border-green-200 bg-green-50 text-green-800'
-              : 'border-red-200 bg-red-50 text-red-800'
+              ? 'border-green-200 bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+              : 'border-red-200 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300'
           }`}
         >
           {mensaje.texto}
@@ -195,7 +196,7 @@ export default function PaginaRoles() {
       )}
 
       {error && (
-        <div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-800 dark:text-red-300">
           <span>{error}</span>
           <Boton variante="contorno" tamano="pequeno" onClick={() => recargar()}>
             Reintentar
@@ -203,7 +204,7 @@ export default function PaginaRoles() {
         </div>
       )}
 
-      <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+      <div className="rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-900/30 px-4 py-3 text-sm text-blue-800 dark:text-blue-300">
         <p className="font-medium">Permisos por rol</p>
         <p className="mt-1">
           Los accesos se asignan por módulo y acción con el botón{' '}
@@ -225,23 +226,19 @@ export default function PaginaRoles() {
                 {roles.length === 1 ? '' : 's'}
               </DescripcionTarjeta>
             </div>
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Entrada
-                placeholder="Buscar rol..."
-                className="pl-10"
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-              />
-            </div>
+            <BuscadorFiltro
+              placeholder="Buscar rol..."
+              value={busqueda}
+              onChange={setBusqueda}
+            />
           </div>
         </EncabezadoTarjeta>
 
         <ContenidoTarjeta>
           {rolesFiltrados.length === 0 ? (
             <div className="text-center py-12">
-              <ShieldCheck className="w-10 h-10 mx-auto text-gray-300" />
-              <p className="mt-3 text-sm text-gray-500">
+              <ShieldCheck className="w-10 h-10 mx-auto text-muted-foreground/70" />
+              <p className="mt-3 text-sm text-muted-foreground">
                 {busqueda
                   ? 'No hay roles que coincidan con la búsqueda'
                   : 'Todavía no hay roles registrados'}
@@ -254,7 +251,7 @@ export default function PaginaRoles() {
               )}
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto scrollarea-tema">
               <Tabla>
                 <EncabezadoTabla>
                   <FilaTabla>
@@ -269,12 +266,12 @@ export default function PaginaRoles() {
                   {rolesFiltrados.map((rol) => (
                     <FilaTabla key={rol.id}>
                       <CeldaTabla>
-                        <code className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700">
+                        <code className="rounded bg-muted px-2 py-1 text-xs text-foreground">
                           {rol.codigo}
                         </code>
                       </CeldaTabla>
-                      <CeldaTabla className="font-medium text-gray-900">{rol.nombre}</CeldaTabla>
-                      <CeldaTabla className="text-gray-500">
+                      <CeldaTabla className="font-medium text-foreground">{rol.nombre}</CeldaTabla>
+                      <CeldaTabla className="text-muted-foreground">
                         {rol.descripcion || '—'}
                       </CeldaTabla>
                       <CeldaTabla>
@@ -306,7 +303,7 @@ export default function PaginaRoles() {
                           <Boton
                             variante="fantasma"
                             tamano="icono"
-                            className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                            className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:bg-red-900/30 hover:text-red-700 dark:text-red-300 dark:hover:bg-red-900/50"
                             onClick={() => {
                               setMensaje(null);
                               setRolEliminando(rol);
@@ -377,7 +374,7 @@ export default function PaginaRoles() {
           />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Descripción
             </label>
             <AreaTexto
@@ -391,7 +388,7 @@ export default function PaginaRoles() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Estado</label>
             <select
               className="w-full rounded-lg border border-input bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
               value={formulario.estado}
@@ -407,14 +404,14 @@ export default function PaginaRoles() {
               <option value="inactivo">Inactivo</option>
             </select>
             {rolEditando?.codigo === 'administrador' && (
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-muted-foreground">
                 El rol administrador siempre debe permanecer activo.
               </p>
             )}
           </div>
 
           {errorFormulario && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+            <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/30 px-3 py-2 text-sm text-red-800 dark:text-red-300">
               {errorFormulario}
             </div>
           )}

@@ -68,7 +68,7 @@ export default function PaginaMaterias() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function PaginaMaterias() {
       <Migas elementos={[{ etiqueta: 'Configuración', href: '/configuracion' }, { etiqueta: 'Materias' }]} />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">Materias</h1>
+        <h1 className="text-xl font-bold text-foreground">Materias</h1>
         <Boton tamano="pequeno" onClick={() => router.push('/materias/nuevo')}>
           <Plus className="w-3 h-3 mr-1" />
           Nueva
@@ -86,7 +86,7 @@ export default function PaginaMaterias() {
       </div>
 
       <div className="relative">
-        <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400" />
+        <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
         <Entrada
           placeholder="Buscar..."
           className="pl-7 h-8 text-sm"
@@ -96,7 +96,7 @@ export default function PaginaMaterias() {
       </div>
 
       {materiasFiltradas.length === 0 ? (
-        <p className="text-center text-sm text-gray-500 py-8">
+        <p className="text-center text-sm text-muted-foreground py-8">
           {consultaBusqueda ? 'Sin resultados' : 'Sin materias registradas'}
         </p>
       ) : (
@@ -104,10 +104,10 @@ export default function PaginaMaterias() {
           {materiasFiltradas.map((materia) => (
             <div
               key={materia.id}
-              className="flex items-center justify-between p-2 border rounded hover:bg-gray-50 group"
+              className="flex items-center justify-between p-2 border rounded hover:bg-muted/40 group"
             >
               <div className="flex-1 mr-2">
-                <p className="text-[10px] text-primary-600 font-medium">{materia.codigo}</p>
+                <p className="text-[10px] text-primary-600 dark:text-primary-400 font-medium">{materia.codigo}</p>
                 <p className="text-sm font-medium break-words">{materia.nombre}</p>
               </div>
               <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">

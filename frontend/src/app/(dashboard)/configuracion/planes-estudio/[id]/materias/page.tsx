@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Migas } from '@/componentes/iu/migas';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
@@ -62,11 +62,37 @@ export default function PaginaMateriasPlan() {
     return materia.codigo.toLowerCase().includes(busqueda) || materia.nombre.toLowerCase().includes(busqueda);
   });
 
-  const prerrequisitosFiltrados = materiasDisponibles.filter(materia => {
-    if (!busquedaPrerrequisito) return true;
-    const busqueda = busquedaPrerrequisito.toLowerCase();
-    return materia.codigo.toLowerCase().includes(busqueda) || materia.nombre.toLowerCase().includes(busqueda);
-  });
+  /**
+   * Prerrequisitos disponibles: solo materias del MISMO plan de estudio y de
+   * semestres anteriores (o el mismo semestre). Una materia no puede tener
+   * como prerrequisito una materia de otro plan ni de un semestre posterior.
+   */
+  const prerrequisitosFiltrados = useMemo(() => {
+    const semestreLimite = agregandoASemestre ?? 1;
+
+    const idsMateriasDelPlan = new Set(
+      materiasPlan.map(materiaPlan => materiaPlan.materiaId),
+    );
+
+    // Materias del plan con su semestre, para filtrar por semestre.
+    const semestrePorMateria = new Map<number, number>();
+    for (const materiaPlan of materiasPlan) {
+      semestrePorMateria.set(materiaPlan.materiaId, materiaPlan.semestre);
+    }
+
+    return materiasDisponibles.filter(materia => {
+      if (!idsMateriasDelPlan.has(materia.id)) return false;
+      const semestre = semestrePorMateria.get(materia.id);
+      if (semestre === undefined) return false;
+      if (semestre > semestreLimite) return false;
+      if (!busquedaPrerrequisito) return true;
+      const busqueda = busquedaPrerrequisito.toLowerCase();
+      return (
+        materia.codigo.toLowerCase().includes(busqueda) ||
+        materia.nombre.toLowerCase().includes(busqueda)
+      );
+    });
+  }, [materiasDisponibles, materiasPlan, agregandoASemestre, busquedaPrerrequisito]);
 
   useEffect(() => {
     obtenerPlan();
@@ -210,7 +236,7 @@ export default function PaginaMateriasPlan() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -230,12 +256,12 @@ export default function PaginaMateriasPlan() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-foreground">
             Plan de Estudios: {plan?.numeroRm}
           </h1>
           <div className="flex items-center gap-3 mt-1">
             <Insignia variante="contorno">{plan?.carrera?.codigo}</Insignia>
-            <span className="text-gray-500">{plan?.carrera?.nombre}</span>
+            <span className="text-muted-foreground">{plan?.carrera?.nombre}</span>
             <Insignia variante={plan?.estado === 'vigente' ? 'exito' : 'secundario'}>
               {plan?.estado}
             </Insignia>
@@ -244,7 +270,7 @@ export default function PaginaMateriasPlan() {
       </div>
 
       {errores.submit && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
           {errores.submit}
         </div>
       )}
@@ -252,8 +278,8 @@ export default function PaginaMateriasPlan() {
       <div className="space-y-6">
         {materiasPlan.length === 0 && agregandoASemestre === null ? (
           <Tarjeta variante="conBorde">
-            <ContenidoTarjeta className="py-12 text-center text-gray-500">
-              <BookOpen className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+            <ContenidoTarjeta className="py-12 text-center text-muted-foreground">
+              <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground/70" />
               <p className="text-lg font-medium mb-2">No hay materias asignadas</p>
               <p className="text-sm mb-4">
                 Comienza agregando materias a los semestres.
@@ -272,11 +298,11 @@ export default function PaginaMateriasPlan() {
 
             return (
               <Tarjeta key={semestre} variante="conBorde">
-                <EncabezadoTarjeta className="bg-gray-50 py-3">
+                <EncabezadoTarjeta className="bg-muted/40 py-3">
                   <div className="flex items-center justify-between">
                     <TituloTarjeta className="text-lg">Semestre {semestre}</TituloTarjeta>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-muted-foreground">
                         {materiasSemestre.length} materia{materiasSemestre.length !== 1 ? 's' : ''}
                       </span>
                       <Insignia variante="contorno">{totalHoras} horas/semana</Insignia>
@@ -292,16 +318,16 @@ export default function PaginaMateriasPlan() {
 
                 <ContenidoTarjeta className="p-4">
                   {estaAgregando && (
-                    <div className="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/30 rounded-lg border border-green-200">
                       <div className="flex items-center gap-2 mb-3">
-                        <Search className="w-4 h-4 text-green-600" />
-                        <span className="font-medium text-green-700">Agregar nueva materia</span>
+                        <Search className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        <span className="font-medium text-green-700 dark:text-green-300">Agregar nueva materia</span>
                       </div>
 
                       <div className="space-y-3">
                         <div className="flex flex-col md:flex-row gap-3">
                           <div className="flex-1">
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Materia</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1">Materia</label>
                             <div className="relative">
                               <Entrada
                                 type="text"
@@ -312,31 +338,31 @@ export default function PaginaMateriasPlan() {
                               />
                             </div>
                             {busquedaMateria && materiasFiltradas.length > 0 && (
-                              <div className="absolute z-10 mt-1 w-64 bg-white rounded-lg border shadow-lg max-h-40 overflow-y-auto">
+                              <div className="absolute z-10 mt-1 w-64 bg-card rounded-lg border shadow-lg max-h-40 overflow-y-auto scrollarea-tema">
                                 {materiasFiltradas.map(materia => (
                                   <div
                                     key={materia.id}
-                                    className="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
+                                    className="px-3 py-2 hover:bg-muted/40 cursor-pointer border-b last:border-b-0"
                                     onClick={() => {
                                       setIdMateriaNueva(materia.id);
                                       setBusquedaMateria(`${materia.codigo} - ${materia.nombre}`);
                                     }}
                                   >
                                     <span className="font-medium text-sm">{materia.codigo}</span>
-                                    <span className="text-gray-500 text-sm ml-2">{materia.nombre}</span>
+                                    <span className="text-muted-foreground text-sm ml-2">{materia.nombre}</span>
                                   </div>
                                 ))}
                               </div>
                             )}
                             {idMateriaNueva && busquedaMateria && (
-                              <div className="mt-1 px-2 py-1 bg-green-100 rounded text-xs text-green-700">
+                              <div className="mt-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded text-xs text-green-700 dark:text-green-300">
                                 Seleccionado: {materiasDisponibles.find(materia => materia.id === idMateriaNueva)?.codigo} - {materiasDisponibles.find(materia => materia.id === idMateriaNueva)?.nombre}
                               </div>
                             )}
                           </div>
 
                           <div className="w-24">
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Horas/Sem</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1">Horas/Sem</label>
                             <Entrada
                               type="number"
                               value={horasSemanalesNuevas || ''}
@@ -347,7 +373,7 @@ export default function PaginaMateriasPlan() {
                           </div>
 
                           <div className="flex-1">
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Prerrequisito (opcional)</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1">Prerrequisito (opcional)</label>
                             <div className="relative">
                               <Entrada
                                 type="text"
@@ -358,24 +384,24 @@ export default function PaginaMateriasPlan() {
                               />
                             </div>
                             {busquedaPrerrequisito && prerrequisitosFiltrados.length > 0 && (
-                              <div className="absolute z-10 mt-1 w-64 bg-white rounded-lg border shadow-lg max-h-40 overflow-y-auto">
+                              <div className="absolute z-10 mt-1 w-64 bg-card rounded-lg border shadow-lg max-h-40 overflow-y-auto scrollarea-tema">
                                 {prerrequisitosFiltrados.filter(prerrequisito => prerrequisito.id !== idMateriaNueva).map(prerrequisito => (
                                   <div
                                     key={prerrequisito.id}
-                                    className="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
+                                    className="px-3 py-2 hover:bg-muted/40 cursor-pointer border-b last:border-b-0"
                                     onClick={() => {
                                       setIdPrerrequisitoNuevo(prerrequisito.id);
                                       setBusquedaPrerrequisito(`${prerrequisito.codigo} - ${prerrequisito.nombre}`);
                                     }}
                                   >
                                     <span className="font-medium text-sm">{prerrequisito.codigo}</span>
-                                    <span className="text-gray-500 text-sm ml-2">{prerrequisito.nombre}</span>
+                                    <span className="text-muted-foreground text-sm ml-2">{prerrequisito.nombre}</span>
                                   </div>
                                 ))}
                               </div>
                             )}
                             {idPrerrequisitoNuevo && (
-                              <div className="mt-1 px-2 py-1 bg-purple-100 rounded text-xs text-purple-700">
+                              <div className="mt-1 px-2 py-1 bg-purple-100 dark:bg-purple-900/40 rounded text-xs text-purple-700 dark:text-purple-300">
                                 Prerrequisito: {materiasDisponibles.find(materia => materia.id === idPrerrequisitoNuevo)?.codigo}
                               </div>
                             )}
@@ -396,7 +422,7 @@ export default function PaginaMateriasPlan() {
                   )}
 
                   {materiasSemestre.length === 0 && !estaAgregando ? (
-                    <div className="py-6 text-center text-gray-400 text-sm">
+                    <div className="py-6 text-center text-muted-foreground text-sm">
                       Sin materias en este semestre
                     </div>
                   ) : (
@@ -420,7 +446,7 @@ export default function PaginaMateriasPlan() {
                               {materiaPlan.prerrequisitoId ? (
                                 <Insignia variante="secundario">{materiaPlan.prerrequisito?.codigo || materiaPlan.prerrequisitoId}</Insignia>
                               ) : (
-                                <span className="text-gray-400 text-sm">-</span>
+                                <span className="text-muted-foreground text-sm">-</span>
                               )}
                             </CeldaTabla>
                             <CeldaTabla className="text-right">

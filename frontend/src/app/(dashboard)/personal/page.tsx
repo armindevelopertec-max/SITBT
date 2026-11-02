@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Migas } from '@/componentes/iu/migas';
+import { BuscadorFiltro } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
@@ -12,18 +13,11 @@ import { Modal, ModalConfirmacion } from '@/componentes/iu/modal';
 import { Plus, Search, Edit2, Trash2, Loader2, User, Eye, Key } from 'lucide-react';
 import { api } from '@/libreria/api';
 import { Personal } from '@/tipos';
-
-const OPCIONES_CARGO = [
-  { value: 'docente', etiqueta: 'Docente' },
-  { value: 'secretaria', etiqueta: 'Secretaría' },
-  { value: 'director_academico', etiqueta: 'Director Académico' },
-  { value: 'rector', etiqueta: 'Rector' },
-  { value: 'apoyo', etiqueta: 'Personal de Apoyo' },
-  { value: 'bibliotecario', etiqueta: 'Bibliotecario' },
-];
+import { usarCargosPersonal } from '@/ganchos/usarCargosPersonal';
 
 export default function PaginaPersonal() {
   const router = useRouter();
+  const { cargos } = usarCargosPersonal();
   const [personal, setPersonal] = useState<Personal[]>([]);
   const [cargando, setCargando] = useState(true);
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
@@ -76,7 +70,9 @@ export default function PaginaPersonal() {
       apoyo: 'secundario',
       bibliotecario: 'secundario',
     };
-    return <Insignia variante={variantes[cargo] || 'secundario'}>{cargo.replace('_', ' ')}</Insignia>;
+    // El cargo es el código de un rol: se muestra el nombre del rol.
+    const nombre = cargos.find((item) => item.codigo === cargo)?.nombre ?? cargo.replace(/_/g, ' ');
+    return <Insignia variante={variantes[cargo] || 'secundario'}>{nombre}</Insignia>;
   };
 
   const eliminar = async () => {
@@ -143,7 +139,7 @@ export default function PaginaPersonal() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -153,7 +149,7 @@ export default function PaginaPersonal() {
       <Migas elementos={[{ etiqueta: 'Personal' }]} />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gestión de Personal</h1>
+        <h1 className="text-2xl font-bold text-foreground">Gestión de Personal</h1>
         <Boton onClick={() => router.push('/personal/nuevo')}>
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Personal
@@ -164,15 +160,11 @@ export default function PaginaPersonal() {
         <EncabezadoTarjeta>
           <div className="flex items-center justify-between">
             <TituloTarjeta>Lista de Personal ({personal.length})</TituloTarjeta>
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Entrada
-                placeholder="Buscar por nombre o CI..."
-                className="pl-10"
-                value={terminoBusqueda}
-                onChange={(e) => setTerminoBusqueda(e.target.value)}
-              />
-            </div>
+            <BuscadorFiltro
+              placeholder="Buscar por nombre o CI..."
+              value={terminoBusqueda}
+              onChange={setTerminoBusqueda}
+            />
           </div>
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
@@ -216,7 +208,7 @@ export default function PaginaPersonal() {
               ))}
               {personalFiltrado.length === 0 && (
                 <FilaTabla>
-                  <CeldaTabla colSpan={6} className="text-center py-8 text-gray-500">
+                  <CeldaTabla colSpan={6} className="text-center py-8 text-muted-foreground">
                     {terminoBusqueda ? 'No se encontró personal' : 'No hay personal registrado'}
                   </CeldaTabla>
                 </FilaTabla>
@@ -240,26 +232,26 @@ export default function PaginaPersonal() {
       <Modal abierto={!!modalCredenciales} alCerrar={() => setModalCredenciales(null)} titulo="Credenciales del Personal" tamano="mediano">
         {modalCredenciales && (
           <div className="space-y-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Credenciales de acceso para <strong>{modalCredenciales.nombre}</strong>:
             </p>
-            <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+            <div className="bg-muted/40 p-4 rounded-lg space-y-3">
               <div className="flex items-center gap-3">
-                <User className="w-5 h-5 text-gray-400" />
+                <User className="w-5 h-5 text-muted-foreground" />
                 <div>
-                  <p className="text-xs text-gray-500">Nombre de usuario</p>
+                  <p className="text-xs text-muted-foreground">Nombre de usuario</p>
                   <p className="font-mono font-medium">{modalCredenciales.nombreUsuario}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Key className="w-5 h-5 text-gray-400" />
+                <Key className="w-5 h-5 text-muted-foreground" />
                 <div>
-                  <p className="text-xs text-gray-500">Contraseña temporal</p>
-                  <p className="font-mono font-medium text-green-600">{modalCredenciales.contrasena}</p>
+                  <p className="text-xs text-muted-foreground">Contraseña temporal</p>
+                  <p className="font-mono font-medium text-green-600 dark:text-green-400">{modalCredenciales.contrasena}</p>
                 </div>
               </div>
             </div>
-            <p className="text-xs text-amber-600">
+            <p className="text-xs text-amber-600 dark:text-amber-400">
               ⚠️ Esta contraseña es temporal. El usuario debe cambiarla después de iniciar sesión.
             </p>
             <div className="flex justify-end gap-3">

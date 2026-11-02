@@ -95,8 +95,8 @@ export default function PaginaPerfil() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Mi perfil</h1>
-          <p className="text-gray-600 mt-1">Información de la cuenta y datos personales</p>
+          <h1 className="text-2xl font-bold text-foreground">Mi perfil</h1>
+          <p className="text-muted-foreground mt-1">Información de la cuenta y datos personales</p>
         </div>
         <Boton variante="contorno" onClick={cargarPerfil} disabled={cargando}>
           {cargando ? (
@@ -109,25 +109,25 @@ export default function PaginaPerfil() {
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/30 px-4 py-3 text-sm text-red-700 dark:text-red-300">
           {error}
         </div>
       )}
 
       {cargando && !datos ? (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+          <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1 space-y-6">
             <Tarjeta variante="conBorde">
               <ContenidoTarjeta className="text-center">
-                <div className="w-24 h-24 rounded-full bg-primary-100 flex items-center justify-center mx-auto mb-4">
-                  <User className="w-12 h-12 text-primary-600" />
+                <div className="w-24 h-24 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mx-auto mb-4">
+                  <User className="w-12 h-12 text-primary-600 dark:text-primary-400" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900">{nombreCompleto(persona)}</h2>
-                <p className="text-gray-500 mt-1">@{datos?.nombreUsuario}</p>
+                <h2 className="text-xl font-semibold text-foreground">{nombreCompleto(persona)}</h2>
+                <p className="text-muted-foreground mt-1">@{datos?.nombreUsuario}</p>
                 <div className="flex flex-wrap justify-center gap-2 mt-4">
                   {(datos?.roles || []).map((rol: Rol) => (
                     <Insignia key={rol.id} variante="primario">
@@ -198,10 +198,10 @@ export default function PaginaPerfil() {
 function Dato({ etiqueta, valor, icono }: { etiqueta: string; valor: string; icono?: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3">
-      {icono && <div className="mt-0.5 text-gray-400">{icono}</div>}
+      {icono && <div className="mt-0.5 text-muted-foreground">{icono}</div>}
       <div>
-        <p className="text-xs text-gray-500">{etiqueta}</p>
-        <p className="text-sm font-medium text-gray-900 mt-0.5">{valor}</p>
+        <p className="text-xs text-muted-foreground">{etiqueta}</p>
+        <p className="text-sm font-medium text-foreground mt-0.5">{valor}</p>
       </div>
     </div>
   );

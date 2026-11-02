@@ -155,8 +155,8 @@ export default function PaginaConfiguracion() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Configuración Institucional</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Configuración Institucional</h1>
+          <p className="text-muted-foreground mt-1">
             Datos de la institución que aparecerán en certificados y documentos
           </p>
         </div>
@@ -172,8 +172,8 @@ export default function PaginaConfiguracion() {
         <div
           className={`p-4 rounded-lg ${
             mensaje.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
+              ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200'
+              : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-200'
           }`}
         >
           {mensaje.texto}
@@ -236,7 +236,7 @@ export default function PaginaConfiguracion() {
                 textoAyuda="PNG, JPG o WEBP (máx. 5MB). El logo se sube y se guarda automáticamente."
               />
               {guardandoLogo && (
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-muted-foreground mt-2">
                   Guardando logo automáticamente...
                 </p>
               )}
@@ -328,20 +328,20 @@ export default function PaginaConfiguracion() {
             <ContenidoTarjeta className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Nombre Completo</p>
-                  <p className="text-gray-900">{configuracion?.nombre || '-'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Nombre Completo</p>
+                  <p className="text-foreground">{configuracion?.nombre || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Nombre Corto / Sigla</p>
-                  <p className="text-gray-900">{configuracion?.nombreCorto || '-'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Nombre Corto / Sigla</p>
+                  <p className="text-foreground">{configuracion?.nombreCorto || '-'}</p>
                 </div>
                 <div className="md:col-span-2">
-                  <p className="text-sm font-medium text-gray-500">Lema</p>
-                  <p className="text-gray-900">{configuracion?.lema || '-'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Lema</p>
+                  <p className="text-foreground">{configuracion?.lema || '-'}</p>
                 </div>
                 <div className="md:col-span-2">
-                  <p className="text-sm font-medium text-gray-500">Descripción</p>
-                  <p className="text-gray-900">{configuracion?.descripcion || '-'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Descripción</p>
+                  <p className="text-foreground">{configuracion?.descripcion || '-'}</p>
                 </div>
               </div>
             </ContenidoTarjeta>
@@ -360,16 +360,16 @@ export default function PaginaConfiguracion() {
                   <img
                     src={configuracion.logoUrl}
                     alt="Logo"
-                    className="w-24 h-24 object-contain rounded-lg border border-gray-200"
+                    className="w-24 h-24 object-contain rounded-lg border border-border"
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center">
-                    <Building2 className="w-12 h-12 text-gray-300" />
+                  <div className="w-24 h-24 rounded-lg border border-border bg-muted/40 flex items-center justify-center">
+                    <Building2 className="w-12 h-12 text-muted-foreground/70" />
                   </div>
                 )}
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Logo Institucional</p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-sm font-medium text-muted-foreground">Logo Institucional</p>
+                  <p className="text-xs text-muted-foreground mt-1">
                     {configuracion?.logoUrl ? 'Logo actual' : 'Sin logo configurado'}
                   </p>
                 </div>
@@ -387,16 +387,16 @@ export default function PaginaConfiguracion() {
             <ContenidoTarjeta>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Dirección</p>
-                  <p className="text-gray-900">{configuracion?.direccion || '-'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Dirección</p>
+                  <p className="text-foreground">{configuracion?.direccion || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Ciudad</p>
-                  <p className="text-gray-900">{configuracion?.ciudad || '-'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Ciudad</p>
+                  <p className="text-foreground">{configuracion?.ciudad || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">País</p>
-                  <p className="text-gray-900">{configuracion?.pais || '-'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">País</p>
+                  <p className="text-foreground">{configuracion?.pais || '-'}</p>
                 </div>
               </div>
             </ContenidoTarjeta>
@@ -412,20 +412,20 @@ export default function PaginaConfiguracion() {
             <ContenidoTarjeta>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Teléfono</p>
-                  <p className="text-gray-900">{configuracion?.telefono || '-'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Teléfono</p>
+                  <p className="text-foreground">{configuracion?.telefono || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Departamento</p>
-                  <p className="text-gray-900">{configuracion?.departamento || '-'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Departamento</p>
+                  <p className="text-foreground">{configuracion?.departamento || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Correo</p>
-                  <p className="text-gray-900">{configuracion?.correo || '-'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Correo</p>
+                  <p className="text-foreground">{configuracion?.correo || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Sitio Web</p>
-                  <p className="text-gray-900">{configuracion?.sitioWeb || '-'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Sitio Web</p>
+                  <p className="text-foreground">{configuracion?.sitioWeb || '-'}</p>
                 </div>
               </div>
             </ContenidoTarjeta>

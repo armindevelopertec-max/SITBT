@@ -98,7 +98,7 @@ export function CargarImagen({
   return (
     <div className={cn('w-full', className)}>
       {etiqueta && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
           {etiqueta}
         </label>
       )}
@@ -113,7 +113,7 @@ export function CargarImagen({
 
       {value ? (
         <div className="relative">
-          <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
+          <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
             <div className="flex items-center gap-4">
               <img
                 src={value}
@@ -124,8 +124,8 @@ export function CargarImagen({
                 }}
               />
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-700">Logo actual</p>
-                <p className="text-xs text-gray-500 mt-1">{value.split('/').pop()}</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Logo actual</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{value.split('/').pop()}</p>
               </div>
             </div>
           </div>
@@ -133,7 +133,7 @@ export function CargarImagen({
             <button
               type="button"
               onClick={() => refEntrada.current?.click()}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors dark:bg-gray-700 dark:hover:bg-gray-600"
               disabled={subiendo}
             >
               <Upload className="w-4 h-4" />
@@ -166,10 +166,10 @@ export function CargarImagen({
           <div className="flex flex-col items-center gap-3">
             {subiendo ? (
               <>
-                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                   <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary-600 border-t-transparent"></div>
                 </div>
-                <p className="text-sm text-gray-500">Subiendo imagen...</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Subiendo imagen...</p>
               </>
             ) : (
               <>
@@ -177,10 +177,10 @@ export function CargarImagen({
                   <Image className="w-6 h-6 text-primary-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-700">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
                     Arrastra una imagen aquí o haz clic para seleccionar
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     PNG, JPG o WEBP (máx. 5MB)
                   </p>
                 </div>
@@ -191,7 +191,7 @@ export function CargarImagen({
       )}
 
       {textoAyuda && !error && (
-        <p className="mt-1 text-sm text-gray-500">{textoAyuda}</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{textoAyuda}</p>
       )}
       {error && (
         <p className="mt-1 text-sm text-red-600">{error}</p>

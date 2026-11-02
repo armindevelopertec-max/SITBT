@@ -13,7 +13,11 @@ import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
 import { Selector } from '@/componentes/iu/selector';
 import { Insignia } from '@/componentes/iu/insignia';
-import { Modal } from '@/componentes/iu/modal';
+import {
+  BarraFiltros,
+  BuscadorFiltro,
+  CampoFiltro,
+} from '@/componentes/iu/barra-filtros';
 import {
   Tabla,
   CuerpoTabla,
@@ -24,7 +28,7 @@ import {
 } from '@/componentes/iu/tabla';
 import { api } from '@/libreria/api';
 import { mensajeDeError } from '@/libreria/utilidades';
-import { Search, Wand2, Eye, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Eye, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import type {
   MateriaImpartida,
   EstadoLibro,
@@ -123,10 +127,6 @@ export default function PaginaMateriasImpartidas() {
   const [busqueda, setBusqueda] = useState('');
   const [busquedaAplicada, setBusquedaAplicada] = useState('');
 
-  const [modalGenerarAbierto, setModalGenerarAbierto] = useState(false);
-  const [formularioGenerar, setFormularioGenerar] = useState({ periodoId: '', carreraId: '' });
-  const [resultadoGenerar, setResultadoGenerar] = useState<{ creados: number; existentes: number; mensaje: string } | null>(null);
-  const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
     obtenerDatosIniciales();
@@ -181,44 +181,11 @@ export default function PaginaMateriasImpartidas() {
     }
   };
 
-  const abrirGenerar = () => {
-    setResultadoGenerar(null);
-    setFormularioGenerar({ periodoId: filtroPeriodo || '', carreraId: filtroCarrera || '' });
-    setModalGenerarAbierto(true);
-  };
-
-  const generar = async () => {
-    if (!formularioGenerar.periodoId) {
-      setResultadoGenerar({ creados: 0, existentes: 0, mensaje: 'Selecciona un periodo.' });
-      return;
-    }
-    setGuardando(true);
-    try {
-      const cuerpo: Record<string, number> = { periodoId: Number(formularioGenerar.periodoId) };
-      if (formularioGenerar.carreraId) cuerpo.carreraId = Number(formularioGenerar.carreraId);
-      const respuesta = await api.post('/materias-impartidas/generar', cuerpo);
-      setResultadoGenerar({
-        creados: respuesta.data.creados,
-        existentes: respuesta.data.existentes,
-        mensaje: respuesta.data.mensaje,
-      });
-      if (respuesta.data.creados > 0) {
-        setFiltroPeriodo(formularioGenerar.periodoId);
-        setPagina(1);
-        obtenerMaterias();
-      }
-    } catch (error) {
-      console.error('Error al generar materias impartidas:', error);
-      setResultadoGenerar({ creados: 0, existentes: 0, mensaje: mensajeDeError(error, 'Error al generar') });
-    } finally {
-      setGuardando(false);
-    }
-  };
-
   const semestres = Array.from({ length: 12 }, (_, i) => ({
     value: (i + 1).toString(),
-    etiqueta: `${i + 1}.º semestre`,
+    etiqueta: `${i + 1}.º Semestre`,
   }));
+  const paralelosDisponibles = ['A', 'B', 'C', 'D', 'E', 'F'];
 
   const totalPaginas = Math.max(1, Math.ceil(total / LIMITE));
 
@@ -228,65 +195,66 @@ export default function PaginaMateriasImpartidas() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Materias Impartidas</h1>
-          <p className="text-sm text-gray-500">
-            Asignaturas de la malla que se dictan a cada grupo, con sus docentes y libros de calificaciones.
+          <h1 className="text-2xl font-bold text-foreground">Materias Impartidas</h1>
+          <p className="text-sm text-muted-foreground">
+            Asignaturas de la malla que se dictan a cada grupo, con sus docentes y libros de
+            calificaciones. Se generan automáticamente al crear los grupos.
           </p>
         </div>
-        <Boton onClick={abrirGenerar}>
-          <Wand2 className="w-4 h-4 mr-2" />
-          Generar materias impartidas
-        </Boton>
       </div>
 
       <Tarjeta variante="conBorde">
         <ContenidoTarjeta className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            <Selector
+          <BarraFiltros columnas={5}>
+            <CampoFiltro
               etiqueta="Periodo"
               value={filtroPeriodo}
-              onChange={(e) => {
+              onChange={(valor) => {
                 setPagina(1);
-                setFiltroPeriodo(e.target.value);
+                setFiltroPeriodo(valor);
               }}
-              opciones={[{ value: '', etiqueta: 'Todos' }, ...periodos.map((p) => ({ value: p.id, etiqueta: p.etiqueta }))]}
+              placeholder="Todos"
+              opciones={periodos.map((p) => ({ value: p.id, etiqueta: p.etiqueta }))}
             />
-            <Selector
+            <CampoFiltro
               etiqueta="Carrera"
               value={filtroCarrera}
-              onChange={(e) => {
+              onChange={(valor) => {
                 setPagina(1);
-                setFiltroCarrera(e.target.value);
+                setFiltroCarrera(valor);
               }}
-              opciones={[{ value: '', etiqueta: 'Todas' }, ...carreras.map((c) => ({ value: c.id, etiqueta: c.nombre }))]}
+              placeholder="Todas"
+              opciones={carreras.map((c) => ({ value: c.id, etiqueta: c.nombre }))}
             />
-            <Selector
+            <CampoFiltro
               etiqueta="Semestre"
               value={filtroSemestre}
-              onChange={(e) => {
+              onChange={(valor) => {
                 setPagina(1);
-                setFiltroSemestre(e.target.value);
+                setFiltroSemestre(valor);
               }}
-              opciones={[{ value: '', etiqueta: 'Todos' }, ...semestres]}
+              placeholder="Todos"
+              opciones={semestres}
             />
-            <Entrada
+            <CampoFiltro
               etiqueta="Paralelo"
-              placeholder="A, B, C..."
               value={filtroParalelo}
-              onChange={(e) => {
+              onChange={(valor) => {
                 setPagina(1);
-                setFiltroParalelo(e.target.value);
+                setFiltroParalelo(valor);
               }}
+              placeholder="Todos"
+              opciones={paralelosDisponibles.map((p) => ({ value: p, etiqueta: p }))}
             />
-            <Selector
+            <CampoFiltro
               etiqueta="Estado de notas"
               value={filtroEstadoNotas}
-              onChange={(e) => {
+              onChange={(valor) => {
                 setPagina(1);
-                setFiltroEstadoNotas(e.target.value);
+                setFiltroEstadoNotas(valor);
               }}
+              placeholder="Todos"
               opciones={[
-                { value: '', etiqueta: 'Todos' },
                 { value: 'borrador', etiqueta: 'Sin iniciar' },
                 { value: 'en_registro', etiqueta: 'En registro' },
                 { value: 'pendiente_revision', etiqueta: 'Pendiente de revisión' },
@@ -294,27 +262,23 @@ export default function PaginaMateriasImpartidas() {
                 { value: 'reabierto', etiqueta: 'Reabierto' },
               ]}
             />
-          </div>
+          </BarraFiltros>
 
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Buscar por materia o código de grupo..."
-              className="w-full rounded-lg border border-gray-300 pl-10 pr-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-            />
-          </div>
+          <BuscadorFiltro
+            value={busqueda}
+            onChange={setBusqueda}
+            placeholder="Buscar por materia o código de grupo..."
+            className="max-w-md"
+          />
         </ContenidoTarjeta>
       </Tarjeta>
 
       <Tarjeta variante="conBorde">
         <EncabezadoTarjeta className="flex items-center justify-between">
           <TituloTarjeta>Listado ({total})</TituloTarjeta>
-          {cargando && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+          {cargando && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
         </EncabezadoTarjeta>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollarea-tema">
           <Tabla>
             <EncabezadoTabla>
               <FilaTabla>
@@ -331,7 +295,7 @@ export default function PaginaMateriasImpartidas() {
             <CuerpoTabla>
               {materias.length === 0 && !cargando ? (
                 <FilaTabla>
-                  <CeldaTabla colSpan={8} className="text-center text-gray-500 py-10">
+                  <CeldaTabla colSpan={8} className="text-center text-muted-foreground py-10">
                     No hay materias impartidas con los filtros seleccionados.
                   </CeldaTabla>
                 </FilaTabla>
@@ -339,22 +303,22 @@ export default function PaginaMateriasImpartidas() {
                 materias.map((fila) => (
                   <FilaTabla key={fila.id}>
                     <CeldaTabla>
-                      <div className="font-medium text-gray-900">{fila.materia?.nombre}</div>
-                      <div className="text-xs text-gray-500">{fila.materia?.codigo}</div>
+                      <div className="font-medium text-foreground">{fila.materia?.nombre}</div>
+                      <div className="text-xs text-muted-foreground">{fila.materia?.codigo}</div>
                     </CeldaTabla>
-                    <CeldaTabla className="text-gray-700">{fila.grupo?.carrera?.nombre || '—'}</CeldaTabla>
+                    <CeldaTabla className="text-foreground">{fila.grupo?.carrera?.nombre || '—'}</CeldaTabla>
                     <CeldaTabla>
-                      <div className="text-gray-700">
+                      <div className="text-foreground">
                         {fila.grupo?.semestre}.º · {fila.grupo?.paralelo || '—'}
                       </div>
-                      <div className="text-xs text-gray-500">{fila.grupo?.turno?.nombre || '—'}</div>
+                      <div className="text-xs text-muted-foreground">{fila.grupo?.turno?.nombre || '—'}</div>
                     </CeldaTabla>
-                    <CeldaTabla className="text-gray-700">
+                    <CeldaTabla className="text-foreground">
                       {fila.gestion} · {fila.grupo?.periodo?.numero ? `Periodo ${fila.grupo.periodo.numero}` : '—'}
                     </CeldaTabla>
-                    <CeldaTabla className="text-gray-700">{fila.inscritos ?? 0}</CeldaTabla>
+                    <CeldaTabla className="text-foreground">{fila.inscritos ?? 0}</CeldaTabla>
                     <CeldaTabla>
-                      <div className="text-gray-700">{nombrePersona(fila.docente)}</div>
+                      <div className="text-foreground">{nombrePersona(fila.docente)}</div>
                       <Insignia variante={VARIANTES_ESTADO_DOCENTE[fila.estadoDocente || 'pendiente']}>
                         {ETIQUETAS_ESTADO_DOCENTE[fila.estadoDocente || 'pendiente']}
                       </Insignia>
@@ -381,8 +345,8 @@ export default function PaginaMateriasImpartidas() {
           </Tabla>
         </div>
         {total > LIMITE && (
-          <div className="flex items-center justify-between border-t border-gray-200 px-6 py-3">
-            <span className="text-sm text-gray-500">
+          <div className="flex items-center justify-between border-t border-border px-6 py-3">
+            <span className="text-sm text-muted-foreground">
               Página {pagina} de {totalPaginas}
             </span>
             <div className="flex gap-2">
@@ -406,48 +370,6 @@ export default function PaginaMateriasImpartidas() {
           </div>
         )}
       </Tarjeta>
-
-      <Modal
-        abierto={modalGenerarAbierto}
-        alCerrar={() => setModalGenerarAbierto(false)}
-        titulo="Generar materias impartidas"
-        descripcion="Crea las materias impartidas de los grupos del periodo a partir de la malla curricular."
-        tamano="grande"
-      >
-        <div className="space-y-4 p-4">
-          <Selector
-            etiqueta="Periodo"
-            value={formularioGenerar.periodoId}
-            onChange={(e) => setFormularioGenerar((f) => ({ ...f, periodoId: e.target.value }))}
-            opciones={[{ value: '', etiqueta: 'Selecciona un periodo' }, ...periodos.map((p) => ({ value: p.id, etiqueta: p.etiqueta }))]}
-          />
-          <Selector
-            etiqueta="Carrera (opcional)"
-            value={formularioGenerar.carreraId}
-            onChange={(e) => setFormularioGenerar((f) => ({ ...f, carreraId: e.target.value }))}
-            opciones={[{ value: '', etiqueta: 'Todas las carreras' }, ...carreras.map((c) => ({ value: c.id, etiqueta: c.nombre }))]}
-          />
-          {resultadoGenerar && (
-            <div
-              className={`rounded-lg border p-3 text-sm ${
-                resultadoGenerar.creados > 0
-                  ? 'border-green-200 bg-green-50 text-green-800'
-                  : 'border-gray-200 bg-gray-50 text-gray-700'
-              }`}
-            >
-              {resultadoGenerar.mensaje}
-            </div>
-          )}
-          <div className="flex justify-end gap-2">
-            <Boton variante="contorno" onClick={() => setModalGenerarAbierto(false)}>
-              Cerrar
-            </Boton>
-            <Boton onClick={generar} cargando={guardando}>
-              Generar
-            </Boton>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 }

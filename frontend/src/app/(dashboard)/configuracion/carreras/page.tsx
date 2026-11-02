@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Migas } from '@/componentes/iu/migas';
+import { BuscadorFiltro, FilaFiltros, CampoFiltro } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
@@ -133,15 +134,15 @@ export default function PaginaCarreras() {
 
   const obtenerInsigniaEstado = (estado: string) => {
     const configuracionInsignia = estado === 'activo'
-      ? { etiqueta: 'Activo', color: 'bg-green-100 text-green-800' }
-      : { etiqueta: 'Inactivo', color: 'bg-red-100 text-red-800' };
+      ? { etiqueta: 'Activo', color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' }
+      : { etiqueta: 'Inactivo', color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' };
     return <Insignia className={configuracionInsignia.color}>{configuracionInsignia.etiqueta}</Insignia>;
   };
 
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -151,7 +152,7 @@ export default function PaginaCarreras() {
       <Migas elementos={[{ etiqueta: 'Panel' }, { etiqueta: 'Carreras' }]} />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gestión de Carreras</h1>
+        <h1 className="text-2xl font-bold text-foreground">Gestión de Carreras</h1>
         <Boton onClick={() => abrirModal()}>
           <Plus className="w-4 h-4 mr-2" />
           Nueva Carrera
@@ -161,26 +162,24 @@ export default function PaginaCarreras() {
       <Tarjeta variante="conBorde">
         <EncabezadoTarjeta>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex flex-col md:flex-row gap-4 md:items-center">
-              <select
-                className="px-3 py-2 border border-gray-300 rounded-lg"
+            <FilaFiltros>
+              <CampoFiltro
+                etiqueta="Estado"
                 value={filtroEstado}
-                onChange={(e) => setFiltroEstado(e.target.value)}
-              >
-                <option value="">Todos los estados</option>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-              </select>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Entrada
-                  placeholder="Buscar por nombre, código o área..."
-                  className="pl-10 w-64"
-                  value={terminoBusqueda}
-                  onChange={(e) => setTerminoBusqueda(e.target.value)}
-                />
-              </div>
-            </div>
+                onChange={setFiltroEstado}
+                placeholder="Todos los estados"
+                className="w-full sm:w-44"
+                opciones={[
+                  { value: 'activo', etiqueta: 'Activo' },
+                  { value: 'inactivo', etiqueta: 'Inactivo' },
+                ]}
+              />
+              <BuscadorFiltro
+                placeholder="Buscar por nombre, código o área..."
+                value={terminoBusqueda}
+                onChange={setTerminoBusqueda}
+              />
+            </FilaFiltros>
           </div>
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
@@ -217,7 +216,7 @@ export default function PaginaCarreras() {
               ))}
               {carrerasFiltradas.length === 0 && (
                 <FilaTabla>
-                  <CeldaTabla colSpan={6} className="text-center py-8 text-gray-500">
+                  <CeldaTabla colSpan={6} className="text-center py-8 text-muted-foreground">
                     {terminoBusqueda || filtroEstado ? 'No se encontraron carreras' : 'No hay carreras registradas'}
                   </CeldaTabla>
                 </FilaTabla>
@@ -231,7 +230,7 @@ export default function PaginaCarreras() {
       <Modal abierto={modalAbierto} alCerrar={cerrarModal} titulo={carreraEditando ? 'Editar Carrera' : 'Nueva Carrera'} tamano="mediano">
         <form onSubmit={guardar} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Código *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Código *</label>
             <Entrada
               value={formulario.codigo}
               onChange={(e) => setFormulario({ ...formulario, codigo: e.target.value })}
@@ -240,7 +239,7 @@ export default function PaginaCarreras() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Nombre *</label>
             <Entrada
               value={formulario.nombre}
               onChange={(e) => setFormulario({ ...formulario, nombre: e.target.value })}
@@ -249,9 +248,9 @@ export default function PaginaCarreras() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Área</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Área</label>
             <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="w-full px-3 py-2 border border-border rounded-lg"
               value={formulario.area}
               onChange={(e) => setFormulario({ ...formulario, area: e.target.value })}
             >
@@ -264,9 +263,9 @@ export default function PaginaCarreras() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Descripción</label>
             <textarea
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="w-full px-3 py-2 border border-border rounded-lg"
               rows={3}
               value={formulario.descripcion}
               onChange={(e) => setFormulario({ ...formulario, descripcion: e.target.value })}
@@ -287,7 +286,7 @@ export default function PaginaCarreras() {
       {/* Modal Confirmar Eliminación */}
       <Modal abierto={!!carreraEliminando} alCerrar={() => setCarreraEliminando(null)} titulo="Eliminar Carrera" tamano="pequeno">
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             ¿Está seguro de eliminar la carrera <strong>{carreraEliminando?.nombre}</strong>?
           </p>
           <div className="flex justify-end gap-2">

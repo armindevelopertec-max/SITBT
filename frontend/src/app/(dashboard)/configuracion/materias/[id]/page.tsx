@@ -100,7 +100,7 @@ export default function PaginaEditarMateria() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -118,7 +118,7 @@ export default function PaginaEditarMateria() {
             { etiqueta: 'Editar Materia' }
           ]} />
         </div>
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
           Materia no encontrada
         </div>
       </div>
@@ -139,7 +139,7 @@ export default function PaginaEditarMateria() {
       </div>
 
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Editar Materia</h1>
+        <h1 className="text-2xl font-bold text-foreground">Editar Materia</h1>
       </div>
 
       <form onSubmit={enviarFormulario} className="space-y-6">
@@ -172,7 +172,7 @@ export default function PaginaEditarMateria() {
         </Tarjeta>
 
         {errores.submit && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
             {errores.submit}
           </div>
         )}

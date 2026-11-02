@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Migas } from '@/componentes/iu/migas';
+import { BuscadorFiltro } from '@/componentes/iu/barra-filtros';
 import {
   Tarjeta,
   ContenidoTarjeta,
@@ -423,7 +424,7 @@ export default function PaginaDetalleMateriaImpartida() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -432,7 +433,7 @@ export default function PaginaDetalleMateriaImpartida() {
     return (
       <div className="space-y-6">
         <Migas elementos={[{ etiqueta: 'Materias Impartidas', href: '/materias-impartidas' }, { etiqueta: 'No encontrada' }]} />
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg">
           No se encontró la materia impartida solicitada.
         </div>
         <Boton variante="contorno" onClick={() => router.push('/materias-impartidas')}>
@@ -476,12 +477,12 @@ export default function PaginaDetalleMateriaImpartida() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-gray-900">{materia.materia?.nombre}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{materia.materia?.nombre}</h1>
             <Insignia variante={libroEstado === 'cerrado' ? 'exito' : 'primario'}>
               {ETIQUETAS_ESTADO_NOTAS[libroEstado] || libroEstado}
             </Insignia>
           </div>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             {materia.materia?.codigo} · {materia.grupo?.carrera?.nombre} · {materia.grupo?.semestre}.º semestre · Paralelo{' '}
             {materia.grupo?.paralelo} · {materia.gestion}
             {materia.grupo?.periodo?.numero ? ` · Periodo ${materia.grupo.periodo.numero}` : ''}
@@ -514,7 +515,7 @@ export default function PaginaDetalleMateriaImpartida() {
       </div>
 
       <Tarjeta variante="conBorde">
-        <div className="border-b border-gray-200 px-2">
+        <div className="border-b border-border px-2">
           <nav className="flex flex-wrap gap-1">
             {pestanas.map((item) => (
               <button
@@ -523,8 +524,8 @@ export default function PaginaDetalleMateriaImpartida() {
                 className={
                   'inline-flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ' +
                   (pestana === item.clave
-                    ? 'border-primary-600 text-primary-700'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300')
+                    ? 'border-primary-600 text-primary-700 dark:text-primary-300'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border')
                 }
               >
                 {item.icono}
@@ -558,8 +559,8 @@ export default function PaginaDetalleMateriaImpartida() {
             <div className="space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h3 className="font-semibold text-gray-900">Docente asignado</h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className="font-semibold text-foreground">Docente asignado</h3>
+                  <p className="text-sm text-muted-foreground">
                     {materia.docente ? nombrePersona(materia.docente.persona) : 'Aún no se asignó un docente.'}
                   </p>
                 </div>
@@ -570,7 +571,7 @@ export default function PaginaDetalleMateriaImpartida() {
               </div>
               {cargandoDocentes ? (
                 <div className="flex justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+                  <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
                 </div>
               ) : (
                 <Tabla>
@@ -586,7 +587,7 @@ export default function PaginaDetalleMateriaImpartida() {
                   <CuerpoTabla>
                     {asignaciones.length === 0 ? (
                       <FilaTabla>
-                        <CeldaTabla colSpan={5} className="text-center py-8 text-gray-500">
+                        <CeldaTabla colSpan={5} className="text-center py-8 text-muted-foreground">
                           No hay asignaciones registradas.
                         </CeldaTabla>
                       </FilaTabla>
@@ -594,10 +595,10 @@ export default function PaginaDetalleMateriaImpartida() {
                       asignaciones.map((a) => (
                         <FilaTabla key={a.id}>
                           <CeldaTabla>{nombrePersona(a.docente?.persona)}</CeldaTabla>
-                          <CeldaTabla className="text-sm text-gray-600">
+                          <CeldaTabla className="text-sm text-muted-foreground">
                             {(a.fechaInicio || '—') + ' → ' + (a.fechaFin || 'vigente')}
                           </CeldaTabla>
-                          <CeldaTabla className="text-sm text-gray-600">{a.cargaHoraria ?? '—'}</CeldaTabla>
+                          <CeldaTabla className="text-sm text-muted-foreground">{a.cargaHoraria ?? '—'}</CeldaTabla>
                           <CeldaTabla>
                             <Insignia variante={a.estado === 'activo' ? 'exito' : 'secundario'}>
                               {a.estado === 'activo' ? 'Activo' : a.estado === 'finalizado' ? 'Finalizado' : 'Anulado'}
@@ -629,8 +630,8 @@ export default function PaginaDetalleMateriaImpartida() {
             <div className="space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h3 className="font-semibold text-gray-900">Estudiantes inscritos</h3>
-                  <p className="text-sm text-gray-500">{estudiantes.length} estudiante(s)</p>
+                  <h3 className="font-semibold text-foreground">Estudiantes inscritos</h3>
+                  <p className="text-sm text-muted-foreground">{estudiantes.length} estudiante(s)</p>
                 </div>
                 <div className="flex gap-2">
                   <Boton variante="contorno" onClick={sincronizarEstudiantes} disabled={procesando}>
@@ -645,7 +646,7 @@ export default function PaginaDetalleMateriaImpartida() {
               </div>
               {cargandoEstudiantes ? (
                 <div className="flex justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+                  <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
                 </div>
               ) : (
                 <Tabla>
@@ -660,7 +661,7 @@ export default function PaginaDetalleMateriaImpartida() {
                   <CuerpoTabla>
                     {estudiantes.length === 0 ? (
                       <FilaTabla>
-                        <CeldaTabla colSpan={4} className="text-center py-8 text-gray-500">
+                        <CeldaTabla colSpan={4} className="text-center py-8 text-muted-foreground">
                           No hay estudiantes inscritos.
                         </CeldaTabla>
                       </FilaTabla>
@@ -669,7 +670,7 @@ export default function PaginaDetalleMateriaImpartida() {
                         <FilaTabla key={e.inscripcionMateriaId}>
                           <CeldaTabla>
                             <div className="text-sm font-medium">{e.estudiante?.persona?.ci || '—'}</div>
-                            <div className="text-xs text-gray-500">{e.estudiante?.codigoInscripcion || ''}</div>
+                            <div className="text-xs text-muted-foreground">{e.estudiante?.codigoInscripcion || ''}</div>
                           </CeldaTabla>
                           <CeldaTabla>{nombrePersona(e.estudiante?.persona)}</CeldaTabla>
                           <CeldaTabla>
@@ -701,8 +702,8 @@ export default function PaginaDetalleMateriaImpartida() {
             <div className="space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h3 className="font-semibold text-gray-900">Libro de calificaciones</h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className="font-semibold text-foreground">Libro de calificaciones</h3>
+                  <p className="text-sm text-muted-foreground">
                     {filasLibro.length} estudiante(s) · {pendientes} pendiente(s) · Estado: {ETIQUETAS_ESTADO_NOTAS[libroEstado] || libroEstado}
                   </p>
                 </div>
@@ -713,14 +714,14 @@ export default function PaginaDetalleMateriaImpartida() {
               </div>
 
               {libroEstado === 'cerrado' && (
-                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-lg text-sm">
+                <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 text-green-700 dark:text-green-300 px-4 py-2 rounded-lg text-sm">
                   El libro está cerrado. Reábralo con autorización para modificar notas.
                 </div>
               )}
 
               {cargandoLibro ? (
                 <div className="flex justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+                  <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
                 </div>
               ) : (
                 <Tabla>
@@ -740,7 +741,7 @@ export default function PaginaDetalleMateriaImpartida() {
                   <CuerpoTabla>
                     {filasLibro.length === 0 ? (
                       <FilaTabla>
-                        <CeldaTabla colSpan={9} className="text-center py-8 text-gray-500">
+                        <CeldaTabla colSpan={9} className="text-center py-8 text-muted-foreground">
                           No hay estudiantes inscritos en esta materia.
                         </CeldaTabla>
                       </FilaTabla>
@@ -749,10 +750,10 @@ export default function PaginaDetalleMateriaImpartida() {
                         const c = fila.calificacion;
                         return (
                           <FilaTabla key={fila.inscripcionMateriaId}>
-                            <CeldaTabla className="text-gray-500">{indice + 1}</CeldaTabla>
+                            <CeldaTabla className="text-muted-foreground">{indice + 1}</CeldaTabla>
                             <CeldaTabla>
                               <div className="text-sm font-medium">{nombrePersona(fila.estudiante?.persona)}</div>
-                              <div className="text-xs text-gray-500">{fila.estudiante?.persona?.ci}</div>
+                              <div className="text-xs text-muted-foreground">{fila.estudiante?.persona?.ci}</div>
                             </CeldaTabla>
                             <CeldaTabla>{c?.parcial1 != null ? c.parcial1 : c?.parcial1Estado === 'ausente' ? 'AUS' : '—'}</CeldaTabla>
                             <CeldaTabla>{c?.parcial2 != null ? c.parcial2 : c?.parcial2Estado === 'ausente' ? 'AUS' : '—'}</CeldaTabla>
@@ -789,10 +790,10 @@ export default function PaginaDetalleMateriaImpartida() {
           {pestana === 'historial' && (
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold text-gray-900">Cierres y reaperturas</h3>
+                <h3 className="font-semibold text-foreground">Cierres y reaperturas</h3>
                 {cargandoHistorial ? (
                   <div className="flex justify-center py-6">
-                    <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+                    <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
                   </div>
                 ) : (
                   <Tabla>
@@ -807,7 +808,7 @@ export default function PaginaDetalleMateriaImpartida() {
                     <CuerpoTabla>
                       {!historial || historial.cierres.length === 0 ? (
                         <FilaTabla>
-                          <CeldaTabla colSpan={4} className="text-center py-6 text-gray-500">
+                          <CeldaTabla colSpan={4} className="text-center py-6 text-muted-foreground">
                             Sin cierres registrados.
                           </CeldaTabla>
                         </FilaTabla>
@@ -820,8 +821,8 @@ export default function PaginaDetalleMateriaImpartida() {
                                 {c.accion === 'cerrar' ? 'Cierre' : 'Reapertura'}
                               </Insignia>
                             </CeldaTabla>
-                            <CeldaTabla className="text-sm text-gray-600">{c.motivo || '—'}</CeldaTabla>
-                            <CeldaTabla className="text-sm text-gray-600">{nombrePersona(c.autorizador?.persona)}</CeldaTabla>
+                            <CeldaTabla className="text-sm text-muted-foreground">{c.motivo || '—'}</CeldaTabla>
+                            <CeldaTabla className="text-sm text-muted-foreground">{nombrePersona(c.autorizador?.persona)}</CeldaTabla>
                           </FilaTabla>
                         ))
                       )}
@@ -831,11 +832,11 @@ export default function PaginaDetalleMateriaImpartida() {
               </div>
 
               <div>
-                <h3 className="font-semibold text-gray-900">Auditoría de notas</h3>
-                <p className="text-sm text-gray-500">Cambios registrados sobre las calificaciones (valor anterior y nuevo).</p>
+                <h3 className="font-semibold text-foreground">Auditoría de notas</h3>
+                <p className="text-sm text-muted-foreground">Cambios registrados sobre las calificaciones (valor anterior y nuevo).</p>
                 {cargandoHistorial ? (
                   <div className="flex justify-center py-6">
-                    <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+                    <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
                   </div>
                 ) : (
                   <Tabla>
@@ -851,7 +852,7 @@ export default function PaginaDetalleMateriaImpartida() {
                     <CuerpoTabla>
                       {!historial || historial.auditoria.length === 0 ? (
                         <FilaTabla>
-                          <CeldaTabla colSpan={5} className="text-center py-6 text-gray-500">
+                          <CeldaTabla colSpan={5} className="text-center py-6 text-muted-foreground">
                             Sin cambios registrados.
                           </CeldaTabla>
                         </FilaTabla>
@@ -860,9 +861,9 @@ export default function PaginaDetalleMateriaImpartida() {
                           <FilaTabla key={a.id}>
                             <CeldaTabla className="text-sm whitespace-nowrap">{formatearFechaHora(a.cambiadoEn || '')}</CeldaTabla>
                             <CeldaTabla className="text-sm">{a.campoCambiado}</CeldaTabla>
-                            <CeldaTabla className="text-sm text-gray-600">{a.valorAnterior ?? '—'}</CeldaTabla>
-                            <CeldaTabla className="text-sm text-gray-600">{a.valorNuevo ?? '—'}</CeldaTabla>
-                            <CeldaTabla className="text-sm text-gray-600">{a.motivo || '—'}</CeldaTabla>
+                            <CeldaTabla className="text-sm text-muted-foreground">{a.valorAnterior ?? '—'}</CeldaTabla>
+                            <CeldaTabla className="text-sm text-muted-foreground">{a.valorNuevo ?? '—'}</CeldaTabla>
+                            <CeldaTabla className="text-sm text-muted-foreground">{a.motivo || '—'}</CeldaTabla>
                           </FilaTabla>
                         ))
                       )}
@@ -902,7 +903,7 @@ export default function PaginaDetalleMateriaImpartida() {
             placeholder="Horas"
           />
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Observación</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Observación</label>
             <AreaTexto
               rows={2}
               value={formularioDocente.observacion}
@@ -930,28 +931,24 @@ export default function PaginaDetalleMateriaImpartida() {
         tamano="grande"
       >
         <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              className="w-full rounded-lg border border-gray-300 pl-10 pr-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              placeholder="Buscar por nombre o CI..."
-              value={busquedaEstudiante}
-              onChange={(e) => setBusquedaEstudiante(e.target.value)}
-            />
-          </div>
+          <BuscadorFiltro
+            placeholder="Buscar por nombre o CI..."
+            value={busquedaEstudiante}
+            onChange={setBusquedaEstudiante}
+          />
           {cargandoDisponibles ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+              <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
             </div>
           ) : estudiantesFiltrados.length === 0 ? (
-            <p className="text-center py-8 text-gray-500 text-sm">No hay estudiantes disponibles para inscribir.</p>
+            <p className="text-center py-8 text-muted-foreground text-sm">No hay estudiantes disponibles para inscribir.</p>
           ) : (
-            <div className="max-h-80 overflow-y-auto divide-y divide-gray-100">
+            <div className="max-h-80 overflow-y-auto scrollarea-tema divide-y divide-gray-100">
               {estudiantesFiltrados.map((e) => (
                 <div key={e.id} className="flex items-center justify-between py-3 gap-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{nombrePersona(e.persona)}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm font-medium text-foreground">{nombrePersona(e.persona)}</p>
+                    <p className="text-xs text-muted-foreground">
                       CI: {e.persona?.ci || '—'} · {e.codigoInscripcion}
                     </p>
                   </div>
@@ -981,7 +978,7 @@ export default function PaginaDetalleMateriaImpartida() {
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">Primer parcial</p>
+              <p className="text-sm font-medium text-foreground">Primer parcial</p>
               <Selector
                 value={formularioCalificacion.parcial1Estado}
                 onChange={(e) =>
@@ -1005,7 +1002,7 @@ export default function PaginaDetalleMateriaImpartida() {
               />
             </div>
             <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">Segundo parcial</p>
+              <p className="text-sm font-medium text-foreground">Segundo parcial</p>
               <Selector
                 value={formularioCalificacion.parcial2Estado}
                 onChange={(e) =>
@@ -1030,9 +1027,9 @@ export default function PaginaDetalleMateriaImpartida() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-gray-100 pt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-border pt-4">
             <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">Segundo turno</p>
+              <p className="text-sm font-medium text-foreground">Segundo turno</p>
               <Selector
                 value={formularioCalificacion.estado2T}
                 onChange={(e) =>
@@ -1057,7 +1054,7 @@ export default function PaginaDetalleMateriaImpartida() {
               />
             </div>
             <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">Motivo (si corrige una nota ya registrada)</p>
+              <p className="text-sm font-medium text-foreground">Motivo (si corrige una nota ya registrada)</p>
               <AreaTexto
                 rows={3}
                 value={formularioCalificacion.motivo}
@@ -1067,7 +1064,7 @@ export default function PaginaDetalleMateriaImpartida() {
             </div>
           </div>
 
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             El promedio semestral se calcula automáticamente. La nota de 2.º turno reemplaza el promedio cuando está
             calificada.
           </p>
@@ -1091,13 +1088,13 @@ export default function PaginaDetalleMateriaImpartida() {
         tamano="mediano"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             {pendientes > 0
               ? `Hay ${pendientes} estudiante(s) sin resultado definitivo. No se podrá cerrar hasta resolverlos.`
               : 'Todos los estudiantes tienen resultado definitivo. El libro quedará cerrado.'}
           </p>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Observación</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Observación</label>
             <AreaTexto
               rows={2}
               value={observacionCierre}
@@ -1124,11 +1121,11 @@ export default function PaginaDetalleMateriaImpartida() {
         tamano="mediano"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             La reapertura permite modificar notas cerradas y queda registrada en la auditoría con autorización.
           </p>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Motivo *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Motivo *</label>
             <AreaTexto
               rows={3}
               value={motivoReapertura}
@@ -1169,8 +1166,8 @@ export default function PaginaDetalleMateriaImpartida() {
 function DatoResumen({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-wide text-gray-500">{etiqueta}</p>
-      <p className="mt-1 text-sm font-medium text-gray-900">{valor}</p>
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">{etiqueta}</p>
+      <p className="mt-1 text-sm font-medium text-foreground">{valor}</p>
     </div>
   );
 }

@@ -18,8 +18,8 @@ export default function PaginaApariencia() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Apariencia</h2>
-        <p className="text-gray-500 dark:text-gray-400">Personaliza el tema y el color principal del panel</p>
+        <h2 className="text-xl font-semibold text-foreground dark:text-gray-100">Apariencia</h2>
+        <p className="text-muted-foreground dark:text-muted-foreground">Personaliza el tema y el color principal del panel</p>
       </div>
 
       <Tarjeta variante="conBorde">
@@ -40,13 +40,13 @@ export default function PaginaApariencia() {
                     'flex items-center gap-3 p-4 rounded-lg border transition-colors text-left',
                     activo
                       ? 'border-primary bg-primary/5 text-primary'
-                      : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200'
+                      : 'border-border dark:border-gray-700 hover:bg-muted/40 dark:hover:bg-gray-800 text-foreground dark:text-gray-200'
                   )}
                 >
                   <ActivoIcono className="w-5 h-5" />
                   <div className="flex-1">
                     <p className="font-medium">{opcion.etiqueta}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                       {opcion.valor === 'sistema' ? `Actual: ${temaEfectivo === 'oscuro' ? 'oscuro' : 'claro'}` : opcion.etiqueta}
                     </p>
                   </div>
@@ -75,7 +75,7 @@ export default function PaginaApariencia() {
                     'flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors',
                     activo
                       ? 'border-primary bg-primary/5 text-primary'
-                      : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200'
+                      : 'border-border dark:border-gray-700 hover:bg-muted/40 dark:hover:bg-gray-800 text-foreground dark:text-gray-200'
                   )}
                   title={color.etiqueta}
                 >
@@ -89,7 +89,7 @@ export default function PaginaApariencia() {
               );
             })}
           </div>
-          <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-4 text-xs text-muted-foreground dark:text-muted-foreground">
             Los cambios se aplican inmediatamente y se guardan en este equipo.
           </p>
         </ContenidoTarjeta>

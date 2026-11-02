@@ -1,6 +1,11 @@
 import { Usuario, Rol } from '@/tipos';
 
-export const ROLES: Record<Rol, { etiqueta: string; color: string }> = {
+/**
+ * Etiquetas y colores sugeridos para los roles conocidos del sistema.
+ * Los roles son configurables desde /roles: si un rol no está en esta tabla
+ * se muestra su código con el estilo por defecto.
+ */
+export const ROLES: Record<string, { etiqueta: string; color: string }> = {
   administrador: { etiqueta: 'Administrador', color: 'bg-red-100 text-red-800' },
   secretaria: { etiqueta: 'Secretaria', color: 'bg-pink-100 text-pink-800' },
   director_academico: { etiqueta: 'Director Académico', color: 'bg-purple-100 text-purple-800' },

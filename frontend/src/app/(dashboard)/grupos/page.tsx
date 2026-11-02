@@ -8,6 +8,11 @@ import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
 import { Selector } from '@/componentes/iu/selector';
 import { Insignia } from '@/componentes/iu/insignia';
+import {
+  BarraFiltros,
+  BuscadorFiltro,
+  CampoFiltro,
+} from '@/componentes/iu/barra-filtros';
 import { Modal, ModalConfirmacion } from '@/componentes/iu/modal';
 import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/componentes/iu/tabla';
 import { api } from '@/libreria/api';
@@ -351,7 +356,7 @@ export default function PaginaGrupos() {
       <Migas elementos={[{ etiqueta: 'Grupos' }]} />
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Grupos y Paralelos</h1>
+        <h1 className="text-2xl font-bold text-foreground">Grupos y Paralelos</h1>
         <div className="flex flex-wrap gap-2">
           <Boton variante="contorno" onClick={abrirClonar}>
             <CopyPlus className="w-4 h-4 mr-2" />
@@ -375,76 +380,77 @@ export default function PaginaGrupos() {
               <TituloTarjeta>Filtros</TituloTarjeta>
               <DescripcionTarjeta>Busca y filtra los grupos y paralelos registrados.</DescripcionTarjeta>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Selector
+            <BarraFiltros columnas={6}>
+              <CampoFiltro
                 etiqueta="Carrera"
                 value={filtroCarrera}
-                onChange={(e) => setFiltroCarrera(e.target.value)}
-                opciones={[
-                  { value: '', etiqueta: 'Todas las carreras' },
-                  ...carreras.map((carrera) => ({ value: carrera.id.toString(), etiqueta: carrera.nombre })),
-                ]}
+                onChange={setFiltroCarrera}
+                placeholder="Todas las carreras"
+                opciones={carreras.map((carrera) => ({
+                  value: carrera.id.toString(),
+                  etiqueta: carrera.nombre,
+                }))}
               />
-              <Selector
+              <CampoFiltro
                 etiqueta="Semestre"
                 value={filtroSemestre}
-                onChange={(e) => setFiltroSemestre(e.target.value)}
-                opciones={[{ value: '', etiqueta: 'Todos los semestres' }, ...obtenerSemestres()]}
+                onChange={setFiltroSemestre}
+                placeholder="Todos los semestres"
+                opciones={obtenerSemestres()}
               />
-              <Selector
+              <CampoFiltro
                 etiqueta="Periodo"
                 value={filtroPeriodo}
-                onChange={(e) => setFiltroPeriodo(e.target.value)}
-                opciones={[
-                  { value: '', etiqueta: 'Todos los periodos' },
-                  ...periodos.map((periodo) => ({ value: periodo.id.toString(), etiqueta: periodo.etiqueta })),
-                ]}
+                onChange={setFiltroPeriodo}
+                placeholder="Todos los periodos"
+                opciones={periodos.map((periodo) => ({
+                  value: periodo.id.toString(),
+                  etiqueta: periodo.etiqueta,
+                }))}
               />
-              <Selector
+              <CampoFiltro
                 etiqueta="Turno"
                 value={filtroTurno}
-                onChange={(e) => setFiltroTurno(e.target.value)}
-                opciones={[
-                  { value: '', etiqueta: 'Todos los turnos' },
-                  ...turnos.map((turno) => ({ value: turno.id.toString(), etiqueta: `${turno.codigo} - ${turno.nombre}` })),
-                ]}
+                onChange={setFiltroTurno}
+                placeholder="Todos los turnos"
+                opciones={turnos.map((turno) => ({
+                  value: turno.id.toString(),
+                  etiqueta: `${turno.codigo} - ${turno.nombre}`,
+                }))}
               />
-              <Entrada
+              <CampoFiltro
                 etiqueta="Paralelo"
                 value={filtroParalelo}
-                onChange={(e) => setFiltroParalelo(e.target.value.toUpperCase())}
-                placeholder="Ej.: A"
-                maxLength={5}
+                onChange={(valor) => setFiltroParalelo(valor.toUpperCase())}
+                placeholder="Todos"
+                opciones={['A', 'B', 'C', 'D', 'E', 'F'].map((p) => ({
+                  value: p,
+                  etiqueta: p,
+                }))}
               />
-              <Selector
+              <CampoFiltro
                 etiqueta="Estado"
                 value={filtroEstado}
-                onChange={(e) => setFiltroEstado(e.target.value)}
+                onChange={setFiltroEstado}
+                placeholder="Todos"
                 opciones={[
-                  { value: '', etiqueta: 'Todos' },
                   { value: 'activo', etiqueta: 'Activos' },
                   { value: 'cerrado', etiqueta: 'Cerrados' },
                 ]}
               />
-              <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Búsqueda</label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Entrada
-                    placeholder="Buscar por código o carrera..."
-                    className="pl-10"
-                    value={busqueda}
-                    onChange={(e) => setBusqueda(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
+              <BuscadorFiltro
+                value={busqueda}
+                onChange={setBusqueda}
+                placeholder="Buscar por código o carrera..."
+                className="lg:col-span-2"
+              />
+            </BarraFiltros>
           </div>
         </EncabezadoTarjeta>
         <ContenidoTarjeta>
           {cargando ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+              <Loader2 className="w-6 h-6 animate-spin text-primary-600 dark:text-primary-400" />
             </div>
           ) : (
             <>
@@ -467,7 +473,7 @@ export default function PaginaGrupos() {
                 <CuerpoTabla>
                   {grupos.length === 0 ? (
                     <FilaTabla>
-                      <CeldaTabla colSpan={11} className="text-center py-8 text-gray-500">
+                      <CeldaTabla colSpan={11} className="text-center py-8 text-muted-foreground">
                         No se encontraron grupos
                       </CeldaTabla>
                     </FilaTabla>
@@ -477,14 +483,14 @@ export default function PaginaGrupos() {
                         <CeldaTabla className="font-medium">
                           <button
                             onClick={() => router.push(`/grupos/${grupo.id}`)}
-                            className="text-primary-600 hover:underline text-left font-bold"
+                            className="text-primary-600 dark:text-primary-400 hover:underline text-left font-bold"
                           >
                             {grupo.codigo}
                           </button>
                         </CeldaTabla>
                         <CeldaTabla>
                           <div className="text-sm font-medium">{grupo.carrera?.nombre || '-'}</div>
-                          <div className="text-xs text-gray-500">{grupo.carrera?.codigo || ''}</div>
+                          <div className="text-xs text-muted-foreground">{grupo.carrera?.codigo || ''}</div>
                         </CeldaTabla>
                         <CeldaTabla>{grupo.semestre}.º semestre</CeldaTabla>
                         <CeldaTabla>
@@ -494,7 +500,7 @@ export default function PaginaGrupos() {
                         </CeldaTabla>
                         <CeldaTabla>
                           <div className="text-sm">{grupo.turno?.nombre || '-'}</div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-muted-foreground">
                             {grupo.turno ? `${grupo.turno.horaInicio} - ${grupo.turno.horaFin}` : ''}
                           </div>
                         </CeldaTabla>
@@ -544,7 +550,7 @@ export default function PaginaGrupos() {
                   )}
                 </CuerpoTabla>
               </Tabla>
-              <p className="mt-4 text-sm text-gray-500">
+              <p className="mt-4 text-sm text-muted-foreground">
                 Mostrando {grupos.length} de {total} grupo(s).
               </p>
             </>
@@ -563,7 +569,7 @@ export default function PaginaGrupos() {
         tamano="grande"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Genera automáticamente los <strong>6 grupos</strong> (uno por semestre) del plan de estudios, en el turno
             <strong> Mañana</strong> y paralelo <strong>A</strong>, cubriendo todas las materias de la carrera.
           </p>
@@ -606,7 +612,7 @@ export default function PaginaGrupos() {
             <div
               className={
                 'p-3 rounded-lg text-sm ' +
-                (resultadoGenerar.creados > 0 ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700')
+                (resultadoGenerar.creados > 0 ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300')
               }
             >
               <p>{resultadoGenerar.mensaje}</p>
@@ -648,7 +654,7 @@ export default function PaginaGrupos() {
         tamano="grande"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Copia la <strong>estructura</strong> de los grupos (carrera, semestre, turno, paralelo y capacidad)
             desde un periodo a otro, regenerando el código. <strong>No se copian los estudiantes.</strong>
           </p>
@@ -691,7 +697,7 @@ export default function PaginaGrupos() {
             <div
               className={
                 'p-3 rounded-lg text-sm ' +
-                (resultadoClonar.creados > 0 ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700')
+                (resultadoClonar.creados > 0 ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300')
               }
             >
               <p>{resultadoClonar.mensaje}</p>

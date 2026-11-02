@@ -21,10 +21,10 @@ const etiquetasTipo: Record<string, string> = {
 };
 
 const etiquetasEstado: Record<string, { etiqueta: string; color: string }> = {
-  generado: { etiqueta: 'Generado', color: 'bg-gray-100 text-gray-800' },
-  impreso: { etiqueta: 'Impreso', color: 'bg-blue-100 text-blue-800' },
-  entregado: { etiqueta: 'Entregado', color: 'bg-green-100 text-green-800' },
-  anulado: { etiqueta: 'Anulado', color: 'bg-red-100 text-red-800' },
+  generado: { etiqueta: 'Generado', color: 'bg-muted text-foreground' },
+  impreso: { etiqueta: 'Impreso', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' },
+  entregado: { etiqueta: 'Entregado', color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' },
+  anulado: { etiqueta: 'Anulado', color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' },
 };
 
 export default function PaginaDetalleDocumento() {
@@ -119,7 +119,7 @@ export default function PaginaDetalleDocumento() {
   if (!documento) {
     return (
       <div className="p-6">
-        <p className="text-center text-gray-500">Documento no encontrado</p>
+        <p className="text-center text-muted-foreground">Documento no encontrado</p>
       </div>
     );
   }
@@ -136,8 +136,8 @@ export default function PaginaDetalleDocumento() {
           </Boton>
         </Link>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-gray-900">Detalle de Documento</h1>
-          <p className="text-gray-500">ID: {documento.id.slice(0, 8)}...</p>
+          <h1 className="text-2xl font-bold text-foreground">Detalle de Documento</h1>
+          <p className="text-muted-foreground">ID: {documento.id.slice(0, 8)}...</p>
         </div>
         <Insignia className={estado?.color}>
           {estado?.etiqueta}
@@ -156,15 +156,15 @@ export default function PaginaDetalleDocumento() {
             <ContenidoTarjeta className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Número de documento</p>
+                  <p className="text-sm text-muted-foreground">Número de documento</p>
                   <p className="font-semibold">{documento.numeroDocumento}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Gestión</p>
+                  <p className="text-sm text-muted-foreground">Gestión</p>
                   <p className="font-semibold">{documento.gestion}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Fecha de emisión</p>
+                  <p className="text-sm text-muted-foreground">Fecha de emisión</p>
                   <p className="font-semibold">
                     {documento.fechaEmision
                       ? format(new Date(documento.fechaEmision), "d 'de' MMMM 'de' yyyy HH:mm", { locale: es })
@@ -172,14 +172,14 @@ export default function PaginaDetalleDocumento() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Tipo</p>
+                  <p className="text-sm text-muted-foreground">Tipo</p>
                   <p className="font-semibold">{etiquetasTipo[documento.tipo] || documento.tipo}</p>
                 </div>
               </div>
 
               {documento.observaciones && (
                 <div>
-                  <p className="text-sm text-gray-500">Observaciones</p>
+                  <p className="text-sm text-muted-foreground">Observaciones</p>
                   <p className="font-medium">{documento.observaciones}</p>
                 </div>
               )}
@@ -200,10 +200,10 @@ export default function PaginaDetalleDocumento() {
                   {documento.estudiante.persona?.apellidoPaterno}{' '}
                   {documento.estudiante.persona?.apellidoMaterno}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   {documento.estudiante.persona?.ci}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Código: {documento.estudiante.codigoInscripcion}
                 </p>
               </ContenidoTarjeta>
@@ -217,7 +217,7 @@ export default function PaginaDetalleDocumento() {
               </EncabezadoTarjeta>
               <ContenidoTarjeta>
                 <p className="font-medium">Entregado a: {documento.entregadoA}</p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Fecha: {format(new Date(documento.fechaEntrega), "d 'de' MMMM 'de' yyyy HH:mm", { locale: es })}
                 </p>
               </ContenidoTarjeta>

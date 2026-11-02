@@ -156,25 +156,25 @@ function TarjetaCredencial({ credencial, seleccionada, onClick }: { credencial: 
   return (
     <div
       onClick={onClick}
-      className={`p-3 border rounded-lg cursor-pointer transition-all ${seleccionada ? 'border-primary-600 shadow-md' : 'border-gray-200 hover:border-gray-300'}`}
+      className={`p-3 border rounded-lg cursor-pointer transition-all ${seleccionada ? 'border-primary-600 shadow-md' : 'border-border hover:border-border'}`}
     >
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-sm flex-shrink-0">
+        <div className="w-10 h-10 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-700 dark:text-primary-300 font-bold text-sm flex-shrink-0">
           {persona?.nombres?.charAt(0) || '?'}{persona?.apellidoPaterno?.charAt(0) || ''}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm text-gray-900 truncate">{nombreCompleto}</p>
-          <p className="text-xs text-gray-500">{estudiante?.codigoInscripcion}</p>
-          <p className="text-xs text-gray-400">{estudiante?.carrera?.nombre || 'Sin carrera'}</p>
+          <p className="font-semibold text-sm text-foreground truncate">{nombreCompleto}</p>
+          <p className="text-xs text-muted-foreground">{estudiante?.codigoInscripcion}</p>
+          <p className="text-xs text-muted-foreground">{estudiante?.carrera?.nombre || 'Sin carrera'}</p>
         </div>
         <div className="text-right flex-shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+            <span className="text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
               Sem {credencial.semestre}
             </span>
             <InsigniaEstado estado={credencial.estado} />
           </div>
-          <p className="text-[10px] text-gray-400 mt-1">{credencial.impreso ? '✓ Impresa' : 'Sin imprimir'}</p>
+          <p className="text-[10px] text-muted-foreground mt-1">{credencial.impreso ? '✓ Impresa' : 'Sin imprimir'}</p>
         </div>
       </div>
     </div>
@@ -198,10 +198,10 @@ function VistaPreviaCredencial({ credencial, institucion }: { credencial: Creden
 
   return (
     <div className="flex flex-col items-center">
-      <p className="text-xs font-semibold text-gray-500 mb-3">Vista previa</p>
+      <p className="text-xs font-semibold text-muted-foreground mb-3">Vista previa</p>
       <div className="flex gap-6">
         <div className="flex flex-col items-center">
-          <span className="text-[10px] text-gray-500 mb-1 font-medium">ANVERSO</span>
+          <span className="text-[10px] text-muted-foreground mb-1 font-medium">ANVERSO</span>
           <div className="cred-card" style={{ background: CREMA, width: 340, height: 214, position: 'relative', overflow: 'hidden' }}>
             <MarcaAgua url={logoUrl} />
             <div style={franja}>
@@ -230,7 +230,7 @@ function VistaPreviaCredencial({ credencial, institucion }: { credencial: Creden
         </div>
 
         <div className="flex flex-col items-center">
-          <span className="text-[10px] text-gray-500 mb-1 font-medium">REVERSO</span>
+          <span className="text-[10px] text-muted-foreground mb-1 font-medium">REVERSO</span>
           <div className="cred-card" style={{ background: CREMA, width: 340, height: 214, position: 'relative', overflow: 'hidden' }}>
             <MarcaAgua url={logoUrl} />
             <div style={franja}>
@@ -382,7 +382,7 @@ export default function PaginaCredenciales() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-400" />
       </div>
     );
   }
@@ -400,7 +400,7 @@ export default function PaginaCredenciales() {
       <Migas elementos={[{ etiqueta: 'Configuración', href: '/configuracion' }, { etiqueta: 'Credenciales' }]} />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">Credenciales</h1>
+        <h1 className="text-xl font-bold text-foreground">Credenciales</h1>
         <Boton tamano="pequeno" onClick={() => router.push('/credenciales/nuevo')}>
           <Plus className="w-3 h-3 mr-1" />
           Nueva
@@ -409,20 +409,20 @@ export default function PaginaCredenciales() {
 
       <div className="flex gap-2 flex-wrap items-center">
         <div className="relative flex-1 min-w-[200px] max-w-[300px]">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400" />
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
           <Entrada placeholder="Buscar por nombre o código..." className="pl-7 h-8 text-sm" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
         </div>
-        <select className="h-8 text-sm border rounded px-2" value={filtroGestion} onChange={(e) => setFiltroGestion(e.target.value)}>
+        <select className="h-8 text-sm border rounded px-2 bg-card text-foreground border-border dark:border-gray-600" value={filtroGestion} onChange={(e) => setFiltroGestion(e.target.value)}>
           <option value="TODOS">Todas las gestiones</option>
           {gestiones.map((g) => <option key={g} value={g}>{g}</option>)}
         </select>
-        <select className="h-8 text-sm border rounded px-2" value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value as any)}>
+        <select className="h-8 text-sm border rounded px-2 bg-card text-foreground border-border dark:border-gray-600" value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value as any)}>
           <option value="TODOS">Todos los estados</option>
           <option value="emitida">Emitidas</option>
           <option value="anulada">Anuladas</option>
           <option value="reemplazada">Reemplazadas</option>
         </select>
-        <span className="text-xs text-gray-500 ml-auto">{credencialesFiltradas.length} credenciales</span>
+        <span className="text-xs text-muted-foreground ml-auto">{credencialesFiltradas.length} credenciales</span>
       </div>
 
       {credencialesFiltradas.length > 0 && !seleccionada && (
@@ -431,11 +431,11 @@ export default function PaginaCredenciales() {
             <div
               key={credencial.id}
               onClick={() => setSeleccionada(credencial)}
-              className="px-3 py-2 border rounded-lg cursor-pointer hover:bg-gray-50 text-sm flex items-center gap-2"
+              className="px-3 py-2 border rounded-lg cursor-pointer hover:bg-muted/40 text-sm flex items-center gap-2"
             >
               <span className="font-medium">{credencial.estudiante?.persona?.nombres?.charAt(0) || '?'}{credencial.estudiante?.persona?.apellidoPaterno?.charAt(0) || ''}</span>
-              <span className="text-gray-600">{credencial.estudiante?.persona?.nombres} {credencial.estudiante?.persona?.apellidoPaterno}</span>
-              <span className="text-xs text-gray-400">Sem {credencial.semestre}</span>
+              <span className="text-muted-foreground">{credencial.estudiante?.persona?.nombres} {credencial.estudiante?.persona?.apellidoPaterno}</span>
+              <span className="text-xs text-muted-foreground">Sem {credencial.semestre}</span>
             </div>
           ))}
         </div>
@@ -452,31 +452,31 @@ export default function PaginaCredenciales() {
                   Imprimir
                 </Boton>
                 {seleccionada.estado === 'emitida' && (
-                  <Boton tamano="pequeno" variante="contorno" className="text-red-600" onClick={() => setModalAnular(seleccionada)}>
+                  <Boton tamano="pequeno" variante="contorno" className="text-red-600 dark:text-red-400" onClick={() => setModalAnular(seleccionada)}>
                     <X className="w-3 h-3 mr-1" />
                     Anular
                   </Boton>
                 )}
-                <Boton tamano="pequeno" variante="contorno" className="text-red-600" onClick={() => setModalEliminar(seleccionada)}>
+                <Boton tamano="pequeno" variante="contorno" className="text-red-600 dark:text-red-400" onClick={() => setModalEliminar(seleccionada)}>
                   <Trash2 className="w-3 h-3 mr-1" />
                   Eliminar
                 </Boton>
               </div>
               <div className="mt-4 pt-4 border-t grid grid-cols-4 gap-3 text-xs">
                 <div>
-                  <p className="text-gray-500">Código</p>
+                  <p className="text-muted-foreground">Código</p>
                   <p className="font-medium">{seleccionada.estudiante?.codigoInscripcion}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Gestión</p>
+                  <p className="text-muted-foreground">Gestión</p>
                   <p className="font-medium">{seleccionada.gestion}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Semestre</p>
+                  <p className="text-muted-foreground">Semestre</p>
                   <p className="font-medium">{seleccionada.semestre}°</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Fecha de emisión</p>
+                  <p className="text-muted-foreground">Fecha de emisión</p>
                   <p className="font-medium">{formatearFecha(seleccionada.fechaEmision)}</p>
                 </div>
               </div>
@@ -486,8 +486,8 @@ export default function PaginaCredenciales() {
           <Tarjeta variante="conBorde">
             <ContenidoTarjeta className="p-12 text-center">
               <div className="text-4xl mb-2">🎓</div>
-              <p className="text-gray-500">Selecciona una credencial para visualizarla</p>
-              <p className="text-xs text-gray-400 mt-1">Usa el buscador para filtrar por nombre o código</p>
+              <p className="text-muted-foreground">Selecciona una credencial para visualizarla</p>
+              <p className="text-xs text-muted-foreground mt-1">Usa el buscador para filtrar por nombre o código</p>
             </ContenidoTarjeta>
           </Tarjeta>
         )}
