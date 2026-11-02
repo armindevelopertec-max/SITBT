@@ -64,6 +64,7 @@ export class ControladorMateriasImpartidas {
     @Query('estadoMateria') estadoMateria?: EstadoMateriaImpartida,
     @Query('estadoNotas') estadoNotas?: EstadoLibro,
     @Query('busqueda') busqueda?: string,
+    @Query('incluirSinInscritos') incluirSinInscritos?: string,
   ) {
     const filtros: FiltrosMateriaImpartida = {
       gestion,
@@ -76,6 +77,7 @@ export class ControladorMateriasImpartidas {
       estadoMateria,
       estadoNotas,
       busqueda,
+      incluirSinInscritos: incluirSinInscritos === 'true',
     };
     return this.servicio.listar(+pagina, +limite, filtros);
   }

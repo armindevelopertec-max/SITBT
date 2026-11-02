@@ -60,6 +60,8 @@ export interface FiltrosMateriaImpartida {
   estadoMateria?: EstadoMateriaImpartida;
   estadoNotas?: EstadoLibro;
   busqueda?: string;
+  /** Por defecto solo se listan las materias con estudiantes inscritos. */
+  incluirSinInscritos?: boolean;
 }
 
 @Injectable()
@@ -274,6 +276,18 @@ export class ServicioMateriasImpartidas {
         'lic',
         'lic.materia_impartida_id = mi.id AND lic.estado = :estadoNotas',
         { estadoNotas: filtros.estadoNotas },
+      );
+    }
+
+    // Solo se listan las materias impartidas con estudiantes inscritos: una
+    // materia sin inscritos no se está dictando. El filtro va en la consulta
+    // para que el total y la paginación sean correctos.
+    if (!filtros.incluirSinInscritos) {
+      consulta.innerJoin(
+        'inscripciones_materia',
+        'im',
+        'im.materia_impartida_id = mi.id AND im.estado != :retirado',
+        { retirado: EstadoInscripcionMateria.RETIRADO },
       );
     }
 

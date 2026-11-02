@@ -34,6 +34,8 @@ export interface FiltrosGrupo {
   periodoId?: number;
   estado?: EstadoGrupo;
   busqueda?: string;
+  /** Por defecto solo se listan los grupos con estudiantes inscritos. */
+  incluirSinInscritos?: boolean;
 }
 
 @Injectable()
@@ -495,6 +497,17 @@ export class ServicioGrupos {
       consulta.andWhere('(grupo.codigo ILIKE :busqueda OR carrera.nombre ILIKE :busqueda)', {
         busqueda: `%${filtros.busqueda}%`,
       });
+    }
+
+    // Por defecto solo se listan los grupos con estudiantes inscritos: un
+    // grupo sin nadie no está en marcha. El filtro va en la consulta para que
+    // el total y la paginación sean correctos.
+    if (!filtros.incluirSinInscritos) {
+      consulta.innerJoin(
+        'grupos_estudiantes',
+        'ge',
+        'ge.grupo_id = grupo.id',
+      );
     }
 
     const [datos, total] = await consulta
