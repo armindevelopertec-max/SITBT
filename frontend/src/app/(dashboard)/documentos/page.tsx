@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { usarDocumentos, DocumentoEmitido } from '@/ganchos/usarDocumentos';
 import { Boton } from '@/componentes/iu/boton';
 import { Insignia } from '@/componentes/iu/insignia';
-import { CampoFiltro } from '@/componentes/iu/barra-filtros';
+import { BuscadorFiltro, CampoFiltro } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import {
   Tabla,
@@ -37,13 +37,20 @@ const etiquetasEstado: Record<string, { etiqueta: string; color: string }> = {
 };
 
 export default function PaginaDocumentos() {
-  const { cargando, obtenerDocumentos, obtenerEstadisticas } = usarDocumentos();
+  const { cargando, obtenerDocumentos } = usarDocumentos();
   const [documentos, setDocumentos] = useState<DocumentoEmitido[]>([]);
   const [total, setTotal] = useState(0);
   const [pagina, setPagina] = useState(1);
   const [filtroTipo, setFiltroTipo] = useState<string>('');
   const [filtroEstado, setFiltroEstado] = useState<string>('');
-  const [estadisticas, setEstadisticas] = useState<any>(null);
+  const [busqueda, setBusqueda] = useState('');
+  const [busquedaAplicada, setBusquedaAplicada] = useState('');
+
+  // La búsqueda se aplica con un retardo para no pedir en cada tecla.
+  useEffect(() => {
+    const temporizador = setTimeout(() => setBusquedaAplicada(busqueda), 400);
+    return () => clearTimeout(temporizador);
+  }, [busqueda]);
 
   useEffect(() => {
     obtenerDocumentos({
@@ -51,15 +58,12 @@ export default function PaginaDocumentos() {
       limite: 20,
       tipo: filtroTipo || undefined,
       estado: filtroEstado || undefined,
+      busqueda: busquedaAplicada.trim() || undefined,
     }).then((resultado) => {
       setDocumentos(resultado.datos);
       setTotal(resultado.total);
     }).catch(console.error);
-  }, [pagina, filtroTipo, filtroEstado]);
-
-  useEffect(() => {
-    obtenerEstadisticas().then(setEstadisticas).catch(console.error);
-  }, []);
+  }, [pagina, filtroTipo, filtroEstado, busquedaAplicada]);
 
   return (
     <div className="p-6">
@@ -75,34 +79,6 @@ export default function PaginaDocumentos() {
           </Boton>
         </Link>
       </div>
-
-      {/* Stats */}
-      {estadisticas && (
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-card rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-foreground">{estadisticas.total || 0}</div>
-            <div className="text-sm text-muted-foreground">Total documentos</div>
-          </div>
-          <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {estadisticas.porTipo?.find((elemento: any) => elemento.tipo === 'boleta_inscripcion')?.cantidad || 0}
-            </div>
-            <div className="text-sm text-blue-600 dark:text-blue-400">Boletas</div>
-          </div>
-          <div className="bg-green-50 dark:bg-green-900/30 rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {estadisticas.porTipo?.find((elemento: any) => elemento.tipo === 'recibo_pago')?.cantidad || 0}
-            </div>
-            <div className="text-sm text-green-600 dark:text-green-400">Recibos</div>
-          </div>
-          <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {estadisticas.porTipo?.find((elemento: any) => elemento.tipo === 'carnet')?.cantidad || 0}
-            </div>
-            <div className="text-sm text-purple-600 dark:text-purple-400">Carnets</div>
-          </div>
-        </div>
-      )}
 
       {/* Filters */}
       <Tarjeta className="mb-6">
@@ -133,6 +109,12 @@ export default function PaginaDocumentos() {
                 { value: 'entregado', etiqueta: 'Entregado' },
                 { value: 'anulado', etiqueta: 'Anulado' },
               ]}
+            />
+            <BuscadorFiltro
+              value={busqueda}
+              onChange={setBusqueda}
+              placeholder="Buscar por número, estudiante o CI..."
+              className="w-full sm:w-72"
             />
           </div>
         </ContenidoTarjeta>

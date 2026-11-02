@@ -39,6 +39,7 @@ export class ControladorDocumentos {
     @Query('gestion') gestion?: string,
     @Query('estudianteId') estudianteId?: number,
     @Query('estado') estado?: EstadoDocumento,
+    @Query('busqueda') busqueda?: string,
   ) {
     return this.servicio.obtenerTodos(
       +pagina,
@@ -47,6 +48,7 @@ export class ControladorDocumentos {
       gestion,
       estudianteId ? +estudianteId : undefined,
       estado,
+      busqueda,
     );
   }
 

@@ -29,6 +29,7 @@ export function usarDocumentos() {
     gestion?: string;
     estudianteId?: number;
     estado?: string;
+    busqueda?: string;
   }): Promise<{ datos: DocumentoEmitido[]; total: number }> => {
     setCargando(true);
     setError(null);

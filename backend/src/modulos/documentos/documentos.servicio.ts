@@ -24,6 +24,7 @@ export class ServicioDocumentos {
     gestion?: string,
     estudianteId?: number,
     estado?: EstadoDocumento,
+    busqueda?: string,
   ): Promise<{ datos: DocumentoEmitido[]; total: number; pagina: number; limite: number }> {
     const consulta = this.repositorioDocumento
       .createQueryBuilder('documento')
@@ -45,6 +46,19 @@ export class ServicioDocumentos {
 
     if (estado) {
       consulta.andWhere('documento.estado = :estado', { estado: estado });
+    }
+
+    if (busqueda && busqueda.trim()) {
+      const texto = `%${busqueda.trim().toLowerCase()}%`;
+      consulta.andWhere(
+        '(LOWER(documento.numeroDocumento) LIKE :texto' +
+          ' OR LOWER(documento.entregadoA) LIKE :texto' +
+          ' OR LOWER(persona.ci) LIKE :texto' +
+          ' OR LOWER(persona.nombres) LIKE :texto' +
+          ' OR LOWER(persona.apellidoPaterno) LIKE :texto' +
+          ' OR LOWER(persona.apellidoMaterno) LIKE :texto)',
+        { texto },
+      );
     }
 
     const [datos, total] = await consulta

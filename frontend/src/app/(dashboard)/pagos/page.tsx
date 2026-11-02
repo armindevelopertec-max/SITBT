@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { LucideIcon } from 'lucide-react';
 import { Migas } from '@/componentes/iu/migas';
 import { Tarjeta, ContenidoTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
@@ -22,10 +21,7 @@ import {
   Plus,
   Trash2,
   Loader2,
-  Wallet,
   Receipt,
-  Clock,
-  Ban,
   Users,
   Filter,
   X,
@@ -307,40 +303,6 @@ export default function PaginaPagos() {
     return nombreCompleto.includes(busqueda) || ci.includes(busqueda) || codigo.includes(busqueda);
   });
 
-  const totalRecaudado = pagos
-    .filter((pago) => pago.estado === 'pagado')
-    .reduce((suma, pago) => suma + Number(pago.monto || 0), 0);
-  const cantidadPagados = pagos.filter((pago) => pago.estado === 'pagado').length;
-  const cantidadPendientes = pagos.filter((pago) => pago.estado === 'pendiente').length;
-  const cantidadAnulados = pagos.filter((pago) => pago.estado === 'anulado').length;
-
-  const resumen: { etiqueta: string; valor: string; icono: LucideIcon; tono: string }[] = [
-    {
-      etiqueta: 'Total recaudado',
-      valor: formatearMoneda(totalRecaudado),
-      icono: Wallet,
-      tono: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
-    },
-    {
-      etiqueta: 'Pagos registrados',
-      valor: String(cantidadPagados),
-      icono: Receipt,
-      tono: 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400',
-    },
-    {
-      etiqueta: 'Pendientes',
-      valor: String(cantidadPendientes),
-      icono: Clock,
-      tono: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
-    },
-    {
-      etiqueta: 'Anulados',
-      valor: String(cantidadAnulados),
-      icono: Ban,
-      tono: 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400',
-    },
-  ];
-
   const hayFiltros = !!(terminoBusqueda || filtroGestion || filtroPeriodo || filtroEstado);
 
   return (
@@ -356,30 +318,6 @@ export default function PaginaPagos() {
           <Plus className="mr-2 h-4 w-4" />
           Nuevo pago
         </Boton>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {resumen.map((item) => {
-          const Icono = item.icono;
-          return (
-            <Tarjeta key={item.etiqueta} variante="conBorde" className="rounded-2xl">
-              <ContenidoTarjeta className="flex items-center gap-4">
-                <span className={cn('grid h-11 w-11 shrink-0 place-items-center rounded-xl', item.tono)}>
-                  <Icono className="h-5 w-5" />
-                </span>
-                <div className="min-w-0">
-                  <p
-                    className="truncate text-xs font-medium uppercase tracking-wide text-muted-foreground"
-                    title={item.etiqueta}
-                  >
-                    {item.etiqueta}
-                  </p>
-                  <p className="truncate text-xl font-bold text-foreground">{item.valor}</p>
-                </div>
-              </ContenidoTarjeta>
-            </Tarjeta>
-          );
-        })}
       </div>
 
       {error && (
