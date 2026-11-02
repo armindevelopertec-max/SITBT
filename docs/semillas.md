@@ -24,6 +24,7 @@ npm run semilla:carreras
 npm run semilla:materias
 npm run semilla:planes-variantes
 npm run semilla:docentes
+npm run semilla:docentes-materias
 npm run semilla:estudiantes
 ```
 
@@ -189,6 +190,21 @@ formato que el alta de personal desde la aplicación:
 El rol `docente` **no se crea aquí**: si ya existe y está activo se asigna a los
 docentes; si no, los usuarios quedan sin rol y el administrador los asigna desde
 `/usuarios`.
+
+## `semilla:docentes-materias`
+
+Asigna **docentes a las materias impartidas**. Los docentes imparten en ambas carreras,
+así que el reparto se hace por carga y respetando los horarios:
+
+- Solo se asignan las materias impartidas de **grupos con estudiantes inscritos**.
+- Dentro de un **turno**, un docente da como máximo **una materia**, para que no tenga
+  clases simultáneas. Sí puede impartir en turnos distintos.
+- La **carga se equilibra**: se asigna al docente con menos horas acumuladas.
+- La carga horaria de cada asignación es la de la materia en la malla.
+- Es **idempotente**: si la materia ya tiene docente, no se modifica.
+
+El resultado se ve en **Materias Impartidas** (columna *Docente*) y en la pestaña
+*Docente* de cada materia.
 
 ## `semilla:estudiantes`
 

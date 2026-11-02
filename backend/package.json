@@ -17,6 +17,7 @@
     "semilla:materias": "ts-node src/semilla-materias.ts",
     "semilla:planes-variantes": "ts-node src/semilla-planes-variantes.ts",
     "semilla:docentes": "ts-node src/semilla-docentes.ts",
+    "semilla:docentes-materias": "ts-node src/semilla-docentes-materias.ts",
     "semilla:estudiantes": "ts-node src/semilla-estudiantes.ts",
     "semilla:grupos": "ts-node src/semilla-grupos.ts",
     "generar-usuarios": "ts-node src/generar-usuarios.ts"
