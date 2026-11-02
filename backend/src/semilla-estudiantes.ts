@@ -145,12 +145,16 @@ async function sembrarEstudiantes() {
     const planes: any[] = await ejecutor.query(
       `SELECT id, carrera_id, estado FROM planes_estudio ORDER BY id`
     );
+    // Se toma el PRIMER plan vigente de cada carrera (el plan base). Las
+    // variantes se crean después y también son vigentes, pero no son las
+    // originales del padrón.
     const planPorCarrera = new Map<number, number>();
-    planes.forEach((p) => {
-      if (p.estado === 'vigente' || !planPorCarrera.has(p.carrera_id)) {
-        planPorCarrera.set(p.carrera_id, p.id);
+    for (const plan of planes) {
+      if (plan.estado !== 'vigente') continue;
+      if (!planPorCarrera.has(plan.carrera_id)) {
+        planPorCarrera.set(plan.carrera_id, plan.id);
       }
-    });
+    }
 
     // El rol NO se crea aquí: el administrador lo crea desde /roles.
     // Si ya existe y está activo, se asigna a los estudiantes.
