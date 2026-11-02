@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usarDocumentos, DocumentoEmitido } from '@/ganchos/usarDocumentos';
 import { Boton } from '@/componentes/iu/boton';
+import { Paginacion } from '@/componentes/iu/paginacion';
 import { Insignia } from '@/componentes/iu/insignia';
 import { BuscadorFiltro, CampoFiltro } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
@@ -203,26 +204,13 @@ export default function PaginaDocumentos() {
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">
         <div className="text-sm text-muted-foreground">
-          Mostrando {documentos.length} documentos
         </div>
-        <div className="flex gap-2">
-          <Boton
-            variante="contorno"
-            tamano="pequeno"
-            onClick={() => setPagina((p) => Math.max(1, p - 1))}
-            disabled={pagina === 1}
-          >
-            Anterior
-          </Boton>
-          <Boton
-            variante="contorno"
-            tamano="pequeno"
-            onClick={() => setPagina((p) => p + 1)}
-            disabled={documentos.length < 20}
-          >
-            Siguiente
-          </Boton>
-        </div>
+        <Paginacion
+          pagina={pagina}
+          totalPaginas={Math.max(1, Math.ceil(total / 20))}
+          alCambiar={setPagina}
+          informacion={`Mostrando ${documentos.length} de ${total} documentos`}
+        />
       </div>
     </div>
   );

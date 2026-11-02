@@ -10,6 +10,7 @@ import { Insignia } from '@/componentes/iu/insignia';
 import { api } from '@/libreria/api';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { BuscadorFiltro } from '@/componentes/iu/barra-filtros';
+import { Paginacion } from '@/componentes/iu/paginacion';
 import { cn, formatearMoneda, mensajeDeError, obtenerIniciales } from '@/libreria/utilidades';
 import {
   Search,
@@ -670,57 +671,15 @@ export default function PaginaPreinscripcion() {
                 ))}
               </div>
 
-              {totalPaginasInscritos > 1 && (
-                <div className="flex items-center justify-center gap-2 pt-2">
-                  <Boton
-                    variante="contorno"
-                    tamano="pequeno"
-                    disabled={paginaInscritos <= 1 || cargandoInscritos}
-                    onClick={() => {
-                      const nueva = paginaInscritos - 1;
-                      setPaginaInscritos(nueva);
-                      void cargarInscritos(nueva);
-                    }}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Boton>
-
-                  {Array.from({ length: totalPaginasInscritos }, (_, indice) => indice + 1).map(
-                    (numero) => (
-                      <button
-                        key={numero}
-                        type="button"
-                        disabled={cargandoInscritos}
-                        onClick={() => {
-                          setPaginaInscritos(numero);
-                          void cargarInscritos(numero);
-                        }}
-                        className={cn(
-                          'grid h-8 w-8 place-items-center rounded-lg border text-sm font-medium transition-colors',
-                          numero === paginaInscritos
-                            ? 'border-primary-600 bg-primary-600 text-white'
-                            : 'border-border bg-card text-foreground hover:bg-muted/40',
-                        )}
-                      >
-                        {numero}
-                      </button>
-                    ),
-                  )}
-
-                  <Boton
-                    variante="contorno"
-                    tamano="pequeno"
-                    disabled={paginaInscritos >= totalPaginasInscritos || cargandoInscritos}
-                    onClick={() => {
-                      const nueva = paginaInscritos + 1;
-                      setPaginaInscritos(nueva);
-                      void cargarInscritos(nueva);
-                    }}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Boton>
-                </div>
-              )}
+              <Paginacion
+                className="pt-2"
+                pagina={paginaInscritos}
+                totalPaginas={totalPaginasInscritos}
+                alCambiar={(nueva) => {
+                  setPaginaInscritos(nueva);
+                  void cargarInscritos(nueva);
+                }}
+              />
             </>
           )}
         </div>

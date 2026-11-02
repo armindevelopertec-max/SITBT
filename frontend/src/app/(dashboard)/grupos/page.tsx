@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Migas } from '@/componentes/iu/migas';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta, DescripcionTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
+import { Paginacion } from '@/componentes/iu/paginacion';
 import { Entrada } from '@/componentes/iu/entrada';
 import { Selector } from '@/componentes/iu/selector';
 import { Insignia } from '@/componentes/iu/insignia';
@@ -259,9 +260,13 @@ export default function PaginaGrupos() {
                   )}
                 </CuerpoTabla>
               </Tabla>
-              <p className="mt-4 text-sm text-muted-foreground">
-                Mostrando {grupos.length} de {total} grupo(s).
-              </p>
+              <Paginacion
+                className="mt-4"
+                pagina={1}
+                totalPaginas={1}
+                alCambiar={() => {}}
+                informacion={`Mostrando ${grupos.length} de ${total} grupo(s).`}
+              />
             </>
           )}
         </ContenidoTarjeta>

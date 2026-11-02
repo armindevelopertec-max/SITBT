@@ -6,6 +6,7 @@ import { Migas } from '@/componentes/iu/migas';
 import { BuscadorFiltro, CampoFiltro, FilaFiltros } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
+import { Paginacion } from '@/componentes/iu/paginacion';
 import { Entrada } from '@/componentes/iu/entrada';
 import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/componentes/iu/tabla';
 import { Insignia } from '@/componentes/iu/insignia';
@@ -29,20 +30,6 @@ const etiquetasOrigen: Record<string, string> = {
 };
 
 /** Genera la lista de páginas a mostrar, con elipsis si son muchas. */
-const generarPaginas = (actual: number, total: number): (number | '...')[] => {
-  if (total <= 7) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-  const paginas: (number | '...')[] = [1];
-  const inicio = Math.max(2, actual - 1);
-  const fin = Math.min(total - 1, actual + 1);
-  if (inicio > 2) paginas.push('...');
-  for (let p = inicio; p <= fin; p++) paginas.push(p);
-  if (fin < total - 1) paginas.push('...');
-  paginas.push(total);
-  return paginas;
-};
-
 const ESTUDIANTES_POR_PAGINA = 20;
 
 export default function PaginaEstudiantes() {
@@ -295,46 +282,13 @@ export default function PaginaEstudiantes() {
           </Tabla>
 
           {estudiantesFiltrados.length > 0 && (
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
-              <p className="text-sm text-muted-foreground">
-                Mostrando {inicio}-{fin} de {estudiantesFiltrados.length} estudiante(s)
-              </p>
-              <div className="flex items-center gap-1">
-                <Boton
-                  variante="contorno"
-                  tamano="pequeno"
-                  onClick={() => setPagina((p) => Math.max(1, p - 1))}
-                  disabled={pagina === 1}
-                >
-                  Anterior
-                </Boton>
-                {generarPaginas(pagina, totalPaginas).map((p, indice) =>
-                  p === '...' ? (
-                    <span key={`puntos-${indice}`} className="px-2 text-muted-foreground">
-                      …
-                    </span>
-                  ) : (
-                    <Boton
-                      key={p}
-                      variante={p === pagina ? 'primario' : 'contorno'}
-                      tamano="pequeno"
-                      className="min-w-[2.25rem]"
-                      onClick={() => setPagina(p)}
-                    >
-                      {p}
-                    </Boton>
-                  ),
-                )}
-                <Boton
-                  variante="contorno"
-                  tamano="pequeno"
-                  onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
-                  disabled={pagina >= totalPaginas}
-                >
-                  Siguiente
-                </Boton>
-              </div>
-            </div>
+            <Paginacion
+              className="mt-4"
+              pagina={pagina}
+              totalPaginas={totalPaginas}
+              alCambiar={setPagina}
+              informacion={`Mostrando ${inicio}-${fin} de ${estudiantesFiltrados.length} estudiante(s)`}
+            />
           )}
         </ContenidoTarjeta>
       </Tarjeta>

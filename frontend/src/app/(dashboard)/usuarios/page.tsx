@@ -5,6 +5,7 @@ import { Migas } from '@/componentes/iu/migas';
 import { BuscadorFiltro } from '@/componentes/iu/barra-filtros';
 import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
+import { Paginacion } from '@/componentes/iu/paginacion';
 import { Entrada } from '@/componentes/iu/entrada';
 import { Tabla, CuerpoTabla, CeldaTabla, CeldaEncabezado, EncabezadoTabla, FilaTabla } from '@/componentes/iu/tabla';
 import { Insignia } from '@/componentes/iu/insignia';
@@ -51,21 +52,6 @@ export default function PaginaUsuarios() {
     usuario.persona?.correo?.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
     usuario.persona?.nombres?.toLowerCase().includes(terminoBusqueda.toLowerCase())
   );
-
-  const generarPaginas = (paginaActual: number, totalPag: number): (number | '...')[] => {
-    if (totalPag <= 1) return [1];
-    const paginas: (number | '...')[] = [];
-    const inicio = Math.max(2, paginaActual - 1);
-    const fin = Math.min(totalPag - 1, paginaActual + 1);
-    paginas.push(1);
-    if (inicio > 2) paginas.push('...');
-    for (let p = inicio; p <= fin; p++) {
-      paginas.push(p);
-    }
-    if (fin < totalPag - 1) paginas.push('...');
-    paginas.push(totalPag);
-    return paginas;
-  };
 
   const totalPaginas = Math.max(1, Math.ceil(paginacion.total / paginacion.limite));
   const cambiarPagina = (nuevaPagina: number) => {
@@ -297,47 +283,13 @@ export default function PaginaUsuarios() {
             </Tabla>
           )}
           {paginacion.total > 0 && (
-            <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-              <div className="text-sm text-muted-foreground">
-                Mostrando {inicioRango} a {finRango} de {paginacion.total} usuarios
-              </div>
-              <div className="flex items-center gap-2">
-                <Boton
-                  variante="contorno"
-                  tamano="pequeno"
-                  onClick={() => cambiarPagina(paginacion.pagina - 1)}
-                  disabled={paginacion.pagina === 1 || cargando}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Anterior
-                </Boton>
-                {generarPaginas(paginacion.pagina, totalPaginas).map((p, indice) =>
-                  p === '...' ? (
-                    <span key={`ellipsis-${indice}`} className="px-2 text-muted-foreground">
-                      ...
-                    </span>
-                  ) : (
-                    <Boton
-                      key={p}
-                      variante={p === paginacion.pagina ? 'primario' : 'contorno'}
-                      tamano="pequeno"
-                      onClick={() => cambiarPagina(p as number)}
-                      disabled={cargando}
-                    >
-                      {p}
-                    </Boton>
-                  )
-                )}
-                <Boton
-                  variante="contorno"
-                  tamano="pequeno"
-                  onClick={() => cambiarPagina(paginacion.pagina + 1)}
-                  disabled={paginacion.pagina >= totalPaginas || cargando}
-                >
-                  Siguiente
-                  <ChevronRight className="w-4 h-4" />
-                </Boton>
-              </div>
+            <div className="border-t border-border px-6 py-4">
+              <Paginacion
+                pagina={paginacion.pagina}
+                totalPaginas={totalPaginas}
+                alCambiar={(nueva) => cambiarPagina(nueva)}
+                informacion={`Mostrando ${inicioRango} a ${finRango} de ${paginacion.total} usuarios`}
+              />
             </div>
           )}
         </ContenidoTarjeta>

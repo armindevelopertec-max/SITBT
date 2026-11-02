@@ -13,6 +13,7 @@ import { Boton } from '@/componentes/iu/boton';
 import { Entrada } from '@/componentes/iu/entrada';
 import { Selector } from '@/componentes/iu/selector';
 import { Insignia } from '@/componentes/iu/insignia';
+import { Paginacion } from '@/componentes/iu/paginacion';
 import {
   BarraFiltros,
   BuscadorFiltro,
@@ -345,28 +346,13 @@ export default function PaginaMateriasImpartidas() {
           </Tabla>
         </div>
         {total > LIMITE && (
-          <div className="flex items-center justify-between border-t border-border px-6 py-3">
-            <span className="text-sm text-muted-foreground">
-              Página {pagina} de {totalPaginas}
-            </span>
-            <div className="flex gap-2">
-              <Boton
-                variante="contorno"
-                tamano="pequeno"
-                disabled={pagina <= 1}
-                onClick={() => setPagina((p) => Math.max(1, p - 1))}
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </Boton>
-              <Boton
-                variante="contorno"
-                tamano="pequeno"
-                disabled={pagina >= totalPaginas}
-                onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
-              >
-                <ChevronRight className="w-4 h-4" />
-              </Boton>
-            </div>
+          <div className="border-t border-border px-6 py-3">
+            <Paginacion
+              pagina={pagina}
+              totalPaginas={totalPaginas}
+              alCambiar={setPagina}
+              informacion={`Mostrando ${materias.length} de ${total} materia(s) impartida(s)`}
+            />
           </div>
         )}
       </Tarjeta>

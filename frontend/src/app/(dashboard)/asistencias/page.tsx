@@ -10,6 +10,7 @@ import {
   TituloTarjeta,
 } from '@/componentes/iu/tarjeta';
 import { Boton } from '@/componentes/iu/boton';
+import { Paginacion } from '@/componentes/iu/paginacion';
 import { Entrada } from '@/componentes/iu/entrada';
 import { Selector } from '@/componentes/iu/selector';
 import {
@@ -522,32 +523,13 @@ export default function PaginaAsistencias() {
                 </CuerpoTabla>
               </Tabla>
 
-              <div className="mt-4 flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  Mostrando {historial.length} de {totalHistorial} marcaciones
-                </p>
-                <div className="flex items-center gap-2">
-                  <Boton
-                    variante="contorno"
-                    tamano="pequeno"
-                    disabled={pagina <= 1}
-                    onClick={() => setPagina((p) => Math.max(1, p - 1))}
-                  >
-                    Anterior
-                  </Boton>
-                  <span className="text-sm text-muted-foreground">
-                    Página {pagina} de {totalPaginas}
-                  </span>
-                  <Boton
-                    variante="contorno"
-                    tamano="pequeno"
-                    disabled={pagina >= totalPaginas}
-                    onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
-                  >
-                    Siguiente
-                  </Boton>
-                </div>
-              </div>
+              <Paginacion
+                className="mt-4"
+                pagina={pagina}
+                totalPaginas={totalPaginas}
+                alCambiar={setPagina}
+                informacion={`Mostrando ${historial.length} de ${totalHistorial} marcaciones`}
+              />
             </>
           )}
         </ContenidoTarjeta>
