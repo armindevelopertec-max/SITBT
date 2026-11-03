@@ -9,6 +9,7 @@ import {
 import BarraLateral from '@/componentes/diseno/BarraLateral';
 import Encabezado from '@/componentes/diseno/Encabezado';
 import api from '@/libreria/api';
+import { esDocentePuro } from '@/libreria/autenticacion';
 import { cn } from '@/libreria/utilidades';
 
 export default function DisenoPanel({
@@ -20,7 +21,7 @@ export default function DisenoPanel({
   const [barraLateralColapsada, setBarraLateralColapsada] = useState(false);
   const [esMovil, setEsMovil] = useState(false);
   const router = useRouter();
-  const { estaAutenticado, _hidratado, establecerUsuario } =
+  const { estaAutenticado, _hidratado, establecerUsuario, usuario } =
     usarAlmacenAutenticacion();
 
   useEffect(() => {
@@ -63,11 +64,18 @@ export default function DisenoPanel({
     }
   }, [_hidratado, estaAutenticado, router]);
 
+  // El docente tiene su propia interfaz: no entra al panel administrativo.
+  useEffect(() => {
+    if (_hidratado && estaAutenticado && esDocentePuro(usuario)) {
+      router.replace('/docente');
+    }
+  }, [_hidratado, estaAutenticado, usuario, router]);
+
   if (!_hidratado) {
     return null;
   }
 
-  if (!estaAutenticado) {
+  if (!estaAutenticado || esDocentePuro(usuario)) {
     return null;
   }
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
+import { rutaInicio } from '@/libreria/autenticacion';
 import { AlertCircle, Lock, User } from 'lucide-react';
 
 export default function AccederPage() {
@@ -11,13 +12,13 @@ export default function AccederPage() {
   const [contrasena, setContrasena] = useState('');
   const [cargando, setCargando] = useState(false);
   const router = useRouter();
-  const { iniciarSesion, estaAutenticado, _hidratado } = usarAlmacenAutenticacion();
+  const { iniciarSesion, estaAutenticado, _hidratado, usuario } = usarAlmacenAutenticacion();
 
   useEffect(() => {
     if (_hidratado && estaAutenticado) {
-      router.push('/panel');
+      router.push(rutaInicio(usuario));
     }
-  }, [_hidratado, estaAutenticado, router]);
+  }, [_hidratado, estaAutenticado, usuario, router]);
 
   const enviarFormulario = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +27,8 @@ export default function AccederPage() {
 
     try {
       await iniciarSesion(nombreUsuario, contrasena);
-      router.push('/panel');
+      const usuarioActual = usarAlmacenAutenticacion.getState().usuario;
+      router.push(rutaInicio(usuarioActual));
     } catch (err: any) {
       setError(err.response?.data?.mensaje || 'Credenciales inválidas');
     } finally {

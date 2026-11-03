@@ -175,6 +175,13 @@ export const CATALOGO_PERMISOS: ModuloPermiso[] = [
     grupo: 'Sistema',
     acciones: [AccionPermiso.LEER, AccionPermiso.CREAR, AccionPermiso.ELIMINAR],
   },
+  {
+    modulo: 'docente',
+    nombre: 'Mi Docencia',
+    descripcion: 'Panel, materias y calificaciones del docente',
+    grupo: 'Docencia',
+    acciones: [AccionPermiso.LEER, AccionPermiso.CREAR],
+  },
 ];
 
 /**

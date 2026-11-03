@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
-import { etiquetaRol, colorRol } from '@/libreria/autenticacion';
+import { etiquetaRol, colorRol, esDocentePuro } from '@/libreria/autenticacion';
 import { Bell, LogOut, User, Settings, ChevronDown, Menu, UserCircle, Palette } from 'lucide-react';
 import { cn } from '@/libreria/utilidades';
 
@@ -92,30 +92,34 @@ export default function Encabezado({ titulo, alHacerClicMenu }: PropsEncabezado)
                 </div>
 
                 <div className="py-1">
-                  <Link
-                    href="/perfil"
-                    onClick={() => setDesplegableAbierto(false)}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    <UserCircle className="w-4 h-4" />
-                    Mi perfil
-                  </Link>
-                  <Link
-                    href="/configuracion/apariencia"
-                    onClick={() => setDesplegableAbierto(false)}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    <Palette className="w-4 h-4" />
-                    Apariencia
-                  </Link>
-                  <Link
-                    href="/configuracion/institucion"
-                    onClick={() => setDesplegableAbierto(false)}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    <Settings className="w-4 h-4" />
-                    Configuración
-                  </Link>
+                  {!esDocentePuro(usuario) && (
+                    <>
+                      <Link
+                        href="/perfil"
+                        onClick={() => setDesplegableAbierto(false)}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      >
+                        <UserCircle className="w-4 h-4" />
+                        Mi perfil
+                      </Link>
+                      <Link
+                        href="/configuracion/apariencia"
+                        onClick={() => setDesplegableAbierto(false)}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      >
+                        <Palette className="w-4 h-4" />
+                        Apariencia
+                      </Link>
+                      <Link
+                        href="/configuracion/institucion"
+                        onClick={() => setDesplegableAbierto(false)}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      >
+                        <Settings className="w-4 h-4" />
+                        Configuración
+                      </Link>
+                    </>
+                  )}
                   <button
                     onClick={cerrarSesionUsuario}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50"

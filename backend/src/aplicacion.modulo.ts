@@ -30,6 +30,7 @@ import { ModuloConsentimiento } from './modulos/consentimiento/consentimiento.mo
 import { ModuloDocumentos } from './modulos/documentos/documentos.modulo';
 import { ModuloNotificaciones } from './modulos/notificaciones/notificaciones.modulo';
 import { ModuloPreinscripcion } from './modulos/preinscripcion/preinscripcion.modulo';
+import { ModuloDocente } from './modulos/docente/docente.modulo';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { ModuloPreinscripcion } from './modulos/preinscripcion/preinscripcion.mo
     ModuloDocumentos,
     ModuloNotificaciones,
     ModuloPreinscripcion,
+    ModuloDocente,
   ],
 })
 export class ModuloAplicacion {}

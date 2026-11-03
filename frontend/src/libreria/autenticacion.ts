@@ -26,3 +26,26 @@ export const colorRol = (rol: Rol): string => {
 export const formatearNombreRol = (usuario: Usuario): string => {
   return etiquetaRol(usuario.rol);
 };
+
+/** Códigos de rol del usuario, contemplando el rol principal y la lista. */
+export const codigosRol = (usuario?: Usuario | null): string[] => {
+  if (!usuario) return [];
+  if (usuario.roles && usuario.roles.length > 0) {
+    return usuario.roles.map((rol: any) => rol.codigo || rol);
+  }
+  return usuario.rol ? [usuario.rol] : [];
+};
+
+/**
+ * Un docente "puro" es quien tiene el rol docente y no es administrador.
+ * Solo ese perfil entra a la interfaz /docente.
+ */
+export const esDocentePuro = (usuario?: Usuario | null): boolean => {
+  const roles = codigosRol(usuario);
+  return roles.includes('docente') && !roles.includes('administrador');
+};
+
+/** Ruta de inicio según el perfil del usuario. */
+export const rutaInicio = (usuario?: Usuario | null): string => {
+  return esDocentePuro(usuario) ? '/docente' : '/panel';
+};

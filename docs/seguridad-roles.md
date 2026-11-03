@@ -68,6 +68,7 @@ El catálogo vive en `backend/src/modulos/permisos/catalogo-permisos.ts` y se ex
 - Personal: `personal`, `asistencias`.
 - Documentación y reportes: `certificados`, `documentos`, `credenciales`, `reportes`,
   `notificaciones`, `consentimiento`.
+- Docencia: `docente` (interfaz propia del docente).
 - Sistema: `almacenamiento`.
 
 Cada módulo declara las acciones que admite. Por ejemplo, `reportes` solo admite `leer` y
