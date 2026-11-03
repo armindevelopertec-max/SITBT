@@ -182,6 +182,13 @@ export const CATALOGO_PERMISOS: ModuloPermiso[] = [
     grupo: 'Docencia',
     acciones: [AccionPermiso.LEER, AccionPermiso.CREAR],
   },
+  {
+    modulo: 'portal_estudiante',
+    nombre: 'Mi Espacio',
+    descripcion: 'Panel, materias y notas del estudiante (solo lectura)',
+    grupo: 'Docencia',
+    acciones: [AccionPermiso.LEER],
+  },
 ];
 
 /**

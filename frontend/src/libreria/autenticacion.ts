@@ -45,7 +45,36 @@ export const esDocentePuro = (usuario?: Usuario | null): boolean => {
   return roles.includes('docente') && !roles.includes('administrador');
 };
 
+/** Roles que pertenecen al panel administrativo o a la docencia. */
+const ROLES_INTERNOS = [
+  'administrador',
+  'secretaria',
+  'director_academico',
+  'rector',
+  'docente',
+  'apoyo',
+];
+
+/**
+ * Un estudiante "puro" es quien tiene el rol estudiante y ningún rol interno.
+ * Solo ese perfil entra a la interfaz /estudiante.
+ */
+export const esEstudiantePuro = (usuario?: Usuario | null): boolean => {
+  const roles = codigosRol(usuario);
+  return (
+    roles.includes('estudiante') &&
+    !roles.some((rol) => ROLES_INTERNOS.includes(rol))
+  );
+};
+
+/** Indica si el usuario tiene una interfaz propia distinta al panel. */
+export const tienePortalPropio = (usuario?: Usuario | null): boolean => {
+  return esDocentePuro(usuario) || esEstudiantePuro(usuario);
+};
+
 /** Ruta de inicio según el perfil del usuario. */
 export const rutaInicio = (usuario?: Usuario | null): string => {
-  return esDocentePuro(usuario) ? '/docente' : '/panel';
+  if (esDocentePuro(usuario)) return '/docente';
+  if (esEstudiantePuro(usuario)) return '/estudiante';
+  return '/panel';
 };

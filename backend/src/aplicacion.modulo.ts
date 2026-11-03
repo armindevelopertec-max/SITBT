@@ -31,6 +31,7 @@ import { ModuloDocumentos } from './modulos/documentos/documentos.modulo';
 import { ModuloNotificaciones } from './modulos/notificaciones/notificaciones.modulo';
 import { ModuloPreinscripcion } from './modulos/preinscripcion/preinscripcion.modulo';
 import { ModuloDocente } from './modulos/docente/docente.modulo';
+import { ModuloEstudiante } from './modulos/estudiante/estudiante.modulo';
 
 @Module({
   imports: [
@@ -84,6 +85,7 @@ import { ModuloDocente } from './modulos/docente/docente.modulo';
     ModuloNotificaciones,
     ModuloPreinscripcion,
     ModuloDocente,
+    ModuloEstudiante,
   ],
 })
 export class ModuloAplicacion {}

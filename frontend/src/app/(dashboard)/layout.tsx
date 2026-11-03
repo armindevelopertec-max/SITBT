@@ -9,7 +9,7 @@ import {
 import BarraLateral from '@/componentes/diseno/BarraLateral';
 import Encabezado from '@/componentes/diseno/Encabezado';
 import api from '@/libreria/api';
-import { esDocentePuro } from '@/libreria/autenticacion';
+import { tienePortalPropio, rutaInicio } from '@/libreria/autenticacion';
 import { cn } from '@/libreria/utilidades';
 
 export default function DisenoPanel({
@@ -64,10 +64,10 @@ export default function DisenoPanel({
     }
   }, [_hidratado, estaAutenticado, router]);
 
-  // El docente tiene su propia interfaz: no entra al panel administrativo.
+  // Docentes y estudiantes tienen su propia interfaz: no entran al panel.
   useEffect(() => {
-    if (_hidratado && estaAutenticado && esDocentePuro(usuario)) {
-      router.replace('/docente');
+    if (_hidratado && estaAutenticado && tienePortalPropio(usuario)) {
+      router.replace(rutaInicio(usuario));
     }
   }, [_hidratado, estaAutenticado, usuario, router]);
 
@@ -75,7 +75,7 @@ export default function DisenoPanel({
     return null;
   }
 
-  if (!estaAutenticado || esDocentePuro(usuario)) {
+  if (!estaAutenticado || tienePortalPropio(usuario)) {
     return null;
   }
 

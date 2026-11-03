@@ -56,6 +56,7 @@ export class GuardaRoles implements CanActivate {
     consentimiento: 'consentimiento',
     almacenamiento: 'almacenamiento',
     docente: 'docente',
+    estudiante: 'portal_estudiante',
   };
 
   private static readonly ACCION_POR_METODO: Record<string, AccionPermiso> = {
