@@ -6,8 +6,9 @@ import Link from 'next/link';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { etiquetaRol, colorRol, esDocentePuro, esEstudiantePuro } from '@/libreria/autenticacion';
 import { usarTema } from '@/tema/proveedor-tema';
-import { LogOut, User, Settings, ChevronDown, Menu, UserCircle, Sun, Moon, Monitor } from 'lucide-react';
+import { LogOut, Settings, ChevronDown, Menu, UserCircle, Sun, Moon, Monitor } from 'lucide-react';
 import { cn } from '@/libreria/utilidades';
+import { AvatarUsuario } from './AvatarUsuario';
 
 interface PropsEncabezado {
   titulo?: string;
@@ -102,9 +103,7 @@ export default function Encabezado({ titulo, alHacerClicMenu }: PropsEncabezado)
               onClick={() => setDesplegableAbierto(!desplegableAbierto)}
               className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <User className="w-4 h-4 text-primary" />
-              </div>
+              <AvatarUsuario />
               <div className="hidden sm:block text-left">
                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{usuario?.nombreUsuario}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">{usuario?.correo}</p>

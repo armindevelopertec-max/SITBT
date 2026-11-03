@@ -23,6 +23,9 @@ En el encabezado está el mismo selector de tema que en el resto del sistema,
 con las opciones **Claro**, **Oscuro** y **Sistema**. La preferencia se guarda
 en el equipo y el color principal es siempre cian.
 
+El avatar del usuario es el mismo componente en el encabezado y en el pie de la
+barra lateral: círculo de 32 px con fondo cian translúcido.
+
 ## Acceso
 
 - Un usuario con rol `estudiante` y **sin roles internos** (`administrador`,

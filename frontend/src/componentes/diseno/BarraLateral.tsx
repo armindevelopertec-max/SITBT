@@ -5,7 +5,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/libreria/utilidades';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { usarConfiguracionInstitucional } from '@/ganchos/usarConfiguracionInstitucional';
-import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, ClipboardList, Award, CreditCard, FileText, RefreshCw, BarChart3, Shield, ShieldCheck, User, BookMarked, CalendarCheck, Settings, Building2, Calendar, ClipboardCheck, FileBadge, Fingerprint, LogOut } from 'lucide-react';
+import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, ClipboardList, Award, CreditCard, FileText, RefreshCw, BarChart3, Shield, ShieldCheck, BookMarked, CalendarCheck, Settings, Building2, Calendar, ClipboardCheck, FileBadge, Fingerprint, LogOut } from 'lucide-react';
+import { AvatarUsuario } from './AvatarUsuario';
 
 interface ElementoMenu {
   titulo: string;
@@ -287,9 +288,7 @@ export default function BarraLateral({ colapsada, abierta = true, alCerrar, alCo
 
           <div className="p-4 border-t border-gray-200 dark:border-gray-800">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                <User className="w-5 h-5 text-primary-600" />
-              </div>
+              <AvatarUsuario />
               {!colapsada && (
                 <>
                   <div className="flex-1 min-w-0">

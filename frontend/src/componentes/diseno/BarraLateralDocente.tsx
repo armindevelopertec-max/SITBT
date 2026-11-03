@@ -5,7 +5,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/libreria/utilidades';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { usarConfiguracionInstitucional } from '@/ganchos/usarConfiguracionInstitucional';
-import { BookOpen, LayoutDashboard, LogOut, Menu, User, X } from 'lucide-react';
+import { BookOpen, LayoutDashboard, LogOut, Menu, X } from 'lucide-react';
+import { AvatarUsuario } from './AvatarUsuario';
 
 interface PropsBarraLateralDocente {
   colapsada: boolean;
@@ -140,9 +141,7 @@ export default function BarraLateralDocente({
 
           <div className="p-4 border-t border-gray-200 dark:border-gray-800">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                <User className="w-5 h-5 text-primary-600" />
-              </div>
+              <AvatarUsuario />
               {!colapsada && (
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
