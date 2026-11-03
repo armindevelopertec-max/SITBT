@@ -79,42 +79,42 @@ function FormularioPreRegistro() {
 
   if (exito) {
     return (
-      <div className="bg-dark-900 min-h-screen flex items-center justify-center py-16">
+      <div className="bg-background min-h-screen flex items-center justify-center py-16">
         <div className="max-w-2xl mx-auto px-4 text-center">
           <div className="w-20 h-20 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-10 h-10" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-100 mb-4">
+          <h1 className="text-3xl font-bold text-foreground mb-4">
             ¡Pre-registro exitoso!
           </h1>
-          <p className="text-gray-400 mb-8">
+          <p className="text-muted-foreground mb-8">
             Tu solicitud ha sido recibida. Por favor, dirígete a secretaría con tus documentos
             originales para completar el proceso de verificación.
           </p>
-          <div className="bg-dark-700 rounded-xl p-6 mb-8 text-left">
-            <h3 className="font-semibold text-gray-100 mb-4">Documentos necesarios:</h3>
-            <ul className="text-gray-400 space-y-2">
+          <div className="bg-muted rounded-xl p-6 mb-8 text-left">
+            <h3 className="font-semibold text-foreground mb-4">Documentos necesarios:</h3>
+            <ul className="text-muted-foreground space-y-2">
               <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
+                <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                 Cédula de Identidad original
               </li>
               <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
+                <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                 Certificado de nacimiento original
               </li>
               <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
+                <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                 Título de bachiller o diploma original
               </li>
               <li className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
+                <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                 4 fotografías tamaño carnet
               </li>
             </ul>
           </div>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-primary-500 text-gray-100 font-semibold rounded-lg hover:bg-primary-700 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary-700 transition-all"
           >
             Volver al inicio <ArrowRight className="w-5 h-5" />
           </Link>
@@ -124,12 +124,12 @@ function FormularioPreRegistro() {
   }
 
   return (
-    <div className="bg-dark-900 min-h-screen py-16">
+    <div className="bg-background min-h-screen py-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Encabezado */}
         <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-100 mb-3 sm:mb-4">Pre-registro</h1>
-          <p className="text-gray-400 text-sm sm:text-base">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">Pre-registro</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Completa el formulario para iniciar tu proceso de admisión
           </p>
         </div>
@@ -143,17 +143,17 @@ function FormularioPreRegistro() {
 
         <form onSubmit={enviarFormulario} className="space-y-8">
           {/* Datos Personales */}
-          <div className="bg-dark-700 rounded-2xl p-6 sm:p-8">
+          <div className="bg-muted rounded-2xl p-6 sm:p-8">
             <div className="flex items-center gap-3 mb-4 sm:mb-6">
-              <div className="w-10 h-10 bg-primary-500/20 text-primary-400 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary/20 text-primary rounded-lg flex items-center justify-center">
                 <User className="w-5 h-5" />
               </div>
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-100">Datos Personales</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground">Datos Personales</h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Nombres *
                 </label>
                 <input
@@ -162,13 +162,13 @@ function FormularioPreRegistro() {
                   value={formulario.nombre}
                   onChange={cambiarCampo}
                   required
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                   placeholder="Juan Carlos"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Apellido Paterno
                 </label>
                 <input
@@ -176,13 +176,13 @@ function FormularioPreRegistro() {
                   name="apellidoPaterno"
                   value={formulario.apellidoPaterno || ''}
                   onChange={cambiarCampo}
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                   placeholder="Pérez"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Apellido Materno
                 </label>
                 <input
@@ -190,13 +190,13 @@ function FormularioPreRegistro() {
                   name="apellidoMaterno"
                   value={formulario.apellidoMaterno || ''}
                   onChange={cambiarCampo}
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                   placeholder="López"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Cédula de Identidad *
                 </label>
                 <input
@@ -205,13 +205,13 @@ function FormularioPreRegistro() {
                   value={formulario.ci}
                   onChange={cambiarCampo}
                   required
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                   placeholder="12345678"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Fecha de nacimiento *
                 </label>
                 <input
@@ -220,19 +220,19 @@ function FormularioPreRegistro() {
                   value={formulario.fechaNacimiento}
                   onChange={cambiarCampo}
                   required
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Lugar de nacimiento
                 </label>
                 <select
                   name="lugarNacimiento"
                   value={formulario.lugarNacimiento || ''}
                   onChange={cambiarCampo}
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                 >
                   <option value="">Seleccionar</option>
                   <option value="La Paz">La Paz</option>
@@ -254,14 +254,14 @@ function FormularioPreRegistro() {
                     name="lugarNacimientoOtro"
                     value={formulario.lugarNacimientoOtro || ''}
                     onChange={cambiarCampo}
-                    className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                    className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                     placeholder="Especificar lugar de nacimiento"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Género *
                 </label>
                 <div className="flex gap-6">
@@ -272,9 +272,9 @@ function FormularioPreRegistro() {
                       value="M"
                       checked={formulario.genero === 'M'}
                       onChange={cambiarCampo}
-                      className="w-4 h-4 text-primary-500 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary focus:ring-ring"
                     />
-                    <span className="text-sm text-gray-300">Masculino</span>
+                    <span className="text-sm text-foreground">Masculino</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -283,15 +283,15 @@ function FormularioPreRegistro() {
                       value="F"
                       checked={formulario.genero === 'F'}
                       onChange={cambiarCampo}
-                      className="w-4 h-4 text-primary-500 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary focus:ring-ring"
                     />
-                    <span className="text-sm text-gray-300">Femenino</span>
+                    <span className="text-sm text-foreground">Femenino</span>
                   </label>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Estado civil
                 </label>
                 <div className="flex gap-6">
@@ -302,9 +302,9 @@ function FormularioPreRegistro() {
                       value="Soltera(o)"
                       checked={formulario.estadoCivil === 'Soltera(o)'}
                       onChange={cambiarCampo}
-                      className="w-4 h-4 text-primary-500 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary focus:ring-ring"
                     />
-                    <span className="text-sm text-gray-300">Soltero(a)</span>
+                    <span className="text-sm text-foreground">Soltero(a)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -313,22 +313,22 @@ function FormularioPreRegistro() {
                       value="Casada(o)"
                       checked={formulario.estadoCivil === 'Casada(o)'}
                       onChange={cambiarCampo}
-                      className="w-4 h-4 text-primary-500 focus:ring-primary-500"
+                      className="w-4 h-4 text-primary focus:ring-ring"
                     />
-                    <span className="text-sm text-gray-300">Casado(a)</span>
+                    <span className="text-sm text-foreground">Casado(a)</span>
                   </label>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Nacionalidad
                 </label>
                 <select
                   name="nacionalidad"
                   value={formulario.nacionalidad || 'Boliviana'}
                   onChange={cambiarCampo}
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                 >
                   <option value="Boliviana">Boliviana</option>
                   <option value="Argentina">Argentina</option>
@@ -348,14 +348,14 @@ function FormularioPreRegistro() {
                     name="nacionalidadOtra"
                     value={formulario.nacionalidadOtra || ''}
                     onChange={cambiarCampo}
-                    className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                    className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                     placeholder="Ingrese su nacionalidad"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Teléfono
                 </label>
                 <input
@@ -363,14 +363,14 @@ function FormularioPreRegistro() {
                   name="telefono"
                   value={formulario.telefono || ''}
                   onChange={cambiarCampo}
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                   placeholder="71234567"
                 />
               </div>
             </div>
 
             <div className="mt-5">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Correo electrónico *
               </label>
               <input
@@ -379,13 +379,13 @@ function FormularioPreRegistro() {
                 value={formulario.correo}
                 onChange={cambiarCampo}
                 required
-                className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                 placeholder="juan@ejemplo.com"
               />
             </div>
 
             <div className="mt-5">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Dirección
               </label>
               <input
@@ -393,23 +393,23 @@ function FormularioPreRegistro() {
                 name="direccion"
                 value={formulario.direccion || ''}
                 onChange={cambiarCampo}
-                className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                 placeholder="Zona, calle, número"
               />
             </div>
           </div>
 
           {/* Datos Académicos */}
-          <div className="bg-dark-700 rounded-2xl p-6 sm:p-8">
+          <div className="bg-muted rounded-2xl p-6 sm:p-8">
             <div className="flex items-center gap-3 mb-4 sm:mb-6">
-              <div className="w-10 h-10 bg-primary-500/20 text-primary-400 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary/20 text-primary rounded-lg flex items-center justify-center">
                 <BookOpen className="w-5 h-5" />
               </div>
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-100">Datos Académicos</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground">Datos Académicos</h2>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Carrera de interés *
               </label>
               <select
@@ -417,7 +417,7 @@ function FormularioPreRegistro() {
                 value={formulario.carreraId || ''}
                 onChange={cambiarCampo}
                 required
-                className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
               >
                 <option value="">Seleccionar carrera</option>
                 {carreras.map((carrera) => (
@@ -439,18 +439,18 @@ function FormularioPreRegistro() {
             const edadReal = edad - (mesDiff < 0 || (mesDiff === 0 && diaDiff < 0) ? 1 : 0);
             return edadReal < 18;
           })() && (
-          <div className="bg-dark-700 rounded-2xl p-6 sm:p-8">
+          <div className="bg-muted rounded-2xl p-6 sm:p-8">
             <div className="flex items-center gap-3 mb-4 sm:mb-6">
-              <div className="w-10 h-10 bg-primary-500/20 text-primary-400 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary/20 text-primary rounded-lg flex items-center justify-center">
                 <User className="w-5 h-5" />
               </div>
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-100">Datos del Tutor</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground">Datos del Tutor</h2>
             </div>
-            <p className="text-gray-400 text-sm mb-4 sm:mb-6">Solo para menores de 18 años</p>
+            <p className="text-muted-foreground text-sm mb-4 sm:mb-6">Solo para menores de 18 años</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Nombre del tutor
                 </label>
                 <input
@@ -458,12 +458,12 @@ function FormularioPreRegistro() {
                   name="nombreTutor"
                   value={formulario.nombreTutor || ''}
                   onChange={cambiarCampo}
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   CI del tutor
                 </label>
                 <input
@@ -471,12 +471,12 @@ function FormularioPreRegistro() {
                   name="ciTutor"
                   value={formulario.ciTutor || ''}
                   onChange={cambiarCampo}
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Teléfono del tutor
                 </label>
                 <input
@@ -484,7 +484,7 @@ function FormularioPreRegistro() {
                   name="telefonoTutor"
                   value={formulario.telefonoTutor || ''}
                   onChange={cambiarCampo}
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                  className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                 />
               </div>
             </div>
@@ -492,10 +492,10 @@ function FormularioPreRegistro() {
           )}
 
           {/* Privacidad */}
-          <div className="bg-dark-700/50 rounded-xl p-4 sm:p-6">
-            <p className="text-xs sm:text-sm text-gray-400">
+          <div className="bg-muted/50 rounded-xl p-4 sm:p-6">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Al enviar este formulario, aceptas nuestra{' '}
-              <Link href="/legal/politica-privacidad" className="text-primary-400 hover:text-primary-300 underline">
+              <Link href="/legal/politica-privacidad" className="text-primary hover:text-primary underline">
                 Política de Privacidad
               </Link>{' '}
               y consientes el tratamiento de tus datos personales.
@@ -506,14 +506,14 @@ function FormularioPreRegistro() {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end">
             <Link
               href="/admision"
-              className="px-4 sm:px-6 py-3 sm:py-4 border border-dark-600 text-gray-300 font-medium rounded-lg hover:bg-zinc-800 transition-all text-center"
+              className="px-4 sm:px-6 py-3 sm:py-4 border border-border text-foreground font-medium rounded-lg hover:bg-zinc-800 transition-all text-center"
             >
               Cancelar
             </Link>
             <button
               type="submit"
               disabled={cargando}
-              className="px-6 sm:px-8 py-3 sm:py-4 bg-primary-500 text-gray-100 font-semibold rounded-lg hover:bg-primary-700 disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
+              className="px-6 sm:px-8 py-3 sm:py-4 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary-700 disabled:opacity-50 flex items-center justify-center gap-2 transition-all"
             >
               {cargando ? (
                 <>
@@ -537,8 +537,8 @@ function FormularioPreRegistro() {
 export default function PreRegistroPage() {
   return (
     <Suspense fallback={
-      <div className="bg-dark-900 min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-dark-600 border-t-primary-600 rounded-full animate-spin" />
+      <div className="bg-background min-h-screen flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-border border-t-primary rounded-full animate-spin" />
       </div>
     }>
       <FormularioPreRegistro />

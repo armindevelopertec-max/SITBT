@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/libreria/utilidades';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { usarConfiguracionInstitucional } from '@/ganchos/usarConfiguracionInstitucional';
+import { primerNombreUsuario } from '@/libreria/autenticacion';
 import { BookOpen, LayoutDashboard, LogOut, Menu, X } from 'lucide-react';
 import { AvatarUsuario } from './AvatarUsuario';
 
@@ -39,6 +40,7 @@ export default function BarraLateralDocente({
   const router = useRouter();
   const { usuario, cerrarSesion } = usarAlmacenAutenticacion();
   const { configuracion } = usarConfiguracionInstitucional();
+  const nombreVisible = primerNombreUsuario(usuario);
 
   const cerrarSesionUsuario = () => {
     cerrarSesion();
@@ -145,7 +147,7 @@ export default function BarraLateralDocente({
               {!colapsada && (
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                    {usuario?.nombreUsuario}
+                    {nombreVisible}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                     Docente

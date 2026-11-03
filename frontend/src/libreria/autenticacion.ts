@@ -1,4 +1,4 @@
-import { Usuario, Rol } from '@/tipos';
+import { Usuario, Rol, Persona } from '@/tipos';
 
 /**
  * Etiquetas y colores sugeridos para los roles conocidos del sistema.
@@ -77,4 +77,35 @@ export const rutaInicio = (usuario?: Usuario | null): string => {
   if (esDocentePuro(usuario)) return '/docente';
   if (esEstudiantePuro(usuario)) return '/estudiante';
   return '/panel';
+};
+
+/**
+ * Nombre completo de la persona a la que pertenece el usuario.
+ * Si la persona no está cargada, se recurre al nombre de usuario.
+ */
+export const nombreCompletoUsuario = (usuario?: Usuario | null): string => {
+  if (!usuario) return '';
+  const persona = usuario.persona;
+  if (!persona) return usuario.nombreUsuario || '';
+  const completo = [persona.nombres, persona.apellidoPaterno, persona.apellidoMaterno]
+    .filter(Boolean)
+    .join(' ')
+    .trim();
+  return completo || usuario.nombreUsuario || '';
+};
+
+/**
+ * Primer nombre de la persona, para mostrarlo en lugares con poco espacio
+ * (por ejemplo, el encabezado y el pie de la barra lateral).
+ */
+export const primerNombreUsuario = (usuario?: Usuario | null): string => {
+  if (!usuario) return '';
+  const nombres = usuario.persona?.nombres?.trim();
+  if (!nombres) return usuario.nombreUsuario || '';
+  return nombres.split(/\s+/)[0] || usuario.nombreUsuario || '';
+};
+
+/** Persona asociada al usuario, si el backend la devolvió. */
+export const personaUsuario = (usuario?: Usuario | null): Persona | null => {
+  return usuario?.persona ?? null;
 };

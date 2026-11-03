@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/libreria/utilidades';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { usarConfiguracionInstitucional } from '@/ganchos/usarConfiguracionInstitucional';
+import { nombreCompletoUsuario } from '@/libreria/autenticacion';
 import { Menu, X, Home, Users, GraduationCap, UserCog, BookOpen, FolderKanban, ClipboardList, Award, CreditCard, FileText, RefreshCw, BarChart3, Shield, ShieldCheck, BookMarked, CalendarCheck, Settings, Building2, Calendar, ClipboardCheck, FileBadge, Fingerprint, LogOut } from 'lucide-react';
 import { AvatarUsuario } from './AvatarUsuario';
 
@@ -166,6 +167,7 @@ export default function BarraLateral({ colapsada, abierta = true, alCerrar, alCo
         ? [usuario.rol]
         : [];
   const { configuracion } = usarConfiguracionInstitucional();
+  const nombreVisible = nombreCompletoUsuario(usuario);
   const permisosUsuario: string[] = usuario?.permisos ?? [];
   const esAdministrador = rolesUsuario.includes('administrador');
 
@@ -293,7 +295,7 @@ export default function BarraLateral({ colapsada, abierta = true, alCerrar, alCo
                 <>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                      {usuario?.nombreUsuario}
+                      {nombreVisible}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate capitalize">
                       {rolesUsuario[0]?.replace('_', ' ') || 'Usuario'}

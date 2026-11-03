@@ -37,20 +37,20 @@ export default function AccederPage() {
   };
 
   return (
-    <div className="min-h-screen bg-dark-900 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-500/10 mb-4">
-              <Lock className="w-8 h-8 text-primary-400" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+              <Lock className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-100">Acceso al Sistema</h1>
-            <p className="text-gray-400 mt-2">Ingrese sus credenciales para continuar</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Acceso al Sistema</h1>
+            <p className="text-muted-foreground mt-2">Ingrese sus credenciales para continuar</p>
           </div>
 
-          <div className="bg-dark-700 border border-dark-600 rounded-2xl p-6 sm:p-8">
+          <div className="bg-card border border-border rounded-2xl p-6 sm:p-8">
             {error && (
-              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400">
+              <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-xl flex items-center gap-3 text-destructive">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 <span className="text-sm">{error}</span>
               </div>
@@ -58,16 +58,16 @@ export default function AccederPage() {
 
             <form onSubmit={enviarFormulario} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Usuario
                 </label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="text"
                     value={nombreUsuario}
                     onChange={(e) => setNombreUsuario(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
+                    className="w-full pl-12 pr-4 py-3 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring transition-all"
                     placeholder="Ingrese su usuario"
                     required
                   />
@@ -75,16 +75,16 @@ export default function AccederPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Contraseña
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="password"
                     value={contrasena}
                     onChange={(e) => setContrasena(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
+                    className="w-full pl-12 pr-4 py-3 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring transition-all"
                     placeholder="Ingrese su contraseña"
                     required
                   />
@@ -94,7 +94,7 @@ export default function AccederPage() {
               <button
                 type="submit"
                 disabled={cargando}
-                className="w-full py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {cargando ? (
                   <span className="flex items-center justify-center gap-2">
@@ -111,7 +111,7 @@ export default function AccederPage() {
             </form>
           </div>
 
-          <p className="text-center text-xs text-gray-500 mt-6">
+          <p className="text-center text-xs text-muted-foreground mt-6">
             © {new Date().getFullYear()} ITBT - Todos los derechos reservados
           </p>
         </div>

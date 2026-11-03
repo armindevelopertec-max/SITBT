@@ -7,6 +7,7 @@ import { Tarjeta, ContenidoTarjeta, EncabezadoTarjeta, TituloTarjeta } from '@/c
 import { Migas } from '@/componentes/iu/migas';
 import { Users, GraduationCap, UserCog, BookOpen, Clock, Fingerprint } from 'lucide-react';
 import { api } from '@/libreria/api';
+import { nombreCompletoUsuario } from '@/libreria/autenticacion';
 import { EstadoPersonalHoy } from '@/tipos';
 
 const formatearHora = (iso?: string | null) =>
@@ -123,7 +124,7 @@ export default function PaginaPanel() {
       <Migas elementos={[{ etiqueta: 'Panel' }]} />
 
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Bienvenido, {usuario?.nombreUsuario}</h1>
+        <h1 className="text-2xl font-bold text-foreground">Bienvenido, {nombreCompletoUsuario(usuario)}</h1>
         <p className="text-muted-foreground mt-1">
           Rol: <span className="font-medium capitalize">{usuario?.rol?.replace('_', ' ')}</span>
         </p>

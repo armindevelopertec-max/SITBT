@@ -184,23 +184,23 @@ export default function PaginaCarreras() {
 
   if (cargando) {
     return (
-      <div className="bg-dark-900 min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-gray-700 border-t-primary-600 rounded-full animate-spin" />
+      <div className="bg-background min-h-screen flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-border border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="bg-dark-900">
+    <div className="bg-background">
       {/* Encabezado */}
-      <section className="relative h-64 sm:h-80 overflow-hidden bg-dark-900">
+      <section className="relative h-64 sm:h-80 overflow-hidden bg-background">
         <div className="absolute inset-0 opacity-30">
           <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80" alt="" className="w-full h-full object-cover" />
         </div>
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-100 mb-3 sm:mb-4">Nuestras Carreras</h1>
-            <p className="text-lg sm:text-xl text-primary-400">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4">Nuestras Carreras</h1>
+            <p className="text-lg sm:text-xl text-primary">
               Programas técnicos superiores autorizados por el Ministerio de Educación
             </p>
           </div>
@@ -208,11 +208,11 @@ export default function PaginaCarreras() {
       </section>
 
       {/* Carreras */}
-      <section className="bg-dark-900 text-gray-100 py-16 sm:py-24">
+      <section className="bg-background text-foreground py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-6 sm:space-y-8">
             {carreras.map((carrera) => (
-              <div key={carrera.id} className="bg-dark-700 rounded-2xl overflow-hidden">
+              <div key={carrera.id} className="bg-muted rounded-2xl overflow-hidden">
                 <div className="md:flex">
                   {/* Imagen */}
                   <div className="md:w-1/3 relative">
@@ -234,19 +234,19 @@ export default function PaginaCarreras() {
                             Activo
                           </span>
                         </div>
-                        <p className="text-primary-400 font-medium text-sm sm:text-base">{carrera.titulo}</p>
+                        <p className="text-primary font-medium text-sm sm:text-base">{carrera.titulo}</p>
                       </div>
                       <Link
                         href={`/admision/pre-registro?carrera=${carrera.id}`}
-                        className="hidden md:flex items-center gap-2 px-6 py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all"
+                        className="hidden md:flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all"
                       >
                         Postular <ArrowRight className="w-4 h-4" />
                       </Link>
                     </div>
 
-                    <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">{carrera.descripcion}</p>
+                    <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">{carrera.descripcion}</p>
 
-                    <div className="flex flex-wrap gap-4 sm:gap-6 text-sm text-gray-500 mb-4 sm:mb-6">
+                    <div className="flex flex-wrap gap-4 sm:gap-6 text-sm text-muted-foreground mb-4 sm:mb-6">
                       <div className="flex items-center gap-2">
                         <Award className="w-4 h-4" />
                         <span>{carrera.area}</span>
@@ -268,7 +268,7 @@ export default function PaginaCarreras() {
                     <div className="flex flex-col sm:flex-row gap-4">
                       <Link
                         href={`/carreras/${carrera.id}`}
-                        className="inline-flex items-center gap-2 text-primary-400 font-semibold hover:text-primary-300 transition-colors text-sm sm:text-base"
+                        className="inline-flex items-center gap-2 text-primary font-semibold hover:text-primary transition-colors text-sm sm:text-base"
                       >
                         Ver Malla Curricular <ArrowRight className="w-4 h-4" />
                       </Link>
@@ -276,7 +276,7 @@ export default function PaginaCarreras() {
                       <div className="mt-4 md:hidden">
                         <Link
                           href={`/admision/pre-registro?carrera=${carrera.id}`}
-                          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all"
+                          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all"
                         >
                           Postular <ArrowRight className="w-4 h-4" />
                         </Link>
@@ -291,17 +291,17 @@ export default function PaginaCarreras() {
       </section>
 
       {/* Llamada a la acción */}
-      <section className="bg-dark-700 py-12 sm:py-16">
+      <section className="bg-muted py-12 sm:py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-3 sm:mb-4">¿Quieres más información?</h2>
-          <p className="text-gray-400 mb-5 sm:mb-6 text-sm sm:text-base">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 sm:mb-4">¿Quieres más información?</h2>
+          <p className="text-muted-foreground mb-5 sm:mb-6 text-sm sm:text-base">
             Contáctanos o visítanos para conocer más sobre nuestras carreras.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <Link href="/contacto" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-primary-500 text-dark-900 font-semibold rounded-lg hover:bg-primary-400 transition-all">
+            <Link href="/contacto" className="px-5 sm:px-6 py-2.5 sm:py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all">
               Contactar
             </Link>
-            <Link href="/admision/pre-registro" className="px-5 sm:px-6 py-2.5 sm:py-3 border-2 border-primary-500 text-primary-400 font-semibold rounded-lg hover:bg-primary-500/10 transition-all">
+            <Link href="/admision/pre-registro" className="px-5 sm:px-6 py-2.5 sm:py-3 border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary/10 transition-all">
               Pre-registro
             </Link>
           </div>

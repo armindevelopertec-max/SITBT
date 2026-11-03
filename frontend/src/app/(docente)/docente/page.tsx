@@ -20,6 +20,7 @@ import {
 } from '@/componentes/iu/tabla';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { api } from '@/libreria/api';
+import { nombreCompletoUsuario } from '@/libreria/autenticacion';
 import {
   BookOpen,
   CalendarClock,
@@ -60,15 +61,7 @@ export default function PaginaPanelDocente() {
     };
   }, []);
 
-  const nombreDocente = usuario?.persona
-    ? [
-        usuario.persona.nombres,
-        usuario.persona.apellidoPaterno,
-        usuario.persona.apellidoMaterno,
-      ]
-        .filter(Boolean)
-        .join(' ')
-    : '';
+  const nombreDocente = nombreCompletoUsuario(usuario);
 
   const tarjetas = [
     {

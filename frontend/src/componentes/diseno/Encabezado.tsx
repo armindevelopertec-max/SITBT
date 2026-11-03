@@ -4,29 +4,23 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
-import { etiquetaRol, colorRol, esDocentePuro, esEstudiantePuro } from '@/libreria/autenticacion';
-import { usarTema } from '@/tema/proveedor-tema';
-import { LogOut, Settings, ChevronDown, Menu, UserCircle, Sun, Moon, Monitor } from 'lucide-react';
+import { etiquetaRol, colorRol, esDocentePuro, esEstudiantePuro, primerNombreUsuario } from '@/libreria/autenticacion';
+import { LogOut, Settings, ChevronDown, Menu, UserCircle } from 'lucide-react';
 import { cn } from '@/libreria/utilidades';
 import { AvatarUsuario } from './AvatarUsuario';
+import { SelectorTema } from './SelectorTema';
 
 interface PropsEncabezado {
   titulo?: string;
   alHacerClicMenu?: () => void;
 }
 
-const opcionesTema = [
-  { valor: 'claro', etiqueta: 'Claro', icono: Sun },
-  { valor: 'oscuro', etiqueta: 'Oscuro', icono: Moon },
-  { valor: 'sistema', etiqueta: 'Sistema', icono: Monitor },
-] as const;
-
 export default function Encabezado({ titulo, alHacerClicMenu }: PropsEncabezado) {
   const [desplegableAbierto, setDesplegableAbierto] = useState(false);
   const refDesplegable = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { usuario, cerrarSesion } = usarAlmacenAutenticacion();
-  const { tema, establecerTema } = usarTema();
+  const nombreVisible = primerNombreUsuario(usuario);
   const esDocente = esDocentePuro(usuario);
   const esEstudiante = esEstudiantePuro(usuario);
   const rutaPerfil = esDocente
@@ -68,35 +62,7 @@ export default function Encabezado({ titulo, alHacerClicMenu }: PropsEncabezado)
         </div>
 
         <div className="flex items-center gap-3">
-          <div
-            className="flex items-center rounded-lg border border-gray-200 bg-gray-50 p-0.5 dark:border-gray-800 dark:bg-gray-800/50"
-            role="group"
-            aria-label="Tema de la interfaz"
-          >
-            {opcionesTema.map((opcion) => {
-              const Icono = opcion.icono;
-              const activo = tema === opcion.valor;
-
-              return (
-                <button
-                  key={opcion.valor}
-                  type="button"
-                  onClick={() => establecerTema(opcion.valor)}
-                  className={cn(
-                    'p-1.5 rounded-md transition-colors',
-                    activo
-                      ? 'bg-white text-primary shadow-sm dark:bg-gray-700 dark:text-primary-300'
-                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                  )}
-                  title={`Tema ${opcion.etiqueta.toLowerCase()}`}
-                  aria-label={`Tema ${opcion.etiqueta.toLowerCase()}`}
-                  aria-pressed={activo}
-                >
-                  <Icono className="w-4 h-4" />
-                </button>
-              );
-            })}
-          </div>
+          <SelectorTema />
 
           <div className="relative" ref={refDesplegable}>
             <button
@@ -105,7 +71,7 @@ export default function Encabezado({ titulo, alHacerClicMenu }: PropsEncabezado)
             >
               <AvatarUsuario />
               <div className="hidden sm:block text-left">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{usuario?.nombreUsuario}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{nombreVisible}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">{usuario?.correo}</p>
               </div>
               <ChevronDown
@@ -119,7 +85,7 @@ export default function Encabezado({ titulo, alHacerClicMenu }: PropsEncabezado)
             {desplegableAbierto && (
               <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-card rounded-lg shadow-lg border border-gray-200 dark:border-gray-800 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{usuario?.nombreUsuario}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{nombreVisible}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{usuario?.correo}</p>
                   <span
                     className={cn(

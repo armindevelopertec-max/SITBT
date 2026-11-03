@@ -23,6 +23,9 @@ sistema es siempre cian.
 El avatar del usuario es el mismo componente en el encabezado y en el pie de la
 barra lateral: círculo de 32 px con fondo cian translúcido.
 
+En el encabezado y en la barra lateral se muestra el **primer nombre** de la
+persona (por ejemplo, `Geobany`), no el nombre de usuario.
+
 ## Acceso
 
 - Un usuario con rol `docente` (y sin rol `administrador`) va a `/docente`

@@ -26,6 +26,9 @@ en el equipo y el color principal es siempre cian.
 El avatar del usuario es el mismo componente en el encabezado y en el pie de la
 barra lateral: círculo de 32 px con fondo cian translúcido.
 
+En el encabezado y en la barra lateral se muestra el **primer nombre** de la
+persona (por ejemplo, `WENCESLAO`), no el nombre de usuario.
+
 ## Acceso
 
 - Un usuario con rol `estudiante` y **sin roles internos** (`administrador`,
