@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { etiquetaRol, colorRol, esDocentePuro, esEstudiantePuro } from '@/libreria/autenticacion';
 import { usarTema } from '@/tema/proveedor-tema';
-import { Bell, LogOut, User, Settings, ChevronDown, Menu, UserCircle, Palette, Sun, Moon } from 'lucide-react';
+import { LogOut, User, Settings, ChevronDown, Menu, UserCircle, Palette, Sun, Moon } from 'lucide-react';
 import { cn } from '@/libreria/utilidades';
 
 interface PropsEncabezado {
@@ -74,11 +74,6 @@ export default function Encabezado({ titulo, alHacerClicMenu }: PropsEncabezado)
             ) : (
               <Moon className="w-5 h-5 text-slate-800 dark:text-slate-200" />
             )}
-          </button>
-
-          <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
           </button>
 
           <div className="relative" ref={refDesplegable}>

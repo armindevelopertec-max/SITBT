@@ -20,9 +20,8 @@ Malla Curricular**. En el menú del usuario (arriba a la derecha) están **Mi
 perfil** y **Cerrar sesión**; no se muestran **Apariencia** ni
 **Configuración**.
 
-Junto a la campana de notificaciones está el mismo botón de tema que en el
-resto del sistema (sol dorado / media luna oscura) para alternar entre modo
-claro y oscuro.
+En el encabezado está el mismo botón de tema que en el resto del sistema
+(sol dorado / media luna oscura) para alternar entre modo claro y oscuro.
 
 ## Acceso
 

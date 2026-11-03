@@ -16,9 +16,9 @@ El menú lateral del docente solo muestra **Mi Panel** y **Mis Materias**. En el
 menú del usuario (arriba a la derecha) están **Mi perfil** y **Cerrar sesión**;
 no se muestran **Apariencia** ni **Configuración**.
 
-Junto a la campana de notificaciones hay un botón con ícono de sol dorado o
-media luna oscura para alternar entre modo claro y oscuro sin entrar a una
-pantalla de configuración. La preferencia se guarda en el equipo.
+En el encabezado hay un botón con ícono de sol dorado o media luna oscura
+para alternar entre modo claro y oscuro sin entrar a una pantalla de
+configuración. La preferencia se guarda en el equipo.
 
 ## Acceso
 
