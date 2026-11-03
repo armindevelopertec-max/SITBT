@@ -206,7 +206,7 @@ export default function BarraLateral({ colapsada, abierta = true, alCerrar, alCo
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-800">
-            {!colapsada ? (
+            {!colapsada && (
               <div className="flex flex-col min-w-0">
                 <div className="flex items-center gap-2">
                   {configuracion?.logoUrl ? (
@@ -230,20 +230,6 @@ export default function BarraLateral({ colapsada, abierta = true, alCerrar, alCo
                   {configuracion?.lema || 'Instituto Tecnológico'}
                 </span>
               </div>
-            ) : (
-              configuracion?.logoUrl ? (
-                <img
-                  src={configuracion.logoUrl}
-                  alt="Logo"
-                  className="w-8 h-8 object-contain"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
-                  <span className="text-sm font-bold text-primary-600">
-                    {configuracion?.nombreCorto?.charAt(0) || 'S'}
-                  </span>
-                </div>
-              )
             )}
             <button
               onClick={alColapsar}
