@@ -95,12 +95,6 @@ export default function DisenoPanel({
         alCerrar={() => setBarraLateralAbierta(false)}
         alColapsar={() => setBarraLateralColapsada(!barraLateralColapsada)}
       />
-      {esMovil && barraLateralAbierta && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-          onClick={() => setBarraLateralAbierta(false)}
-        />
-      )}
       <div
         className={cn(
           'transition-all duration-300',
@@ -108,7 +102,7 @@ export default function DisenoPanel({
         )}
       >
         <Encabezado alHacerClicMenu={manejarClicMenu} />
-        <main className="p-6">{children}</main>
+        <main className="p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );
