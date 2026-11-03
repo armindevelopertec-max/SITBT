@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client } from 'minio';
+import { ServicioOptimizacionImagen } from './servicio-optimizacion-imagen';
 
 export interface ArchivoSubido {
   nombreArchivo: string;
@@ -16,7 +17,10 @@ export class ServicioAlmacenamiento {
   private bucket: string;
   private usarSSL: boolean;
 
-  constructor(private servicioConfiguracion: ConfigService) {
+  constructor(
+    private servicioConfiguracion: ConfigService,
+    private servicioOptimizacion: ServicioOptimizacionImagen,
+  ) {
     this.bucket = this.servicioConfiguracion.get('MINIO_BUCKET', 'sitbt-files');
     this.usarSSL = this.servicioConfiguracion.get('MINIO_USE_SSL', 'false') === 'true';
 
@@ -49,27 +53,48 @@ export class ServicioAlmacenamiento {
     carpeta: string = 'general',
   ): Promise<ArchivoSubido> {
     try {
-      const nombreArchivo = `${carpeta}/${Date.now()}-${archivo.originalname}`;
+      const optimizada = await this.servicioOptimizacion.optimizar(
+        archivo.buffer,
+        archivo.mimetype,
+        carpeta,
+      );
+
+      const nombreArchivo = `${carpeta}/${Date.now()}-${this.nombreSinExtension(
+        archivo.originalname,
+      )}.${optimizada.extension}`;
+
       await this.clienteMinio.putObject(
         this.bucket,
         nombreArchivo,
-        archivo.buffer,
-        archivo.size,
-        { 'Content-Type': archivo.mimetype },
+        optimizada.buffer,
+        optimizada.buffer.length,
+        { 'Content-Type': optimizada.tipoMime },
       );
 
       const url = `/api/almacenamiento/archivos/${nombreArchivo}`;
 
+      if (optimizada.pesoOptimizado < optimizada.pesoOriginal) {
+        console.log(
+          `Imagen optimizada ${nombreArchivo}: ${(optimizada.pesoOriginal / 1024).toFixed(1)} KB -> ${(optimizada.pesoOptimizado / 1024).toFixed(1)} KB`,
+        );
+      }
+
       return {
         nombreArchivo,
         nombreOriginal: archivo.originalname,
-        tipoMime: archivo.mimetype,
-        tamano: archivo.size,
+        tipoMime: optimizada.tipoMime,
+        tamano: optimizada.buffer.length,
         url,
       };
     } catch (error: any) {
       throw new InternalServerErrorException(`No se pudo subir el archivo: ${error.message}`);
     }
+  }
+
+  /** Quita la extensión del nombre original del archivo. */
+  private nombreSinExtension(nombre: string): string {
+    const punto = nombre.lastIndexOf('.');
+    return punto > 0 ? nombre.slice(0, punto) : nombre;
   }
 
   async subirBuffer(
@@ -79,22 +104,37 @@ export class ServicioAlmacenamiento {
     carpeta: string = 'general',
   ): Promise<ArchivoSubido> {
     try {
-      const rutaCompleta = `${carpeta}/${nombreArchivo}`;
+      const optimizada = await this.servicioOptimizacion.optimizar(
+        buffer,
+        tipoMime,
+        carpeta,
+      );
+
+      const rutaCompleta = `${carpeta}/${this.nombreSinExtension(
+        nombreArchivo,
+      )}.${optimizada.extension}`;
+
       await this.clienteMinio.putObject(
         this.bucket,
         rutaCompleta,
-        buffer,
-        buffer.length,
-        { 'Content-Type': tipoMime },
+        optimizada.buffer,
+        optimizada.buffer.length,
+        { 'Content-Type': optimizada.tipoMime },
       );
 
       const url = `/api/almacenamiento/archivos/${rutaCompleta}`;
 
+      if (optimizada.pesoOptimizado < optimizada.pesoOriginal) {
+        console.log(
+          `Imagen optimizada ${rutaCompleta}: ${(optimizada.pesoOriginal / 1024).toFixed(1)} KB -> ${(optimizada.pesoOptimizado / 1024).toFixed(1)} KB`,
+        );
+      }
+
       return {
         nombreArchivo: rutaCompleta,
         nombreOriginal: nombreArchivo,
-        tipoMime,
-        tamano: buffer.length,
+        tipoMime: optimizada.tipoMime,
+        tamano: optimizada.buffer.length,
         url,
       };
     } catch (error: any) {
