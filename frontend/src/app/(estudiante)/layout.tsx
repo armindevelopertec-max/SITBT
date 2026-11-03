@@ -9,7 +9,7 @@ import {
 import BarraLateralEstudiante from '@/componentes/diseno/BarraLateralEstudiante';
 import Encabezado from '@/componentes/diseno/Encabezado';
 import api from '@/libreria/api';
-import { esEstudiantePuro } from '@/libreria/autenticacion';
+import { esEstudiantePuro, rutaInicio } from '@/libreria/autenticacion';
 import { cn } from '@/libreria/utilidades';
 
 /**
@@ -73,7 +73,7 @@ export default function DisenoEstudiante({
       usuario &&
       !esEstudiantePuro(usuario)
     ) {
-      router.replace('/panel');
+      router.replace(rutaInicio(usuario));
     }
   }, [_hidratado, estaAutenticado, usuario, router]);
 

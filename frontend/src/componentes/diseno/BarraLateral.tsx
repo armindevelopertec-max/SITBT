@@ -13,6 +13,7 @@ interface ElementoMenu {
   icono: React.ReactNode;
   modulo: string;
   soloAdministrador?: boolean;
+  sinPermiso?: boolean;
 }
 
 interface SeccionMenu {
@@ -28,16 +29,17 @@ interface PropsBarraLateral {
 }
 
 const seccionesMenu: SeccionMenu[] = [
-  // {
-  //   elementos: [
-  //     {
-  //       titulo: 'Panel Principal',
-  //       href: '/panel',
-  //       icono: <Home className="w-5 h-5" />,
-  //       modulo: 'panel',
-  //     },
-  //   ],
-  // },
+  {
+    elementos: [
+      {
+        titulo: 'Panel Principal',
+        href: '/panel',
+        icono: <Home className="w-5 h-5" />,
+        modulo: 'panel',
+        sinPermiso: true,
+      },
+    ],
+  },
   {
     titulo: 'Gestion de Admisiones y Estudiantes',
     elementos: [
@@ -170,6 +172,7 @@ export default function BarraLateral({ colapsada, abierta = true, alCerrar, alCo
       ...seccion,
       elementos: seccion.elementos.filter((elemento) => {
         if (!usuario) return false;
+        if (elemento.sinPermiso) return true;
         if (elemento.soloAdministrador) return esAdministrador;
         return (
           esAdministrador ||

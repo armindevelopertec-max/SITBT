@@ -9,7 +9,7 @@ import {
 import BarraLateralDocente from '@/componentes/diseno/BarraLateralDocente';
 import Encabezado from '@/componentes/diseno/Encabezado';
 import api from '@/libreria/api';
-import { esDocentePuro } from '@/libreria/autenticacion';
+import { esDocentePuro, rutaInicio } from '@/libreria/autenticacion';
 import { cn } from '@/libreria/utilidades';
 
 /**
@@ -73,7 +73,7 @@ export default function DisenoDocente({
       usuario &&
       !esDocentePuro(usuario)
     ) {
-      router.replace('/panel');
+      router.replace(rutaInicio(usuario));
     }
   }, [_hidratado, estaAutenticado, usuario, router]);
 
