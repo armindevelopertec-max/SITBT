@@ -32,6 +32,12 @@ export class ControladorEstudiante {
     return this.servicio.resumen(peticion.user.id);
   }
 
+  /** Malla curricular del plan de estudio con el que ingresó el estudiante. */
+  @Get('malla')
+  obtenerMalla(@Request() peticion) {
+    return this.servicio.obtenerMalla(peticion.user.id);
+  }
+
   /** Materias que el estudiante autenticado está cursando. */
   @Get('materias')
   listarMisMaterias(@Request() peticion, @Query('gestion') gestion?: string) {

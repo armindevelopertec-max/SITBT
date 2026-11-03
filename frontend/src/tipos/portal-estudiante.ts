@@ -77,3 +77,55 @@ export interface ResumenEstudiante {
   notasRegistradas: number;
   promedioGeneral: number | null;
 }
+
+/** Estado de una materia dentro de la malla curricular del estudiante. */
+export type EstadoMateriaMalla =
+  | 'aprobada'
+  | 'cursando'
+  | 'reprobada'
+  | 'pendiente';
+
+export interface MateriaMallaEstudiante {
+  id: number;
+  codigo: string;
+  nombre: string;
+  semestre: number;
+  horasSemanales: number;
+  estado: EstadoMateriaMalla;
+  notaFinal: number | null;
+  gestion: string | null;
+  prerrequisito: { codigo: string; nombre: string } | null;
+}
+
+export interface SemestreMallaEstudiante {
+  semestre: number;
+  materias: MateriaMallaEstudiante[];
+}
+
+export interface MallaEstudiante {
+  estudiante: {
+    id: number;
+    codigoInscripcion: string;
+    nombres: string;
+    apellidoPaterno: string;
+    apellidoMaterno: string;
+    carrera: { id: number; nombre: string } | null;
+  };
+  plan: {
+    id: number;
+    numeroRm: string;
+    fechaRm: string;
+    estado: string;
+    carrera: { id: number; nombre: string } | null;
+  } | null;
+  resumen: {
+    totalMaterias: number;
+    aprobadas: number;
+    cursando: number;
+    reprobadas: number;
+    pendientes: number;
+    porcentajeAvance: number;
+    semestreActual: number | null;
+  };
+  semestres: SemestreMallaEstudiante[];
+}

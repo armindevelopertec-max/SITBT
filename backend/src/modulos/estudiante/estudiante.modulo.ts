@@ -5,6 +5,7 @@ import { Calificacion } from '../../entidades/calificacion.entidad';
 import { Estudiante } from '../../entidades/estudiante.entidad';
 import { InscripcionMateria } from '../../entidades/inscripcion-materia.entidad';
 import { LibroCalificaciones } from '../../entidades/libro-calificaciones.entidad';
+import { MateriaPlan } from '../../entidades/materia-plan.entidad';
 import { Usuario } from '../../entidades/usuario.entidad';
 import { ControladorEstudiante } from './estudiante.controlador';
 import { ServicioEstudiante } from './estudiante.servicio';
@@ -15,6 +16,7 @@ import { ServicioEstudiante } from './estudiante.servicio';
       Usuario,
       Estudiante,
       InscripcionMateria,
+      MateriaPlan,
       Calificacion,
       AsignacionDocente,
       LibroCalificaciones,

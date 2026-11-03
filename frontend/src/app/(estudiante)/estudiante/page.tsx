@@ -151,12 +151,20 @@ export default function PaginaPanelEstudiante() {
         <EncabezadoTarjeta>
           <div className="flex items-center justify-between gap-3">
             <TituloTarjeta>Mis materias</TituloTarjeta>
-            <Link
-              href="/estudiante/materias"
-              className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline"
-            >
-              Ver todas
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/estudiante/malla"
+                className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline"
+              >
+                Ver malla curricular
+              </Link>
+              <Link
+                href="/estudiante/materias"
+                className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline"
+              >
+                Ver todas
+              </Link>
+            </div>
           </div>
         </EncabezadoTarjeta>
         <ContenidoTarjeta className="p-0">

@@ -6,6 +6,7 @@ import { Calificacion } from '../../entidades/calificacion.entidad';
 import { Estudiante } from '../../entidades/estudiante.entidad';
 import { EstadoInscripcionMateria, InscripcionMateria } from '../../entidades/inscripcion-materia.entidad';
 import { LibroCalificaciones } from '../../entidades/libro-calificaciones.entidad';
+import { MateriaPlan } from '../../entidades/materia-plan.entidad';
 import { Personal } from '../../entidades/personal.entidad';
 import { Usuario } from '../../entidades/usuario.entidad';
 
@@ -25,6 +26,8 @@ export class ServicioEstudiante {
     private repositorioEstudiante: Repository<Estudiante>,
     @InjectRepository(InscripcionMateria)
     private repositorioInscripcion: Repository<InscripcionMateria>,
+    @InjectRepository(MateriaPlan)
+    private repositorioMateriaPlan: Repository<MateriaPlan>,
     @InjectRepository(Calificacion)
     private repositorioCalificacion: Repository<Calificacion>,
     @InjectRepository(AsignacionDocente)
@@ -190,6 +193,237 @@ export class ServicioEstudiante {
         ),
       };
     });
+  }
+
+  /**
+   * Malla curricular del plan con el que ingresó el estudiante autenticado.
+   *
+   * Se usa `estudiante.planEstudioId` y no el plan vigente de la carrera:
+   * un estudiante puede seguir un plan histórico. Cada materia se cruza con
+   * sus inscripciones para mostrar avance, estado y nota final.
+   */
+  async obtenerMalla(usuarioId: number): Promise<any> {
+    const estudiante = await this.obtenerEstudianteDelUsuario(usuarioId);
+
+    if (!estudiante.planEstudioId) {
+      throw new NotFoundException('No tienes un plan de estudio asignado');
+    }
+
+    const materiasPlan = await this.repositorioMateriaPlan.find({
+      where: { planEstudioId: estudiante.planEstudioId },
+      relations: ['materia'],
+    });
+
+    const materiasPlanOrdenadas = [...materiasPlan].sort((a, b) => {
+      if (a.semestre !== b.semestre) {
+        return a.semestre - b.semestre;
+      }
+      return (a.materia?.codigo ?? '').localeCompare(b.materia?.codigo ?? '');
+    });
+
+    const materiasPlanPorId = new Map(
+      materiasPlanOrdenadas.map((materiaPlan) => [materiaPlan.id, materiaPlan]),
+    );
+
+    const inscripciones = await this.repositorioInscripcion.find({
+      where: { estudianteId: estudiante.id },
+      relations: ['materiaImpartida'],
+    });
+
+    const inscripcionesPorPlan = new Map<number, InscripcionMateria[]>();
+    const inscripcionesPorMateria = new Map<number, InscripcionMateria[]>();
+
+    for (const inscripcion of inscripciones) {
+      const materiaImpartida = inscripcion.materiaImpartida;
+      if (!materiaImpartida) {
+        continue;
+      }
+
+      if (materiaImpartida.materiaPlanId != null) {
+        const lista =
+          inscripcionesPorPlan.get(materiaImpartida.materiaPlanId) ?? [];
+        lista.push(inscripcion);
+        inscripcionesPorPlan.set(materiaImpartida.materiaPlanId, lista);
+      } else {
+        const lista =
+          inscripcionesPorMateria.get(materiaImpartida.materiaId) ?? [];
+        lista.push(inscripcion);
+        inscripcionesPorMateria.set(materiaImpartida.materiaId, lista);
+      }
+    }
+
+    const idsInscripcion = inscripciones.map((inscripcion) => inscripcion.id);
+    const calificaciones = idsInscripcion.length
+      ? await this.repositorioCalificacion.find({
+          where: { inscripcionMateriaId: In(idsInscripcion) },
+        })
+      : [];
+    const calificacionPorInscripcion = new Map(
+      calificaciones.map((calificacion) => [
+        calificacion.inscripcionMateriaId,
+        calificacion,
+      ]),
+    );
+
+    const materias = materiasPlanOrdenadas.map((materiaPlan) => {
+      const propias = [
+        ...(inscripcionesPorPlan.get(materiaPlan.id) ?? []),
+        ...(inscripcionesPorMateria.get(materiaPlan.materiaId) ?? []),
+      ];
+      const inscripcionesUnicas = Array.from(
+        new Map(
+          propias.map((inscripcion) => [inscripcion.id, inscripcion]),
+        ).values(),
+      );
+      const referencia = this.inscripcionReferenciaMalla(inscripcionesUnicas);
+      const calificacion = referencia
+        ? calificacionPorInscripcion.get(referencia.id)
+        : null;
+      const prerrequisito =
+        materiaPlan.prerrequisitoId != null
+          ? materiasPlanPorId.get(materiaPlan.prerrequisitoId)
+          : null;
+
+      return {
+        id: materiaPlan.id,
+        codigo: materiaPlan.materia?.codigo ?? '',
+        nombre: materiaPlan.materia?.nombre ?? '',
+        semestre: materiaPlan.semestre,
+        horasSemanales: materiaPlan.horasSemanales,
+        estado: this.estadoMalla(inscripcionesUnicas),
+        notaFinal: calificacion?.notaDefinitiva ?? null,
+        gestion: referencia?.materiaImpartida?.gestion ?? null,
+        prerrequisito: prerrequisito?.materia
+          ? {
+              codigo: prerrequisito.materia.codigo,
+              nombre: prerrequisito.materia.nombre,
+            }
+          : null,
+      };
+    });
+
+    const aprobadas = materias.filter(
+      (materia) => materia.estado === 'aprobada',
+    ).length;
+    const cursando = materias.filter(
+      (materia) => materia.estado === 'cursando',
+    ).length;
+    const reprobadas = materias.filter(
+      (materia) => materia.estado === 'reprobada',
+    ).length;
+    const pendientes = materias.filter(
+      (materia) => materia.estado === 'pendiente',
+    ).length;
+    const semestresCursando = materias
+      .filter((materia) => materia.estado === 'cursando')
+      .map((materia) => materia.semestre);
+
+    const semestres = [...new Set(materias.map((materia) => materia.semestre))]
+      .sort((a, b) => a - b)
+      .map((semestre) => ({
+        semestre,
+        materias: materias.filter((materia) => materia.semestre === semestre),
+      }));
+
+    const plan = estudiante.plan_estudio;
+
+    return {
+      estudiante: {
+        id: estudiante.id,
+        codigoInscripcion: estudiante.codigoInscripcion,
+        nombres: estudiante.persona?.nombres ?? '',
+        apellidoPaterno: estudiante.persona?.apellidoPaterno ?? '',
+        apellidoMaterno: estudiante.persona?.apellidoMaterno ?? '',
+        carrera: estudiante.carrera
+          ? { id: estudiante.carrera.id, nombre: estudiante.carrera.nombre }
+          : null,
+      },
+      plan: plan
+        ? {
+            id: plan.id,
+            numeroRm: plan.numeroRm,
+            fechaRm: plan.fechaRm,
+            estado: plan.estado,
+            carrera: estudiante.carrera
+              ? {
+                  id: estudiante.carrera.id,
+                  nombre: estudiante.carrera.nombre,
+                }
+              : null,
+          }
+        : null,
+      resumen: {
+        totalMaterias: materias.length,
+        aprobadas,
+        cursando,
+        reprobadas,
+        pendientes,
+        porcentajeAvance:
+          materias.length > 0
+            ? Math.round((aprobadas / materias.length) * 100)
+            : 0,
+        semestreActual:
+          semestresCursando.length > 0
+            ? Math.max(...semestresCursando)
+            : null,
+      },
+      semestres,
+    };
+  }
+
+  private estadoMalla(
+    inscripciones: InscripcionMateria[],
+  ): 'aprobada' | 'cursando' | 'reprobada' | 'pendiente' {
+    if (
+      inscripciones.some(
+        (inscripcion) =>
+          inscripcion.estado === EstadoInscripcionMateria.APROBADO,
+      )
+    ) {
+      return 'aprobada';
+    }
+    if (
+      inscripciones.some(
+        (inscripcion) =>
+          inscripcion.estado === EstadoInscripcionMateria.CURSANDO,
+      )
+    ) {
+      return 'cursando';
+    }
+    if (
+      inscripciones.some(
+        (inscripcion) =>
+          inscripcion.estado === EstadoInscripcionMateria.REPROBADO,
+      )
+    ) {
+      return 'reprobada';
+    }
+    return 'pendiente';
+  }
+
+  private inscripcionReferenciaMalla(
+    inscripciones: InscripcionMateria[],
+  ): InscripcionMateria | null {
+    const prioridad = [
+      EstadoInscripcionMateria.APROBADO,
+      EstadoInscripcionMateria.CURSANDO,
+      EstadoInscripcionMateria.REPROBADO,
+      EstadoInscripcionMateria.RETIRADO,
+    ];
+
+    for (const estado of prioridad) {
+      const encontrada = inscripciones
+        .filter((inscripcion) => inscripcion.estado === estado)
+        .sort(
+          (a, b) =>
+            new Date(b.creadoEn).getTime() - new Date(a.creadoEn).getTime(),
+        )[0];
+      if (encontrada) {
+        return encontrada;
+      }
+    }
+
+    return null;
   }
 
   /** Resumen para el panel del estudiante. */

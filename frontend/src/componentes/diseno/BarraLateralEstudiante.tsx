@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/libreria/utilidades';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { usarConfiguracionInstitucional } from '@/ganchos/usarConfiguracionInstitucional';
-import { BookOpen, LayoutDashboard, LogOut, Menu, User, X } from 'lucide-react';
+import { BookOpen, GraduationCap, LayoutDashboard, LogOut, Menu, User, X } from 'lucide-react';
 
 interface PropsBarraLateralEstudiante {
   colapsada: boolean;
@@ -24,6 +24,11 @@ const enlaces = [
     titulo: 'Mis Materias',
     href: '/estudiante/materias',
     icono: <BookOpen className="w-5 h-5" />,
+  },
+  {
+    titulo: 'Mi Malla Curricular',
+    href: '/estudiante/malla',
+    icono: <GraduationCap className="w-5 h-5" />,
   },
 ];
 
