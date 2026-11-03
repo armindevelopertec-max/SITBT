@@ -10,8 +10,16 @@ Entra automáticamente al iniciar sesión y **solo ve las materias que dicta**.
 | `/docente` | Mi Panel: resumen de materias, estudiantes, grupos y carga horaria |
 | `/docente/materias` | Listado de sus materias con buscador |
 | `/docente/materias/:id` | Detalle: pestañas **Estudiantes** y **Calificaciones** |
+| `/docente/perfil` | Datos personales y de la cuenta del docente |
+| `/docente/apariencia` | Apariencia: solo modo **claro** u **oscuro** |
 
-El menú lateral del docente solo muestra **Mi Panel** y **Mis Materias**.
+El menú lateral del docente solo muestra **Mi Panel** y **Mis Materias**. En el
+menú del usuario (arriba a la derecha) están **Mi perfil**, **Apariencia** y
+**Cerrar sesión**; no se muestra **Configuración**.
+
+Junto a la campana de notificaciones hay un botón con ícono de sol/luna para
+alternar entre modo claro y oscuro sin entrar a una pantalla de configuración.
+La preferencia se guarda en el equipo.
 
 ## Acceso
 
