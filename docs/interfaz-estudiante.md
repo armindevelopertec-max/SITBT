@@ -17,11 +17,11 @@ puede modificar notas ni inscripciones.
 
 El menú lateral del estudiante muestra **Mi Panel**, **Mis Materias** y **Mi
 Malla Curricular**. En el menú del usuario (arriba a la derecha) están **Mi
-perfil** y **Cerrar sesión**; no se muestran **Apariencia** ni
-**Configuración**.
+perfil** y **Cerrar sesión**; no se muestra **Configuración**.
 
-En el encabezado está el mismo botón de tema que en el resto del sistema
-(sol dorado / media luna oscura) para alternar entre modo claro y oscuro.
+En el encabezado está el mismo selector de tema que en el resto del sistema,
+con las opciones **Claro**, **Oscuro** y **Sistema**. La preferencia se guarda
+en el equipo y el color principal es siempre cian.
 
 ## Acceso
 

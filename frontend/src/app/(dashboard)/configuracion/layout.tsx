@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/libreria/utilidades';
-import { Building2, Settings as SettingsIcon, Calendar, BookOpen, BookMarked, GraduationCap, Palette, GitCompare } from 'lucide-react';
+import { Building2, Settings as SettingsIcon, Calendar, BookOpen, BookMarked, GraduationCap, GitCompare } from 'lucide-react';
 
 interface PropsDisposicionConfiguracion {
   children: ReactNode;
@@ -46,12 +46,6 @@ const enlacesConfiguracion = [
     href: '/configuracion/convalidaciones',
     icono: GitCompare,
     descripcion: 'Equivalencias entre planes RM',
-  },
-  {
-    titulo: 'Apariencia',
-    href: '/configuracion/apariencia',
-    icono: Palette,
-    descripcion: 'Tema oscuro y color principal',
   },
 ];
 
