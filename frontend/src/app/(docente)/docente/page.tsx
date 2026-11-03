@@ -60,6 +60,16 @@ export default function PaginaPanelDocente() {
     };
   }, []);
 
+  const nombreDocente = usuario?.persona
+    ? [
+        usuario.persona.nombres,
+        usuario.persona.apellidoPaterno,
+        usuario.persona.apellidoMaterno,
+      ]
+        .filter(Boolean)
+        .join(' ')
+    : '';
+
   const tarjetas = [
     {
       titulo: 'Materias que dicto',
@@ -101,7 +111,7 @@ export default function PaginaPanelDocente() {
 
       <div>
         <h1 className="text-2xl font-bold text-foreground">
-          Bienvenido, {usuario?.nombreUsuario}
+          Bienvenido, {nombreDocente || usuario?.nombreUsuario}
         </h1>
         <p className="text-muted-foreground mt-1">
           Desde aquí puedes revisar tus materias, la lista de estudiantes y
