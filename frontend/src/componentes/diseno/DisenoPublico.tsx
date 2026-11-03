@@ -33,13 +33,13 @@ export default function DisenoPublico({ children }: { children: React.ReactNode 
                 <img
                   src={logoUrl}
                   alt={nombreInstitucion}
-                  className="h-12 w-auto object-contain transition-transform group-hover:scale-105"
+                  className="h-9 w-9 object-contain transition-transform group-hover:scale-105"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
                 />
               ) : (
-                <GraduationCap className="w-10 h-10 text-primary" />
+                <GraduationCap className="w-9 h-9 text-primary" />
               )}
               <div className="flex flex-col">
                 <span className="text-lg font-bold text-foreground tracking-tight leading-tight">{nombreInstitucion}</span>
@@ -139,13 +139,13 @@ export default function DisenoPublico({ children }: { children: React.ReactNode 
                   <img
                     src={logoUrl}
                     alt={nombreInstitucion}
-                    className="h-10 w-auto object-contain"
+                    className="h-8 w-8 object-contain"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                     }}
                   />
                 ) : (
-                  <GraduationCap className="w-8 h-8 lg:w-10 lg:h-10 text-primary" />
+                  <GraduationCap className="w-8 h-8 text-primary" />
                 )}
                 <div className="flex flex-col">
                   <span className="text-base lg:text-lg font-bold text-foreground leading-tight">{nombreInstitucion}</span>

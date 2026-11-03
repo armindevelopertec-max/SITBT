@@ -41,3 +41,9 @@ el modo oscuro. Antes se usaba una paleta oscura fija (`dark-800`, `dark-700`,
   variante `publico`.
 - `AvatarUsuario`: avatar genérico del usuario, idéntico en el encabezado y en
   el pie de las barras laterales.
+
+## Logo
+
+- El logo de la institución se muestra a 36 px en el encabezado público y a
+  32 px en el pie de la página y en las barras laterales del sistema.
+- La imagen se recorta con `object-contain` para que no se deforme.
