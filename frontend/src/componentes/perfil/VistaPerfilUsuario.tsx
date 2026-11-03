@@ -13,12 +13,11 @@ import { Boton } from '@/componentes/iu/boton';
 import { Insignia } from '@/componentes/iu/insignia';
 import { usarAlmacenAutenticacion } from '@/almacen/almacen-autenticacion';
 import { api } from '@/libreria/api';
-import { etiquetaRol, rutaInicio } from '@/libreria/autenticacion';
+import { rutaInicio } from '@/libreria/autenticacion';
 import { formatearFecha, mensajeDeError } from '@/libreria/utilidades';
 import { Loader2, Mail, Phone, RefreshCw, UserCircle } from 'lucide-react';
 
 interface PersonaPerfil {
-  id?: number;
   ci?: string;
   nombres?: string;
   apellidoPaterno?: string;
@@ -36,12 +35,9 @@ interface PersonaPerfil {
 }
 
 interface PerfilUsuario {
-  id: number;
   nombreUsuario: string;
-  personaId?: number;
   persona?: PersonaPerfil | null;
   estado?: string;
-  roles?: Array<{ id: number; codigo: string; nombre: string; estado?: string }>;
 }
 
 const nombreCompleto = (persona?: PersonaPerfil | null) => {
@@ -119,9 +115,6 @@ export default function VistaPerfilUsuario() {
 
   const persona = perfil.persona;
   const nombre = nombreCompleto(persona) || perfil.nombreUsuario;
-  const roles = perfil.roles || [];
-  const etiquetaDeRol = (rol: { codigo: string; nombre?: string }) =>
-    rol.nombre || etiquetaRol(rol.codigo as any);
 
   const datosPersonales = [
     { etiqueta: 'Nombres', valor: persona?.nombres },
@@ -150,14 +143,9 @@ export default function VistaPerfilUsuario() {
 
   const datosCuenta = [
     { etiqueta: 'Usuario', valor: perfil.nombreUsuario },
-    { etiqueta: 'ID de usuario', valor: String(perfil.id ?? '—') },
     {
-      etiqueta: 'ID de persona',
-      valor: String(perfil.personaId ?? persona?.id ?? '—'),
-    },
-    {
-      etiqueta: 'Roles',
-      valor: roles.length > 0 ? roles.map(etiquetaDeRol).join(', ') : '—',
+      etiqueta: 'Estado',
+      valor: perfil.estado === 'activo' ? 'Activo' : 'Inactivo',
     },
   ];
 
@@ -213,11 +201,6 @@ export default function VistaPerfilUsuario() {
                 {perfil.nombreUsuario}
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
-                {roles.map((rol) => (
-                  <Insignia key={rol.id} variante="primario">
-                    {etiquetaDeRol(rol)}
-                  </Insignia>
-                ))}
                 <Insignia
                   variante={perfil.estado === 'activo' ? 'exito' : 'error'}
                 >
